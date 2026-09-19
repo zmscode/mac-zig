@@ -603,6 +603,10 @@ pub const Context = struct {
 
     /// A copy of the current path, which the caller owns. Taking this
     /// before drawing is the other way to reuse a shape.
+    ///
+    /// `CGContextCopyPath` returns null when the current path is **empty**,
+    /// so this gives `error.Failed` rather than an empty `Path`. Check
+    /// `isPathEmpty` first if an empty path is a case you expect.
     pub fn copyPath(self: Context) Error!Path {
         return .{ .handle = try errors.checkPtr(raw.CGContextCopyPath(self.handle)) };
     }
