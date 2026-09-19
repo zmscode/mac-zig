@@ -62,6 +62,14 @@ pub const Format = union(enum) {
 pub const EncodeOptions = struct {
     /// 0 to 1, for the formats that lose detail -- JPEG and HEIC. Ignored
     /// by PNG and the other lossless formats.
+    ///
+    /// null takes ImageIO's own default, which is **not** maximum quality:
+    /// on a 6016x3384 screenshot it produced a 2.0 MB JPEG where
+    /// `.quality = 1.0` produced 5.3 MB. Say what you want rather than
+    /// inheriting that.
+    ///
+    /// PNG is lossless whatever this says, so a capture written with
+    /// `.png` keeps every pixel exactly.
     quality: ?f64 = null,
 };
 

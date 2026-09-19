@@ -15,6 +15,10 @@
 //! the geometry, the layer -- is available without it. A `null` `title` on
 //! a window that plainly has one means the permission is missing, not that
 //! the window is untitled, and no error is reported for it.
+//!
+//! `hasScreenCaptureAccess` answers the question directly, and
+//! `requestScreenCaptureAccess` prompts -- once, and once only, for the
+//! life of a process that has been refused.
 
 const std = @import("std");
 const raw = @import("mac_raw");
@@ -73,9 +77,16 @@ pub const Window = struct {
     /// whether or not the window has one.
     title: ?[]const u8,
 
-    /// A picture of this window, as an image the caller owns. Needs Screen
-    /// Recording permission, and is deprecated by Apple in macOS 15 in
-    /// favour of ScreenCaptureKit.
+    /// A picture of this window, as an image the caller owns, at the
+    /// window's real pixel size.
+    ///
+    /// Needs Screen Recording permission -- check `hasScreenCaptureAccess`
+    /// first. **Apple marks this obsoleted as of macOS 15**
+    /// (`obsoleted=15.0`, "Please use ScreenCaptureKit instead"), which in
+    /// C is a hard compile error. Zig's C translator ignores availability
+    /// attributes, so this compiles where clang would refuse, and it was
+    /// still working on macOS 26.6. There will be no warning on the day it
+    /// stops, only a null return.
     pub fn createImage(self: Window) Error!Image {
         const created = raw.CGWindowListCreateImage(
             Rect.nullRect().toRaw(),
@@ -100,6 +111,34 @@ pub const List = struct {
         allocator.free(self.windows);
     }
 };
+
+/// Whether this process has Screen Recording permission.
+///
+/// This is what window titles, `Window.createImage` and
+/// `Display.createImage` all need, and none of them report its absence as
+/// an error -- a missing title is indistinguishable from an untitled
+/// window, and a capture comes back null or blank depending on the
+/// version. Check here instead of inferring it from a failure.
+///
+/// The input-monitoring equivalents are `cg.event.hasListenAccess` and
+/// `requestListenAccess`.
+pub fn hasScreenCaptureAccess() bool {
+    return raw.CGPreflightScreenCaptureAccess();
+}
+
+/// Asks for Screen Recording permission, showing the system prompt.
+///
+/// **A process that has been denied once is never prompted again.** Apple's
+/// own header says so: after a refusal the only way back is System
+/// Settings -> Privacy & Security -> Screen Recording. So a `false` from
+/// this is final for the life of the process, and the right response is to
+/// tell the user where to go rather than to ask again.
+///
+/// Returns whether access is granted. Use `hasScreenCaptureAccess` to
+/// check without prompting.
+pub fn requestScreenCaptureAccess() bool {
+    return raw.CGRequestScreenCaptureAccess();
+}
 
 /// Every window matching `options`, in front-to-back order.
 ///
@@ -187,6 +226,21 @@ test "the visible preset is a subset of everything" {
     try std.testing.expect(visible.windows.len <= everything.windows.len);
     for (visible.windows) |window| {
         try std.testing.expect(window.is_on_screen);
+    }
+}
+
+test "screen capture access can be checked without prompting" {
+    // Only the preflight is called here. `requestScreenCaptureAccess`
+    // would put a system dialog in front of whoever is running the tests.
+    const granted = hasScreenCaptureAccess();
+
+    const found = try list(std.testing.allocator, .visible, 0);
+    defer found.deinit(std.testing.allocator);
+
+    if (!granted) {
+        // Without the permission no window reports a title, which is the
+        // symptom this call exists to explain.
+        for (found.windows) |window| try std.testing.expect(window.title == null);
     }
 }
 

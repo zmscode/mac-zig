@@ -79,7 +79,11 @@ try cg.imageio.writeContext(ctx, "out.png", .png, .{});
 7. **`bitmapData()` rows are padded.** The slice is `bytesPerRow * height`, and
    `bytesPerRow` is not always `width * 4`. Index with `bitmapBytesPerRow()`.
 8. **Permissions fail quietly.** `Event.post` does nothing without Accessibility; window
-   titles are `null` without Screen Recording. Neither reports an error.
+   titles are `null` and captures come back null or blank without Screen Recording. Neither
+   reports an error — call `cg.window.hasScreenCaptureAccess()` or
+   `cg.event.hasListenAccess()` instead of inferring it from a failure.
+9. **Size capture buffers from `Display.pixelSize()`, never `bounds()`.** On a Retina display
+   `bounds()` is points and a buffer sized from it holds a quarter of the pixels.
 
 ## Colours
 

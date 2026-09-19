@@ -38,6 +38,17 @@ pub const Display = struct {
         return .{ .id = raw.CGMainDisplayID() };
     }
 
+    /// A display from an id obtained elsewhere — SDL's
+    /// `SDL_PROP_DISPLAY_KHRDISPLAY_...`, an AppKit `NSScreen`'s
+    /// `NSScreenNumber`, or anything else that hands out a
+    /// `CGDirectDisplayID`.
+    ///
+    /// Nothing is checked: an id for a display that has gone away fails at
+    /// the call that uses it, not here.
+    pub fn fromId(id: raw.CGDirectDisplayID) Display {
+        return .{ .id = id };
+    }
+
     /// Every display that can currently draw. `buffer` is filled and the
     /// populated prefix returned, so no allocation happens here.
     pub fn active(buffer: *[max_displays]Display) Error![]Display {
@@ -68,9 +79,32 @@ pub const Display = struct {
         return .fromRaw(raw.CGDisplayBounds(self.id));
     }
 
-    /// The framebuffer size in pixels, which on a Retina display is larger
-    /// than `bounds`.
+    /// The real backing-store size in pixels. On a Retina display this is
+    /// larger than `bounds`, and it is the size a screen capture of this
+    /// display comes back at.
+    ///
+    /// This deliberately does **not** use `CGDisplayPixelsWide`, which
+    /// predates Retina and returns the size in *points* — on a 6016x3384
+    /// panel it answers 3008x1692, and a capture buffer sized from it
+    /// holds a quarter of the pixels. The number here comes from the
+    /// current display mode instead, which reports both sizes honestly.
+    ///
+    /// `legacyPixelSize` is the old value, for anyone who needs to match
+    /// what `CGDisplayPixelsWide` says.
     pub fn pixelSize(self: Display) Size {
+        if (self.currentMode()) |mode| {
+            defer mode.deinit();
+            return mode.pixelSize();
+        } else |_| {
+            // Only reachable for a display that has gone away mid-call.
+            return self.legacyPixelSize();
+        }
+    }
+
+    /// What `CGDisplayPixelsWide` and `CGDisplayPixelsHigh` report, which
+    /// is the size in points despite the name. Equal to `bounds().size`
+    /// on every display this has been seen on.
+    pub fn legacyPixelSize(self: Display) Size {
         return .{
             .width = @floatFromInt(raw.CGDisplayPixelsWide(self.id)),
             .height = @floatFromInt(raw.CGDisplayPixelsHigh(self.id)),
@@ -156,19 +190,30 @@ pub const Display = struct {
         include_scaled: bool = false,
     };
 
-    /// A screenshot of this display, as an image the caller owns.
+    /// A screenshot of this display, as an image the caller owns, at the
+    /// display's real pixel size -- `pixelSize`, not `bounds`.
     ///
-    /// On macOS 14 and later this needs Screen Recording permission, and
-    /// without it returns `error.Failed` -- or, worse on some versions, a
-    /// blank image. Apple deprecated it in macOS 15 in favour of
-    /// ScreenCaptureKit, which is not part of CoreGraphics and so is not
-    /// wrapped here.
+    /// Needs Screen Recording permission; check for it with
+    /// `cg.window.hasScreenCaptureAccess` first, because without it this
+    /// returns `error.Failed` on some versions and a blank image on
+    /// others.
+    ///
+    /// **Apple marks this obsoleted as of macOS 15**
+    /// (`obsoleted=15.0`, "Please use ScreenCaptureKit instead"), which in
+    /// C is a hard compile error rather than a warning. Zig's C translator
+    /// ignores availability attributes, so this compiles and links where
+    /// clang would refuse -- and it was still working on macOS 26.6,
+    /// returning a full-resolution image. That is a reprieve, not a
+    /// guarantee: there will be no compiler warning on the day it stops,
+    /// only a null return. ScreenCaptureKit is Objective-C and so is out
+    /// of scope for this package.
     pub fn createImage(self: Display) Error!Image {
         const created = raw.CGDisplayCreateImage(self.id);
         return .{ .handle = try errors.checkPtr(created) };
     }
 
-    /// The same, for one rectangle of the display.
+    /// The same, for one rectangle of the display, with the same
+    /// permission requirement and the same obsolescence.
     pub fn createImageForRect(self: Display, area: Rect) Error!Image {
         const created = raw.CGDisplayCreateImageForRect(self.id, area.toRaw());
         return .{ .handle = try errors.checkPtr(created) };
@@ -282,7 +327,7 @@ test "the main display sits at the origin of the global space" {
     try std.testing.expect(area.height() > 0);
 }
 
-test "a display's pixels are at least its points" {
+test "pixelSize is the backing store, not the legacy point count" {
     var buffer: [max_displays]Display = undefined;
     if ((try Display.active(&buffer)).len == 0) return;
 
@@ -292,6 +337,19 @@ test "a display's pixels are at least its points" {
 
     try std.testing.expect(pixels.width >= points.width);
     try std.testing.expect(pixels.height >= points.height);
+
+    // The whole point of not using CGDisplayPixelsWide: on a Retina
+    // display it answers in points, so it equals `bounds` where the real
+    // backing store does not. Asserting `>=` alone passes either way,
+    // which is how this was wrong in the first place.
+    const mode = try primary.currentMode();
+    defer mode.deinit();
+    try std.testing.expect(pixels.eql(mode.pixelSize()));
+
+    if (mode.isRetina()) {
+        try std.testing.expect(pixels.width > points.width);
+        try std.testing.expect(primary.legacyPixelSize().eql(points));
+    }
 }
 
 test "a display lists its modes" {

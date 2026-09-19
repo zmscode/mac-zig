@@ -282,6 +282,8 @@ for (windows.windows) |w| {
 
 Window *titles* need Screen Recording permission; everything else does not, and a `null`
 title means the permission is missing rather than that the window is untitled.
+`cg.window.hasScreenCaptureAccess()` answers that directly, and `requestScreenCaptureAccess()`
+prompts — once only, since a process that has been refused is never re-prompted.
 
 ## Text
 
@@ -312,6 +314,16 @@ try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
 - **`intersection` returns a *null* rectangle, not an empty one, when two rectangles miss.**
   Check it with `isNull`, not `isEmpty`.
 - **`Image.cropped` measures from the top left**, unlike everything else in the framework.
+- **`Display.pixelSize()` is not `CGDisplayPixelsWide`.** That call predates Retina and answers
+  in *points* — on a 6016x3384 panel it says 3008x1692, and a capture buffer sized from it holds
+  a quarter of the pixels. `pixelSize()` reads the current mode instead; `legacyPixelSize()` is
+  the old number if you need to match it.
+- **ImageIO's default JPEG quality is not maximum.** A 6016x3384 screenshot came out at 2.0 MB
+  with `.{}` and 5.3 MB with `.{ .quality = 1.0 }`. PNG is lossless regardless.
+- **The screen-capture calls are obsoleted as of macOS 15**, not merely deprecated —
+  `obsoleted=15.0`, which in C is a hard compile error. Zig ignores availability attributes, so
+  they compile and link, and they still worked on macOS 26.6. There will be no warning on the
+  day they stop, only a null return.
 - **IOKit reports a time-to-empty of 0 while on mains**, which is not an estimate that the
   machine is about to die. `Source.time_to_empty` is null unless the source is actually
   discharging, and `time_to_full` unless it is actually charging.
