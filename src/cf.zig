@@ -498,6 +498,54 @@ pub const Dictionary = struct {
         return (self.getAs(Boolean, key) orelse return null).value();
     }
 
+    /// Looks a value up by a plain Zig string key, narrowed to `T`.
+    ///
+    /// Slower than `getAs`, because CoreFoundation needs a `CFString` to
+    /// look up with and one is made and released here. Use it for the
+    /// frameworks whose dictionary keys are plain C strings -- IOKit's
+    /// are -- and `getAs` where a `CFStringRef` constant already exists.
+    pub fn lookup(self: Dictionary, comptime T: type, key: []const u8) Error!?T {
+        const cf_key = try String.init(key);
+        defer cf_key.deinit();
+        return self.getAs(T, cf_key.toRaw());
+    }
+
+    pub fn lookupInt(self: Dictionary, key: []const u8) Error!?i64 {
+        return (try self.lookup(Number, key) orelse return null).toInt();
+    }
+
+    pub fn lookupFloat(self: Dictionary, key: []const u8) Error!?f64 {
+        return (try self.lookup(Number, key) orelse return null).toFloat();
+    }
+
+    pub fn lookupBool(self: Dictionary, key: []const u8) Error!?bool {
+        return (try self.lookup(Boolean, key) orelse return null).value();
+    }
+
+    /// A UTF-8 copy of a string entry found by a plain Zig string key.
+    pub fn lookupString(
+        self: Dictionary,
+        allocator: std.mem.Allocator,
+        key: []const u8,
+    ) ![]u8 {
+        const found = try self.lookup(String, key) orelse return Error.Failed;
+        return found.toOwnedSlice(allocator);
+    }
+
+    /// True when a string entry holds exactly `expected`. This is how
+    /// IOKit's enumerated values -- "AC Power", "InternalBattery" -- are
+    /// compared without allocating.
+    pub fn lookupStringEquals(
+        self: Dictionary,
+        key: []const u8,
+        expected: []const u8,
+    ) Error!bool {
+        const found = try self.lookup(String, key) orelse return false;
+        const wanted = try String.init(expected);
+        defer wanted.deinit();
+        return raw.CFEqual(found.handle, wanted.handle) != 0;
+    }
+
     /// A UTF-8 copy of a string entry, in memory the caller owns.
     pub fn getString(
         self: Dictionary,

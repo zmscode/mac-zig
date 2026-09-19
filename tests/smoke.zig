@@ -211,6 +211,23 @@ test "text measures and draws through the public API" {
     try std.testing.expect(paintedPixels(ctx) > 0);
 }
 
+test "power reads through the public API" {
+    if (!mac.features.iokit) return error.SkipZigTest;
+
+    const state = try mac.iokit.power.snapshot(std.testing.allocator);
+    defer state.deinit(std.testing.allocator);
+
+    // Whatever this machine is, it is being powered by something.
+    try std.testing.expect(state.providing != .unknown);
+
+    if (state.battery()) |b| {
+        try std.testing.expect(b.percent <= 100);
+        try std.testing.expect(b.is_present);
+        // On battery, the machine cannot also be charging.
+        if (state.onBattery()) try std.testing.expect(!b.is_charging);
+    }
+}
+
 test "the raw layer is reachable for anything not wrapped" {
     // The wrapper does not cover CGColorSpaceGetColorTableCount, so this is
     // what dropping through to `cg.raw` looks like.

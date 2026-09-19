@@ -14,6 +14,11 @@ pub fn build(b: *std.Build) void {
         "coretext",
         "Expose the CoreText bridge, which is what draws a string",
     ) orelse true;
+    const iokit = b.option(
+        bool,
+        "iokit",
+        "Expose IOKit's power sources: battery charge and time remaining",
+    ) orelse true;
 
     // -----------------------------------------------------------------
     // CoreGraphics ships with macOS, so there is nothing to build and
@@ -43,6 +48,7 @@ pub fn build(b: *std.Build) void {
     const options = b.addOptions();
     options.addOption(bool, "imageio", imageio);
     options.addOption(bool, "coretext", coretext);
+    options.addOption(bool, "iokit", iokit);
 
     // -----------------------------------------------------------------
     // The raw layer.
@@ -60,6 +66,7 @@ pub fn build(b: *std.Build) void {
         .cwd_relative = b.pathJoin(&.{ sdk, "usr/include" }),
     });
     if (imageio) translate_c.defineCMacro("MAC_ZIG_IMAGEIO", "1");
+    if (iokit) translate_c.defineCMacro("MAC_ZIG_IOKIT", "1");
 
     // -----------------------------------------------------------------
     // The idiomatic layer.
@@ -81,6 +88,7 @@ pub fn build(b: *std.Build) void {
     mac.linkFramework("CoreGraphics", .{});
     if (imageio) mac.linkFramework("ImageIO", .{});
     if (coretext) mac.linkFramework("CoreText", .{});
+    if (iokit) mac.linkFramework("IOKit", .{});
 
     // -----------------------------------------------------------------
     // Steps
@@ -112,6 +120,7 @@ pub fn build(b: *std.Build) void {
     unit_tests.root_module.linkFramework("CoreGraphics", .{});
     if (imageio) unit_tests.root_module.linkFramework("ImageIO", .{});
     if (coretext) unit_tests.root_module.linkFramework("CoreText", .{});
+    if (iokit) unit_tests.root_module.linkFramework("IOKit", .{});
     test_step.dependOn(&b.addRunArtifact(unit_tests).step);
 
     // The tests that use the package the way a dependent would.
@@ -126,7 +135,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&b.addRunArtifact(smoke_tests).step);
 
     const examples_step = b.step("examples", "Build every example");
-    for ([_][]const u8{ "info", "shapes", "gradient", "text", "pdf" }) |name| {
+    for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf" }) |name| {
         addExample(b, examples_step, mac, target, optimize, name);
     }
     b.getInstallStep().dependOn(examples_step);

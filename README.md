@@ -10,6 +10,7 @@ Today that is:
 | `mac.cg`  | CoreGraphics | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
 | `mac.cg.imageio` | ImageIO | reading and writing image files, under `-Dimageio` |
 | `mac.cg.text` | CoreText | drawing and measuring a line of text, under `-Dcoretext` |
+| `mac.iokit` | IOKit | power sources: battery charge, mains or battery, time remaining, under `-Diokit` |
 | `mac.cf`  | CoreFoundation | just enough to work the frameworks above it |
 
 Everything links what macOS already ships, so there is nothing to fetch and nothing to build.
@@ -240,6 +241,23 @@ ctx.concat(page.drawingTransform(.media, box, 0, true));
 ctx.drawPdfPage(page);
 ```
 
+## Power
+
+```zig
+const state = try mac.iokit.power.snapshot(allocator);
+defer state.deinit(allocator);
+
+if (state.battery()) |b| {
+    std.debug.print("{d}%{s}\n", .{ b.percent, if (b.is_charging) " charging" else "" });
+}
+if (mac.iokit.power.timeRemaining()) |minutes| { ... }
+```
+
+In C this is an opaque blob, then a `CFArray` of opaque handles, then a `CFDictionary` per
+handle whose keys are plain C strings and whose values are boxed `CFNumber`s. Here it is one
+call returning plain structs. A desktop with no battery gives an empty source list rather than
+an error, and nothing here needs a permission.
+
 ## Displays and windows
 
 ```zig
@@ -294,11 +312,15 @@ try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
 - **`intersection` returns a *null* rectangle, not an empty one, when two rectangles miss.**
   Check it with `isNull`, not `isEmpty`.
 - **`Image.cropped` measures from the top left**, unlike everything else in the framework.
+- **IOKit reports a time-to-empty of 0 while on mains**, which is not an estimate that the
+  machine is about to die. `Source.time_to_empty` is null unless the source is actually
+  discharging, and `time_to_full` unless it is actually charging.
 
 ## Examples
 
 ```sh
 zig build run-info        # displays, modes and the windows on screen
+zig build run-power       # battery, mains, time remaining
 zig build run-shapes      # paths, dashes, clipping, shadows, boolean ops
 zig build run-gradient    # gradients, transforms and layers
 zig build run-text        # measuring, aligning, the flipped-context fix
@@ -311,6 +333,7 @@ zig build run-pdf         # a PDF written, read back and rasterised
 | ------------------- | ------- | --------------------------------------------------------- |
 | `-Dimageio=false`   | on      | Drops `mac.cg.imageio`; no reading or writing of image files |
 | `-Dcoretext=false`  | on      | Drops `mac.cg.text`; no string drawing                     |
+| `-Diokit=false`     | on      | Drops `mac.iokit`; no power-source reading                 |
 
 Both namespaces still exist when switched off, holding only `enabled = false`, so a
 dependent can check `mac.features.imageio` rather than failing to compile.
@@ -342,12 +365,14 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 | `src/cg/event.zig`        | Synthetic input and event taps                            |
 | `src/cg/imageio.zig`      | Image files, under `-Dimageio`                            |
 | `src/cg/text.zig`         | The CoreText bridge, under `-Dcoretext`                   |
+| `src/iokit/iokit.zig`     | IOKit namespace root                                      |
+| `src/iokit/power.zig`     | Power sources, under `-Diokit`                            |
 | `vendor/mac_translate.h`  | The umbrella header, and the header workarounds           |
 
 ## Where the frameworks come from
 
 They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
-optionally `ImageIO` and `CoreText`, from the macOS SDK that `xcode-select` points at.
+optionally `ImageIO`, `CoreText` and `IOKit`, from the macOS SDK that `xcode-select` points at.
 
 The one piece worth knowing about is `vendor/mac_translate.h`. Three of Apple's spellings do
 not survive Zig 0.17's C translator, and all three are handled there rather than in

@@ -31,6 +31,7 @@
 //!
 //! - `cg` -- CoreGraphics: 2D drawing, images, PDF, displays, the window
 //!   list and synthetic input. Optionally ImageIO and a CoreText bridge.
+//! - `iokit` -- power sources: battery charge and time remaining.
 //! - `cf` -- just enough CoreFoundation to work the rest.
 //!
 //! Everything is C. Frameworks written in Objective-C -- AVFoundation,
@@ -54,6 +55,13 @@ pub const cf = @import("cf.zig");
 /// displays, the window list and synthetic input.
 pub const cg = @import("cg/cg.zig");
 
+/// IOKit's power sources: battery charge, mains or battery, time
+/// remaining. Under `-Diokit` (on by default); without it this namespace
+/// holds only `enabled = false`.
+pub const iokit = if (build_options.iokit) @import("iokit/iokit.zig") else struct {
+    pub const enabled = false;
+};
+
 pub const Error = errors.Error;
 
 /// Which optional pieces this build has. Check these rather than assuming,
@@ -61,6 +69,7 @@ pub const Error = errors.Error;
 pub const features: Features = .{
     .imageio = build_options.imageio,
     .coretext = build_options.coretext,
+    .iokit = build_options.iokit,
 };
 
 pub const Features = struct {
@@ -68,6 +77,8 @@ pub const Features = struct {
     imageio: bool,
     /// `mac.cg.text`: drawing a string.
     coretext: bool,
+    /// `mac.iokit`: power sources.
+    iokit: bool,
 };
 
 test {
@@ -77,4 +88,5 @@ test {
     _ = errors;
     _ = cf;
     _ = cg;
+    _ = iokit;
 }

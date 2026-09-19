@@ -12,6 +12,7 @@ One package, a namespace per framework:
 | `mac.cg` | CoreGraphics |
 | `mac.cg.imageio` | ImageIO, under `-Dimageio` |
 | `mac.cg.text` | CoreText, under `-Dcoretext` |
+| `mac.iokit` | IOKit power sources, under `-Diokit` |
 | `mac.cf` | CoreFoundation |
 
 Use the idiomatic namespaces by default. Reach for `mac.raw` only when a wrapper does not
@@ -268,12 +269,34 @@ y downwards — not a context's coordinates.
 Reading a scroll amount back is asymmetric: `scroll_delta_axis_1` is always in lines, so a
 `.pixel` event's amounts come from `scroll_point_delta_axis_1`.
 
+## Power
+
+```zig
+const state = try mac.iokit.power.snapshot(allocator);
+defer state.deinit(allocator);
+
+state.providing           // .ac, .battery, .off_line
+state.onBattery()
+state.battery()           // ?Source, null on a desktop
+
+mac.iokit.power.timeRemaining()   // ?u32 minutes, null on mains or while estimating
+mac.iokit.power.warningLevel()    // .none, .early, .final
+```
+
+No permission needed. A desktop gives an empty `sources` list, not an error.
+`Source.time_to_empty` is null unless the source is discharging and `time_to_full` is null
+unless it is charging -- IOKit reports 0 for the irrelevant half rather than omitting it.
+
+Prefer `warningLevel()` over a percentage threshold of your own: it is what drives the
+system's own low-battery notifications.
+
 ## Build options
 
 | Option              | Default | Effect                                              |
 | ------------------- | ------- | --------------------------------------------------- |
 | `-Dimageio=false`   | on      | Drops `mac.cg.imageio`                              |
 | `-Dcoretext=false`  | on      | Drops `mac.cg.text`                                 |
+| `-Diokit=false`     | on      | Drops `mac.iokit`                                   |
 
 Both namespaces exist either way, holding `enabled = false` when off. Check
 `mac.features.imageio` / `mac.features.coretext` rather than assuming.

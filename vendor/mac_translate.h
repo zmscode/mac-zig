@@ -346,3 +346,16 @@ typedef struct CGImageMetadataTag *CGImageMetadataTagRef;
 #include <ImageIO/ImageIO.h>
 
 #endif
+
+/* ------------------------------------------------------------------ */
+/* IOKit, under -Diokit. Power sources: battery charge, whether the     */
+/* machine is on mains, and how long it has left.                       */
+/*                                                                      */
+/* Only the power-source headers are pulled in. IOKit as a whole is far */
+/* larger, and the rest of it is not wrapped.                           */
+/* ------------------------------------------------------------------ */
+
+#ifdef MAC_ZIG_IOKIT
+#include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/ps/IOPowerSources.h>
+#endif
