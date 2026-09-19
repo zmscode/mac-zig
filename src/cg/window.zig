@@ -17,9 +17,9 @@
 //! the window is untitled, and no error is reported for it.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const geometry = @import("geometry.zig");
 const image_mod = @import("image.zig");
 
@@ -111,7 +111,7 @@ pub fn list(
     relative_to: u32,
 ) !List {
     const info = raw.CGWindowListCopyWindowInfo(@backingInt(options), relative_to);
-    const array = cf.Array.fromRaw(try errors.checkPtr(info)) orelse return Error.CgError;
+    const array = cf.Array.fromRaw(try errors.checkPtr(info)) orelse return Error.Failed;
     defer array.deinit();
 
     var windows: std.ArrayList(Window) = .empty;

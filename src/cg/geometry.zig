@@ -14,7 +14,7 @@
 //! `Context.flipVertically`.
 
 const std = @import("std");
-const raw = @import("cg_raw");
+const raw = @import("mac_raw");
 
 /// `CGFloat`: `f64` on every 64-bit Apple platform, which is all of them
 /// that still ship. Spelled as an alias rather than as `f64` so that code

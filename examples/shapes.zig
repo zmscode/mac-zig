@@ -3,7 +3,8 @@
 //!     zig build run-shapes
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 const width = 480;
 const height = 320;

@@ -2,7 +2,7 @@
 //!
 //! Most of the framework reports failure by returning `NULL` and recording
 //! nothing at all -- no code, no message, no thread-local slot to read after
-//! the fact. `error.CgError` is that channel, and the call site is the only
+//! the fact. `error.Failed` is that channel, and the call site is the only
 //! context there will ever be.
 //!
 //! The corner of the framework that talks to the window server -- displays,
@@ -13,16 +13,19 @@
 //! permission the call needs.
 
 const std = @import("std");
-const raw = @import("cg_raw");
+const raw = @import("mac_raw");
 
 pub const Error = error{
-    /// A call that reports failure by returning null did so. CoreGraphics
-    /// records no further detail for these.
-    CgError,
+    /// A call that reports failure by returning null did so. Most of
+    /// CoreFoundation and CoreGraphics report failure this way and record
+    /// no further detail, so the call site is the only context there is.
+    Failed,
 
     // The CGError codes. Everything below comes from a call that returns
     // one, which is a much smaller set of calls than the ones above.
-    Failure,
+    /// `kCGErrorFailure`. Prefixed so that it does not read as the
+    /// null-return case above.
+    CgFailure,
     IllegalArgument,
     InvalidConnection,
     InvalidContext,
@@ -44,20 +47,20 @@ pub const Error = error{
 /// this context -- is returned as an optional instead. A `?T` from this
 /// binding is a real answer; an error is a failure.
 pub inline fn checkPtr(pointer: anytype) Error!@TypeOf(pointer.?) {
-    return pointer orelse Error.CgError;
+    return pointer orelse Error.Failed;
 }
 
 /// Turns a `bool` return into an error union, for the handful of calls that
 /// report success that way.
 pub inline fn check(ok: bool) Error!void {
-    if (!ok) return Error.CgError;
+    if (!ok) return Error.Failed;
 }
 
 /// Turns a `CGError` code into an error union.
 pub fn checkCode(code: raw.CGError) Error!void {
     return switch (code) {
         raw.kCGErrorSuccess => {},
-        raw.kCGErrorFailure => Error.Failure,
+        raw.kCGErrorFailure => Error.CgFailure,
         raw.kCGErrorIllegalArgument => Error.IllegalArgument,
         raw.kCGErrorInvalidConnection => Error.InvalidConnection,
         raw.kCGErrorInvalidContext => Error.InvalidContext,
@@ -79,7 +82,7 @@ test "checkCode maps success and a named code" {
 
 test "checkPtr turns null into an error and unwraps otherwise" {
     const absent: ?*const u8 = null;
-    try std.testing.expectError(Error.CgError, checkPtr(absent));
+    try std.testing.expectError(Error.Failed, checkPtr(absent));
 
     const byte: u8 = 7;
     const present: ?*const u8 = &byte;

@@ -3,13 +3,14 @@
 //!     zig build run-text
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 const width = 520;
 const height = 260;
 
 pub fn main() !void {
-    if (!cg.features.coretext) {
+    if (!mac.features.coretext) {
         std.debug.print("built with -Dcoretext=false; nothing to draw\n", .{});
         return;
     }
@@ -34,7 +35,7 @@ pub fn main() !void {
 
     // A left-aligned title. `origin` is the baseline, so the ascent is
     // added to place the top of the text at y = 32.
-    const title = try cg.text.Line.init("cg-zig", title_font, null);
+    const title = try cg.text.Line.init("mac-zig", title_font, null);
     defer title.deinit();
 
     ctx.setFillColor(.hex(0xECF0F1));

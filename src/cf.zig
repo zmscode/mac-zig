@@ -21,7 +21,7 @@
 //! `deinit`.
 
 const std = @import("std");
-const raw = @import("cg_raw");
+const raw = @import("mac_raw");
 const errors = @import("errors.zig");
 
 const Error = errors.Error;
@@ -142,7 +142,7 @@ pub const String = struct {
             buffer.ptr,
             @intCast(buffer.len),
             raw.kCFStringEncodingUTF8,
-        ) == 0) return Error.CgError;
+        ) == 0) return Error.Failed;
 
         const len = std.mem.indexOfScalar(u8, buffer, 0) orelse buffer.len;
         return allocator.realloc(buffer, len);

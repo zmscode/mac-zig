@@ -1,44 +1,65 @@
-# cg-zig
+# mac-zig
 
-Zig 0.17 bindings for [CoreGraphics](https://developer.apple.com/documentation/coregraphics),
-Apple's 2D drawing engine. The package:
+Zig 0.17 bindings for the macOS system frameworks. One package, one translated C layer, one
+`Error` set, and a namespace per framework.
 
-- provides an idiomatic, resource-safe Zig API and the complete raw C ABI;
-- covers contexts, paths, colours and colour spaces, images, gradients, layers, PDF in
-  and out, displays, the window list, and synthetic input;
-- links what macOS already ships, so there is nothing to fetch and nothing to build;
-- optionally bridges ImageIO for reading and writing image files, and CoreText for
-  drawing a string.
+Today that is:
 
-AI coding agents can use the repository's installable [`cg-zig` skill](SKILL.md) for concise,
+| Namespace | Framework | Covers |
+| --------- | --------- | ------ |
+| `mac.cg`  | CoreGraphics | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
+| `mac.cg.imageio` | ImageIO | reading and writing image files, under `-Dimageio` |
+| `mac.cg.text` | CoreText | drawing and measuring a line of text, under `-Dcoretext` |
+| `mac.cf`  | CoreFoundation | just enough to work the frameworks above it |
+
+Everything links what macOS already ships, so there is nothing to fetch and nothing to build.
+
+AI coding agents can use the repository's installable [`mac-zig` skill](SKILL.md) for concise,
 version-specific integration guidance.
 
-macOS only, and the Xcode command line tools must be installed — CoreGraphics' headers live
-in the SDK.
+macOS only, and the Xcode command line tools must be installed — the headers live in the SDK.
+
+## Why one package
+
+These frameworks share CoreFoundation's types. A `CFStringRef` that CoreGraphics produces has
+to be the *same Zig type* as one IOKit consumes, or the two cannot be passed between. Separate
+packages, each running `translate-c` over its own headers, would each emit their own
+incompatible `CFStringRef`.
+
+So there is one translation unit covering every framework that is switched on, one `mac.cf`
+namespace they all share, and one `mac.Error`. Adding a framework is a build option and a
+namespace, not another dependency.
+
+## What is not here
+
+Frameworks written in Objective-C — AVFoundation, Metal, AppKit, Foundation, CoreImage — need
+a message-sending bridge (`objc_msgSend`, selector lookup, retain/release by hand) that this
+package does not have. They are out of scope until it does. Of AVFoundation's 160 headers, 106
+declare Objective-C classes; of CoreGraphics' 50, none do. That line is the whole difference.
 
 ## Use as a dependency
 
 ```sh
-zig fetch --save=cg git+https://github.com/zmscode/cg-zig.git
+zig fetch --save=mac git+https://github.com/zmscode/mac-zig.git
 ```
 
 For local development the equivalent path dependency is:
 
 ```zig
 .dependencies = .{
-    .cg = .{ .path = "../cg-zig" },
+    .mac = .{ .path = "../mac-zig" },
 },
 ```
 
 Then expose the module to your executable in `build.zig`:
 
 ```zig
-const cg_dependency = b.dependency("cg", .{
+const mac_dependency = b.dependency("mac", .{
     .target = target,
     .optimize = optimize,
 });
 
-exe.root_module.addImport("cg", cg_dependency.module("cg"));
+exe.root_module.addImport("mac", mac_dependency.module("mac"));
 ```
 
 Nothing else is needed — the frameworks are linked for you.
@@ -46,9 +67,9 @@ Nothing else is needed — the frameworks are linked for you.
 ## A drawing
 
 ```zig
-const cg = @import("cg");
+const mac = @import("mac");
 
-const ctx = try cg.Context.initBitmap(.{ .width = 400, .height = 300 });
+const ctx = try mac.cg.Context.initBitmap(.{ .width = 400, .height = 300 });
 defer ctx.deinit();
 
 ctx.setFillColor(.hex(0x1E2430));
@@ -57,7 +78,14 @@ ctx.fillRect(ctx.bitmapBounds());
 ctx.setFillColor(.hex(0x2ECC71));
 ctx.fillEllipseInRect(.init(150, 100, 100, 100));
 
-try cg.imageio.writeContext(ctx, "out.png", .png, .{});
+try mac.cg.imageio.writeContext(ctx, "out.png", .png, .{});
+```
+
+A program that wants one framework can pull the namespace out and forget the umbrella is
+there, which is how the rest of this file is written:
+
+```zig
+const cg = @import("mac").cg;
 ```
 
 `Context`, `Image`, `Path` and the rest are one-pointer handles passed by value. Most of
@@ -67,7 +95,7 @@ you own, and they say so.
 
 ## What the wrapper changes
 
-| CoreGraphics                                      | cg-zig                                                    |
+| CoreGraphics                                      | mac-zig                                                    |
 | ------------------------------------------------- | --------------------------------------------------------- |
 | `CGBitmapContextCreate` / `CGContextRelease`      | `Context.initBitmap` / `deinit`, with `defer`              |
 | `NULL` returns with no error code                 | an `Error` set; `?T` where null is a real answer           |
@@ -81,7 +109,7 @@ you own, and they say so.
 | `CFDictionary` of `CFNumber` for the window list  | `window.Window`, a plain struct                            |
 | `CGRectDivide` with two out-parameters            | `Rect.divide` returning a `Division`                       |
 
-Anything not yet wrapped is reachable through `cg.raw`, the complete translated API.
+Anything not yet wrapped is reachable through `mac.raw`, the complete translated API.
 
 ## Two things to get right
 
@@ -247,9 +275,9 @@ one font, which is enough to label, caption and measure:
 const font = try cg.text.Font.initSystem(24);
 defer font.deinit();
 
-const metrics = try cg.text.measure("cg-zig", font);   // for alignment
+const metrics = try cg.text.measure("mac-zig", font);   // for alignment
 ctx.setFillColor(.white);
-try cg.text.draw(ctx, "cg-zig", font, .init(40, 40), null);
+try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
 ```
 
 ## Traps
@@ -281,11 +309,11 @@ zig build run-pdf         # a PDF written, read back and rasterised
 
 | Option              | Default | Effect                                                    |
 | ------------------- | ------- | --------------------------------------------------------- |
-| `-Dimageio=false`   | on      | Drops `cg.imageio`; no reading or writing of image files   |
-| `-Dcoretext=false`  | on      | Drops `cg.text`; no string drawing                        |
+| `-Dimageio=false`   | on      | Drops `mac.cg.imageio`; no reading or writing of image files |
+| `-Dcoretext=false`  | on      | Drops `mac.cg.text`; no string drawing                     |
 
 Both namespaces still exist when switched off, holding only `enabled = false`, so a
-dependent can check `cg.features.imageio` rather than failing to compile.
+dependent can check `mac.features.imageio` rather than failing to compile.
 
 ## Steps
 
@@ -297,30 +325,31 @@ dependent can check `cg.features.imageio` rather than failing to compile.
 
 ## Layout
 
-| Path                     | What is in it                                             |
-| ------------------------ | --------------------------------------------------------- |
-| `src/cg.zig`             | Root module, re-exports, feature flags                    |
-| `src/errors.zig`         | The `Error` set and both failure channels                 |
-| `src/cf.zig`             | Just enough CoreFoundation to work CoreGraphics           |
-| `src/geometry.zig`       | `Point`, `Size`, `Rect`, `AffineTransform`                |
-| `src/color.zig`          | `ColorSpace`, `Color`, `Rgba`                             |
-| `src/image.zig`          | `Image`, `BitmapInfo`, `DataProvider`                     |
-| `src/path.zig`           | `Path`, `MutablePath`, `Element`                          |
-| `src/context.zig`        | `Context`, `Gradient`, `Layer` — the drawing surface      |
-| `src/pdf.zig`            | Reading PDFs                                              |
-| `src/display.zig`        | Displays and display modes                                |
-| `src/window.zig`         | The window list                                           |
-| `src/event.zig`          | Synthetic input and event taps                            |
-| `src/imageio.zig`        | Image files, under `-Dimageio`                            |
-| `src/text.zig`           | The CoreText bridge, under `-Dcoretext`                   |
-| `vendor/cg_translate.h`  | The umbrella header, and the header workarounds           |
+| Path                      | What is in it                                             |
+| ------------------------- | --------------------------------------------------------- |
+| `src/mac.zig`             | Umbrella root: the framework namespaces and feature flags |
+| `src/errors.zig`          | The `Error` set, shared by every framework                |
+| `src/cf.zig`              | Just enough CoreFoundation to work the rest               |
+| `src/cg/cg.zig`           | CoreGraphics namespace root and re-exports                |
+| `src/cg/geometry.zig`     | `Point`, `Size`, `Rect`, `AffineTransform`                |
+| `src/cg/color.zig`        | `ColorSpace`, `Color`, `Rgba`                             |
+| `src/cg/image.zig`        | `Image`, `BitmapInfo`, `DataProvider`                     |
+| `src/cg/path.zig`         | `Path`, `MutablePath`, `Element`                          |
+| `src/cg/context.zig`      | `Context`, `Gradient`, `Layer` — the drawing surface      |
+| `src/cg/pdf.zig`          | Reading PDFs                                              |
+| `src/cg/display.zig`      | Displays and display modes                                |
+| `src/cg/window.zig`       | The window list                                           |
+| `src/cg/event.zig`        | Synthetic input and event taps                            |
+| `src/cg/imageio.zig`      | Image files, under `-Dimageio`                            |
+| `src/cg/text.zig`         | The CoreText bridge, under `-Dcoretext`                   |
+| `vendor/mac_translate.h`  | The umbrella header, and the header workarounds           |
 
-## Where CoreGraphics comes from
+## Where the frameworks come from
 
-It is already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
+They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
 optionally `ImageIO` and `CoreText`, from the macOS SDK that `xcode-select` points at.
 
-The one piece worth knowing about is `vendor/cg_translate.h`. Three of Apple's spellings do
+The one piece worth knowing about is `vendor/mac_translate.h`. Three of Apple's spellings do
 not survive Zig 0.17's C translator, and all three are handled there rather than in
 `build.zig`, so the workaround sits next to the thing it works around:
 

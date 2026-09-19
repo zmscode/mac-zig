@@ -3,7 +3,8 @@
 //!     zig build run-gradient
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 const width = 420;
 const height = 420;

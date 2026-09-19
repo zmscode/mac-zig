@@ -32,9 +32,9 @@
 //! what a fresh context already has.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const geometry = @import("geometry.zig");
 const color_mod = @import("color.zig");
 const context_mod = @import("context.zig");
@@ -121,7 +121,7 @@ pub const Font = struct {
     /// after `init`, since an unknown name substitutes silently.
     pub fn fullName(self: Font, allocator: std.mem.Allocator) ![]u8 {
         const name = cf.String.fromRaw(CTFontCopyFullName(self.handle)) orelse
-            return Error.CgError;
+            return Error.Failed;
         defer name.deinit();
         return name.toOwnedSlice(allocator);
     }

@@ -13,10 +13,10 @@
 //! negative x.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
 const geometry = @import("geometry.zig");
-const cf = @import("cf.zig");
+const cf = @import("../cf.zig");
 const image_mod = @import("image.zig");
 
 const Error = errors.Error;
@@ -159,7 +159,7 @@ pub const Display = struct {
     /// A screenshot of this display, as an image the caller owns.
     ///
     /// On macOS 14 and later this needs Screen Recording permission, and
-    /// without it returns `error.CgError` -- or, worse on some versions, a
+    /// without it returns `error.Failed` -- or, worse on some versions, a
     /// blank image. Apple deprecated it in macOS 15 in favour of
     /// ScreenCaptureKit, which is not part of CoreGraphics and so is not
     /// wrapped here.

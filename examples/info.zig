@@ -3,7 +3,8 @@
 //!     zig build run-info
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 const print = std.debug.print;
 
@@ -12,9 +13,9 @@ pub fn main() !void {
     defer _ = debug_allocator.deinit();
     const allocator = debug_allocator.allocator();
 
-    print("cg-zig features: imageio={}, coretext={}\n\n", .{
-        cg.features.imageio,
-        cg.features.coretext,
+    print("mac-zig features: imageio={}, coretext={}\n\n", .{
+        mac.features.imageio,
+        mac.features.coretext,
     });
 
     // -- displays -----------------------------------------------------

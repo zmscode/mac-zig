@@ -22,8 +22,8 @@
 //! that are there.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
 const geometry = @import("geometry.zig");
 
 const Error = errors.Error;

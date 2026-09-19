@@ -3,7 +3,8 @@
 //!     zig build run-pdf
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 /// US Letter, in PDF points -- 72 to the inch.
 const page_box = cg.Rect.init(0, 0, 612, 792);
@@ -22,8 +23,8 @@ pub fn main() !void {
 fn write(allocator: std.mem.Allocator, path: []const u8) !void {
     const ctx = try cg.Context.initPdfFile(allocator, path, .{
         .media_box = page_box,
-        .title = "cg-zig sample",
-        .author = "cg-zig",
+        .title = "mac-zig sample",
+        .author = "mac-zig",
         .creator = "zig build run-pdf",
     });
     defer ctx.deinit();
@@ -46,7 +47,7 @@ fn write(allocator: std.mem.Allocator, path: []const u8) !void {
 
         // A PDF context is unflipped, so the text matrix is already
         // right and nothing has to be undone.
-        if (comptime cg.features.coretext) {
+        if (comptime mac.features.coretext) {
             const font = try cg.text.Font.initSystem(28);
             defer font.deinit();
 

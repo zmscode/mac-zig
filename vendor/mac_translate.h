@@ -335,7 +335,7 @@ CG_EXTERN CGImageRef CGBitmapContextCreateImage(CGContextRef context);
 /* CGImageSource and CGImageDestination mention them in signatures.      */
 /* ------------------------------------------------------------------ */
 
-#ifdef CG_ZIG_IMAGEIO
+#ifdef MAC_ZIG_IMAGEIO
 
 #define CGIMAGEANIMATION_H_
 #define CGIMAGEMETADATA_H_

@@ -22,7 +22,7 @@ pub fn build(b: *std.Build) void {
     // -----------------------------------------------------------------
     if (!target.result.os.tag.isDarwin()) {
         std.debug.print(
-            \\cg-zig binds CoreGraphics, which exists only on Apple platforms.
+            \\mac-zig binds the macOS system frameworks, which exist only on Apple platforms.
             \\The requested target was {s}.
             \\
         , .{@tagName(target.result.os.tag)});
@@ -31,7 +31,7 @@ pub fn build(b: *std.Build) void {
 
     const sdk = std.zig.system.darwin.getSdk(b.graph.arena, b.graph.io, &target.result) orelse {
         std.debug.print(
-            \\cg-zig needs the macOS SDK headers and could not find them.
+            \\mac-zig needs the macOS SDK headers and could not find them.
             \\Install the Xcode command line tools with:
             \\
             \\    xcode-select --install
@@ -48,7 +48,7 @@ pub fn build(b: *std.Build) void {
     // The raw layer.
     // -----------------------------------------------------------------
     const translate_c = b.addTranslateC(.{
-        .root_source_file = b.path("vendor/cg_translate.h"),
+        .root_source_file = b.path("vendor/mac_translate.h"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
@@ -59,34 +59,34 @@ pub fn build(b: *std.Build) void {
     translate_c.addSystemIncludePath(.{
         .cwd_relative = b.pathJoin(&.{ sdk, "usr/include" }),
     });
-    if (imageio) translate_c.defineCMacro("CG_ZIG_IMAGEIO", "1");
+    if (imageio) translate_c.defineCMacro("MAC_ZIG_IMAGEIO", "1");
 
     // -----------------------------------------------------------------
     // The idiomatic layer.
     // -----------------------------------------------------------------
-    const cg = b.addModule("cg", .{
-        .root_source_file = b.path("src/cg.zig"),
+    const mac = b.addModule("mac", .{
+        .root_source_file = b.path("src/mac.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
         .imports = &.{
-            .{ .name = "cg_raw", .module = translate_c.createModule() },
-            .{ .name = "cg_build_options", .module = options.createModule() },
+            .{ .name = "mac_raw", .module = translate_c.createModule() },
+            .{ .name = "mac_build_options", .module = options.createModule() },
         },
     });
-    cg.addSystemFrameworkPath(.{
+    mac.addSystemFrameworkPath(.{
         .cwd_relative = b.pathJoin(&.{ sdk, "System/Library/Frameworks" }),
     });
-    cg.linkFramework("CoreFoundation", .{});
-    cg.linkFramework("CoreGraphics", .{});
-    if (imageio) cg.linkFramework("ImageIO", .{});
-    if (coretext) cg.linkFramework("CoreText", .{});
+    mac.linkFramework("CoreFoundation", .{});
+    mac.linkFramework("CoreGraphics", .{});
+    if (imageio) mac.linkFramework("ImageIO", .{});
+    if (coretext) mac.linkFramework("CoreText", .{});
 
     // -----------------------------------------------------------------
     // Steps
     // -----------------------------------------------------------------
     const bindings_step = b.step("bindings", "Write the translated C bindings to zig-out/bindings");
-    bindings_step.dependOn(&b.addInstallFile(translate_c.getOutput(), "bindings/cg.zig").step);
+    bindings_step.dependOn(&b.addInstallFile(translate_c.getOutput(), "bindings/mac.zig").step);
 
     const test_step = b.step("test", "Run the binding tests");
 
@@ -95,13 +95,13 @@ pub fn build(b: *std.Build) void {
     // test artifact and a dependency's own tests do not come along.
     const unit_tests = b.addTest(.{
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/cg.zig"),
+            .root_source_file = b.path("src/mac.zig"),
             .target = target,
             .optimize = optimize,
             .link_libc = true,
             .imports = &.{
-                .{ .name = "cg_raw", .module = translate_c.createModule() },
-                .{ .name = "cg_build_options", .module = options.createModule() },
+                .{ .name = "mac_raw", .module = translate_c.createModule() },
+                .{ .name = "mac_build_options", .module = options.createModule() },
             },
         }),
     });
@@ -120,14 +120,14 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("tests/smoke.zig"),
             .target = target,
             .optimize = optimize,
-            .imports = &.{.{ .name = "cg", .module = cg }},
+            .imports = &.{.{ .name = "mac", .module = mac }},
         }),
     });
     test_step.dependOn(&b.addRunArtifact(smoke_tests).step);
 
     const examples_step = b.step("examples", "Build every example");
     for ([_][]const u8{ "info", "shapes", "gradient", "text", "pdf" }) |name| {
-        addExample(b, examples_step, cg, target, optimize, name);
+        addExample(b, examples_step, mac, target, optimize, name);
     }
     b.getInstallStep().dependOn(examples_step);
 }
@@ -135,7 +135,7 @@ pub fn build(b: *std.Build) void {
 fn addExample(
     b: *std.Build,
     step: *std.Build.Step,
-    cg: *std.Build.Module,
+    mac: *std.Build.Module,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
     name: []const u8,
@@ -146,7 +146,7 @@ fn addExample(
             .root_source_file = b.path(b.fmt("examples/{s}.zig", .{name})),
             .target = target,
             .optimize = optimize,
-            .imports = &.{.{ .name = "cg", .module = cg }},
+            .imports = &.{.{ .name = "mac", .module = mac }},
         }),
     });
     step.dependOn(&b.addInstallArtifact(exe, .{}).step);

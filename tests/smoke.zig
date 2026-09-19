@@ -2,7 +2,8 @@
 //! public `cg` module only, with no access to the internals.
 
 const std = @import("std");
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;
 
 test "the shape of a drawing program" {
     const ctx = try cg.Context.initBitmap(.{ .width = 64, .height = 64 });
@@ -99,7 +100,7 @@ test "flipping the context flips images, and drawImageUpright undoes it" {
 }
 
 test "a drawing round-trips through a PNG file" {
-    if (!cg.features.imageio) return error.SkipZigTest;
+    if (!mac.features.imageio) return error.SkipZigTest;
 
     var tmp = std.testing.tmpDir(.{});
     defer tmp.cleanup();
@@ -131,7 +132,7 @@ test "a PDF written to memory reads back with the pages it was given" {
     {
         const ctx = try cg.Context.initPdfData(std.testing.allocator, buffer, .{
             .media_box = .init(0, 0, 200, 100),
-            .title = "cg-zig round trip",
+            .title = "mac-zig round trip",
         });
         defer ctx.deinit();
 
@@ -193,19 +194,19 @@ test "a PDF page renders back into a bitmap" {
 }
 
 test "text measures and draws through the public API" {
-    if (!cg.features.coretext) return error.SkipZigTest;
+    if (!mac.features.coretext) return error.SkipZigTest;
 
     const font = try cg.text.Font.initSystem(16);
     defer font.deinit();
 
-    const metrics = try cg.text.measure("cg-zig", font);
+    const metrics = try cg.text.measure("mac-zig", font);
     try std.testing.expect(metrics.width > 0);
     try std.testing.expect(metrics.height() > 0);
 
     const ctx = try cg.Context.initBitmap(.{ .width = 120, .height = 32 });
     defer ctx.deinit();
     ctx.setFillColor(.white);
-    try cg.text.draw(ctx, "cg-zig", font, .init(4, 8), null);
+    try cg.text.draw(ctx, "mac-zig", font, .init(4, 8), null);
 
     try std.testing.expect(paintedPixels(ctx) > 0);
 }

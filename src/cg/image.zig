@@ -30,9 +30,9 @@
 //! supported; `.bgra8888` is the native order and the faster of the two.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const geometry = @import("geometry.zig");
 const color = @import("color.zig");
 
@@ -381,7 +381,7 @@ pub const Image = struct {
     /// bitmap context it is a copy, not the context's live buffer.
     pub fn copyData(self: Image) Error!cf.Data {
         const provider = DataProvider.fromRaw(raw.CGImageGetDataProvider(self.handle)) orelse
-            return Error.CgError;
+            return Error.Failed;
         return provider.copyData();
     }
 
@@ -392,7 +392,7 @@ pub const Image = struct {
     ///
     /// `area` is in pixels with the origin at the **top left**, unlike the
     /// rest of CoreGraphics, and it is rounded outwards to whole pixels.
-    /// A rectangle outside the image gives `error.CgError`.
+    /// A rectangle outside the image gives `error.Failed`.
     pub fn cropped(self: Image, area: Rect) Error!Image {
         const created = raw.CGImageCreateWithImageInRect(self.handle, area.toRaw());
         return .{ .handle = try errors.checkPtr(created) };

@@ -1,5 +1,5 @@
-//! Zig bindings for [CoreGraphics](https://developer.apple.com/documentation/coregraphics),
-//! Apple's 2D drawing engine.
+//! [CoreGraphics](https://developer.apple.com/documentation/coregraphics),
+//! Apple's 2D drawing engine -- reached as `mac.cg`.
 //!
 //! CoreGraphics is C, so the raw layer is `translate-c` over the framework
 //! headers with no shim in between. Everything else is the layer you are
@@ -19,7 +19,7 @@
 //! Reach for `raw` where the wrapper does not yet cover something.
 //!
 //! ```zig
-//! const cg = @import("cg");
+//! const cg = @import("mac").cg;
 //!
 //! const ctx = try cg.Context.initBitmap(.{ .width = 400, .height = 300 });
 //! defer ctx.deinit();
@@ -46,14 +46,14 @@
 //! visible: anything with a `deinit` is yours, and anything returned
 //! without one is borrowed from something that is.
 
-const build_options = @import("cg_build_options");
+const build_options = @import("mac_build_options");
 
 /// The complete, mechanically translated CoreGraphics and CoreFoundation
 /// API, for the corners this wrapper does not cover.
-pub const raw = @import("cg_raw");
+pub const raw = @import("mac_raw");
 
-pub const errors = @import("errors.zig");
-pub const cf = @import("cf.zig");
+pub const errors = @import("../errors.zig");
+pub const cf = @import("../cf.zig");
 pub const geometry = @import("geometry.zig");
 pub const color = @import("color.zig");
 pub const image = @import("image.zig");
@@ -74,16 +74,6 @@ pub const imageio = if (build_options.imageio) @import("imageio.zig") else struc
 /// Without it this namespace holds only `enabled = false`.
 pub const text = if (build_options.coretext) @import("text.zig") else struct {
     pub const enabled = false;
-};
-
-pub const features: Features = .{
-    .imageio = build_options.imageio,
-    .coretext = build_options.coretext,
-};
-
-pub const Features = struct {
-    imageio: bool,
-    coretext: bool,
 };
 
 // The types you reach for most, re-exported so a program can say
@@ -130,7 +120,6 @@ test {
     // force the Mach message headers' size assertions -- those cover
     // bitfield structs that translate-c can only render as `opaque`.
     _ = errors;
-    _ = cf;
     _ = geometry;
     _ = color;
     _ = image;

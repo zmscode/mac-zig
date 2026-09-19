@@ -17,9 +17,9 @@
 //! instead of a null destination.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const image_mod = @import("image.zig");
 const context_mod = @import("context.zig");
 
@@ -223,8 +223,8 @@ pub const Source = struct {
         const properties = try self.propertiesAt(index);
         defer properties.deinit();
 
-        const w = properties.getInt(raw.kCGImagePropertyPixelWidth) orelse return Error.CgError;
-        const h = properties.getInt(raw.kCGImagePropertyPixelHeight) orelse return Error.CgError;
+        const w = properties.getInt(raw.kCGImagePropertyPixelWidth) orelse return Error.Failed;
+        const h = properties.getInt(raw.kCGImagePropertyPixelHeight) orelse return Error.Failed;
         return .{ .width = @intCast(w), .height = @intCast(h) };
     }
 };

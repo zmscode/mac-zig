@@ -55,9 +55,9 @@
 //! `Path` once and calling `addPath` before each draw.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const geometry = @import("geometry.zig");
 const color_mod = @import("color.zig");
 const image_mod = @import("image.zig");

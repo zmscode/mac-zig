@@ -24,8 +24,8 @@
 //! system from `cg.display`, not a context's.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
 const geometry = @import("geometry.zig");
 
 const Error = errors.Error;
@@ -444,7 +444,7 @@ pub const Tap = struct {
     /// given to let it through, or null to swallow it. Swallowing requires
     /// a tap created with `.options = .default`.
     ///
-    /// Returns `error.CgError` when the permission is missing, which is the
+    /// Returns `error.Failed` when the permission is missing, which is the
     /// one part of this module that does report a failure.
     pub fn init(
         options: Options,

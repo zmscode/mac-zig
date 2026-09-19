@@ -1,12 +1,24 @@
 ---
-name: cg-zig
-description: Integrate, configure, test, and debug the cg-zig Zig 0.17 bindings for CoreGraphics. Use when an agent needs 2D drawing, bitmap or PDF output, image loading and saving, paths, gradients, colour spaces, text drawing on macOS from Zig; needs display or window enumeration; needs synthetic mouse or keyboard input; or must reach parts of the CoreGraphics API the wrapper does not yet cover.
+name: mac-zig
+description: Integrate, configure, test, and debug the mac-zig Zig 0.17 bindings for the macOS system frameworks. Use when an agent needs 2D drawing, bitmap or PDF output, image loading and saving, paths, gradients, colour spaces, or text drawing on macOS from Zig; needs display or window enumeration; needs mouse position, modifier state or synthetic input; or must reach parts of a macOS C framework the wrappers do not yet cover.
 ---
 
-# CoreGraphics in Zig
+# macOS frameworks in Zig
 
-Use the idiomatic `cg` module by default. Reach for `cg.raw` only when the wrapper does not
+One package, a namespace per framework:
+
+| Namespace | Framework |
+| --------- | --------- |
+| `mac.cg` | CoreGraphics |
+| `mac.cg.imageio` | ImageIO, under `-Dimageio` |
+| `mac.cg.text` | CoreText, under `-Dcoretext` |
+| `mac.cf` | CoreFoundation |
+
+Use the idiomatic namespaces by default. Reach for `mac.raw` only when a wrapper does not
 cover a call.
+
+Objective-C frameworks (AVFoundation, Metal, AppKit, Foundation) are **not** here and cannot
+be added without a message-sending bridge. Do not reach for them.
 
 macOS only. The Xcode command line tools must be present, because the headers come from the
 SDK that `xcode-select` points at.
@@ -14,16 +26,16 @@ SDK that `xcode-select` points at.
 ## Add the dependency
 
 ```sh
-zig fetch --save=cg git+https://github.com/zmscode/cg-zig.git
+zig fetch --save=mac git+https://github.com/zmscode/mac-zig.git
 ```
 
 ```zig
-const dependency = b.dependency("cg", .{
+const dependency = b.dependency("mac", .{
     .target = target,
     .optimize = optimize,
 });
 
-exe.root_module.addImport("cg", dependency.module("cg"));
+exe.root_module.addImport("mac", dependency.module("mac"));
 ```
 
 The frameworks ship with macOS and are linked for you. Nothing is fetched or compiled.
@@ -31,7 +43,8 @@ The frameworks ship with macOS and are linked for you. Nothing is fetched or com
 ## The shape of a program
 
 ```zig
-const cg = @import("cg");
+const mac = @import("mac");
+const cg = mac.cg;            // the rest of this file assumes this
 
 const ctx = try cg.Context.initBitmap(.{ .width = 400, .height = 300 });
 defer ctx.deinit();
@@ -59,7 +72,8 @@ try cg.imageio.writeContext(ctx, "out.png", .png, .{});
 4. **Clipping only shrinks.** There is no call to widen it again. Wrap it in
    `save()` / `defer restore()`.
 5. **`?T` is an answer, an error is a failure.** Null that means *absent* comes back as an
-   optional; null that means *failed* becomes `error.CgError`.
+   optional; null that means *failed* becomes `error.Failed`. The `CGError` codes are named
+   separately in the same set -- `error.CgFailure` is `kCGErrorFailure`, not the null case.
 6. **A PDF context needs `closePdf`.** Releasing it without that leaves a truncated file.
 7. **`bitmapData()` rows are padded.** The slice is `bytesPerRow * height`, and
    `bytesPerRow` is not always `width * 4`. Index with `bitmapBytesPerRow()`.
@@ -149,7 +163,7 @@ _ = try path.asPath().flattened(0.1);
 
 ## Text
 
-Under `-Dcoretext`. Check `cg.features.coretext` if the package might be built without it.
+Under `-Dcoretext`. Check `mac.features.coretext` if the package might be built without it.
 
 ```zig
 const font = try cg.text.Font.initSystem(24);      // or .initMonospaced, or .init("Helvetica", 24)
@@ -258,11 +272,11 @@ Reading a scroll amount back is asymmetric: `scroll_delta_axis_1` is always in l
 
 | Option              | Default | Effect                                              |
 | ------------------- | ------- | --------------------------------------------------- |
-| `-Dimageio=false`   | on      | Drops `cg.imageio`                                  |
-| `-Dcoretext=false`  | on      | Drops `cg.text`                                     |
+| `-Dimageio=false`   | on      | Drops `mac.cg.imageio`                              |
+| `-Dcoretext=false`  | on      | Drops `mac.cg.text`                                 |
 
 Both namespaces exist either way, holding `enabled = false` when off. Check
-`cg.features.imageio` / `cg.features.coretext` rather than assuming.
+`mac.features.imageio` / `mac.features.coretext` rather than assuming.
 
 ## Validate a change
 
@@ -278,13 +292,28 @@ Drawing tests assert on real pixels — make a small bitmap context, draw, and r
 `bitmapData()` indexed by `bitmapBytesPerRow()`. Do not write tests that post events: they
 would move the user's real mouse.
 
+## Adding a framework
+
+One translation unit, one `Error` set, one `cf`. To add a C framework:
+
+1. include its umbrella header in `vendor/mac_translate.h` behind a `MAC_ZIG_<NAME>` macro;
+2. add the build option, the `defineCMacro`, the `linkFramework` and the `features` field in
+   `build.zig` and `src/mac.zig`;
+3. put the wrappers in `src/<name>/`, importing `../errors.zig` and `../cf.zig`;
+4. add any new failure codes to the shared `Error` set.
+
+Expect header trouble: see the notes at the end of README.md for the three spellings that do
+not survive Zig 0.17's C translator. Check a new framework's headers for blocks first --
+`grep -l '(\^' <headers>/*.h` -- because those cannot be translated at all.
+
 ## Adding a wrapper
 
-Find the call in `zig-out/bindings/cg.zig` after `zig build bindings`, then:
+Find the call in `zig-out/bindings/mac.zig` after `zig build bindings`, then:
 
 - handles are a struct over one non-optional pointer, with `init`/`deinit`, `toRaw` and
   `fromRaw`;
-- null-on-failure goes through `errors.checkPtr`, a `CGError` through `errors.checkCode`;
+- null-on-failure goes through `errors.checkPtr` (`error.Failed`), a `CGError` through
+  `errors.checkCode`;
 - loose integer constants become an `enum` with `_` for the unnamed values, converted with
   `@backingInt` / `@fromBackingInt`;
 - an or-ed bit word becomes a `packed struct(uN)` with a test asserting it equals the C

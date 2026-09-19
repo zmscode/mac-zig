@@ -1,6 +1,6 @@
 .{
-    .name = .cg,
-    .fingerprint = 0xdcdfde60d22e30e8,
+    .name = .mac,
+    .fingerprint = 0x1713eb65e878e4c0,
     .version = "0.1.0",
     .minimum_zig_version = "0.17.0-dev.2163+89ff10d56",
     .dependencies = .{},

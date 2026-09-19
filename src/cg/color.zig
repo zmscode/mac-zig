@@ -17,9 +17,9 @@
 //! creating one per shape.
 
 const std = @import("std");
-const raw = @import("cg_raw");
-const errors = @import("errors.zig");
-const cf = @import("cf.zig");
+const raw = @import("mac_raw");
+const errors = @import("../errors.zig");
+const cf = @import("../cf.zig");
 const geometry = @import("geometry.zig");
 
 const Error = errors.Error;
