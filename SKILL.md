@@ -244,6 +244,10 @@ const mode = try displays[0].currentMode();
 defer mode.deinit();
 ```
 
+`Display.containing(point)` and `Display.bestFor(rect)` answer "which screen is this on" —
+both in the global display space, which is what `cg.event` locations and SDL window positions
+are already in. `Display.fromId(n)` wraps an id from elsewhere.
+
 `modes(.{})` usually **omits the current mode** on a Retina display. Pass
 `.{ .include_scaled = true }` to see it.
 

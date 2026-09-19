@@ -21,6 +21,7 @@ const image_mod = @import("image.zig");
 
 const Error = errors.Error;
 const Float = geometry.Float;
+const Point = geometry.Point;
 const Rect = geometry.Rect;
 const Size = geometry.Size;
 const Image = image_mod.Image;
@@ -71,6 +72,79 @@ pub const Display = struct {
             &count,
         ));
         return buffer[0..count];
+    }
+
+    /// The display showing `point`, or null when nothing does -- which
+    /// happens for a coordinate off the side of every screen.
+    ///
+    /// `point` is in the global display space: origin at the main
+    /// display's top left, y downwards. That is the same space as
+    /// `cg.event.Event.location()`, so the display under the cursor is:
+    ///
+    /// ```zig
+    /// const now = try cg.event.Event.initCurrentState(null);
+    /// defer now.deinit();
+    /// const screen = cg.Display.containing(now.location()) orelse .main();
+    /// ```
+    ///
+    /// It is also the space SDL reports window positions and display
+    /// bounds in on macOS, so an SDL window's rectangle can be handed
+    /// straight to `bestFor` without conversion.
+    pub fn containing(point: Point) ?Display {
+        var buffer: [max_displays]Display = undefined;
+        const found = allContaining(point, &buffer) catch return null;
+        if (found.len == 0) return null;
+        return found[0];
+    }
+
+    /// Every display showing `point`. More than one means they are
+    /// mirrored; zero means the point is off every screen.
+    pub fn allContaining(point: Point, buffer: *[max_displays]Display) Error![]Display {
+        var count: u32 = 0;
+        try errors.checkCode(raw.CGGetDisplaysWithPoint(
+            point.toRaw(),
+            max_displays,
+            @ptrCast(buffer),
+            &count,
+        ));
+        return buffer[0..count];
+    }
+
+    /// Every display `area` overlaps, in no particular order.
+    pub fn intersecting(area: Rect, buffer: *[max_displays]Display) Error![]Display {
+        var count: u32 = 0;
+        try errors.checkCode(raw.CGGetDisplaysWithRect(
+            area.toRaw(),
+            max_displays,
+            @ptrCast(buffer),
+            &count,
+        ));
+        return buffer[0..count];
+    }
+
+    /// The display `area` sits on most -- the one with the largest overlap.
+    ///
+    /// This is the question "which screen is this window on?" actually
+    /// asks, since a window straddling two screens is on both and only one
+    /// of them is the right place to go fullscreen. Null when `area`
+    /// touches no display at all.
+    pub fn bestFor(area: Rect) ?Display {
+        var buffer: [max_displays]Display = undefined;
+        const candidates = intersecting(area, &buffer) catch return null;
+
+        var best: ?Display = null;
+        var best_area: Float = 0;
+        for (candidates) |candidate| {
+            const overlap = candidate.bounds().intersection(area);
+            if (overlap.isNull()) continue;
+
+            const covered = overlap.width() * overlap.height();
+            if (best == null or covered > best_area) {
+                best = candidate;
+                best_area = covered;
+            }
+        }
+        return best;
     }
 
     /// The display's rectangle in the global space, in points. The main
@@ -349,6 +423,41 @@ test "pixelSize is the backing store, not the legacy point count" {
     if (mode.isRetina()) {
         try std.testing.expect(pixels.width > points.width);
         try std.testing.expect(primary.legacyPixelSize().eql(points));
+    }
+}
+
+test "a point on a display finds it, and one off every screen does not" {
+    var buffer: [max_displays]Display = undefined;
+    if ((try Display.active(&buffer)).len == 0) return;
+
+    const primary = Display.main();
+    const area = primary.bounds();
+
+    // The centre of the main display is on the main display.
+    try std.testing.expectEqual(primary.id, Display.containing(area.center()).?.id);
+
+    // Far off the side of everything.
+    try std.testing.expect(Display.containing(.init(-500_000, -500_000)) == null);
+}
+
+test "bestFor picks the display a rectangle mostly sits on" {
+    var buffer: [max_displays]Display = undefined;
+    if ((try Display.active(&buffer)).len == 0) return;
+
+    const primary = Display.main();
+    const area = primary.bounds();
+
+    // A window wholly inside the main display is on the main display.
+    const inside = Rect.init(area.minX() + 10, area.minY() + 10, 100, 100);
+    try std.testing.expectEqual(primary.id, Display.bestFor(inside).?.id);
+
+    // A rectangle touching nothing is on nothing.
+    try std.testing.expect(Display.bestFor(.init(-500_000, -500_000, 10, 10)) == null);
+
+    // Everything `intersecting` returns really does overlap.
+    var overlap_buffer: [max_displays]Display = undefined;
+    for (try Display.intersecting(inside, &overlap_buffer)) |screen| {
+        try std.testing.expect(screen.bounds().intersects(inside));
     }
 }
 

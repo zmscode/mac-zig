@@ -260,6 +260,19 @@ an error, and nothing here needs a permission.
 
 ## Displays and windows
 
+Finding the display something is on, which is what "go fullscreen where the cursor is" needs:
+
+```zig
+const now = try cg.event.Event.initCurrentState(null);
+defer now.deinit();
+const under_cursor = cg.Display.containing(now.location()) orelse .main();
+
+// Or, for a window: the display it mostly sits on. SDL reports window
+// positions in this same global space on macOS, so its rectangle goes
+// straight in.
+const window_screen = cg.Display.bestFor(window_rect) orelse .main();
+```
+
 ```zig
 var buffer: [64]cg.Display = undefined;
 for (try cg.Display.active(&buffer)) |screen| {
