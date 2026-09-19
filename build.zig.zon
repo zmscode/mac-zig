@@ -1,0 +1,18 @@
+.{
+    .name = .cg,
+    .fingerprint = 0xdcdfde60d22e30e8,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.17.0-dev.2163+89ff10d56",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "examples",
+        "src",
+        "tests",
+        "vendor",
+        "LICENSE",
+        "README.md",
+        "SKILL.md",
+    },
+}
