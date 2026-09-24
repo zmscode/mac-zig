@@ -39,6 +39,8 @@ pub fn main(init: std.process.Init) !void {
     var names: std.ArrayList([]const u8) = .empty;
     try names.appendSlice(arena, &manifest.classes);
     try names.appendSlice(arena, &manifest.enums);
+    try names.appendSlice(arena, &manifest.structs);
+    try names.appendSlice(arena, &manifest.protocols);
 
     const dumps = try dumpAll(arena, io, zig_exe, sdk, scratch, names.items);
 
@@ -148,11 +150,23 @@ const Method = struct {
     variadic: bool,
 };
 
+/// A class, or a protocol -- both are a name and a list of methods.
 const Class = struct {
     name: []const u8,
     superclass: ?[]const u8 = null,
+    is_protocol: bool = false,
     methods: std.ArrayList(Method) = .empty,
     seen: std.StringHashMapUnmanaged(void) = .empty,
+
+    fn key(arena: Allocator, m: Method) ![]const u8 {
+        return std.fmt.allocPrint(arena, "{c}{s}", .{ @as(u8, if (m.instance) '-' else '+'), m.selector });
+    }
+};
+
+/// A C struct, from a manifest `structs` entry.
+const Record = struct {
+    name: []const u8,
+    fields: []const Param,
 };
 
 const Constant = struct { name: []const u8, value: i128 };
@@ -167,7 +181,9 @@ const Enum = struct {
 const Model = struct {
     arena: Allocator,
     classes: std.StringArrayHashMapUnmanaged(Class) = .empty,
+    protocols: std.StringArrayHashMapUnmanaged(Class) = .empty,
     enums: std.StringArrayHashMapUnmanaged(Enum) = .empty,
+    structs: std.StringArrayHashMapUnmanaged(Record) = .empty,
 
     fn wantsClass(name: []const u8) bool {
         for (manifest.classes) |c| if (std.mem.eql(u8, c, name)) return true;
@@ -176,6 +192,16 @@ const Model = struct {
 
     fn wantsEnum(name: []const u8) bool {
         for (manifest.enums) |e| if (std.mem.eql(u8, e, name)) return true;
+        return false;
+    }
+
+    fn wantsProtocol(name: []const u8) bool {
+        for (manifest.protocols) |p| if (std.mem.eql(u8, p, name)) return true;
+        return false;
+    }
+
+    fn wantsStruct(name: []const u8) bool {
+        for (manifest.structs) |r| if (std.mem.eql(u8, r, name)) return true;
         return false;
     }
 
@@ -205,6 +231,22 @@ const Model = struct {
             if (!wantsClass(interface)) return;
             const inner = object.get("inner") orelse return;
             try self.methods(try self.classNamed(interface), inner);
+        } else if (std.mem.eql(u8, kind, "ObjCProtocolDecl") and wantsProtocol(name)) {
+            const inner = object.get("inner") orelse return;
+            const entry = try self.protocols.getOrPut(self.arena, name);
+            if (!entry.found_existing) entry.value_ptr.* = .{ .name = name, .is_protocol = true };
+            try self.methods(entry.value_ptr, inner);
+        } else if (std.mem.eql(u8, kind, "RecordDecl") and wantsStruct(name) and !self.structs.contains(name)) {
+            const inner = object.get("inner") orelse return;
+            var fields: std.ArrayList(Param) = .empty;
+            for (inner.array.items) |child| {
+                if (!std.mem.eql(u8, child.object.get("kind").?.string, "FieldDecl")) continue;
+                try fields.append(self.arena, .{
+                    .name = child.object.get("name").?.string,
+                    .type = .from(child.object.get("type").?),
+                });
+            }
+            if (fields.items.len > 0) try self.structs.put(self.arena, name, .{ .name = name, .fields = fields.items });
         } else if (std.mem.eql(u8, kind, "EnumDecl") and wantsEnum(name) and !self.enums.contains(name)) {
             const inner = object.get("inner") orelse return;
             var constants: std.ArrayList(Constant) = .empty;
@@ -238,6 +280,19 @@ const Model = struct {
     }
 
     fn methods(self: *Model, class: *Class, inner: Value) !void {
+        // Whether each property -- by name, and by getter -- was declared
+        // with explicit nullability. See `recoverNullability`.
+        var explicit: std.StringHashMapUnmanaged(bool) = .empty;
+        for (inner.array.items) |child| {
+            const object = child.object;
+            if (!std.mem.eql(u8, object.get("kind").?.string, "ObjCPropertyDecl")) continue;
+            const flagged = if (object.get("nullability")) |n| n.bool else false;
+            try explicit.put(self.arena, object.get("name").?.string, flagged);
+            if (object.get("getter")) |getter| {
+                if (getter.object.get("name")) |g| try explicit.put(self.arena, g.string, flagged);
+            }
+        }
+
         for (inner.array.items) |child| {
             const object = child.object;
             if (!std.mem.eql(u8, object.get("kind").?.string, "ObjCMethodDecl")) continue;
@@ -248,22 +303,46 @@ const Model = struct {
             const key = try std.fmt.allocPrint(self.arena, "{c}{s}", .{ @as(u8, if (instance) '-' else '+'), selector });
             if ((try class.seen.getOrPut(self.arena, key)).found_existing) continue;
 
+            const implicit = if (object.get("isImplicit")) |i| i.bool else false;
+            const property: ?bool = if (!implicit) null else explicit.get(accessorProperty(selector)) orelse
+                explicit.get(selector);
+
             var params: std.ArrayList(Param) = .empty;
             if (object.get("inner")) |parts| for (parts.array.items) |part| {
                 if (!std.mem.eql(u8, part.object.get("kind").?.string, "ParmVarDecl")) continue;
                 try params.append(self.arena, .{
                     .name = if (part.object.get("name")) |n| n.string else "arg",
-                    .type = .from(part.object.get("type").?),
+                    .type = try self.recoverNullability(.from(part.object.get("type").?), property),
                 });
             };
             try class.methods.append(self.arena, .{
                 .selector = selector,
                 .instance = instance,
-                .returns = .from(object.get("returnType").?),
+                .returns = try self.recoverNullability(.from(object.get("returnType").?), property),
                 .params = params.items,
                 .variadic = if (object.get("variadic")) |v| v.bool else false,
             });
         }
+    }
+
+    /// A property's accessor inside `NS_ASSUME_NONNULL` is non-null, and
+    /// clang spells that as `_Nonnull` -- except when the property carries
+    /// an availability macro, when the spelling is `API_AVAILABLE(...) T *`
+    /// and the implicit nullability is gone. The property declaration still
+    /// says whether nullability was written out, which inside those regions
+    /// means `nullable`; otherwise the region's non-null applies.
+    fn recoverNullability(self: *Model, t: TypeRef, explicitly: ?bool) !TypeRef {
+        const flagged = explicitly orelse return t;
+        const q = t.qual;
+        const annotated = std.mem.indexOf(u8, q, "_Nonnull") != null or
+            std.mem.indexOf(u8, q, "_Nullable") != null or
+            std.mem.indexOf(u8, q, "_Null_unspecified") != null;
+        const macro_spelled = std.mem.indexOf(u8, q, "API_") != null or std.mem.indexOf(u8, q, "NS_") != null;
+        if (annotated or !macro_spelled) return t;
+        return .{
+            .qual = try std.fmt.allocPrint(self.arena, "{s} {s}", .{ q, if (flagged) "_Nullable" else "_Nonnull" }),
+            .desugared = t.desugared,
+        };
     }
 
     // -- writing Zig ---------------------------------------------------
@@ -297,6 +376,13 @@ const Model = struct {
             \\
         , .{ manifest.framework, lowerFramework(), manifest.framework });
 
+        for (manifest.structs) |name| {
+            const record = self.structs.get(name) orelse {
+                try w.print("\n// Not generated: struct {s}, which was not found.\n", .{name});
+                continue;
+            };
+            try self.emitStruct(w, record);
+        }
         for (manifest.enums) |name| {
             const e = self.enums.get(name) orelse {
                 try w.print("\n// Not generated: enum {s}, which the SDK does not declare as an enum.\n", .{name});
@@ -311,6 +397,61 @@ const Model = struct {
             };
             try self.emitClass(w, class);
         }
+        for (manifest.protocols) |name| {
+            const protocol = self.protocols.getPtr(name) orelse {
+                try w.print("\n// Not generated: protocol {s}, which was not found.\n", .{name});
+                continue;
+            };
+            try w.print(
+                \\
+                \\/// `{s}`, for the `.protocols` of an `objc.Subclass`: the class
+                \\/// adopts it, and each method it implements is checked against it.
+                \\pub const {s} = struct {{
+                \\    pub const protocol_name = "{s}";
+                \\
+            , .{ name, stripPrefix(name), name });
+            try self.emitSignatures(w, protocol, protocol.methods.items);
+            try w.writeAll("};\n");
+        }
+    }
+
+    fn emitStruct(self: *Model, w: *std.Io.Writer, record: Record) !void {
+        var dummy: Class = .{ .name = record.name };
+        try w.print("\n/// `{s}`.\npub const {s} = extern struct {{\n", .{ record.name, stripPrefix(record.name) });
+        for (record.fields) |field| {
+            const t = self.zigType(&dummy, field.type, .param) catch {
+                try w.print("    // Not generated: field {s}, of type {s}\n", .{ field.name, field.type.qual });
+                continue;
+            };
+            try w.print("    {f}: {s},\n", .{ ident(try self.snake(field.name)), t });
+        }
+        try w.writeAll("};\n");
+    }
+
+    /// `pub const signatures`: each method's Zig function type, without
+    /// the receiver, keyed by selector -- `+` first for a class method.
+    /// `objc.Subclass` checks an override against these. A method with a
+    /// block parameter has no single type and is left out.
+    fn emitSignatures(self: *Model, w: *std.Io.Writer, class: *Class, list: []const Method) !void {
+        try w.writeAll("\n    /// Each method's signature, for `objc.Subclass` to check overrides against.\n");
+        try w.writeAll("    pub const signatures = struct {\n");
+        for (list) |m| {
+            if (self.unsupportedReason(class, m) != null) continue;
+            const result = try self.zigType(class, m.returns, .result);
+            var params: std.ArrayList(u8) = .empty;
+            var generic = false;
+            for (m.params, 0..) |p, i| {
+                const t = try self.zigType(class, p.type, .param);
+                if (std.mem.eql(u8, t, "anytype")) generic = true;
+                if (i > 0) try params.appendSlice(self.arena, ", ");
+                try params.appendSlice(self.arena, t);
+            }
+            if (generic) continue;
+            try w.print("        pub const @\"{s}{s}\" = fn ({s}) {s};\n", .{
+                if (m.instance) "" else "+", m.selector, params.items, result,
+            });
+        }
+        try w.writeAll("    };\n");
     }
 
     fn emitEnum(self: *Model, w: *std.Io.Writer, e: Enum) !void {
@@ -438,13 +579,30 @@ const Model = struct {
 
         // Names the struct already uses, which a method must not take.
         var taken: std.StringHashMapUnmanaged(void) = .empty;
-        for ([_][]const u8{ "object", "Self", "Super", "class_name", "class", "alloc", "from", "into", "retain", "release", "autorelease" }) |n| {
+        for ([_][]const u8{ "object", "Self", "Super", "class_name", "class", "alloc", "from", "into", "retain", "release", "autorelease", "signatures" }) |n| {
             try taken.put(self.arena, n, {});
+        }
+
+        // Its own methods, then each generated ancestor's that it does not
+        // redeclare -- so that `window.becomeFirstResponder()` works without
+        // `into(Responder)` first.
+        const Entry = struct { method: Method, origin: []const u8 };
+        var all: std.ArrayList(Entry) = .empty;
+        var keys: std.StringHashMapUnmanaged(void) = .empty;
+        var owner: ?*Class = class;
+        while (owner) |current| {
+            for (current.methods.items) |m| {
+                if ((try keys.getOrPut(self.arena, try Class.key(self.arena, m))).found_existing) continue;
+                try all.append(self.arena, .{ .method = m, .origin = current.name });
+            }
+            const next = current.superclass orelse break;
+            owner = if (wantsClass(next)) self.classes.getPtr(next) else null;
         }
 
         var skipped: std.ArrayList([]const u8) = .empty;
         var method_names: std.ArrayList([]const u8) = .empty;
-        for (class.methods.items) |m| {
+        for (all.items) |entry| {
+            const m = entry.method;
             var name = try methodName(self.arena, m.selector);
             if (!m.instance and taken.contains(name)) name = try std.fmt.allocPrint(self.arena, "class{c}{s}", .{ std.ascii.toUpper(name[0]), name[1..] });
             while (taken.contains(name)) name = try std.fmt.allocPrint(self.arena, "{s}_", .{name});
@@ -452,15 +610,19 @@ const Model = struct {
             try method_names.append(self.arena, name);
         }
 
-        for (class.methods.items, method_names.items) |m, name| {
+        for (all.items, method_names.items) |entry, name| {
+            const m = entry.method;
             if (self.unsupportedReason(class, m)) |why| {
+                // An ancestor's gaps are listed on the ancestor.
+                if (entry.origin.ptr != class.name.ptr) continue;
                 try skipped.append(self.arena, try std.fmt.allocPrint(self.arena, "{c}[{s} {s}]: {s}", .{
                     @as(u8, if (m.instance) '-' else '+'), class.name, m.selector, why,
                 }));
             } else {
-                try self.emitMethod(w, class, m, name, &taken);
+                try self.emitMethod(w, class, entry.origin, m, name, &taken);
             }
         }
+        try self.emitSignatures(w, class, class.methods.items);
         if (skipped.items.len > 0) {
             try w.writeAll("\n    // Not generated:\n");
             for (skipped.items) |line| try w.print("    //   {s}\n", .{line});
@@ -481,11 +643,11 @@ const Model = struct {
         return t.qual;
     }
 
-    fn emitMethod(self: *Model, w: *std.Io.Writer, class: *Class, m: Method, name: []const u8, taken: *std.StringHashMapUnmanaged(void)) !void {
+    fn emitMethod(self: *Model, w: *std.Io.Writer, class: *Class, origin: []const u8, m: Method, name: []const u8, taken: *std.StringHashMapUnmanaged(void)) !void {
         const result = try self.zigType(class, m.returns, .result);
 
         try w.print("\n    /// `{c}[{s} {s}]`\n    pub fn {f}(", .{
-            @as(u8, if (m.instance) '-' else '+'), class.name, m.selector, ident(name),
+            @as(u8, if (m.instance) '-' else '+'), origin, m.selector, ident(name),
         });
         if (m.instance) try w.writeAll("self: Self");
 
@@ -546,13 +708,18 @@ const Model = struct {
         switch (depth) {
             0 => {
                 if (std.mem.eql(u8, base, "void")) return "void";
-                if (std.mem.eql(u8, base, "instancetype")) return try self.maybeOptional(stripPrefix(class.name), optional);
+                if (std.mem.eql(u8, base, "instancetype")) {
+                    return try self.maybeOptional(if (class.is_protocol) "objc.Object" else stripPrefix(class.name), optional);
+                }
+                if (cgHandle(base)) |handle| return try self.maybeOptional(handle, optional);
                 if (std.mem.eql(u8, base, "id") or std.mem.startsWith(u8, base, "id<"))
                     return try self.maybeOptional("objc.Object", optional);
                 if (std.mem.eql(u8, base, "SEL")) return try self.maybeOptional("objc.Sel", optional);
                 if (std.mem.eql(u8, base, "Class")) return try self.maybeOptional("objc.Class", optional);
                 if (scalar(base)) |s| return s;
                 if (structType(base)) |s| return s;
+                const struct_name = if (std.mem.startsWith(u8, base, "struct ")) base["struct ".len..] else base;
+                if (self.structs.contains(struct_name)) return stripPrefix(struct_name);
                 const enum_name = if (std.mem.startsWith(u8, base, "enum ")) base["enum ".len..] else base;
                 if (self.enums.contains(enum_name)) return stripPrefix(enum_name);
                 return null;
@@ -707,6 +874,13 @@ fn clean(arena: Allocator, text: []const u8) !Cleaned {
         if (std.ascii.isUpper(text[i]) and (i == 0 or text[i - 1] == ' ')) {
             var j = i;
             while (j < text.len and (std.ascii.isUpper(text[j]) or text[j] == '_')) j += 1;
+            // Attribute macros without arguments: NS_RETURNS_INNER_POINTER.
+            if (j < text.len and text[j] == ' ' and j - i > 3 and
+                std.mem.indexOfScalar(u8, text[i..j], '_') != null)
+            {
+                i = j + 1;
+                continue;
+            }
             if (j < text.len and text[j] == '(' and j - i > 3) {
                 var depth: usize = 0;
                 while (j < text.len) : (j += 1) {
@@ -777,6 +951,35 @@ fn structType(name: []const u8) ?[]const u8 {
     };
     inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
     return null;
+}
+
+/// A CoreGraphics handle, as the `cg` type that wraps it. Each is a struct
+/// over one pointer, which `objc.abi` passes as the pointer.
+fn cgHandle(name: []const u8) ?[]const u8 {
+    const table = .{
+        .{ "CGImageRef", "cg.Image" },           .{ "CGColorRef", "cg.Color" },
+        .{ "CGColorSpaceRef", "cg.ColorSpace" }, .{ "CGContextRef", "cg.Context" },
+        .{ "CGPathRef", "cg.Path" },             .{ "CGMutablePathRef", "cg.MutablePath" },
+        .{ "CGGradientRef", "cg.Gradient" },     .{ "CGLayerRef", "cg.Layer" },
+    };
+    inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
+    return null;
+}
+
+/// The property an implicit accessor belongs to: `setTitle:` to `title`,
+/// `title` to itself.
+fn accessorProperty(selector: []const u8) []const u8 {
+    if (std.mem.startsWith(u8, selector, "set") and std.mem.endsWith(u8, selector, ":") and selector.len > 4) {
+        const Lowered = struct {
+            var buffer: [256]u8 = undefined;
+        };
+        const name = selector[3 .. selector.len - 1];
+        if (name.len > Lowered.buffer.len) return selector;
+        @memcpy(Lowered.buffer[0..name.len], name);
+        Lowered.buffer[0] = std.ascii.toLower(name[0]);
+        return Lowered.buffer[0..name.len];
+    }
+    return selector;
 }
 
 fn foundationType(name: []const u8) ?[]const u8 {
@@ -880,7 +1083,8 @@ fn contains(list: []const []const u8, name: []const u8) bool {
 /// Names declared at the top of the generated file, which a parameter
 /// may not shadow.
 fn isFileScope(name: []const u8) bool {
-    return contains(&.{ "objc", "foundation", "cg", "inherits", "lookUp", "framework" }, name);
+    return contains(&.{ "objc", "foundation", "cg", "inherits", "lookUp", "framework" }, name) or
+        cgHandle(name) != null;
 }
 
 /// An identifier, quoted with `@"..."` when it is a keyword or a

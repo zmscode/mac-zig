@@ -81,7 +81,6 @@ pub const Block = block.Block;
 pub const BlockRef = block.BlockRef;
 pub const Exception = exception.Exception;
 pub const Subclass = subclass.Subclass;
-pub const SubclassOptions = subclass.Options;
 
 pub const sel = sel_.sel;
 pub const tryCall = exception.tryCall;

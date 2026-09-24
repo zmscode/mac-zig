@@ -17,7 +17,7 @@ const print = std.debug.print;
 
 /// The view: a Zig struct whose fields are its state and whose `pub fn`s
 /// override NSView's methods.
-const Canvas = objc.Subclass(.{ .name = "MacZigExampleCanvas", .superclass = "NSView" }, struct {
+const Canvas = objc.Subclass(.{ .name = "MacZigExampleCanvas", .superclass = appkit.View }, struct {
     dots: [64]cg.Point = undefined,
     count: usize = 0,
     clicks: usize = 0,
@@ -102,6 +102,12 @@ const App = struct {
     answer: u64 = 0,
 
     pub fn launched(self: *App) void {
+        // Bundled, this is the Info.plist's identity; bare, the process's.
+        const me = appkit.RunningApplication.currentApplication();
+        print("running as {f} ({s})\n", .{
+            me.localizedName() orelse mac.foundation.String.literal("?"),
+            if (me.bundleIdentifier()) |id| id.utf8() else "no bundle",
+        });
         const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(
             .init(0, 0, 560, 360),
             .{ .titled = true, .closable = true, .miniaturizable = true, .resizable = true },
@@ -162,7 +168,7 @@ fn saveSnapshot(view: appkit.View, path: []const u8) !void {
     const bounds = view.bounds();
     const rep = view.bitmapImageRepForCachingDisplayInRect(bounds) orelse return error.Failed;
     view.cacheDisplayInRectToBitmapImageRep(bounds, rep);
-    const image = cg.Image.fromRaw(@ptrCast(rep.CGImage() orelse return error.Failed)).?; // borrowed
+    const image = rep.CGImage() orelse return error.Failed; // borrowed from the rep
     try cg.imageio.writeImage(image, path, .png, .{});
     print("wrote {s} ({d}x{d})\n", .{ path, image.width(), image.height() });
 }
@@ -188,6 +194,7 @@ pub fn main(init: std.process.Init) !void {
         }
     }
 
-    appkit.app.run(.{ .name = "mac-zig" }, &app, App);
+    // No name given: it comes from the bundle when there is one.
+    appkit.app.run(.{}, &app, App);
     print("run returned; cleaning up\n", .{});
 }

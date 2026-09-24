@@ -94,6 +94,6 @@ pub fn main() !void {
     print("\nscreens:\n", .{});
     var screens = appkit.Screen.screens().iterator();
     while (screens.next()) |screen| {
-        print("  {f}  {f} at {d}x\n", .{ screen.localizedName() orelse String.literal("(unnamed)"), screen.frame(), screen.backingScaleFactor() });
+        print("  {f}  {f} at {d}x\n", .{ screen.localizedName(), screen.frame(), screen.backingScaleFactor() });
     }
 }

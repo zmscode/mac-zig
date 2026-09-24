@@ -62,21 +62,68 @@ const Class = class_.Class;
 const Sel = sel.Sel;
 const protocol = @import("protocol.zig");
 
+/// `Subclass`'s options, once read. The options themselves are an
+/// anonymous struct:
+///
+/// - `.name` -- the class's name, which is process-wide. Prefix it so it
+///   will not collide with anyone else's.
+/// - `.superclass` -- the class to inherit from: a generated wrapper such
+///   as `appkit.View`, or a name such as `"NSDocument"`. Defaults to
+///   `NSObject`. It must be loaded -- an AppKit class needs AppKit linked.
+/// - `.protocols` -- a tuple of the protocols the class adopts: generated
+///   ones such as `appkit.WindowDelegate`, or names such as `"NSCopying"`.
+///
+/// Given as a type, a superclass or protocol also *checks*: each method
+/// the struct defines whose selector the SDK declares there must take and
+/// return what the SDK's does, or the program does not compile. Given as a
+/// name, nothing is checked.
 pub const Options = struct {
-    /// The class's name, which is process-wide. Prefix it so that it will
-    /// not collide with anyone else's.
     name: [:0]const u8,
-    /// The class to inherit from, by name. It must be loaded -- an AppKit
-    /// class needs AppKit linked.
-    superclass: [:0]const u8 = "NSObject",
-    /// Protocols the class adopts, by name. The methods are up to the
-    /// struct.
-    protocols: []const [:0]const u8 = &.{},
+    superclass_name: [:0]const u8,
+    superclass: ?type,
+    protocol_names: []const [:0]const u8,
+    protocols: []const type,
+
+    fn read(comptime options: anytype) Options {
+        const O = @TypeOf(options);
+        var result: Options = .{
+            .name = options.name,
+            .superclass_name = "NSObject",
+            .superclass = null,
+            .protocol_names = &.{},
+            .protocols = &.{},
+        };
+        if (@hasField(O, "superclass")) {
+            if (@TypeOf(options.superclass) == type) {
+                result.superclass = options.superclass;
+                result.superclass_name = options.superclass.class_name;
+            } else {
+                result.superclass_name = options.superclass;
+            }
+        }
+        if (@hasField(O, "protocols")) {
+            const list = if (@typeInfo(@TypeOf(options.protocols)) == .pointer) options.protocols.* else options.protocols;
+            var names: []const [:0]const u8 = &.{};
+            var types: []const type = &.{};
+            for (list) |entry| {
+                if (@TypeOf(entry) == type) {
+                    names = names ++ .{entry.protocol_name};
+                    types = types ++ .{entry};
+                } else {
+                    names = names ++ .{@as([:0]const u8, entry)};
+                }
+            }
+            result.protocol_names = names;
+            result.protocols = types;
+        }
+        return result;
+    }
 };
 
 /// An Objective-C class whose instance state is `State_`. See the top of
-/// this file.
-pub fn Subclass(comptime options: Options, comptime State_: type) type {
+/// this file, and `Options` for what `options` holds.
+pub fn Subclass(comptime options_: anytype, comptime State_: type) type {
+    const options = comptime Options.read(options_);
     // `extern` so that a slice of them is a C array of object pointers,
     // which is what lets one go in a `foundation.Array`.
     return extern struct {
@@ -156,9 +203,10 @@ pub fn Subclass(comptime options: Options, comptime State_: type) type {
         }
 
         fn register() Class {
-            const superclass = class_.getClass(options.superclass) orelse std.debug.panic(
+            comptime checkOverrides();
+            const superclass = class_.getClass(options.superclass_name) orelse std.debug.panic(
                 "{s}: superclass {s} is not loaded -- is its framework linked?",
-                .{ options.name, options.superclass },
+                .{ options.name, options.superclass_name },
             );
 
             const cls = class_.allocateClassPair(superclass, options.name) catch
@@ -181,7 +229,7 @@ pub fn Subclass(comptime options: Options, comptime State_: type) type {
             cls.addMethod("dealloc", dealloc) catch
                 std.debug.panic("{s}: defines dealloc; put cleanup in deinit instead", .{options.name});
 
-            for (options.protocols) |protocol_name| {
+            for (options.protocol_names) |protocol_name| {
                 const adopted = protocol.getProtocol(protocol_name) orelse std.debug.panic(
                     "{s}: protocol {s} is not loaded -- is its framework linked?",
                     .{ options.name, protocol_name },
@@ -217,6 +265,55 @@ pub fn Subclass(comptime options: Options, comptime State_: type) type {
             const variable = raw.class_getInstanceVariable(cls.value, ivar_name).?;
             state_offset = @intCast(raw.ivar_getOffset(variable));
             @atomicStore(?*raw.struct_objc_class, &registered, cls.value, .release);
+        }
+
+        /// Compares every method with the SDK's signature for its selector,
+        /// where the superclass or a protocol was given as a type.
+        fn checkOverrides() void {
+            @setEvalBranchQuota(100_000);
+            for (@typeInfo(State).@"struct".decl_names) |decl| {
+                const Receiver = receiverOf(decl);
+                if (Receiver == void) continue;
+                const key = (if (Receiver == Class) "+" else "") ++ decl;
+                const found = findSignature(key) orelse continue;
+                checkSignature(decl, found.owner, found.Signature, @TypeOf(@field(State, decl)));
+            }
+        }
+
+        const Found = struct { owner: []const u8, Signature: type };
+
+        fn findSignature(comptime key: []const u8) ?Found {
+            if (options.superclass) |first| {
+                var current: type = first;
+                while (true) {
+                    if (@hasDecl(current, "signatures") and @hasDecl(current.signatures, key)) {
+                        return .{ .owner = current.class_name, .Signature = @field(current.signatures, key) };
+                    }
+                    if (!@hasDecl(current, "Super") or current.Super == Object) break;
+                    current = current.Super;
+                }
+            }
+            for (options.protocols) |P| {
+                if (@hasDecl(P.signatures, key)) return .{ .owner = P.protocol_name, .Signature = @field(P.signatures, key) };
+            }
+            return null;
+        }
+
+        fn checkSignature(comptime decl: []const u8, comptime owner: []const u8, comptime Expected: type, comptime Actual: type) void {
+            const expected = @typeInfo(Expected).@"fn";
+            const actual = @typeInfo(Actual).@"fn";
+            const where = options.name ++ "." ++ decl ++ " overrides " ++ owner ++ "'s " ++ decl;
+            // The receiver is not in the SDK's signature.
+            for (expected.param_types, actual.param_types[1..], 1..) |E, A, i| {
+                if (!sameShape(E.?, A.?)) @compileError(std.fmt.comptimePrint(
+                    "{s}, whose argument {d} is {s}; this takes {s}",
+                    .{ where, i, @typeName(E.?), @typeName(A.?) },
+                ));
+            }
+            if (!sameShape(expected.return_type.?, actual.return_type.?)) @compileError(std.fmt.comptimePrint(
+                "{s}, which returns {s}; this returns {s}",
+                .{ where, @typeName(expected.return_type.?), @typeName(actual.return_type.?) },
+            ));
         }
 
         /// The receiver type of the `pub` declaration `decl`, or `void`
@@ -283,6 +380,10 @@ pub fn Subclass(comptime options: Options, comptime State_: type) type {
             return @ptrCast(abi.cFunction(c_params, abi.Abi(R), Body.call));
         }
 
+        fn sameShape(comptime Expected: type, comptime Actual: type) bool {
+            return Expected == Actual or std.mem.eql(u8, shape(Expected), shape(Actual));
+        }
+
         fn methodEncoding(comptime F: type) [:0]const u8 {
             const params = @typeInfo(F).@"fn".param_types;
             var args: [params.len - 1]type = undefined;
@@ -310,4 +411,54 @@ pub fn Subclass(comptime options: Options, comptime State_: type) type {
             message.sendSuper(self.value, superclass, void, "dealloc", .{});
         }
     };
+}
+
+/// What a type is at the C boundary, as far as a mismatch would matter:
+/// any object or pointer is a pointer, integers and enums and flag sets
+/// are integers of a width, floats are floats of a width, and a struct is
+/// its layout. Two types of the same shape are interchangeable in a
+/// method's signature -- `appkit.View` for `objc.Object`, say -- and two of
+/// different shapes are a bug that would read garbage.
+fn shape(comptime T: type) []const u8 {
+    const A = abi.Abi(T);
+    return comptime switch (@typeInfo(A)) {
+        .void => "void",
+        .bool => "int8",
+        .int => |i| std.fmt.comptimePrint("int{d}", .{(i.bits + 7) / 8 * 8}),
+        .float => |f| std.fmt.comptimePrint("float{d}", .{f.bits}),
+        .@"enum" => |e| shape(e.tag_type),
+        .pointer => "pointer",
+        .optional => |o| if (@typeInfo(o.child) == .pointer) "pointer" else @typeName(A),
+        .@"struct" => |s| if (s.layout == .@"packed") shape(s.backing_integer.?) else layout(encoding.encode(A)),
+        else => @typeName(A),
+    };
+}
+
+/// A struct's fields, flattened, from its encoding: `CGRect`,
+/// `{CGRect={CGPoint=dd}{CGSize=dd}}`, and four doubles, `{?=dddd}`, are
+/// both `struct dddd` -- the same in memory, and so the same to the ABI.
+fn layout(comptime encoded: []const u8) []const u8 {
+    return comptime blk: {
+        var out: []const u8 = "struct ";
+        var i: usize = 0;
+        while (i < encoded.len) : (i += 1) {
+            switch (encoded[i]) {
+                '{' => i = std.mem.indexOfScalarPos(u8, encoded, i, '=') orelse i,
+                '}' => {},
+                else => out = out ++ encoded[i .. i + 1],
+            }
+        }
+        break :blk out;
+    };
+}
+
+test "shapes: what an override may and may not change" {
+    const cg = @import("../cg/cg.zig");
+    try std.testing.expectEqualStrings(shape(Object), shape(struct { object: Object }));
+    try std.testing.expectEqualStrings(shape(?Object), shape(*u8));
+    try std.testing.expectEqualStrings(shape(cg.Rect), shape(extern struct { a: f64, b: f64, c: f64, d: f64 }));
+    try std.testing.expect(!std.mem.eql(u8, shape(cg.Rect), shape(cg.Point)));
+    try std.testing.expect(!std.mem.eql(u8, shape(f32), shape(f64)));
+    try std.testing.expect(!std.mem.eql(u8, shape(bool), shape(c_long)));
+    try std.testing.expectEqualStrings(shape(c_ulong), shape(enum(c_long) { a, _ }));
 }

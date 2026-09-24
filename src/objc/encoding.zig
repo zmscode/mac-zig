@@ -92,6 +92,7 @@ fn inner(comptime T: type) []const u8 {
     if (abi.isObject(T) or T == Protocol) return "@";
     if (T == Class) return "#";
     if (T == Sel) return ":";
+    if (abi.handleField(T) != null) return "^v";
 
     if (T == geometry.Point) return "{CGPoint=dd}";
     if (T == geometry.Size) return "{CGSize=dd}";

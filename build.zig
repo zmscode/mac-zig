@@ -172,9 +172,207 @@ pub fn build(b: *std.Build) void {
 
     const examples_step = b.step("examples", "Build every example");
     for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf", "objc", "window" }) |name| {
-        addExample(b, examples_step, mac, target, optimize, name);
+        const exe = addExample(b, examples_step, mac, target, optimize, name);
+
+        // The window example again, as the app it is.
+        if (std.mem.eql(u8, name, "window") and appkit) {
+            const bundle = addAppBundle(b, exe, .{
+                .name = "mac-zig Window",
+                .identifier = "io.github.zmscode.mac-zig.window",
+                .category = "public.app-category.developer-tools",
+            });
+            b.step("window-app", "Build the window example as a signed .app bundle")
+                .dependOn(bundle.step);
+            b.step("run-window-app", "Run the window example from its .app bundle")
+                .dependOn(&bundle.run.step);
+        }
     }
     b.getInstallStep().dependOn(examples_step);
+}
+
+// ---------------------------------------------------------------------
+// Application bundles
+// ---------------------------------------------------------------------
+
+pub const AppBundleOptions = struct {
+    /// The name in Finder, the Dock and the menu bar. The bundle is
+    /// installed as `<name>.app` under the install prefix.
+    name: []const u8,
+    /// Reverse-DNS and unique to the app -- `com.example.demo`. macOS keys
+    /// permissions, preferences and notifications to it.
+    identifier: []const u8,
+    /// `CFBundleShortVersionString`, the version a person sees.
+    version: []const u8 = "1.0",
+    /// `CFBundleVersion`, the build number.
+    build: []const u8 = "1",
+    /// The oldest macOS the app will launch on.
+    minimum_system_version: []const u8 = "13.0",
+    /// An `.icns` file for the Dock and Finder.
+    icon: ?std.Build.LazyPath = null,
+    /// `LSApplicationCategoryType`, such as `public.app-category.games`.
+    category: ?[]const u8 = null,
+    /// No Dock icon or menu bar (`LSUIElement`): a menu-bar extra or a
+    /// background helper.
+    agent: bool = false,
+    /// Further `Info.plist` entries -- usage descriptions like
+    /// `NSCameraUsageDescription`, say.
+    info: []const InfoEntry = &.{},
+    /// The code-signing identity. `"-"` signs ad hoc, which is enough to
+    /// run locally and to hold on to granted permissions; a Developer ID is
+    /// needed to hand the app to anyone else. null leaves it unsigned.
+    sign: ?[]const u8 = "-",
+    /// An entitlements `.plist` to sign with.
+    entitlements: ?std.Build.LazyPath = null,
+};
+
+pub const InfoEntry = struct {
+    key: []const u8,
+    value: union(enum) {
+        string: []const u8,
+        boolean: bool,
+    },
+};
+
+pub const AppBundle = struct {
+    /// Builds, lays out and signs the bundle.
+    step: *std.Build.Step,
+    /// The installed `.app`, under the install prefix.
+    path: std.Build.LazyPath,
+    /// Runs the executable inside the bundle -- a bundled app in every way
+    /// that matters, with its output still in the terminal. Takes `--`
+    /// arguments.
+    run: *std.Build.Step.Run,
+};
+
+/// Wraps `exe` in a macOS application bundle:
+///
+/// ```text
+/// <name>.app/Contents/Info.plist
+///                    /PkgInfo
+///                    /MacOS/<exe>
+///                    /Resources/<icon>.icns
+/// ```
+///
+/// and signs it. A dependent reaches this from its own `build.zig` through
+/// the package, `@import("mac").addAppBundle(b, exe, .{ ... })`.
+pub fn addAppBundle(b: *std.Build, exe: *std.Build.Step.Compile, options: AppBundleOptions) AppBundle {
+    const app_dir = b.fmt("{s}.app", .{options.name});
+    const contents = b.fmt("{s}/Contents", .{app_dir});
+    const step = b.step(b.fmt("bundle {s}", .{options.name}), b.fmt("Bundle {s}.app", .{options.name}));
+
+    const install_exe = b.addInstallArtifact(exe, .{
+        .dest_dir = .{ .override = .{ .custom = b.fmt("{s}/MacOS", .{contents}) } },
+    });
+
+    const icon_name: ?[]const u8 = if (options.icon) |icon| blk: {
+        const name = "AppIcon.icns";
+        const install_icon = b.addInstallFileWithDir(icon, .{ .custom = b.fmt("{s}/Resources", .{contents}) }, name);
+        step.dependOn(&install_icon.step);
+        break :blk name;
+    } else null;
+
+    const files = b.addWriteFiles();
+    const plist = files.add("Info.plist", infoPlist(b, exe.name, options, icon_name));
+    const pkg_info = files.add("PkgInfo", "APPL????");
+    const install_plist = b.addInstallFileWithDir(plist, .{ .custom = contents }, "Info.plist");
+    const install_pkg_info = b.addInstallFileWithDir(pkg_info, .{ .custom = contents }, "PkgInfo");
+
+    const path: std.Build.LazyPath = .{ .relative = .{ .base = .install_prefix, .sub_path = app_dir } };
+    if (options.sign) |identity| {
+        // Signed last, over the finished bundle: the signature seals
+        // Info.plist and the resources as well as the executable.
+        const codesign = b.addSystemCommand(&.{ "codesign", "--force", "--sign", identity });
+        if (options.entitlements) |entitlements| {
+            codesign.addArg("--entitlements");
+            codesign.addFileArg(entitlements);
+        }
+        codesign.addDirectoryArg(path);
+        codesign.step.dependOn(&install_exe.step);
+        codesign.step.dependOn(&install_plist.step);
+        codesign.step.dependOn(&install_pkg_info.step);
+        codesign.has_side_effects = true;
+        codesign.setName(b.fmt("codesign {s}.app", .{options.name}));
+        step.dependOn(&codesign.step);
+    } else {
+        step.dependOn(&install_exe.step);
+        step.dependOn(&install_plist.step);
+        step.dependOn(&install_pkg_info.step);
+    }
+
+    const run = std.Build.Step.Run.create(b, b.fmt("run {s}.app", .{options.name}));
+    run.addFileArg(.{ .relative = .{
+        .base = .install_prefix,
+        .sub_path = b.fmt("{s}/MacOS/{s}", .{ contents, exe.name }),
+    } });
+    run.step.dependOn(step);
+    run.addPassthruArgs();
+
+    return .{ .step = step, .path = path, .run = run };
+}
+
+fn infoPlist(b: *std.Build, executable: []const u8, options: AppBundleOptions, icon: ?[]const u8) []const u8 {
+    var out: std.ArrayList(u8) = .empty;
+    const a = b.allocator;
+    out.appendSlice(a,
+        \\<?xml version="1.0" encoding="UTF-8"?>
+        \\<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        \\<plist version="1.0">
+        \\<dict>
+        \\
+    ) catch @panic("out of memory");
+
+    const strings = [_][2][]const u8{
+        .{ "CFBundleName", options.name },
+        .{ "CFBundleDisplayName", options.name },
+        .{ "CFBundleIdentifier", options.identifier },
+        .{ "CFBundleExecutable", executable },
+        .{ "CFBundlePackageType", "APPL" },
+        .{ "CFBundleShortVersionString", options.version },
+        .{ "CFBundleVersion", options.build },
+        .{ "CFBundleInfoDictionaryVersion", "6.0" },
+        .{ "LSMinimumSystemVersion", options.minimum_system_version },
+        .{ "NSPrincipalClass", "NSApplication" },
+    };
+    for (strings) |entry| plistString(a, &out, entry[0], entry[1]);
+    plistBool(a, &out, "NSHighResolutionCapable", true);
+    plistBool(a, &out, "NSSupportsAutomaticGraphicsSwitching", true);
+    if (icon) |name| plistString(a, &out, "CFBundleIconFile", name);
+    if (options.category) |category| plistString(a, &out, "LSApplicationCategoryType", category);
+    if (options.agent) plistBool(a, &out, "LSUIElement", true);
+    for (options.info) |entry| switch (entry.value) {
+        .string => |value| plistString(a, &out, entry.key, value),
+        .boolean => |value| plistBool(a, &out, entry.key, value),
+    };
+
+    out.appendSlice(a, "</dict>\n</plist>\n") catch @panic("out of memory");
+    return out.items;
+}
+
+fn plistString(a: std.mem.Allocator, out: *std.ArrayList(u8), key: []const u8, value: []const u8) void {
+    out.appendSlice(a, "\t<key>") catch @panic("out of memory");
+    xmlEscape(a, out, key);
+    out.appendSlice(a, "</key>\n\t<string>") catch @panic("out of memory");
+    xmlEscape(a, out, value);
+    out.appendSlice(a, "</string>\n") catch @panic("out of memory");
+}
+
+fn plistBool(a: std.mem.Allocator, out: *std.ArrayList(u8), key: []const u8, value: bool) void {
+    out.appendSlice(a, "\t<key>") catch @panic("out of memory");
+    xmlEscape(a, out, key);
+    out.appendSlice(a, if (value) "</key>\n\t<true/>\n" else "</key>\n\t<false/>\n") catch @panic("out of memory");
+}
+
+fn xmlEscape(a: std.mem.Allocator, out: *std.ArrayList(u8), text: []const u8) void {
+    for (text) |c| {
+        const escaped: []const u8 = switch (c) {
+            '&' => "&amp;",
+            '<' => "&lt;",
+            '>' => "&gt;",
+            '"' => "&quot;",
+            else => &.{c},
+        };
+        out.appendSlice(a, escaped) catch @panic("out of memory");
+    }
 }
 
 const Features = struct {
@@ -218,7 +416,7 @@ fn addExample(
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
     name: []const u8,
-) void {
+) *std.Build.Step.Compile {
     const exe = b.addExecutable(.{
         .name = name,
         .root_module = b.createModule(.{
@@ -236,4 +434,5 @@ fn addExample(
         b.fmt("run-{s}", .{name}),
         b.fmt("Run the {s} example", .{name}),
     ).dependOn(&run.step);
+    return exe;
 }

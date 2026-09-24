@@ -20,6 +20,13 @@ test "every generated method compiles" {
                 if (info == .@"fn" and !info.@"fn".is_generic) std.mem.doNotOptimizeAway(&member);
             }
         }
+        // Every signature table resolves -- each is a function type built
+        // from the other generated types.
+        if (@TypeOf(T) == type and @typeInfo(T) == .@"struct" and @hasDecl(T, "signatures")) {
+            inline for (@typeInfo(T.signatures).@"struct".decl_names) |decl| {
+                std.debug.assert(@typeInfo(@field(T.signatures, decl)) == .@"fn");
+            }
+        }
     }
 }
 
@@ -30,6 +37,36 @@ test "option sets match the SDK's constants" {
     try std.testing.expectEqual(@as(u64, 1 << 15), @backingInt(appkit.WindowStyleMask{ .full_size_content_view = true }));
     try std.testing.expectEqual(@as(u64, 0), @backingInt(appkit.WindowStyleMask.borderless));
     try std.testing.expectEqual(@as(objc.UInteger, 2), @backingInt(appkit.BackingStoreType.buffered));
+}
+
+test "inherited methods need no conversion, and structs and cg types come through" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+    _ = appkit.Application.sharedApplication();
+
+    const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(
+        .init(0, 0, 100, 100),
+        .borderless,
+        .buffered,
+        true,
+    );
+    window.setReleasedWhenClosed(false);
+    defer window.release();
+
+    // NSResponder's, called on the window directly.
+    try std.testing.expect(window.acceptsFirstResponder() or !window.acceptsFirstResponder());
+    try std.testing.expect(window.nextResponder() == null or window.nextResponder() != null);
+
+    // NSEdgeInsets, as a generated extern struct.
+    if (appkit.Screen.mainScreen()) |screen| {
+        const insets: appkit.EdgeInsets = screen.safeAreaInsets();
+        try std.testing.expect(insets.top >= 0 and insets.left >= 0);
+    }
+
+    // CGColorRef comes back as cg.Color, not a bare pointer.
+    const red = appkit.Color.redColor();
+    const cg_color: cg.Color = red.CGColor();
+    try std.testing.expectEqual(@as(cg.Float, 1), cg_color.components()[0]);
 }
 
 test "inheritance is checked at compile time" {
@@ -85,7 +122,7 @@ test "screens come back as a typed array" {
 
 const dispatch = @import("../dispatch/dispatch.zig");
 
-const Swatch = objc.Subclass(.{ .name = "MacZigTestSwatch", .superclass = "NSView" }, struct {
+const Swatch = objc.Subclass(.{ .name = "MacZigTestSwatch", .superclass = appkit.View }, struct {
     draws: u32 = 0,
 
     pub fn @"drawRect:"(self: *@This(), _: cg.Rect) void {
@@ -153,7 +190,7 @@ test "run launches, services the main queue, and returns on quit" {
 
     var state: Run = .{};
     // No Dock icon or menu bar for a test, and nothing brought forward.
-    appkit.app.run(.{ .name = "mac-zig test", .activation_policy = .accessory, .activate = false }, &state, Run);
+    appkit.app.run(.{ .activation_policy = .accessory, .activate = false }, &state, Run);
 
     // Getting here at all is the point: quitting returned rather than exited.
     try std.testing.expect(state.did_launch);
@@ -164,7 +201,7 @@ test "run launches, services the main queue, and returns on quit" {
 
 // -- events reaching a view -----------------------------------------------
 
-const Pad = objc.Subclass(.{ .name = "MacZigTestPad", .superclass = "NSView" }, struct {
+const Pad = objc.Subclass(.{ .name = "MacZigTestPad", .superclass = appkit.View }, struct {
     last_click: ?cg.Point = null,
     last_key: ?c_ushort = null,
 

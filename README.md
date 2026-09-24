@@ -420,8 +420,27 @@ counter.state().total;   // 2
 - A method's first parameter says what it is: `*State` or the `Counter` type for an instance
   method, `objc.Class` for a class method. There is no `_cmd`. A `pub fn` with no receiver is
   a helper, and is left alone.
+- **Overrides are checked against the SDK** when the superclass or a protocol is given as a
+  generated type rather than a name — see below.
 - Zig does not let a field and a function share a name, so a getter is named apart from its
   field: a `count` method over a `total` field.
+
+Given `.superclass = appkit.View` or `.protocols = .{appkit.WindowDelegate}`, every method the
+struct defines whose selector the SDK declares — anywhere up the superclass chain, or in the
+protocol — is compared with the SDK's signature when the program compiles:
+
+```zig
+const Canvas = objc.Subclass(.{ .name = "Canvas", .superclass = appkit.View }, struct {
+    pub fn @"drawRect:"(self: *@This(), dirty: cg.Point) void { ... }
+});
+// error: Canvas.drawRect: overrides NSView's drawRect:, whose argument 1 is cg.geometry.Rect;
+//        this takes cg.geometry.Point
+```
+
+The comparison is of what each type is at the C boundary, not of its name: an object may be
+declared as any object wrapper, an enum as its integer, but an `f32` for a `CGFloat`, a `Point`
+for a `Rect` or a `bool` for an `NSInteger` is an error — each of those would read garbage. Given
+by name (`.superclass = "NSDocument"`), nothing is checked.
 
 Underneath is the runtime's own API — `allocateClassPair`, `addMethod`, `addIvar`,
 `registerClassPair` — for when the struct form does not fit. `msgSendSuper` is `[super ...]`.
@@ -505,9 +524,14 @@ var screens = appkit.Screen.screens().iterator();   // foundation.Array(appkit.S
 A class loses its `NS`; a method is its selector with the colons removed and each later piece
 capitalised; an enum's constants go to snake case; an option set is a `packed struct` of flags.
 The types map through: `NSString *` is `foundation.String`, `NSArray<NSScreen *> *` is
-`foundation.Array(Screen)`, `NSRect` is `cg.Rect`, a `_Nullable` object is an optional. Inherited
-methods are on the superclass's wrapper, reached with `window.into(appkit.Responder)`, which
-refuses at compile time to convert to something that is not an ancestor.
+`foundation.Array(Screen)`, `NSRect` is `cg.Rect`, `CGImageRef` is `cg.Image`, `NSEdgeInsets` is a
+generated `EdgeInsets`, and a `_Nullable` object is an optional. Inherited methods are on every
+subclass too — `window.nextResponder()` — and `window.into(appkit.Responder)` converts where a
+superclass's type is wanted, refusing at compile time to convert to anything but an ancestor.
+
+Each class also carries `signatures`, the SDK's signature for each of its methods, and the
+delegate protocols the manifest lists (`ApplicationDelegate`, `WindowDelegate`, `MenuDelegate`)
+are generated as types holding theirs. Those are what `objc.Subclass` checks overrides against.
 
 ### An application
 
@@ -594,9 +618,47 @@ wrapper that is a straight transcription is what is wanted. Hand-made convenienc
 
 Anything the generator cannot type safely is left out and listed in a comment at the end of the
 struct — a C function pointer, a struct it does not know, an enum the manifest does not list.
-Fifteen classes come to about 1,200 methods, with nine left out. A test takes the address of
-every generated method, so each one is compiled, and each selector checked against its
-arguments, on every `zig build test`.
+Fifteen classes come to about 1,200 methods of their own, with six left out. A test takes the
+address of every generated method, so each one is compiled, and each selector checked against
+its arguments, on every `zig build test`.
+
+Nullability comes from clang, with one repair. Inside Apple's `NS_ASSUME_NONNULL` regions an
+unannotated pointer is non-null, and clang says so — except for a property carrying an
+availability macro, whose type spelling loses it. The property declaration still records
+whether nullability was written out, so the generator reads it from there.
+
+## Application bundles
+
+A bare executable runs, but a Mac app is a bundle: an `Info.plist` naming it, an identifier that
+permissions, preferences and notifications are keyed to, an icon, and a signature over the lot.
+`addAppBundle` makes one:
+
+```zig
+// build.zig, in a program that depends on mac-zig
+const mac_build = @import("mac");
+
+const bundle = mac_build.addAppBundle(b, exe, .{
+    .name = "Demo",
+    .identifier = "com.example.demo",
+    .version = "1.2",
+    .icon = b.path("assets/AppIcon.icns"),          // optional
+    .info = &.{.{ .key = "NSCameraUsageDescription", .value = .{ .string = "To see you." } }},
+});
+b.getInstallStep().dependOn(bundle.step);           // zig-out/Demo.app
+b.step("run-app", "Run the app").dependOn(&bundle.run.step);
+```
+
+It writes `Info.plist` and `PkgInfo`, lays out `Contents/MacOS` and `Contents/Resources`, and
+signs the bundle — ad hoc by default, which is enough to run locally and to keep a granted
+permission across rebuilds; pass a Developer ID as `.sign` to hand the app to anyone else.
+`bundle.run` runs the executable inside the bundle, so the app has its bundle identity and its
+output stays in the terminal. `appkit.app.run` takes its menu-bar name from the bundle when no
+`.name` is given.
+
+```sh
+zig build window-app        # zig-out/mac-zig Window.app
+zig build run-window-app    # runs it
+```
 
 ## Traps
 
@@ -630,9 +692,6 @@ arguments, on every `zig build test`.
 - **A raw `addIvar` instance variable starts zero-filled**, and a Zig struct's default values
   are never applied. `objc.Subclass` does apply them; with the low-level API, make zero the
   starting state.
-- **Some generated getters are optional that need not be.** Where a property carries an
-  availability macro, clang's type spelling drops its nullability, and the generator falls back
-  to the safe answer. `screen.localizedName()` is `?String` though it is never nil.
 - **AppKit is main-thread only.** `appkit.app.run` checks; the wrappers do not.
 - **A click on an inactive window only activates it.** Override `acceptsFirstMouse:` to take the
   click too.
@@ -673,12 +732,13 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 
 ## Steps
 
-| Step                 | Effect                                                 |
-| -------------------- | ------------------------------------------------------ |
-| `zig build`          | Builds every example into `zig-out/bin`                |
-| `zig build test`     | Runs the inline tests and the integration tests        |
-| `zig build bindings` | Writes the translated C bindings to `zig-out/bindings` |
-| `zig build generate` | Regenerates `src/appkit/generated.zig` from the SDK    |
+| Step                   | Effect                                                 |
+| ---------------------- | ------------------------------------------------------ |
+| `zig build`            | Builds every example into `zig-out/bin`                |
+| `zig build test`       | Runs the inline tests and the integration tests        |
+| `zig build bindings`   | Writes the translated C bindings to `zig-out/bindings` |
+| `zig build generate`   | Regenerates `src/appkit/generated.zig` from the SDK    |
+| `zig build window-app` | Builds the window example as a signed `.app` bundle    |
 
 ## Layout
 

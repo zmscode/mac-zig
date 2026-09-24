@@ -382,6 +382,10 @@ thing.state().last;
 - Receiver (first param): `*State`, `*const State`, `Thing`, or `objc.Object` = instance
   method; `objc.Class` = class method. No `_cmd`. `pub fn`s without a receiver are ignored.
 - A method cannot share a field's name (Zig rule): field `total`, getter `count`.
+- **Give the superclass and protocols as generated types when they exist** —
+  `.superclass = appkit.View`, `.protocols = .{appkit.WindowDelegate, "NSCopying"}` — and every
+  override is checked against the SDK's signature at compile time (by ABI shape: `f32` for
+  `CGFloat`, `Point` for `Rect`, `bool` for `NSInteger` are errors). Strings are unchecked.
 - Methods may not return a Zig error. `[super x]` is
   `self.object.msgSendSuper(<superclass, spelled out>, R, "x", .{})`.
 - The raw API (`allocateClassPair`, `addMethod` with `(self, _: objc.Sel, ...)`, `addIvar`,
@@ -419,13 +423,30 @@ window.into(appkit.Responder)                    // superclass methods; checked 
 - Names: `NSWindow` → `Window`; selector `a:b:c:` → method `aBC`; enum constants snake case
   (`NSBackingStoreBuffered` → `.buffered`); option sets are `packed struct`s of bools.
 - Types: `NSString *` → `foundation.String`, `NSArray<NSScreen *> *` → `foundation.Array(Screen)`,
-  `NSRect` → `cg.Rect`, unlisted classes → `objc.Object`, block params → `anytype` (pass
-  `&block`). Nullable → optional; some getters are optional unnecessarily (see README Traps).
-- **Never edit `src/appkit/generated.zig`.** To wrap more, add the class or enum to
+  `NSRect` → `cg.Rect`, `CGImageRef`/`CGContextRef`/… → `cg.Image`/`cg.Context`/…,
+  `NSEdgeInsets` → `EdgeInsets`, unlisted classes → `objc.Object`, block params → `anytype`
+  (pass `&block`). Nullable → optional.
+- Inherited methods are generated on each subclass: `window.nextResponder()`. `into(T)` is
+  only for passing a value where a superclass type is wanted.
+- **Never edit `src/appkit/generated.zig`.** To wrap more, add the class, enum, struct or
+  protocol to
   `tools/objc_gen/appkit.zig` and run `zig build generate` (about 15 s). Methods the generator
   cannot type are listed in a `// Not generated:` comment at the end of each struct — the usual
   fix is listing the enum they use.
 - Main thread only.
+
+An app bundle, from a dependent's `build.zig`:
+
+```zig
+const bundle = @import("mac").addAppBundle(b, exe, .{ .name = "Demo", .identifier = "com.example.demo" });
+b.getInstallStep().dependOn(bundle.step);            // zig-out/Demo.app, ad-hoc signed
+b.step("run-app", "Run").dependOn(&bundle.run.step); // runs inside the bundle, output in terminal
+```
+
+Options: `.version`, `.build`, `.icon` (.icns LazyPath), `.category`, `.agent` (no Dock icon),
+`.info` (extra Info.plist keys, e.g. usage descriptions), `.sign` (identity; `"-"` ad hoc, null
+unsigned), `.entitlements`. Permissions such as Screen Recording stick to a bundle's identity
+and signature, not to a bare executable that changes with every build.
 
 An application:
 
@@ -436,7 +457,7 @@ const App = struct {
 };                                                              // willQuit, reopened
 var app: App = .{};
 defer app.deinit();                                  // runs: `run` RETURNS on quit, no exit()
-appkit.app.run(.{ .name = "Demo" }, &app, App);      // menu bar, delegate, event loop
+appkit.app.run(.{}, &app, App);                      // menu bar, delegate, event loop; name from bundle
 ```
 
 - Handler names must not match the context struct's field names (Zig rule) — `did_launch`, not

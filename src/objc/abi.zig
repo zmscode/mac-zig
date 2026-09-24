@@ -9,6 +9,9 @@
 //!
 //! - `Object`, `Class`, `Sel`, `Protocol`, and any struct whose only field
 //!   is an `Object`, become the bare pointer the runtime expects;
+//! - so does any other *handle* -- a struct whose only field is a
+//!   non-optional pointer, like `cg.Image` or `cg.Context` -- so a
+//!   `CGImageRef` goes in and comes out as the `cg` type;
 //! - `bool` becomes `BOOL`, which is `bool` on Apple silicon and
 //!   `signed char` on Intel;
 //! - things that have no C form -- `comptime_int`, a Zig error union --
@@ -81,6 +84,22 @@ pub inline fn objectField(comptime T: type) ?[:0]const u8 {
     return info.field_names[0];
 }
 
+/// The name of the pointer field of a handle -- a struct whose only field
+/// is a non-optional single pointer, like `cg.Image` -- or null if `T` is
+/// not one. `Object` and its wrappers are handles too, but are asked
+/// about first everywhere, because they are also objects.
+pub inline fn handleField(comptime T: type) ?[:0]const u8 {
+    const info = switch (@typeInfo(T)) {
+        .@"struct" => |s| s,
+        else => return null,
+    };
+    if (info.field_types.len != 1) return null;
+    return switch (@typeInfo(info.field_types[0])) {
+        .pointer => |p| if (p.size == .one) info.field_names[0] else null,
+        else => null,
+    };
+}
+
 /// The object inside `value`, which is an `Object` or a wrapper of one.
 pub inline fn unwrap(value: anytype) Object {
     const T = @TypeOf(value);
@@ -104,11 +123,12 @@ pub fn Abi(comptime T: type) type {
     if (isObject(T) or T == Protocol) return Id;
     if (T == Class) return raw.Class;
     if (T == Sel) return raw.SEL;
+    if (handleField(T) != null) return Id;
 
     switch (@typeInfo(T)) {
         .optional => |optional| {
             const C = optional.child;
-            if (isObject(C) or C == Protocol or C == Class or C == Sel) return Abi(C);
+            if (isObject(C) or C == Protocol or C == Class or C == Sel or handleField(C) != null) return Abi(C);
             return T;
         },
         .comptime_int => @compileError(
@@ -137,6 +157,8 @@ pub inline fn toAbi(comptime T: type, value: T) Abi(T) {
         return unwrap(value).value;
     } else if (T == Protocol or T == Class or T == Sel) {
         return value.value;
+    } else if (handleField(T)) |field| {
+        return @ptrCast(@constCast(@field(value, field)));
     } else if (@typeInfo(T) == .optional and Abi(T) != T) {
         return if (value) |present| toAbi(@TypeOf(present), present) else null;
     } else {
@@ -155,6 +177,10 @@ pub inline fn fromAbi(comptime T: type, value: Abi(T)) T {
         return .{ .value = @ptrCast(@alignCast(value.?)) };
     } else if (T == Class or T == Sel) {
         return .{ .value = value.? };
+    } else if (handleField(T)) |field| {
+        var handle: T = undefined;
+        @field(handle, field) = @ptrCast(@alignCast(value.?));
+        return handle;
     } else if (@typeInfo(T) == .optional and Abi(T) != T) {
         return if (value == null) null else fromAbi(@typeInfo(T).optional.child, value);
     } else {
@@ -340,6 +366,12 @@ test "the C types each Zig type crosses as" {
     try std.testing.expect(Abi(Window) == Id);
     try std.testing.expect(Abi(?Window) == Id);
     try std.testing.expect(Abi(struct { a: Object, b: Object }) != Id);
+
+    // A handle: one pointer field, like cg.Image.
+    const Handle = struct { handle: *opaque {} };
+    try std.testing.expect(Abi(Handle) == Id);
+    try std.testing.expect(Abi(?Handle) == Id);
+    try std.testing.expect(Abi(struct { handle: ?*u8 }) != Id);
 }
 
 test "bool survives the BOOL round trip" {

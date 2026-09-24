@@ -81,6 +81,14 @@ pub const GraphicsContext = generated.GraphicsContext;
 pub const ImageRep = generated.ImageRep;
 pub const BitmapImageRep = generated.BitmapImageRep;
 
+pub const EdgeInsets = generated.EdgeInsets;
+
+// Delegate protocols, for an `objc.Subclass`'s `.protocols`: adopted, and
+// each method checked against the SDK's signature.
+pub const ApplicationDelegate = generated.ApplicationDelegate;
+pub const WindowDelegate = generated.WindowDelegate;
+pub const MenuDelegate = generated.MenuDelegate;
+
 /// Every generated enum and option set, by its name without `NS`.
 pub const enums = generated;
 

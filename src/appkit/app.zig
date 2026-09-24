@@ -53,9 +53,10 @@ const String = foundation.String;
 
 pub const Options = struct {
     /// The name in the menu bar's application menu: "About Name", "Quit
-    /// Name". A bundled app gets its name from Info.plist; a bare
-    /// executable has only this.
-    name: [:0]const u8,
+    /// Name". Null takes it from the bundle's Info.plist -- see
+    /// `addAppBundle` in build.zig -- or, for a bare executable, the
+    /// process name.
+    name: ?[:0]const u8 = null,
     /// `.regular` has a Dock icon and a menu bar; `.accessory` has neither
     /// but can show windows; `.prohibited` has no UI at all.
     activation_policy: generated.ApplicationActivationPolicy = .regular,
@@ -99,7 +100,7 @@ pub fn run(options: Options, context: anytype, comptime Handlers: type) void {
 
     const app = Application.sharedApplication();
     _ = app.setActivationPolicy(options.activation_policy);
-    if (options.standard_menu) app.setMainMenu(standardMenu(options.name));
+    if (options.standard_menu) app.setMainMenu(standardMenu(appName(options.name)));
 
     const delegate = Delegate.new();
     defer delegate.release();
@@ -118,6 +119,18 @@ pub fn run(options: Options, context: anytype, comptime Handlers: type) void {
     defer app.setDelegate(null);
 
     app.run();
+}
+
+/// The name the application goes by: `name`, the bundle's, or the
+/// process's. Autoreleased.
+fn appName(name: ?[:0]const u8) String {
+    if (name) |given| return (String.init(given) catch String.literal("")).autorelease();
+    const bundle = objc.getClass("NSBundle").?.msgSend(objc.Object, "mainBundle", .{});
+    if (bundle.msgSend(?String, "objectForInfoDictionaryKey:", .{String.literal("CFBundleName")})) |bundled| {
+        return bundled;
+    }
+    const info = objc.getClass("NSProcessInfo").?.msgSend(objc.Object, "processInfo", .{});
+    return info.msgSend(String, "processName", .{});
 }
 
 /// Stops the event loop, so that `run` returns -- the quiet way out,
@@ -158,14 +171,15 @@ pub fn onMain(context: anytype, comptime f: fn (@TypeOf(context)) void) void {
 /// drawing.
 pub fn currentContext() ?cg.Context {
     const graphics = generated.GraphicsContext.currentContext() orelse return null;
-    return cg.Context.fromRaw(@ptrCast(graphics.CGContext() orelse return null));
+    return graphics.CGContext();
 }
 
 // -- the delegate -----------------------------------------------------------
 
 const Delegate = objc.Subclass(.{
     .name = "MacZigApplicationDelegate",
-    .protocols = &.{"NSApplicationDelegate"},
+    // As a type, so that each method below is checked against the SDK's.
+    .protocols = .{generated.ApplicationDelegate},
 }, struct {
     context: ?*anyopaque = null,
     launched: *const fn (?*anyopaque) void = noLaunch,
@@ -216,24 +230,24 @@ const Delegate = objc.Subclass(.{
 /// The menus every Mac app has: the application menu (About, Hide, Quit)
 /// and a Window menu (Minimize, Zoom, Close). Without them a bare
 /// executable does not even quit on Command-Q.
-fn standardMenu(name: [:0]const u8) Menu {
+fn standardMenu(name: String) Menu {
     const bar = Menu.alloc().initWithTitle(.literal("")).autorelease();
 
     const app_menu = Menu.alloc().initWithTitle(.literal("")).autorelease();
     addItem(app_menu, "About ", name, "orderFrontStandardAboutPanel:", "", .{});
     app_menu.addItem(MenuItem.separatorItem());
     addItem(app_menu, "Hide ", name, "hide:", "h", .{ .command = true });
-    addItem(app_menu, "Hide Others", "", "hideOtherApplications:", "h", .{ .command = true, .option = true });
-    addItem(app_menu, "Show All", "", "unhideAllApplications:", "", .{});
+    addItem(app_menu, "Hide Others", .literal(""), "hideOtherApplications:", "h", .{ .command = true, .option = true });
+    addItem(app_menu, "Show All", .literal(""), "unhideAllApplications:", "", .{});
     app_menu.addItem(MenuItem.separatorItem());
     addItem(app_menu, "Quit ", name, "terminate:", "q", .{ .command = true });
     submenu(bar, app_menu, "");
 
     const window_menu = Menu.alloc().initWithTitle(.literal("Window")).autorelease();
-    addItem(window_menu, "Minimize", "", "performMiniaturize:", "m", .{ .command = true });
-    addItem(window_menu, "Zoom", "", "performZoom:", "", .{});
+    addItem(window_menu, "Minimize", .literal(""), "performMiniaturize:", "m", .{ .command = true });
+    addItem(window_menu, "Zoom", .literal(""), "performZoom:", "", .{});
     window_menu.addItem(MenuItem.separatorItem());
-    addItem(window_menu, "Close", "", "performClose:", "w", .{ .command = true });
+    addItem(window_menu, "Close", .literal(""), "performClose:", "w", .{ .command = true });
     submenu(bar, window_menu, "Window");
     Application.sharedApplication().setWindowsMenu(window_menu);
 
@@ -243,13 +257,12 @@ fn standardMenu(name: [:0]const u8) Menu {
 fn addItem(
     menu: Menu,
     comptime title: [:0]const u8,
-    suffix: [:0]const u8,
+    suffix: String,
     comptime action: [:0]const u8,
     comptime key: [:0]const u8,
     modifiers: generated.EventModifierFlags,
 ) void {
-    const tail = (String.init(suffix) catch String.literal("")).autorelease();
-    const full = String.literal(title).appending(tail);
+    const full = String.literal(title).appending(suffix);
     const item = MenuItem.alloc().initWithTitleActionKeyEquivalent(full, objc.Sel.cached(action), .literal(key));
     item.setKeyEquivalentModifierMask(modifiers);
     menu.addItem(item);
