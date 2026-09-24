@@ -5,13 +5,17 @@ Zig 0.17 bindings for the macOS system frameworks. One package, one translated C
 
 Today that is:
 
-| Namespace | Framework | Covers |
-| --------- | --------- | ------ |
-| `mac.cg`  | CoreGraphics | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
-| `mac.cg.imageio` | ImageIO | reading and writing image files, under `-Dimageio` |
-| `mac.cg.text` | CoreText | drawing and measuring a line of text, under `-Dcoretext` |
-| `mac.iokit` | IOKit | power sources: battery charge, mains or battery, time remaining, under `-Diokit` |
-| `mac.cf`  | CoreFoundation | just enough to work the frameworks above it |
+| Namespace        | Framework      | Covers                                                                                                                            |
+| ---------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `mac.cg`         | CoreGraphics   | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
+| `mac.cg.imageio` | ImageIO        | reading and writing image files, under `-Dimageio`                                                                                |
+| `mac.cg.text`    | CoreText       | drawing and measuring a line of text, under `-Dcoretext`                                                                          |
+| `mac.iokit`      | IOKit          | power sources: battery charge, mains or battery, time remaining, under `-Diokit`                                                  |
+| `mac.objc`       | libobjc        | the Objective-C runtime: messages, classes defined in Zig, blocks — the bridge to Foundation, AppKit, Metal, under `-Dobjc`       |
+| `mac.foundation` | Foundation     | strings, numbers, data, URLs, typed arrays and dictionaries, errors — as Zig types, under `-Dobjc`                                |
+| `mac.appkit`     | AppKit         | windows, views, the application, events, menus, screens — generated from the SDK, under `-Dappkit`                                |
+| `mac.dispatch`   | libdispatch    | Grand Central Dispatch: the main queue, global and private queues, semaphores                                                     |
+| `mac.cf`         | CoreFoundation | just enough to work the frameworks above it                                                                                       |
 
 Everything links what macOS already ships, so there is nothing to fetch and nothing to build.
 
@@ -23,7 +27,7 @@ macOS only, and the Xcode command line tools must be installed — the headers l
 ## Why one package
 
 These frameworks share CoreFoundation's types. A `CFStringRef` that CoreGraphics produces has
-to be the *same Zig type* as one IOKit consumes, or the two cannot be passed between. Separate
+to be the _same Zig type_ as one IOKit consumes, or the two cannot be passed between. Separate
 packages, each running `translate-c` over its own headers, would each emit their own
 incompatible `CFStringRef`.
 
@@ -33,10 +37,10 @@ namespace, not another dependency.
 
 ## What is not here
 
-Frameworks written in Objective-C — AVFoundation, Metal, AppKit, Foundation, CoreImage — need
-a message-sending bridge (`objc_msgSend`, selector lookup, retain/release by hand) that this
-package does not have. They are out of scope until it does. Of AVFoundation's 160 headers, 106
-declare Objective-C classes; of CoreGraphics' 50, none do. That line is the whole difference.
+AppKit is wrapped for the fifteen classes in `tools/objc_gen/appkit.zig`, not all of it; adding
+a class is a line there and `zig build generate`. Other Objective-C frameworks — Metal,
+AVFoundation, CoreImage — have no wrappers yet, and are reached through `mac.objc` by sending
+messages by name. The generator is written to take them next.
 
 ## Use as a dependency
 
@@ -91,24 +95,24 @@ const cg = @import("mac").cg;
 
 `Context`, `Image`, `Path` and the rest are one-pointer handles passed by value. Most of
 them need no allocator, because CoreFoundation owns its own memory — the allocator-taking
-calls in this package are the ones that copy data *out* of CoreFoundation and into memory
+calls in this package are the ones that copy data _out_ of CoreFoundation and into memory
 you own, and they say so.
 
 ## What the wrapper changes
 
-| CoreGraphics                                      | mac-zig                                                    |
-| ------------------------------------------------- | --------------------------------------------------------- |
-| `CGBitmapContextCreate` / `CGContextRelease`      | `Context.initBitmap` / `deinit`, with `defer`              |
-| `NULL` returns with no error code                 | an `Error` set; `?T` where null is a real answer           |
-| `CGError` codes from the display calls            | the same `Error` set, with the codes named                 |
-| `CGBitmapInfo` as or-ed constants from three enums | a `packed struct` with four named fields                   |
-| `kCGBlendMode*`, `kCGLineCap*`, `kCGPathFill`     | `BlendMode`, `LineCap`, `DrawingMode` enums                |
-| `CGPathApply` with an untyped points array        | `path.Element`, a `union(enum)`                            |
-| `CGPathRef` and `CGMutablePathRef` by `const`     | `Path` and `MutablePath`, two types                        |
-| `ptr, count` argument pairs                       | slices                                                     |
-| `CFStringRef` everywhere                          | `[]const u8` in, `toOwnedSlice(allocator)` out             |
-| `CFDictionary` of `CFNumber` for the window list  | `window.Window`, a plain struct                            |
-| `CGRectDivide` with two out-parameters            | `Rect.divide` returning a `Division`                       |
+| CoreGraphics                                       | mac-zig                                          |
+| -------------------------------------------------- | ------------------------------------------------ |
+| `CGBitmapContextCreate` / `CGContextRelease`       | `Context.initBitmap` / `deinit`, with `defer`    |
+| `NULL` returns with no error code                  | an `Error` set; `?T` where null is a real answer |
+| `CGError` codes from the display calls             | the same `Error` set, with the codes named       |
+| `CGBitmapInfo` as or-ed constants from three enums | a `packed struct` with four named fields         |
+| `kCGBlendMode*`, `kCGLineCap*`, `kCGPathFill`      | `BlendMode`, `LineCap`, `DrawingMode` enums      |
+| `CGPathApply` with an untyped points array         | `path.Element`, a `union(enum)`                  |
+| `CGPathRef` and `CGMutablePathRef` by `const`      | `Path` and `MutablePath`, two types              |
+| `ptr, count` argument pairs                        | slices                                           |
+| `CFStringRef` everywhere                           | `[]const u8` in, `toOwnedSlice(allocator)` out   |
+| `CFDictionary` of `CFNumber` for the window list   | `window.Window`, a plain struct                  |
+| `CGRectDivide` with two out-parameters             | `Rect.divide` returning a `Division`             |
 
 Anything not yet wrapped is reachable through `mac.raw`, the complete translated API.
 
@@ -207,7 +211,7 @@ ctx.clip();                      // clipping only ever shrinks
 ctx.drawLinearGradient(ramp, .init(0, 120), .init(120, 0), .both);
 ```
 
-The current path is the one thing *not* in the graphics state, which is why every call that
+The current path is the one thing _not_ in the graphics state, which is why every call that
 draws it also clears it. Build a `Path` once and `addPath` it to draw the same shape twice.
 
 ## PDF
@@ -293,7 +297,7 @@ for (windows.windows) |w| {
 }
 ```
 
-Window *titles* need Screen Recording permission; everything else does not, and a `null`
+Window _titles_ need Screen Recording permission; everything else does not, and a `null`
 title means the permission is missing rather than that the window is untitled.
 `cg.window.hasScreenCaptureAccess()` answers that directly, and `requestScreenCaptureAccess()`
 prompts — once only, since a process that has been refused is never re-prompted.
@@ -313,6 +317,287 @@ ctx.setFillColor(.white);
 try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
 ```
 
+## Objective-C
+
+Under `-Dobjc` (on by default), which links libobjc and Foundation. This is the runtime, not a
+binding of any one framework: it is how any Objective-C API is reached from Zig.
+
+```zig
+const objc = mac.objc;
+
+const pool = objc.AutoreleasePool.init();
+defer pool.deinit();
+
+const NSString = objc.getClass("NSString").?;
+const hello = NSString.msgSend(objc.Object, "stringWithUTF8String:", .{"hello".ptr});
+const length = hello.msgSend(objc.UInteger, "length", .{});
+
+// Structs go through as themselves -- NSRect is cg.Rect.
+const boxed = objc.getClass("NSValue").?.msgSend(objc.Object, "valueWithRect:", .{rect});
+const back = boxed.msgSend(cg.Rect, "rectValue", .{});
+```
+
+`msgSend(Return, selector, args)` builds the exact C function type of the call at compile time
+and casts `objc_msgSend` to it, which is the only correct way to call it — on arm64 a varargs
+call puts floats in the wrong registers. Along the way:
+
+- a string selector is checked against the argument tuple: `"setFrame:display:"` with one
+  argument does not compile;
+- `bool`, `Object`, `Class` and `Sel` become `BOOL`, `id`, `Class` and `SEL` and back;
+- an integer or float literal is a compile error naming the fix, since the method's parameter
+  types are not known here — write `@as(objc.Integer, 3)`;
+- `Object` is never nil; ask for `?Object` where nil is an answer.
+
+A struct whose only field is an `objc.Object` is treated as one, which is how a class gets a Zig
+type of its own:
+
+```zig
+const Window = struct {
+    object: objc.Object,
+
+    fn setTitle(self: Window, title: objc.Object) void {
+        self.object.msgSend(void, "setTitle:", .{title});
+    }
+};
+
+const window = app.msgSend(Window, "mainWindow", .{});
+```
+
+### Blocks
+
+`objc.Block(Captures, Args, Return)` lays a block out by hand, following the Block ABI, around
+an ordinary Zig function. It goes to any API that takes one:
+
+```zig
+const Visit = objc.Block(struct { total: *i64 }, &.{ objc.Object, objc.UInteger, *bool }, void);
+
+var total: i64 = 0;
+var block = Visit.init(.{ .total = &total }, struct {
+    fn body(captures: *const Visit.Captures, item: objc.Object, _: objc.UInteger, _: *bool) void {
+        captures.total.* += item.msgSend(i64, "longLongValue", .{});
+    }
+}.body);
+array.msgSend(void, "enumerateObjectsUsingBlock:", .{&block});
+```
+
+`init` makes a stack block that lives as long as the variable. An API that keeps the block —
+a completion handler, an observer — copies it to the heap itself, and the copy retains any
+`Object` among the captures, as a C compiler's would. `objc.BlockRef(Args, Return)` is the other
+direction: a block handed *to* a method you implemented, which you call with `.call(.{...})`.
+
+### Classes
+
+A class is a Zig struct: its fields are every instance's state, and its `pub fn`s are methods.
+
+```zig
+const Counter = objc.Subclass(.{ .name = "MyCounter", .protocols = &.{"NSCopying"} }, struct {
+    total: objc.Integer = 0,
+    history: std.ArrayList(objc.Integer) = .empty,
+
+    pub fn increment(self: *@This()) void {
+        self.total += 1;
+    }
+
+    pub fn @"add:"(self: *@This(), amount: objc.Integer) objc.Integer {
+        self.total += amount;
+        return self.total;
+    }
+
+    pub fn deinit(self: *@This()) void {          // runs from -dealloc
+        self.history.deinit(gpa);
+    }
+});
+
+const counter = Counter.new();
+defer counter.release();
+_ = counter.msgSend(objc.Integer, "add:", .{@as(objc.Integer, 2)});
+counter.state().total;   // 2
+```
+
+- The class is registered on first use, once, however many threads race to be first.
+- Fields get their **default values** when an instance is allocated — every field needs one —
+  and `deinit`, if there is one, runs when it is freed.
+- A method's first parameter says what it is: `*State` or the `Counter` type for an instance
+  method, `objc.Class` for a class method. There is no `_cmd`. A `pub fn` with no receiver is
+  a helper, and is left alone.
+- Zig does not let a field and a function share a name, so a getter is named apart from its
+  field: a `count` method over a `total` field.
+
+Underneath is the runtime's own API — `allocateClassPair`, `addMethod`, `addIvar`,
+`registerClassPair` — for when the struct form does not fit. `msgSendSuper` is `[super ...]`.
+
+### Exceptions
+
+An Objective-C exception that nothing catches ends the process. `tryMsgSend` catches it:
+
+```zig
+var caught: objc.Exception = undefined;
+const item = array.tryMsgSend(objc.Object, "objectAtIndex:", .{index}, &caught) catch {
+    defer caught.deinit();
+    std.log.err("{f}", .{caught});   // NSRangeException: *** index 99 beyond bounds [0 .. 3]
+    return;
+};
+```
+
+`objc.tryCall(f, args, &caught)` does the same around a whole Zig function. The `@try` lives in
+`vendor/mac_objc_exception.m`, the package's one Objective-C file, and costs nothing unless
+something is thrown. The exception unwinds through Zig frames to get there, and **their
+`defer`s do not run** — keep a function run under `tryCall` free of cleanup that must happen.
+
+### Ownership
+
+The same rule as CoreFoundation's, in the method name: **alloc**, **new**, **copy** and
+**mutableCopy** hand you an object to `release`; everything else is autoreleased and lives until
+the innermost `AutoreleasePool` drains. A `cf` value *is* its Objective-C counterpart —
+`Object.fromCf(string)` is an `NSString`, and `asCf(cf.String)` goes back — sharing one
+reference rather than copying.
+
+## Foundation
+
+`mac.foundation` is Foundation's everyday classes, wrapped by hand to be Zig-shaped:
+
+```zig
+const foundation = mac.foundation;
+
+const words = foundation.Array(foundation.String).init(&.{ .literal("b"), .literal("a") });
+defer words.deinit();
+
+var it = words.iterator();
+while (it.next()) |word| std.debug.print("{f}\n", .{word});
+
+var details: foundation.ErrorObject = undefined;
+const text = foundation.String.initContentsOfFile(path, &details) catch {
+    defer details.deinit();
+    std.log.err("{f}", .{details});   // NSCocoaErrorDomain 260: The file ... couldn't be opened
+    return;
+};
+defer text.deinit();
+```
+
+- `String`, `Number`, `Data`, `Url`, and `ErrorObject` for `NSError`.
+- `Array(T)`, `MutableArray(T)`, `Dictionary(K, V)`, `MutableDictionary(K, V)`, typed by what
+  they hold and bounds-checked: past the end is `null` or an assertion, not an exception.
+- Slices in and out; `toOwnedSlice(allocator)` to copy; `{f}` to print.
+- An `error:` out-parameter becomes `error.Failed`, with the `NSError` handed over through an
+  optional `details` pointer.
+- **Anything from an `init...` is yours to `deinit`**; everything else is autoreleased.
+  `String.literal("...")` is made once and never freed, like `@"..."`.
+
+## AppKit
+
+`mac.appkit` is generated from the SDK's headers:
+
+```zig
+const appkit = mac.appkit;
+
+const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(
+    .init(0, 0, 480, 320),
+    .{ .titled = true, .closable = true, .resizable = true },
+    .buffered,
+    false,
+);
+window.setTitle(.literal("mac-zig"));
+window.makeKeyAndOrderFront(null);
+
+var screens = appkit.Screen.screens().iterator();   // foundation.Array(appkit.Screen)
+```
+
+A class loses its `NS`; a method is its selector with the colons removed and each later piece
+capitalised; an enum's constants go to snake case; an option set is a `packed struct` of flags.
+The types map through: `NSString *` is `foundation.String`, `NSArray<NSScreen *> *` is
+`foundation.Array(Screen)`, `NSRect` is `cg.Rect`, a `_Nullable` object is an optional. Inherited
+methods are on the superclass's wrapper, reached with `window.into(appkit.Responder)`, which
+refuses at compile time to convert to something that is not an ancestor.
+
+### An application
+
+`appkit.app.run` is what a nib and `NSApplicationMain` would do: the shared application, a
+standard menu bar (About, Hide, Quit ⌘Q; Minimize ⌘M, Close ⌘W), a delegate written in Zig, and the
+event loop. Handlers are plain Zig functions on a context pointer:
+
+```zig
+const App = struct {
+    window: ?appkit.Window = null,
+
+    pub fn launched(self: *App) void {
+        const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(
+            .init(0, 0, 560, 360), .{ .titled = true, .closable = true }, .buffered, false);
+        const canvas = Canvas.alloc().msgSend(Canvas, "initWithFrame:", .{cg.Rect.init(0, 0, 560, 360)});
+        window.setContentView(appkit.View.from(canvas.object));
+        window.makeKeyAndOrderFront(null);
+        self.window = window;
+    }
+
+    pub fn shouldQuit(_: *App) bool { return true; }   // optional, like willQuit and reopened
+};
+
+pub fn main() void {
+    var app: App = .{};
+    defer app.deinit();                               // runs: see below
+    appkit.app.run(.{ .name = "Demo" }, &app, App);
+}
+```
+
+**Quitting returns.** In Objective-C, `-[NSApp terminate:]` ends in `exit()`, so nothing after the
+event loop runs. Here the delegate turns every way of quitting — the menu, the Dock, logging
+out, the last window closing — into a stop of the loop, and `run` returns with your `defer`s
+still to come. `appkit.app.stop()` stops without asking; `requestQuit()` asks `shouldQuit` first.
+
+A view is an `objc.Subclass` of `NSView`, and draws with `cg`:
+
+```zig
+const Canvas = objc.Subclass(.{ .name = "DemoCanvas", .superclass = "NSView" }, struct {
+    clicks: usize = 0,
+
+    pub fn @"drawRect:"(self: *@This(), _: cg.Rect) void {
+        const ctx = appkit.app.currentContext() orelse return;   // borrowed
+        ctx.setFillColor(.hex(0x2ECC71));
+        ctx.fillEllipseInRect(.init(20, 20, 80, 80));
+    }
+
+    pub fn @"mouseDown:"(self: *@This(), event: appkit.Event) void { ... }
+    pub fn acceptsFirstResponder(_: *@This()) bool { return true; }
+});
+```
+
+### Threads and dispatch
+
+AppKit belongs to the main thread. `mac.dispatch` is Grand Central Dispatch, and the way back
+to it:
+
+```zig
+dispatch.Queue.global(.utility).async(state, struct {
+    fn work(s: *State) void {
+        s.result = compute();
+        appkit.app.onMain(s, show);        // = dispatch.Queue.main().async
+    }
+}.work);
+```
+
+`Queue.main()`, `Queue.global(qos)`, `Queue.initSerial(label)` and `initConcurrent`, each with
+`async`, `sync` and `after(seconds, ...)`; `asyncOwned` copies its context to the heap for work
+that outlives the caller; `Semaphore` waits for it. The context is always a pointer — the work
+runs later, and a value on the caller's stack would be gone.
+
+### The generator
+
+`zig build generate` runs `tools/objc_gen`. For each class and enum in the manifest,
+`tools/objc_gen/appkit.zig`, it has clang dump the declarations as JSON — in parallel, about
+fifteen seconds for the lot — and writes `src/appkit/generated.zig`, which is checked in, so
+building the package never needs it.
+
+Hand-written or generated was the decision to make before AppKit, and the answer is both.
+Foundation is hand-written: it is small, used everywhere, and worth shaping — slices,
+iterators, `details` out-parameters. AppKit is generated: it is thousands of methods, and a
+wrapper that is a straight transcription is what is wanted. Hand-made conveniences go beside
+`generated.zig`, never in it.
+
+Anything the generator cannot type safely is left out and listed in a comment at the end of the
+struct — a C function pointer, a struct it does not know, an enum the manifest does not list.
+Fifteen classes come to about 1,200 methods, with nine left out. A test takes the address of
+every generated method, so each one is compiled, and each selector checked against its
+arguments, on every `zig build test`.
+
 ## Traps
 
 - **`clipToPath` replaces the current path.** CoreGraphics has no call that clips to a path
@@ -324,11 +609,11 @@ try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
 - **A display's current mode is usually absent from `modes(.{})`.** On a Retina display the
   current mode is a scaled one, and CoreGraphics leaves those out unless you pass
   `.{ .include_scaled = true }`.
-- **`intersection` returns a *null* rectangle, not an empty one, when two rectangles miss.**
+- **`intersection` returns a _null_ rectangle, not an empty one, when two rectangles miss.**
   Check it with `isNull`, not `isEmpty`.
 - **`Image.cropped` measures from the top left**, unlike everything else in the framework.
 - **`Display.pixelSize()` is not `CGDisplayPixelsWide`.** That call predates Retina and answers
-  in *points* — on a 6016x3384 panel it says 3008x1692, and a capture buffer sized from it holds
+  in _points_ — on a 6016x3384 panel it says 3008x1692, and a capture buffer sized from it holds
   a quarter of the pixels. `pixelSize()` reads the current mode instead; `legacyPixelSize()` is
   the old number if you need to match it.
 - **ImageIO's default JPEG quality is not maximum.** A 6016x3384 screenshot came out at 2.0 MB
@@ -337,6 +622,25 @@ try cg.text.draw(ctx, "mac-zig", font, .init(40, 40), null);
   `obsoleted=15.0`, which in C is a hard compile error. Zig ignores availability attributes, so
   they compile and link, and they still worked on macOS 26.6. There will be no warning on the
   day they stop, only a null return.
+- **An uncaught Objective-C exception ends the process** — a message the receiver does not
+  understand, an index out of range. Use `tryMsgSend` where one is possible, and remember that
+  unwinding skips the `defer`s in the Zig frames it passes through.
+- **`getClass("NSWindow")` is null unless AppKit is linked.** `-Dappkit` links it; any other
+  framework has to be linked by the program that uses it, with `linkFramework`.
+- **A raw `addIvar` instance variable starts zero-filled**, and a Zig struct's default values
+  are never applied. `objc.Subclass` does apply them; with the low-level API, make zero the
+  starting state.
+- **Some generated getters are optional that need not be.** Where a property carries an
+  availability macro, clang's type spelling drops its nullability, and the generator falls back
+  to the safe answer. `screen.localizedName()` is `?String` though it is never nil.
+- **AppKit is main-thread only.** `appkit.app.run` checks; the wrappers do not.
+- **A click on an inactive window only activates it.** Override `acceptsFirstMouse:` to take the
+  click too.
+- **A window that is not on screen drops mouse events** sent to it with `sendEvent:`. The tests
+  order theirs in at zero alpha.
+- **`launched` runs on the first `run` only** — AppKit finishes launching once per process.
+- **Pass the defining class's superclass to `msgSendSuper`**, spelled out — not
+  `self.getClass().superclass()`, which recurses forever once your class is subclassed.
 - **IOKit reports a time-to-empty of 0 while on mains**, which is not an estimate that the
   machine is about to die. `Source.time_to_empty` is null unless the source is actually
   discharging, and `time_to_full` unless it is actually charging.
@@ -350,68 +654,98 @@ zig build run-shapes      # paths, dashes, clipping, shadows, boolean ops
 zig build run-gradient    # gradients, transforms and layers
 zig build run-text        # measuring, aligning, the flipped-context fix
 zig build run-pdf         # a PDF written, read back and rasterised
+zig build run-objc        # Foundation, a class defined in Zig, exceptions, AppKit
+zig build run-window      # a window: a view drawing with cg, mouse, keys, menus, dispatch
 ```
 
 ## Build options
 
-| Option              | Default | Effect                                                    |
-| ------------------- | ------- | --------------------------------------------------------- |
-| `-Dimageio=false`   | on      | Drops `mac.cg.imageio`; no reading or writing of image files |
-| `-Dcoretext=false`  | on      | Drops `mac.cg.text`; no string drawing                     |
-| `-Diokit=false`     | on      | Drops `mac.iokit`; no power-source reading                 |
+| Option             | Default | Effect                                                       |
+| ------------------ | ------- | ------------------------------------------------------------ |
+| `-Dimageio=false`  | on      | Drops `mac.cg.imageio`; no reading or writing of image files |
+| `-Dcoretext=false` | on      | Drops `mac.cg.text`; no string drawing                       |
+| `-Diokit=false`    | on      | Drops `mac.iokit`; no power-source reading                   |
+| `-Dobjc=false`     | on      | Drops `mac.objc` and `mac.foundation`, and their links       |
+| `-Dappkit=false`   | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`       |
 
-Both namespaces still exist when switched off, holding only `enabled = false`, so a
+Every namespace still exists when switched off, holding only `enabled = false`, so a
 dependent can check `mac.features.imageio` rather than failing to compile.
 
 ## Steps
 
-| Step                | Effect                                                |
-| ------------------- | ----------------------------------------------------- |
-| `zig build`         | Builds every example into `zig-out/bin`               |
-| `zig build test`    | Runs the inline tests and the integration tests       |
-| `zig build bindings`| Writes the translated C bindings to `zig-out/bindings`|
+| Step                 | Effect                                                 |
+| -------------------- | ------------------------------------------------------ |
+| `zig build`          | Builds every example into `zig-out/bin`                |
+| `zig build test`     | Runs the inline tests and the integration tests        |
+| `zig build bindings` | Writes the translated C bindings to `zig-out/bindings` |
+| `zig build generate` | Regenerates `src/appkit/generated.zig` from the SDK    |
 
 ## Layout
 
-| Path                      | What is in it                                             |
-| ------------------------- | --------------------------------------------------------- |
-| `src/mac.zig`             | Umbrella root: the framework namespaces and feature flags |
-| `src/errors.zig`          | The `Error` set, shared by every framework                |
-| `src/cf.zig`              | Just enough CoreFoundation to work the rest               |
-| `src/cg/cg.zig`           | CoreGraphics namespace root and re-exports                |
-| `src/cg/geometry.zig`     | `Point`, `Size`, `Rect`, `AffineTransform`                |
-| `src/cg/color.zig`        | `ColorSpace`, `Color`, `Rgba`                             |
-| `src/cg/image.zig`        | `Image`, `BitmapInfo`, `DataProvider`                     |
-| `src/cg/path.zig`         | `Path`, `MutablePath`, `Element`                          |
-| `src/cg/context.zig`      | `Context`, `Gradient`, `Layer` — the drawing surface      |
-| `src/cg/pdf.zig`          | Reading PDFs                                              |
-| `src/cg/display.zig`      | Displays and display modes                                |
-| `src/cg/window.zig`       | The window list                                           |
-| `src/cg/event.zig`        | Synthetic input and event taps                            |
-| `src/cg/imageio.zig`      | Image files, under `-Dimageio`                            |
-| `src/cg/text.zig`         | The CoreText bridge, under `-Dcoretext`                   |
-| `src/iokit/iokit.zig`     | IOKit namespace root                                      |
-| `src/iokit/power.zig`     | Power sources, under `-Diokit`                            |
-| `vendor/mac_translate.h`  | The umbrella header, and the header workarounds           |
+| Path                          | What is in it                                             |
+| ----------------------------- | --------------------------------------------------------- |
+| `src/mac.zig`                 | Umbrella root: the framework namespaces and feature flags |
+| `src/errors.zig`              | The `Error` set, shared by every framework                |
+| `src/cf.zig`                  | Just enough CoreFoundation to work the rest               |
+| `src/cg/cg.zig`               | CoreGraphics namespace root and re-exports                |
+| `src/cg/geometry.zig`         | `Point`, `Size`, `Rect`, `AffineTransform`                |
+| `src/cg/color.zig`            | `ColorSpace`, `Color`, `Rgba`                             |
+| `src/cg/image.zig`            | `Image`, `BitmapInfo`, `DataProvider`                     |
+| `src/cg/path.zig`             | `Path`, `MutablePath`, `Element`                          |
+| `src/cg/context.zig`          | `Context`, `Gradient`, `Layer` — the drawing surface      |
+| `src/cg/pdf.zig`              | Reading PDFs                                              |
+| `src/cg/display.zig`          | Displays and display modes                                |
+| `src/cg/window.zig`           | The window list                                           |
+| `src/cg/event.zig`            | Synthetic input and event taps                            |
+| `src/cg/imageio.zig`          | Image files, under `-Dimageio`                            |
+| `src/cg/text.zig`             | The CoreText bridge, under `-Dcoretext`                   |
+| `src/iokit/iokit.zig`         | IOKit namespace root                                      |
+| `src/iokit/power.zig`         | Power sources, under `-Diokit`                            |
+| `src/objc/objc.zig`           | Objective-C runtime namespace root, `Range`, `Integer`    |
+| `src/objc/object.zig`         | `Object`: messages, properties, ivars, bridging to `cf`   |
+| `src/objc/class.zig`          | `Class`, and defining classes from Zig                    |
+| `src/objc/message.zig`        | The `objc_msgSend` call, typed at compile time            |
+| `src/objc/block.zig`          | `Block` and `BlockRef`, laid out by the Block ABI         |
+| `src/objc/abi.zig`            | Zig types to C types and back; method trampolines         |
+| `src/objc/encoding.zig`       | Type encodings, computed from Zig types                   |
+| `src/objc/sel.zig`            | `Sel`, cached per call site                               |
+| `src/objc/protocol.zig`       | `Protocol`                                                |
+| `src/objc/autorelease.zig`    | `AutoreleasePool`                                         |
+| `src/objc/subclass.zig`       | `Subclass`: a class defined as a Zig struct               |
+| `src/objc/exception.zig`      | `Exception`, `tryCall`, and `tryMsgSend` underneath       |
+| `src/foundation/`             | `String`, `Number`, `Data`, `Url`, collections, errors    |
+| `src/appkit/appkit.zig`       | AppKit namespace root                                     |
+| `src/appkit/generated.zig`    | The generated wrappers — do not edit                      |
+| `src/appkit/app.zig`          | `run`, the delegate and menu bar, `currentContext`        |
+| `src/dispatch/dispatch.zig`   | Grand Central Dispatch                                    |
+| `tools/objc_gen/main.zig`     | The generator behind `zig build generate`                 |
+| `tools/objc_gen/appkit.zig`   | What the generator wraps from AppKit                      |
+| `vendor/mac_objc_exception.m` | The `@try` that `tryMsgSend` runs under                   |
+| `vendor/mac_translate.h`      | The umbrella header, and the header workarounds           |
 
 ## Where the frameworks come from
 
 They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
-optionally `ImageIO`, `CoreText` and `IOKit`, from the macOS SDK that `xcode-select` points at.
+optionally `ImageIO`, `CoreText`, `IOKit`, `libobjc`, `Foundation` and `AppKit`, from the macOS
+SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
 
-The one piece worth knowing about is `vendor/mac_translate.h`. Three of Apple's spellings do
-not survive Zig 0.17's C translator, and all three are handled there rather than in
+The one piece worth knowing about is `vendor/mac_translate.h`. Four of Apple's spellings do
+not survive Zig 0.17's C translator, and all four are handled there rather than in
 `build.zig`, so the workaround sits next to the thing it works around:
 
 1. **Nullability on bounded array parameters** — `const CGFloat wp[_Nonnull 3]` in
    `CGColorSpace.h`. The translator reports the feature as supported and then rejects the
    syntax, so the spellings are blanked.
-2. **Blocks** — the translator has no blocks support, and Zig cannot call a block anyway. The
-   few headers carrying block declarations claim their own include guards and re-declare
-   everything except the block APIs, each omission documented with the non-block equivalent.
-   CoreText is block-infested throughout, which is why `src/text.zig` declares its thirteen
-   functions by hand instead.
+2. **Blocks** — the translator has no blocks support. The few C headers carrying block
+   declarations claim their own include guards and re-declare everything except the block APIs,
+   each omission documented with the non-block equivalent. CoreText is block-infested
+   throughout, which is why `src/cg/text.zig` declares its thirteen functions by hand instead.
+   (Blocks as *values* are another matter: `mac.objc` builds them by hand, to the Block ABI.)
 3. **Struct-size assertions on bitfield structs** — CoreFoundation reaches `mach/message.h`,
    whose descriptors carry bitfields that translate-c can only render as `opaque`, leaving a
    top-level `comptime` block asking for `@sizeOf` of an opaque type. The assertion macros are
    blanked at the source.
+4. **Objective-C's `BOOL`** — `objc/objc.h` makes it `bool` only when the compiler predefines
+   `__OBJC_BOOL_IS_BOOL`, which clang does for arm64 and the translator does not. Left alone,
+   `BOOL` would be `signed char` on Apple silicon: the call still works, but every type
+   encoding says `c` where the runtime's say `B`. The macro is defined up front, as clang would.

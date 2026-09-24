@@ -1,6 +1,6 @@
 ---
 name: mac-zig
-description: Integrate, configure, test, and debug the mac-zig Zig 0.17 bindings for the macOS system frameworks. Use when an agent needs 2D drawing, bitmap or PDF output, image loading and saving, paths, gradients, colour spaces, or text drawing on macOS from Zig; needs display or window enumeration; needs mouse position, modifier state or synthetic input; or must reach parts of a macOS C framework the wrappers do not yet cover.
+description: Integrate, configure, test, and debug the mac-zig Zig 0.17 bindings for the macOS system frameworks. Use when an agent needs 2D drawing, bitmap or PDF output, image loading and saving, paths, gradients, colour spaces, or text drawing on macOS from Zig; needs display or window enumeration; needs mouse position, modifier state or synthetic input; needs to call an Objective-C framework (Foundation, AppKit, Metal) from Zig, define an Objective-C class in Zig, or pass a block; or must reach parts of a macOS C framework the wrappers do not yet cover.
 ---
 
 # macOS frameworks in Zig
@@ -13,13 +13,18 @@ One package, a namespace per framework:
 | `mac.cg.imageio` | ImageIO, under `-Dimageio` |
 | `mac.cg.text` | CoreText, under `-Dcoretext` |
 | `mac.iokit` | IOKit power sources, under `-Diokit` |
+| `mac.objc` | the Objective-C runtime, under `-Dobjc` |
+| `mac.foundation` | Foundation, hand-wrapped, under `-Dobjc` |
+| `mac.appkit` | AppKit, generated from the SDK, under `-Dappkit` |
+| `mac.dispatch` | Grand Central Dispatch |
 | `mac.cf` | CoreFoundation |
 
 Use the idiomatic namespaces by default. Reach for `mac.raw` only when a wrapper does not
 cover a call.
 
-Objective-C frameworks (AVFoundation, Metal, AppKit, Foundation) are **not** here and cannot
-be added without a message-sending bridge. Do not reach for them.
+For Objective-C, prefer, in order: `mac.foundation` and `mac.appkit` wrappers; then adding the
+class to the generator manifest (`tools/objc_gen/appkit.zig`) and running `zig build generate`;
+then a small hand-written wrapper struct; then raw `msgSend` with a selector string.
 
 macOS only. The Xcode command line tools must be present, because the headers come from the
 SDK that `xcode-select` points at.
@@ -298,6 +303,159 @@ unless it is charging -- IOKit reports 0 for the irrelevant half rather than omi
 Prefer `warningLevel()` over a percentage threshold of your own: it is what drives the
 system's own low-battery notifications.
 
+## Objective-C
+
+Under `-Dobjc`, which links libobjc and Foundation. Any other framework must be linked by the
+program: `exe.root_module.linkFramework("AppKit", .{})`, or `getClass` answers null.
+
+```zig
+const objc = mac.objc;
+
+const pool = objc.AutoreleasePool.init();       // every thread that sends messages needs one
+defer pool.deinit();
+
+const info = objc.getClass("NSProcessInfo").?.msgSend(objc.Object, "processInfo", .{});
+const cores = info.msgSend(objc.UInteger, "activeProcessorCount", .{});
+const rect = boxed.msgSend(cg.Rect, "rectValue", .{});       // NSRect is cg.Rect
+const first = array.msgSend(?objc.Object, "firstObject", .{}); // ?Object where nil is possible
+```
+
+`msgSend(Return, selector, .{args})`. The selector is a comptime string (checked against the
+argument count) or an `objc.Sel` for one built at run time. Rules:
+
+- **Literals need a type**: `@as(objc.Integer, 3)`, `@as(cg.Float, 1.5)`, `@as(?objc.Object, null)`.
+  Pick the type the method declares — `NSInteger` is `objc.Integer`, `NSUInteger` is
+  `objc.UInteger`, `CGFloat` is `cg.Float`, `int` is `c_int`.
+- **Ask for the right return type.** Nothing checks it against the method. `Object` asserts
+  non-nil; use `?Object` when nil is possible.
+- **C strings** go in as `"text".ptr` (`[*:0]const u8`) and come out as `[*:0]const u8`.
+- **Arrays of objects** go in as `@as([*]const objc.Object, &array)` with a count.
+- **Uncaught exceptions are fatal.** Where one is possible, use
+  `obj.tryMsgSend(R, "sel:", .{args}, &caught)` (or `null` to discard it), which answers
+  `error.ObjcException`; `objc.tryCall(f, args, &caught)` wraps a whole function. Unwinding skips
+  Zig `defer`s in the frames it passes, so keep cleanup out of a `tryCall`ed function.
+- **Ownership** is in the name: alloc/new/copy/mutableCopy → `release` it; anything else is
+  autoreleased. `retain` to keep one past the pool.
+- `cf` values bridge: `objc.Object.fromCf(cf_string)` is an NSString; `obj.asCf(cf.String)` goes
+  back. Same reference, not a copy.
+
+Typed wrappers — any struct whose only field is an `objc.Object` passes and returns as one:
+
+```zig
+const Window = struct {
+    object: objc.Object,
+    fn setTitle(self: Window, title: objc.Object) void {
+        self.object.msgSend(void, "setTitle:", .{title});
+    }
+};
+const window = app.msgSend(Window, "mainWindow", .{});
+```
+
+Blocks:
+
+```zig
+const Visit = objc.Block(struct { total: *i64 }, &.{ objc.Object, objc.UInteger, *bool }, void);
+var block = Visit.init(.{ .total = &total }, struct {
+    fn body(captures: *const Visit.Captures, item: objc.Object, _: objc.UInteger, _: *bool) void { ... }
+}.body);
+array.msgSend(void, "enumerateObjectsUsingBlock:", .{&block});   // pass a pointer
+```
+
+The body takes `*const Captures` (or `*Captures`) first, then `Args`. A stack block lives as
+long as its variable; APIs that keep a block copy it themselves. A block handed *to* your method
+is an `objc.BlockRef(Args, Return)` parameter; call it with `.call(.{...})`.
+
+Defining a class — use `objc.Subclass`:
+
+```zig
+const Thing = objc.Subclass(.{ .name = "MyPrefixThing", .superclass = "NSObject" }, struct {
+    last: objc.Integer = 0,                      // every field needs a default
+    pub fn @"doThing:"(self: *@This(), arg: objc.Integer) void { self.last = arg; }
+    pub fn @"make:"(_: objc.Class, n: objc.Integer) Thing { ... }   // class method
+    pub fn deinit(self: *@This()) void { ... }   // runs from -dealloc
+});
+const thing = Thing.new();                       // yours: thing.release()
+thing.state().last;
+```
+
+- Registered on first `Thing.class()`/`new()`, once. Defaults applied at alloc; `deinit` at dealloc.
+- Receiver (first param): `*State`, `*const State`, `Thing`, or `objc.Object` = instance
+  method; `objc.Class` = class method. No `_cmd`. `pub fn`s without a receiver are ignored.
+- A method cannot share a field's name (Zig rule): field `total`, getter `count`.
+- Methods may not return a Zig error. `[super x]` is
+  `self.object.msgSendSuper(<superclass, spelled out>, R, "x", .{})`.
+- The raw API (`allocateClassPair`, `addMethod` with `(self, _: objc.Sel, ...)`, `addIvar`,
+  `registerClassPair`) is there for cases the struct form does not fit; its ivars are
+  zero-filled, with no defaults.
+
+## Foundation
+
+```zig
+const foundation = mac.foundation;
+const s = try foundation.String.init("text");    // yours: s.deinit()
+const k = foundation.String.literal("key");      // made once, never freed; no pool needed
+const list = foundation.Array(foundation.String).init(&.{ k, s });   // yours
+list.at(9)                                       // null, not an exception
+var details: foundation.ErrorObject = undefined; // for `error:` out-parameters
+_ = foundation.Data.initContentsOfFile(path, &details) catch { defer details.deinit(); ... };
+```
+
+- **`init...` → yours to `deinit`**; every other returned object is autoreleased.
+- Collections are typed: `Array(T)`, `MutableArray(T)`, `Dictionary(K, V)`,
+  `MutableDictionary(K, V)`. `T` must be `objc.Object` or an `extern struct` whose one field is
+  an `objc.Object` — every wrapper here, and every `Subclass`, is.
+- `{f}` prints a `String` or an `ErrorObject`. `.utf8()` borrows; `.toOwnedSlice(a)` copies.
+
+## AppKit
+
+```zig
+const appkit = mac.appkit;
+const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(
+    rect, .{ .titled = true, .closable = true }, .buffered, false);
+window.setTitle(.literal("title"));
+window.into(appkit.Responder)                    // superclass methods; checked at compile time
+```
+
+- Names: `NSWindow` → `Window`; selector `a:b:c:` → method `aBC`; enum constants snake case
+  (`NSBackingStoreBuffered` → `.buffered`); option sets are `packed struct`s of bools.
+- Types: `NSString *` → `foundation.String`, `NSArray<NSScreen *> *` → `foundation.Array(Screen)`,
+  `NSRect` → `cg.Rect`, unlisted classes → `objc.Object`, block params → `anytype` (pass
+  `&block`). Nullable → optional; some getters are optional unnecessarily (see README Traps).
+- **Never edit `src/appkit/generated.zig`.** To wrap more, add the class or enum to
+  `tools/objc_gen/appkit.zig` and run `zig build generate` (about 15 s). Methods the generator
+  cannot type are listed in a `// Not generated:` comment at the end of each struct — the usual
+  fix is listing the enum they use.
+- Main thread only.
+
+An application:
+
+```zig
+const App = struct {
+    pub fn launched(self: *App) void { ... make windows ... }   // optional handlers:
+    pub fn shouldQuit(self: *App) bool { return true; }         // launched, shouldQuit,
+};                                                              // willQuit, reopened
+var app: App = .{};
+defer app.deinit();                                  // runs: `run` RETURNS on quit, no exit()
+appkit.app.run(.{ .name = "Demo" }, &app, App);      // menu bar, delegate, event loop
+```
+
+- Handler names must not match the context struct's field names (Zig rule) — `did_launch`, not
+  `launched`, for a flag.
+- A view is `objc.Subclass(.{ .name = ..., .superclass = "NSView" }, struct { ... })` with
+  `pub fn @"drawRect:"(self: *@This(), dirty: cg.Rect) void`; draw into
+  `appkit.app.currentContext().?` (borrowed — no `deinit`). Make one with
+  `Canvas.alloc().msgSend(Canvas, "initWithFrame:", .{rect})`; pass it as
+  `appkit.View.from(canvas.object)`.
+- Override `acceptsFirstResponder` for keys, `acceptsFirstMouse:` to get the activating click.
+- Quit programmatically with `appkit.app.requestQuit()` (asks `shouldQuit`) or `stop()`.
+- Off the main thread: `dispatch.Queue.global(.utility).async(ptr, f)`, back with
+  `appkit.app.onMain(ptr, f)`. Contexts are pointers that must outlive the work, or use
+  `asyncOwned(allocator, value, f)`.
+- Test views offscreen: `view.bitmapImageRepForCachingDisplayInRect` +
+  `cacheDisplayInRectToBitmapImageRep`, then `colorAtXY`. Deliver events with `NSEvent`
+  factories and `window.sendEvent` on a window ordered in at alpha 0 — never `cg.event.post`,
+  which moves the user's real mouse.
+
 ## Build options
 
 | Option              | Default | Effect                                              |
@@ -305,9 +463,11 @@ system's own low-battery notifications.
 | `-Dimageio=false`   | on      | Drops `mac.cg.imageio`                              |
 | `-Dcoretext=false`  | on      | Drops `mac.cg.text`                                 |
 | `-Diokit=false`     | on      | Drops `mac.iokit`                                   |
+| `-Dobjc=false`      | on      | Drops `mac.objc`, `mac.foundation` and their links  |
+| `-Dappkit=false`    | on      | Drops `mac.appkit` and AppKit; needs `-Dobjc`       |
 
-Both namespaces exist either way, holding `enabled = false` when off. Check
-`mac.features.imageio` / `mac.features.coretext` rather than assuming.
+Every namespace exists either way, holding `enabled = false` when off. Check
+`mac.features.imageio` / `mac.features.coretext` / `mac.features.objc` rather than assuming.
 
 ## Validate a change
 
@@ -315,13 +475,21 @@ Both namespaces exist either way, holding `enabled = false` when off. Check
 zig build test                      # inline tests plus integration tests
 zig build test -Dimageio=false      # the gated namespaces still compile out
 zig build test -Dcoretext=false
+zig build test -Dobjc=false
+zig build test -Dappkit=false
+zig build test -Dtarget=x86_64-macos   # BOOL, _stret and _fpret differ on Intel; runs under Rosetta
 zig build                           # every example still builds
 zig build bindings                  # inspect the translated C API
+zig build generate                  # after changing tools/objc_gen; commit the result
 ```
 
 Drawing tests assert on real pixels — make a small bitmap context, draw, and read
 `bitmapData()` indexed by `bitmapBytesPerRow()`. Do not write tests that post events: they
 would move the user's real mouse.
+
+Objective-C tests check values against a real Foundation method (`NSValue` round trips a
+struct, `NSArray` calls a block), not against this binding's own idea of the answer. A class
+defined in a test must be defined once per process: cache it.
 
 ## Adding a framework
 
@@ -365,3 +533,12 @@ These bit during development and are easy to hit again:
   reached with `{f}`.
 - Zig rejects a parameter that shadows a declaration, which bites constantly when a getter
   is named `size`, `width`, `name`, `value` or `components`.
+- `@Fn(param_types, param_attrs, Return, .{ .@"callconv" = .c })` builds a function type, and
+  `@Tuple(&types)` a tuple type. `@Type` is gone. A function *body* of computed arity is still
+  impossible, which is why `objc/abi.zig` spells out one trampoline per arity.
+- A plain function call is a runtime value even when every argument is comptime, so
+  `if (isObject(T))` analyses both branches. Make such type predicates `inline fn`.
+- A struct declared inside a generic function is one type across instantiations unless it
+  mentions the comptime parameter — a per-name static cache has to reference the name.
+- `@alignCast` and `@ptrFromInt` check alignment at run time, even into `[*c]`. A tagged-pointer
+  Objective-C object is not aligned, so objects stay `*anyopaque` and never become `raw.id`.

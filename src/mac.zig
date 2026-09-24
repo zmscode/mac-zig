@@ -32,11 +32,12 @@
 //! - `cg` -- CoreGraphics: 2D drawing, images, PDF, displays, the window
 //!   list and synthetic input. Optionally ImageIO and a CoreText bridge.
 //! - `iokit` -- power sources: battery charge and time remaining.
+//! - `objc` -- the Objective-C runtime: messages, classes defined from
+//!   Zig, blocks. The bridge to Foundation, AppKit, Metal and the rest.
+//! - `foundation` -- Foundation's everyday classes as Zig types.
+//! - `appkit` -- AppKit, from wrappers generated out of the SDK.
+//! - `dispatch` -- Grand Central Dispatch: queues and the main thread.
 //! - `cf` -- just enough CoreFoundation to work the rest.
-//!
-//! Everything is C. Frameworks written in Objective-C -- AVFoundation,
-//! Metal, AppKit -- need a message-sending bridge that this package does
-//! not have, and are out of scope until it does.
 
 const build_options = @import("mac_build_options");
 
@@ -62,6 +63,31 @@ pub const iokit = if (build_options.iokit) @import("iokit/iokit.zig") else struc
     pub const enabled = false;
 };
 
+/// The Objective-C runtime: sending messages, defining classes and
+/// making blocks from Zig. Under `-Dobjc` (on by default), which also
+/// links Foundation; without it this namespace holds only
+/// `enabled = false`.
+pub const objc = if (build_options.objc) @import("objc/objc.zig") else struct {
+    pub const enabled = false;
+};
+
+/// Foundation's everyday classes -- strings, numbers, data, URLs, arrays,
+/// dictionaries, errors -- as Zig types. Under `-Dobjc`.
+pub const foundation = if (build_options.objc) @import("foundation/foundation.zig") else struct {
+    pub const enabled = false;
+};
+
+/// AppKit, from wrappers generated out of the SDK: windows, views, the
+/// application, events, menus. Under `-Dappkit` (on by default with
+/// `-Dobjc`).
+pub const appkit = if (build_options.appkit) @import("appkit/appkit.zig") else struct {
+    pub const enabled = false;
+};
+
+/// Grand Central Dispatch: queues, semaphores, and the main thread.
+/// Part of libSystem, so always here.
+pub const dispatch = @import("dispatch/dispatch.zig");
+
 pub const Error = errors.Error;
 
 /// Which optional pieces this build has. Check these rather than assuming,
@@ -70,6 +96,8 @@ pub const features: Features = .{
     .imageio = build_options.imageio,
     .coretext = build_options.coretext,
     .iokit = build_options.iokit,
+    .objc = build_options.objc,
+    .appkit = build_options.appkit,
 };
 
 pub const Features = struct {
@@ -79,6 +107,11 @@ pub const Features = struct {
     coretext: bool,
     /// `mac.iokit`: power sources.
     iokit: bool,
+    /// `mac.objc` and `mac.foundation`: the Objective-C runtime, and
+    /// Foundation.
+    objc: bool,
+    /// `mac.appkit`: AppKit.
+    appkit: bool,
 };
 
 test {
@@ -89,4 +122,8 @@ test {
     _ = cf;
     _ = cg;
     _ = iokit;
+    _ = objc;
+    _ = foundation;
+    _ = appkit;
+    _ = dispatch;
 }

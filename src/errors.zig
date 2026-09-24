@@ -37,6 +37,10 @@ pub const Error = error{
     NoneAvailable,
     /// A `CGError` code this binding does not name.
     UnknownCgError,
+
+    /// An Objective-C exception was thrown and caught -- by `objc.tryCall`
+    /// or `Object.tryMsgSend`, which can hand over the exception itself.
+    ObjcException,
 };
 
 /// Turns a null return into an error union. Every wrapper over a

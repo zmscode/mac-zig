@@ -228,6 +228,35 @@ test "power reads through the public API" {
     }
 }
 
+test "objc: CoreGraphics geometry goes through a message unchanged" {
+    if (!mac.features.objc) return error.SkipZigTest;
+    const objc = mac.objc;
+
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+
+    // NSValue boxes a CGRect, so a cg.Rect goes in and comes back as is.
+    const rect: cg.Rect = .init(10, 20, 300, 400);
+    const boxed = objc.getClass("NSValue").?.msgSend(objc.Object, "valueWithRect:", .{rect});
+    try std.testing.expectEqual(rect, boxed.msgSend(cg.Rect, "rectValue", .{}));
+}
+
+test "objc: a cf.String is an NSString" {
+    if (!mac.features.objc) return error.SkipZigTest;
+    const objc = mac.objc;
+
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+
+    const text = try mac.cf.String.init("toll-free");
+    defer text.deinit();
+
+    const upper = objc.Object.fromCf(text).msgSend(objc.Object, "uppercaseString", .{});
+    const copy = try upper.asCf(mac.cf.String).?.toOwnedSlice(std.testing.allocator);
+    defer std.testing.allocator.free(copy);
+    try std.testing.expectEqualStrings("TOLL-FREE", copy);
+}
+
 test "the raw layer is reachable for anything not wrapped" {
     // The wrapper does not cover CGColorSpaceGetColorTableCount, so this is
     // what dropping through to `cg.raw` looks like.
