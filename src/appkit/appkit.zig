@@ -62,6 +62,12 @@ const generated = @import("generated.zig");
 /// written in Zig, and getting back to the main thread.
 pub const app = @import("app.zig");
 
+/// A view that shows Metal, redrawn at the display's refresh rate by a Zig
+/// `draw` function. Needs `-Dmetal`.
+pub const MetalView = if (@import("mac_build_options").metal) @import("metal_view.zig").MetalView else struct {
+    pub const enabled = false;
+};
+
 /// True when the package was built with `-Dappkit` (the default).
 pub const enabled = true;
 

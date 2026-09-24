@@ -16,6 +16,7 @@ One package, a namespace per framework:
 | `mac.objc` | the Objective-C runtime, under `-Dobjc` |
 | `mac.foundation` | Foundation, hand-wrapped, under `-Dobjc` |
 | `mac.appkit` | AppKit, generated from the SDK, under `-Dappkit` |
+| `mac.metal` | Metal and QuartzCore's Metal layer, generated, under `-Dmetal` |
 | `mac.dispatch` | Grand Central Dispatch |
 | `mac.cf` | CoreFoundation |
 
@@ -435,6 +436,32 @@ window.into(appkit.Responder)                    // superclass methods; checked 
   fix is listing the enum they use.
 - Main thread only.
 
+`Subclass` instances convert with `into`, checked against the declared superclass and
+protocols: `app.setDelegate(delegate.into(appkit.ApplicationDelegate))`,
+`window.setContentView(canvas.into(appkit.View))`.
+
+## Metal
+
+```zig
+const device = metal.createSystemDefaultDevice() orelse return error.NoGpu;   // yours
+const library = try metal.newLibrary(device, msl_source, &details);           // yours
+const desc = metal.RenderPipelineDescriptor.new();                            // yours
+desc.colorAttachments().objectAtIndexedSubscript(0).setPixelFormat(.bgra8_unorm);
+const pipeline = try metal.newRenderPipelineState(device, desc, null);        // yours
+```
+
+- Protocols are wrappers: `id<MTLDevice>` → `metal.Device`, `id<MTLTexture>` → `metal.Texture`.
+  Parent-protocol methods are on the child (`encoder.endEncoding()`); `into(metal.Resource)`
+  converts.
+- `new...`/`create...`/`copy...` → yours to `release`; command buffers and encoders are
+  autoreleased — a pool per frame.
+- Readback: render into a `.managed` texture, `blit.synchronizeResource(tex.into(metal.Resource))`,
+  `commit()`, `waitUntilCompleted()`, then `getBytesBytesPerRowFromRegionMipmapLevel`.
+- On screen: `appkit.MetalView.init(.{ .frame = rect }, &renderer, Renderer)` with
+  `pub fn draw(*Renderer, appkit.MetalView.Frame) void` (and optional `resized`). In `draw`:
+  `frame.queue.commandBuffer()`, `frame.renderPass(clear)`, encode, `frame.present(commands)`.
+- To wrap more of Metal, edit `tools/objc_gen/metal.zig` and `zig build generate`.
+
 An app bundle, from a dependent's `build.zig`:
 
 ```zig
@@ -486,6 +513,7 @@ appkit.app.run(.{}, &app, App);                      // menu bar, delegate, even
 | `-Diokit=false`     | on      | Drops `mac.iokit`                                   |
 | `-Dobjc=false`      | on      | Drops `mac.objc`, `mac.foundation` and their links  |
 | `-Dappkit=false`    | on      | Drops `mac.appkit` and AppKit; needs `-Dobjc`       |
+| `-Dmetal=false`     | on      | Drops `mac.metal`, `appkit.MetalView`; needs `-Dobjc` |
 
 Every namespace exists either way, holding `enabled = false` when off. Check
 `mac.features.imageio` / `mac.features.coretext` / `mac.features.objc` rather than assuming.
@@ -498,6 +526,7 @@ zig build test -Dimageio=false      # the gated namespaces still compile out
 zig build test -Dcoretext=false
 zig build test -Dobjc=false
 zig build test -Dappkit=false
+zig build test -Dmetal=false
 zig build test -Dtarget=x86_64-macos   # BOOL, _stret and _fpret differ on Intel; runs under Rosetta
 zig build                           # every example still builds
 zig build bindings                  # inspect the translated C API

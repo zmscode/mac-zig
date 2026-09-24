@@ -115,7 +115,7 @@ pub fn run(options: Options, context: anytype, comptime Handlers: type) void {
     };
     // The application keeps only a weak reference to its delegate, which is
     // why `delegate` is held here until the loop ends.
-    app.setDelegate(delegate.object);
+    app.setDelegate(delegate.into(generated.ApplicationDelegate));
     defer app.setDelegate(null);
 
     app.run();

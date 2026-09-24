@@ -5,17 +5,18 @@ Zig 0.17 bindings for the macOS system frameworks. One package, one translated C
 
 Today that is:
 
-| Namespace        | Framework      | Covers                                                                                                                            |
-| ---------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `mac.cg`         | CoreGraphics   | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
-| `mac.cg.imageio` | ImageIO        | reading and writing image files, under `-Dimageio`                                                                                |
-| `mac.cg.text`    | CoreText       | drawing and measuring a line of text, under `-Dcoretext`                                                                          |
-| `mac.iokit`      | IOKit          | power sources: battery charge, mains or battery, time remaining, under `-Diokit`                                                  |
-| `mac.objc`       | libobjc        | the Objective-C runtime: messages, classes defined in Zig, blocks — the bridge to Foundation, AppKit, Metal, under `-Dobjc`       |
-| `mac.foundation` | Foundation     | strings, numbers, data, URLs, typed arrays and dictionaries, errors — as Zig types, under `-Dobjc`                                |
-| `mac.appkit`     | AppKit         | windows, views, the application, events, menus, screens — generated from the SDK, under `-Dappkit`                                |
-| `mac.dispatch`   | libdispatch    | Grand Central Dispatch: the main queue, global and private queues, semaphores                                                     |
-| `mac.cf`         | CoreFoundation | just enough to work the frameworks above it                                                                                       |
+| Namespace        | Framework         | Covers                                                                                                                            |
+| ---------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `mac.cg`         | CoreGraphics      | contexts, paths, colours and colour spaces, images, gradients, layers, PDF in and out, displays, the window list, synthetic input |
+| `mac.cg.imageio` | ImageIO           | reading and writing image files, under `-Dimageio`                                                                                |
+| `mac.cg.text`    | CoreText          | drawing and measuring a line of text, under `-Dcoretext`                                                                          |
+| `mac.iokit`      | IOKit             | power sources: battery charge, mains or battery, time remaining, under `-Diokit`                                                  |
+| `mac.objc`       | libobjc           | the Objective-C runtime: messages, classes defined in Zig, blocks — the bridge to Foundation, AppKit, Metal, under `-Dobjc`       |
+| `mac.foundation` | Foundation        | strings, numbers, data, URLs, typed arrays and dictionaries, errors — as Zig types, under `-Dobjc`                                |
+| `mac.appkit`     | AppKit            | windows, views, the application, events, menus, screens — generated from the SDK, under `-Dappkit`                                |
+| `mac.metal`      | Metal, QuartzCore | devices, queues, buffers, textures, shaders, pipelines, `CAMetalLayer` — generated from the SDK, under `-Dmetal`                  |
+| `mac.dispatch`   | libdispatch       | Grand Central Dispatch: the main queue, global and private queues, semaphores                                                     |
+| `mac.cf`         | CoreFoundation    | just enough to work the frameworks above it                                                                                       |
 
 Everything links what macOS already ships, so there is nothing to fetch and nothing to build.
 
@@ -37,10 +38,10 @@ namespace, not another dependency.
 
 ## What is not here
 
-AppKit is wrapped for the fifteen classes in `tools/objc_gen/appkit.zig`, not all of it; adding
-a class is a line there and `zig build generate`. Other Objective-C frameworks — Metal,
-AVFoundation, CoreImage — have no wrappers yet, and are reached through `mac.objc` by sending
-messages by name. The generator is written to take them next.
+AppKit and Metal are wrapped for what their manifests in `tools/objc_gen/` list, not all of
+them; adding a class or protocol is a line there and `zig build generate`. Other Objective-C
+frameworks — AVFoundation, CoreImage, ScreenCaptureKit — have no manifest yet, and are reached
+through `mac.objc` by sending messages by name. A new framework is a new manifest.
 
 ## Use as a dependency
 
@@ -605,10 +606,13 @@ runs later, and a value on the caller's stack would be gone.
 
 ### The generator
 
-`zig build generate` runs `tools/objc_gen`. For each class and enum in the manifest,
-`tools/objc_gen/appkit.zig`, it has clang dump the declarations as JSON — in parallel, about
-fifteen seconds for the lot — and writes `src/appkit/generated.zig`, which is checked in, so
-building the package never needs it.
+`zig build generate` runs `tools/objc_gen` once per manifest — `tools/objc_gen/appkit.zig` and
+`tools/objc_gen/metal.zig`. For each class, protocol, enum and struct listed, it has clang dump
+the declarations as JSON, in parallel, and writes `src/<framework>/generated.zig`, which is
+checked in, so building the package never needs it. Both together take a minute or two.
+
+A protocol is generated like a class: `id<MTLDevice>` is a `Device`, with `MTLDevice`'s methods
+and those of any protocol it extends. Much of Metal is nothing but protocols.
 
 Hand-written or generated was the decision to make before AppKit, and the answer is both.
 Foundation is hand-written: it is small, used everywhere, and worth shaping — slices,
@@ -626,6 +630,57 @@ Nullability comes from clang, with one repair. Inside Apple's `NS_ASSUME_NONNULL
 unannotated pointer is non-null, and clang says so — except for a property carrying an
 availability macro, whose type spelling loses it. The property declaration still records
 whether nullability was written out, so the generator reads it from there.
+
+## Metal
+
+`mac.metal` is Metal, generated from the SDK like AppKit, plus QuartzCore's `CAMetalLayer`:
+
+```zig
+const metal = mac.metal;
+
+const device = metal.createSystemDefaultDevice() orelse return error.NoGpu;
+defer device.release();
+
+const library = try metal.newLibrary(device, shader_source, &details);   // compiled at run time
+const pipeline_descriptor = metal.RenderPipelineDescriptor.new();
+pipeline_descriptor.setVertexFunction(metal.function(library, "vertex_main").?);
+pipeline_descriptor.colorAttachments().objectAtIndexedSubscript(0).setPixelFormat(.bgra8_unorm);
+const pipeline = try metal.newRenderPipelineState(device, pipeline_descriptor, null);
+```
+
+Names lose `MTL` or `CA` — `CAMetalLayer` is `MetalLayer` — and `new...` methods hand back what
+you own, as the naming rule says. The calls that take `error:` have wrappers returning
+`error.Failed`, with the compiler's messages in `details`.
+
+`appkit.MetalView` puts it on screen: a view backed by a `CAMetalLayer`, redrawn by a display
+link at the screen's refresh rate, calling your `draw` with the frame's drawable, texture, size
+in pixels and timing:
+
+```zig
+const Renderer = struct {
+    pub fn draw(self: *Renderer, frame: appkit.MetalView.Frame) void {
+        const commands = frame.queue.commandBuffer().?;
+        const encoder = commands.renderCommandEncoderWithDescriptor(frame.renderPass(background)).?;
+        // ... set the pipeline, draw ...
+        encoder.endEncoding();
+        frame.present(commands);
+    }
+    pub fn resized(self: *Renderer, pixels: cg.Size) void { ... }   // optional
+};
+
+const view = try appkit.MetalView.init(.{ .frame = rect }, &renderer, Renderer);
+defer view.deinit();
+window.setContentView(view.asView());
+```
+
+The loop starts when the view goes into a window and stops when it leaves one, skips frames
+while the window is hidden, and gives each frame its own autorelease pool. Before macOS 14,
+which has no display link for a view, a 60 Hz timer stands in.
+
+```sh
+zig build run-metal                              # a spinning triangle
+zig build run-metal -- --snapshot metal.png      # one frame, offscreen, to a PNG
+```
 
 ## Application bundles
 
@@ -715,17 +770,19 @@ zig build run-text        # measuring, aligning, the flipped-context fix
 zig build run-pdf         # a PDF written, read back and rasterised
 zig build run-objc        # Foundation, a class defined in Zig, exceptions, AppKit
 zig build run-window      # a window: a view drawing with cg, mouse, keys, menus, dispatch
+zig build run-metal       # Metal: a shader, a pipeline, a triangle at the display's rate
 ```
 
 ## Build options
 
-| Option             | Default | Effect                                                       |
-| ------------------ | ------- | ------------------------------------------------------------ |
-| `-Dimageio=false`  | on      | Drops `mac.cg.imageio`; no reading or writing of image files |
-| `-Dcoretext=false` | on      | Drops `mac.cg.text`; no string drawing                       |
-| `-Diokit=false`    | on      | Drops `mac.iokit`; no power-source reading                   |
-| `-Dobjc=false`     | on      | Drops `mac.objc` and `mac.foundation`, and their links       |
-| `-Dappkit=false`   | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`       |
+| Option             | Default | Effect                                                                                    |
+| ------------------ | ------- | ----------------------------------------------------------------------------------------- |
+| `-Dimageio=false`  | on      | Drops `mac.cg.imageio`; no reading or writing of image files                              |
+| `-Dcoretext=false` | on      | Drops `mac.cg.text`; no string drawing                                                    |
+| `-Diokit=false`    | on      | Drops `mac.iokit`; no power-source reading                                                |
+| `-Dobjc=false`     | on      | Drops `mac.objc` and `mac.foundation`, and their links                                    |
+| `-Dappkit=false`   | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`                                    |
+| `-Dmetal=false`    | on      | Drops `mac.metal`, `appkit.MetalView`, and the Metal and QuartzCore links; needs `-Dobjc` |
 
 Every namespace still exists when switched off, holding only `enabled = false`, so a
 dependent can check `mac.features.imageio` rather than failing to compile.
@@ -780,14 +837,18 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 | `src/dispatch/dispatch.zig`   | Grand Central Dispatch                                    |
 | `tools/objc_gen/main.zig`     | The generator behind `zig build generate`                 |
 | `tools/objc_gen/appkit.zig`   | What the generator wraps from AppKit                      |
+| `tools/objc_gen/metal.zig`    | What the generator wraps from Metal and QuartzCore        |
+| `src/metal/metal.zig`         | Metal namespace root, and the calls that are not methods  |
+| `src/metal/generated.zig`     | The generated Metal wrappers — do not edit                |
+| `src/appkit/metal_view.zig`   | `MetalView`: a Metal layer and a display-link render loop |
 | `vendor/mac_objc_exception.m` | The `@try` that `tryMsgSend` runs under                   |
 | `vendor/mac_translate.h`      | The umbrella header, and the header workarounds           |
 
 ## Where the frameworks come from
 
 They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
-optionally `ImageIO`, `CoreText`, `IOKit`, `libobjc`, `Foundation` and `AppKit`, from the macOS
-SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
+optionally `ImageIO`, `CoreText`, `IOKit`, `libobjc`, `Foundation`, `AppKit`, `Metal` and
+`QuartzCore`, from the macOS SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
 
 The one piece worth knowing about is `vendor/mac_translate.h`. Four of Apple's spellings do
 not survive Zig 0.17's C translator, and all four are handled there rather than in

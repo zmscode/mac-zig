@@ -29,6 +29,15 @@ pub fn build(b: *std.Build) void {
         "appkit",
         "Expose the generated AppKit wrappers and link AppKit (needs -Dobjc)",
     ) orelse objc;
+    const metal = b.option(
+        bool,
+        "metal",
+        "Expose the generated Metal wrappers and link Metal and QuartzCore (needs -Dobjc)",
+    ) orelse objc;
+    if (metal and !objc) {
+        std.debug.print("-Dmetal needs -Dobjc: Metal is reached through the Objective-C runtime.\n", .{});
+        std.process.exit(1);
+    }
     if (appkit and !objc) {
         std.debug.print("-Dappkit needs -Dobjc: AppKit is reached through the Objective-C runtime.\n", .{});
         std.process.exit(1);
@@ -39,6 +48,7 @@ pub fn build(b: *std.Build) void {
         .iokit = iokit,
         .objc = objc,
         .appkit = appkit,
+        .metal = metal,
     };
 
     // -----------------------------------------------------------------
@@ -72,6 +82,7 @@ pub fn build(b: *std.Build) void {
     options.addOption(bool, "iokit", iokit);
     options.addOption(bool, "objc", objc);
     options.addOption(bool, "appkit", appkit);
+    options.addOption(bool, "metal", metal);
 
     // -----------------------------------------------------------------
     // The raw layer.
@@ -148,30 +159,34 @@ pub fn build(b: *std.Build) void {
     // Regenerating the Objective-C wrappers. Not part of a normal build:
     // the output is checked in, and this needs the SDK's full headers.
     // -----------------------------------------------------------------
-    const generator = b.addExecutable(.{
-        .name = "objc_gen",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("tools/objc_gen/main.zig"),
-            .target = b.graph.host,
-            .optimize = .ReleaseSafe,
-            .imports = &.{.{
-                .name = "manifest",
-                .module = b.createModule(.{ .root_source_file = b.path("tools/objc_gen/appkit.zig") }),
-            }},
-        }),
-    });
-    const generate = b.addRunArtifact(generator);
-    generate.addArgs(&.{ b.graph.zig_exe, sdk });
-    _ = generate.addOutputDirectoryArg("dumps");
-    generate.addDirectoryArg(b.path("src/appkit"));
-    generate.has_side_effects = true;
-    const format_generated = b.addFmt(.{ .paths = &.{b.path("src/appkit/generated.zig")} });
-    format_generated.step.dependOn(&generate.step);
-    b.step("generate", "Regenerate src/appkit/generated.zig from the SDK's headers")
-        .dependOn(&format_generated.step);
+    const generate_step = b.step("generate", "Regenerate the Objective-C wrappers from the SDK's headers");
+    // Each manifest, and where its wrappers go. The generator is built once
+    // per manifest, since the manifest is compiled into it.
+    for ([_][2][]const u8{ .{ "appkit", "src/appkit" }, .{ "metal", "src/metal" } }) |job| {
+        const generator = b.addExecutable(.{
+            .name = b.fmt("objc_gen_{s}", .{job[0]}),
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("tools/objc_gen/main.zig"),
+                .target = b.graph.host,
+                .optimize = .ReleaseSafe,
+                .imports = &.{.{
+                    .name = "manifest",
+                    .module = b.createModule(.{ .root_source_file = b.path(b.fmt("tools/objc_gen/{s}.zig", .{job[0]})) }),
+                }},
+            }),
+        });
+        const generate = b.addRunArtifact(generator);
+        generate.addArgs(&.{ b.graph.zig_exe, sdk });
+        _ = generate.addOutputDirectoryArg("dumps");
+        generate.addDirectoryArg(b.path(job[1]));
+        generate.has_side_effects = true;
+        const format_generated = b.addFmt(.{ .paths = &.{b.path(b.fmt("{s}/generated.zig", .{job[1]}))} });
+        format_generated.step.dependOn(&generate.step);
+        generate_step.dependOn(&format_generated.step);
+    }
 
     const examples_step = b.step("examples", "Build every example");
-    for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf", "objc", "window" }) |name| {
+    for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf", "objc", "window", "metal" }) |name| {
         const exe = addExample(b, examples_step, mac, target, optimize, name);
 
         // The window example again, as the app it is.
@@ -381,6 +396,7 @@ const Features = struct {
     iokit: bool,
     objc: bool,
     appkit: bool,
+    metal: bool,
 };
 
 /// Everything a module needs to use the frameworks that are switched on:
@@ -407,6 +423,10 @@ fn linkFrameworks(b: *std.Build, module: *std.Build.Module, sdk: []const u8, fea
         module.addCSourceFile(.{ .file = b.path("vendor/mac_objc_exception.m") });
     }
     if (features.appkit) module.linkFramework("AppKit", .{});
+    if (features.metal) {
+        module.linkFramework("Metal", .{});
+        module.linkFramework("QuartzCore", .{});
+    }
 }
 
 fn addExample(

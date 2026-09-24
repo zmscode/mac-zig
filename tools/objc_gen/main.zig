@@ -72,7 +72,11 @@ fn dumpAll(
     const source = try std.fs.path.join(arena, &.{ scratch, "umbrella.m" });
     try cwd.writeFile(io, .{
         .sub_path = source,
-        .data = try std.fmt.allocPrint(arena, "#import <{s}>\n", .{manifest.umbrella}),
+        .data = blk: {
+            var text: []const u8 = "";
+            for (manifest.imports) |header| text = try std.fmt.allocPrint(arena, "{s}#import <{s}>\n", .{ text, header });
+            break :blk text;
+        },
     });
     const frameworks = try std.fs.path.join(arena, &.{ sdk, "System/Library/Frameworks" });
 
@@ -184,6 +188,9 @@ const Model = struct {
     protocols: std.StringArrayHashMapUnmanaged(Class) = .empty,
     enums: std.StringArrayHashMapUnmanaged(Enum) = .empty,
     structs: std.StringArrayHashMapUnmanaged(Record) = .empty,
+    /// The fields of the last nameless struct seen: `typedef struct {...}
+    /// MTLClearColor` dumps as a nameless record, then the typedef naming it.
+    anonymous_fields: ?[]const Param = null,
 
     fn wantsClass(name: []const u8) bool {
         for (manifest.classes) |c| if (std.mem.eql(u8, c, name)) return true;
@@ -219,7 +226,19 @@ const Model = struct {
     fn declaration(self: *Model, value: Value) !void {
         const object = value.object;
         const kind = object.get("kind").?.string;
+        if (std.mem.eql(u8, kind, "RecordDecl") and object.get("name") == null) {
+            self.anonymous_fields = if (object.get("inner")) |inner| try self.fields(inner) else null;
+            return;
+        }
         const name = if (object.get("name")) |n| n.string else return;
+
+        if (std.mem.eql(u8, kind, "TypedefDecl") and wantsStruct(name) and !self.structs.contains(name)) {
+            if (self.anonymous_fields) |pending| {
+                if (pending.len > 0) try self.structs.put(self.arena, name, .{ .name = name, .fields = pending });
+            }
+            self.anonymous_fields = null;
+            return;
+        }
 
         if (std.mem.eql(u8, kind, "ObjCInterfaceDecl") and wantsClass(name)) {
             const inner = object.get("inner") orelse return; // a forward declaration
@@ -235,18 +254,22 @@ const Model = struct {
             const inner = object.get("inner") orelse return;
             const entry = try self.protocols.getOrPut(self.arena, name);
             if (!entry.found_existing) entry.value_ptr.* = .{ .name = name, .is_protocol = true };
+            // A protocol's parent is its "superclass" here: the first one
+            // it adopts that is also being generated.
+            if (entry.value_ptr.superclass == null) if (object.get("protocols")) |parents| {
+                for (parents.array.items) |parent| {
+                    const parent_name = parent.object.get("name").?.string;
+                    if (wantsProtocol(parent_name)) {
+                        entry.value_ptr.superclass = parent_name;
+                        break;
+                    }
+                }
+            };
             try self.methods(entry.value_ptr, inner);
         } else if (std.mem.eql(u8, kind, "RecordDecl") and wantsStruct(name) and !self.structs.contains(name)) {
             const inner = object.get("inner") orelse return;
-            var fields: std.ArrayList(Param) = .empty;
-            for (inner.array.items) |child| {
-                if (!std.mem.eql(u8, child.object.get("kind").?.string, "FieldDecl")) continue;
-                try fields.append(self.arena, .{
-                    .name = child.object.get("name").?.string,
-                    .type = .from(child.object.get("type").?),
-                });
-            }
-            if (fields.items.len > 0) try self.structs.put(self.arena, name, .{ .name = name, .fields = fields.items });
+            const found = try self.fields(inner);
+            if (found.len > 0) try self.structs.put(self.arena, name, .{ .name = name, .fields = found });
         } else if (std.mem.eql(u8, kind, "EnumDecl") and wantsEnum(name) and !self.enums.contains(name)) {
             const inner = object.get("inner") orelse return;
             var constants: std.ArrayList(Constant) = .empty;
@@ -271,6 +294,18 @@ const Model = struct {
                 .constants = constants.items,
             });
         }
+    }
+
+    fn fields(self: *Model, inner: Value) ![]const Param {
+        var list: std.ArrayList(Param) = .empty;
+        for (inner.array.items) |child| {
+            if (!std.mem.eql(u8, child.object.get("kind").?.string, "FieldDecl")) continue;
+            try list.append(self.arena, .{
+                .name = child.object.get("name").?.string,
+                .type = .from(child.object.get("type").?),
+            });
+        }
+        return list.items;
     }
 
     fn classNamed(self: *Model, name: []const u8) !*Class {
@@ -402,16 +437,7 @@ const Model = struct {
                 try w.print("\n// Not generated: protocol {s}, which was not found.\n", .{name});
                 continue;
             };
-            try w.print(
-                \\
-                \\/// `{s}`, for the `.protocols` of an `objc.Subclass`: the class
-                \\/// adopts it, and each method it implements is checked against it.
-                \\pub const {s} = struct {{
-                \\    pub const protocol_name = "{s}";
-                \\
-            , .{ name, stripPrefix(name), name });
-            try self.emitSignatures(w, protocol, protocol.methods.items);
-            try w.writeAll("};\n");
+            try self.emitClass(w, protocol);
         }
     }
 
@@ -517,14 +543,66 @@ const Model = struct {
         }
     }
 
+    fn isGenerated(name: []const u8) bool {
+        return wantsClass(name) or wantsProtocol(name);
+    }
+
+    /// A generated class or protocol by name.
+    fn container(self: *Model, name: []const u8) ?*Class {
+        return self.classes.getPtr(name) orelse self.protocols.getPtr(name);
+    }
+
     fn emitClass(self: *Model, w: *std.Io.Writer, class: *Class) !void {
         const zig_name = stripPrefix(class.name);
         const super: []const u8 = if (class.superclass) |s|
-            (if (wantsClass(s)) stripPrefix(s) else "objc.Object")
+            (if (isGenerated(s)) stripPrefix(s) else "objc.Object")
         else
             "objc.Object";
 
-        try w.print(
+        if (class.is_protocol) try w.print(
+            \\
+            \\/// An object conforming to `{s}`{s}{s}{s}. As an `objc.Subclass`
+            \\/// protocol, each method the class implements is checked against it.
+            \\pub const {s} = extern struct {{
+            \\    object: objc.Object,
+            \\
+            \\    const Self = @This();
+            \\    pub const Super = {s};
+            \\    pub const protocol_name = "{s}";
+            \\
+            \\    /// An object that came from elsewhere, taken to conform to `{s}`.
+            \\    pub fn from(object: objc.Object) Self {{
+            \\        return .{{ .object = object }};
+            \\    }}
+            \\
+            \\    /// This object as a parent protocol's wrapper, or `objc.Object`.
+            \\    pub fn into(self: Self, comptime T: type) T {{
+            \\        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+            \\        return objc.abi.wrap(T, self.object);
+            \\    }}
+            \\
+            \\    pub fn retain(self: Self) Self {{
+            \\        return .{{ .object = self.object.retain() }};
+            \\    }}
+            \\
+            \\    pub fn release(self: Self) void {{
+            \\        self.object.release();
+            \\    }}
+            \\
+            \\    pub fn autorelease(self: Self) Self {{
+            \\        return .{{ .object = self.object.autorelease() }};
+            \\    }}
+            \\
+        , .{
+            class.name,
+            if (class.superclass != null) ", which extends `" else "",
+            class.superclass orelse "",
+            if (class.superclass != null) "`" else "",
+            zig_name,
+            super,
+            class.name,
+            class.name,
+        }) else try w.print(
             \\
             \\/// `{s}`{s}{s}{s}.
             \\pub const {s} = extern struct {{
@@ -541,6 +619,11 @@ const Model = struct {
             \\    /// An uninitialised instance, for an `init...` method. Yours.
             \\    pub fn alloc() Self {{
             \\        return class().msgSend(Self, "alloc", .{{}});
+            \\    }}
+            \\
+            \\    /// `[[{s} alloc] init]`. Yours.
+            \\    pub fn new() Self {{
+            \\        return class().msgSend(Self, "new", .{{}});
             \\    }}
             \\
             \\    /// An object that came from elsewhere, taken to be a `{s}`.
@@ -575,11 +658,12 @@ const Model = struct {
             super,
             class.name,
             class.name,
+            class.name,
         });
 
         // Names the struct already uses, which a method must not take.
         var taken: std.StringHashMapUnmanaged(void) = .empty;
-        for ([_][]const u8{ "object", "Self", "Super", "class_name", "class", "alloc", "from", "into", "retain", "release", "autorelease", "signatures" }) |n| {
+        for ([_][]const u8{ "object", "Self", "Super", "class_name", "protocol_name", "class", "alloc", "new", "from", "into", "retain", "release", "autorelease", "signatures" }) |n| {
             try taken.put(self.arena, n, {});
         }
 
@@ -592,11 +676,13 @@ const Model = struct {
         var owner: ?*Class = class;
         while (owner) |current| {
             for (current.methods.items) |m| {
+                // A protocol's class methods have no class to be sent to.
+                if (class.is_protocol and !m.instance) continue;
                 if ((try keys.getOrPut(self.arena, try Class.key(self.arena, m))).found_existing) continue;
                 try all.append(self.arena, .{ .method = m, .origin = current.name });
             }
             const next = current.superclass orelse break;
-            owner = if (wantsClass(next)) self.classes.getPtr(next) else null;
+            owner = if (isGenerated(next)) self.container(next) else null;
         }
 
         var skipped: std.ArrayList([]const u8) = .empty;
@@ -712,8 +798,16 @@ const Model = struct {
                     return try self.maybeOptional(if (class.is_protocol) "objc.Object" else stripPrefix(class.name), optional);
                 }
                 if (cgHandle(base)) |handle| return try self.maybeOptional(handle, optional);
-                if (std.mem.eql(u8, base, "id") or std.mem.startsWith(u8, base, "id<"))
-                    return try self.maybeOptional("objc.Object", optional);
+                if (std.mem.startsWith(u8, base, "id<") and std.mem.endsWith(u8, base, ">")) {
+                    // One generated protocol: its wrapper. Otherwise a bare object.
+                    const inside = std.mem.trim(u8, base[3 .. base.len - 1], " ");
+                    const wrapper = if (std.mem.indexOfScalar(u8, inside, ',') == null and wantsProtocol(inside))
+                        stripPrefix(inside)
+                    else
+                        "objc.Object";
+                    return try self.maybeOptional(wrapper, optional);
+                }
+                if (std.mem.eql(u8, base, "id")) return try self.maybeOptional("objc.Object", optional);
                 if (std.mem.eql(u8, base, "SEL")) return try self.maybeOptional("objc.Sel", optional);
                 if (std.mem.eql(u8, base, "Class")) return try self.maybeOptional("objc.Class", optional);
                 if (scalar(base)) |s| return s;
@@ -795,7 +889,9 @@ const Model = struct {
         return (try self.objectType(t)) orelse "objc.Object";
     }
 
-    fn snake(self: *Model, name: []const u8) ![]const u8 {
+    fn snake(self: *Model, raw_name: []const u8) ![]const u8 {
+        // `BGRA8Unorm_sRGB` should read `bgra8_unorm_srgb`, not `..._s_rgb`.
+        const name = try std.mem.replaceOwned(u8, self.arena, raw_name, "sRGB", "Srgb");
         var out: std.ArrayList(u8) = .empty;
         for (name, 0..) |c, i| {
             if (std.ascii.isUpper(c) and i > 0) {
@@ -1008,7 +1104,7 @@ fn constantPrefix(e: Enum) []const u8 {
         const n = std.mem.indexOfDiff(u8, prefix, c.name) orelse prefix.len;
         prefix = prefix[0..@min(n, prefix.len)];
     }
-    if (e.constants.len == 1 and !std.mem.startsWith(u8, e.constants[0].name, prefix)) prefix = manifest.prefix;
+    if (e.constants.len == 1 and !std.mem.startsWith(u8, e.constants[0].name, prefix)) prefix = manifest.prefixes[0];
     while (prefix.len > 0) {
         var ok = true;
         for (e.constants) |c| {
@@ -1021,7 +1117,10 @@ fn constantPrefix(e: Enum) []const u8 {
 }
 
 fn stripPrefix(name: []const u8) []const u8 {
-    return if (std.mem.startsWith(u8, name, manifest.prefix)) name[manifest.prefix.len..] else name;
+    for (manifest.prefixes) |prefix| {
+        if (std.mem.startsWith(u8, name, prefix)) return name[prefix.len..];
+    }
+    return name;
 }
 
 fn lowerFramework() []const u8 {

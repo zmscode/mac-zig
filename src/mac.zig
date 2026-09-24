@@ -36,6 +36,7 @@
 //!   Zig, blocks. The bridge to Foundation, AppKit, Metal and the rest.
 //! - `foundation` -- Foundation's everyday classes as Zig types.
 //! - `appkit` -- AppKit, from wrappers generated out of the SDK.
+//! - `metal` -- Metal, generated, and QuartzCore's Metal layer.
 //! - `dispatch` -- Grand Central Dispatch: queues and the main thread.
 //! - `cf` -- just enough CoreFoundation to work the rest.
 
@@ -84,6 +85,13 @@ pub const appkit = if (build_options.appkit) @import("appkit/appkit.zig") else s
     pub const enabled = false;
 };
 
+/// Metal, from wrappers generated out of the SDK, and the part of
+/// QuartzCore that shows it on screen. Under `-Dmetal` (on by default with
+/// `-Dobjc`).
+pub const metal = if (build_options.metal) @import("metal/metal.zig") else struct {
+    pub const enabled = false;
+};
+
 /// Grand Central Dispatch: queues, semaphores, and the main thread.
 /// Part of libSystem, so always here.
 pub const dispatch = @import("dispatch/dispatch.zig");
@@ -98,6 +106,7 @@ pub const features: Features = .{
     .iokit = build_options.iokit,
     .objc = build_options.objc,
     .appkit = build_options.appkit,
+    .metal = build_options.metal,
 };
 
 pub const Features = struct {
@@ -112,6 +121,8 @@ pub const Features = struct {
     objc: bool,
     /// `mac.appkit`: AppKit.
     appkit: bool,
+    /// `mac.metal`: Metal and QuartzCore.
+    metal: bool,
 };
 
 test {
@@ -126,4 +137,5 @@ test {
     _ = foundation;
     _ = appkit;
     _ = dispatch;
+    _ = metal;
 }

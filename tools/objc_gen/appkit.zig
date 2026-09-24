@@ -10,8 +10,8 @@
 //! of each generated struct names what was left out and why.
 
 pub const framework = "AppKit";
-pub const umbrella = "AppKit/AppKit.h";
-pub const prefix = "NS";
+pub const imports = [_][]const u8{"AppKit/AppKit.h"};
+pub const prefixes = [_][]const u8{"NS"};
 
 pub const classes = [_][]const u8{
     "NSResponder",

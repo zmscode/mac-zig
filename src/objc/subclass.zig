@@ -186,6 +186,34 @@ pub fn Subclass(comptime options_: anytype, comptime State_: type) type {
             return .{ .object = .{ .value = @ptrFromInt(@intFromPtr(state_pointer) - state_offset) } };
         }
 
+        /// This object as `T`: its superclass or an ancestor of it, a
+        /// protocol it adopts or a parent of one -- each given as a type in
+        /// the options -- or `objc.Object`. Anything else does not compile.
+        ///
+        /// ```zig
+        /// app.setDelegate(delegate.into(appkit.ApplicationDelegate));
+        /// window.setContentView(canvas.into(appkit.View));
+        /// ```
+        pub fn into(self: Self, comptime T: type) T {
+            if (!comptime isA(T)) @compileError(options.name ++ " is not declared to be a " ++ @typeName(T) ++
+                ": give it as .superclass or in .protocols, as a type");
+            return abi.wrap(T, self.object);
+        }
+
+        fn isA(comptime T: type) bool {
+            if (T == Object or T == Self) return true;
+            const roots = (if (options.superclass) |S| &[_]type{S} else &[_]type{}) ++ options.protocols;
+            for (roots) |root| {
+                var current: type = root;
+                while (true) {
+                    if (current == T) return true;
+                    if (!@hasDecl(current, "Super") or current.Super == Object) break;
+                    current = current.Super;
+                }
+            }
+            return false;
+        }
+
         pub inline fn msgSend(self: Self, comptime Return: type, selector: anytype, args: anytype) Return {
             return self.object.msgSend(Return, selector, args);
         }

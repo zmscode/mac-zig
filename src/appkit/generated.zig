@@ -800,6 +800,11 @@ pub const Responder = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSResponder alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSResponder`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -1181,6 +1186,11 @@ pub const Application = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSApplication alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSApplication`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -1410,12 +1420,12 @@ pub const Application = extern struct {
     }
 
     /// `-[NSApplication delegate]`
-    pub fn delegate(self: Self) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "delegate", .{});
+    pub fn delegate(self: Self) ?ApplicationDelegate {
+        return self.object.msgSend(?ApplicationDelegate, "delegate", .{});
     }
 
     /// `-[NSApplication setDelegate:]`
-    pub fn setDelegate(self: Self, delegate_: ?objc.Object) void {
+    pub fn setDelegate(self: Self, delegate_: ?ApplicationDelegate) void {
         return self.object.msgSend(void, "setDelegate:", .{delegate_});
     }
 
@@ -1921,8 +1931,8 @@ pub const Application = extern struct {
         pub const @"replyToOpenOrPrint:" = fn (ApplicationDelegateReply) void;
         pub const @"orderFrontCharacterPalette:" = fn (?objc.Object) void;
         pub const @"+sharedApplication" = fn () Application;
-        pub const delegate = fn () ?objc.Object;
-        pub const @"setDelegate:" = fn (?objc.Object) void;
+        pub const delegate = fn () ?ApplicationDelegate;
+        pub const @"setDelegate:" = fn (?ApplicationDelegate) void;
         pub const mainWindow = fn () ?Window;
         pub const keyWindow = fn () ?Window;
         pub const isActive = fn () bool;
@@ -1978,6 +1988,11 @@ pub const RunningApplication = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSRunningApplication alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSRunningApplication`.
@@ -2167,6 +2182,11 @@ pub const Window = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSWindow alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSWindow`.
@@ -2828,12 +2848,12 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow delegate]`
-    pub fn delegate(self: Self) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "delegate", .{});
+    pub fn delegate(self: Self) ?WindowDelegate {
+        return self.object.msgSend(?WindowDelegate, "delegate", .{});
     }
 
     /// `-[NSWindow setDelegate:]`
-    pub fn setDelegate(self: Self, delegate_: ?objc.Object) void {
+    pub fn setDelegate(self: Self, delegate_: ?WindowDelegate) void {
         return self.object.msgSend(void, "setDelegate:", .{delegate_});
     }
 
@@ -4001,8 +4021,8 @@ pub const Window = extern struct {
         pub const @"setExcludedFromWindowsMenu:" = fn (bool) void;
         pub const contentView = fn () ?View;
         pub const @"setContentView:" = fn (?View) void;
-        pub const delegate = fn () ?objc.Object;
-        pub const @"setDelegate:" = fn (?objc.Object) void;
+        pub const delegate = fn () ?WindowDelegate;
+        pub const @"setDelegate:" = fn (?WindowDelegate) void;
         pub const windowNumber = fn () objc.Integer;
         pub const styleMask = fn () WindowStyleMask;
         pub const @"setStyleMask:" = fn (WindowStyleMask) void;
@@ -4174,6 +4194,11 @@ pub const View = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSView alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSView`.
@@ -5610,6 +5635,11 @@ pub const Screen = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSScreen alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSScreen`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -5779,6 +5809,11 @@ pub const Color = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSColor alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSColor`.
@@ -6671,6 +6706,11 @@ pub const Event = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSEvent alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSEvent`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -7211,6 +7251,11 @@ pub const Menu = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSMenu alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSMenu`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -7430,12 +7475,12 @@ pub const Menu = extern struct {
     }
 
     /// `-[NSMenu delegate]`
-    pub fn delegate(self: Self) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "delegate", .{});
+    pub fn delegate(self: Self) ?MenuDelegate {
+        return self.object.msgSend(?MenuDelegate, "delegate", .{});
     }
 
     /// `-[NSMenu setDelegate:]`
-    pub fn setDelegate(self: Self, delegate_: ?objc.Object) void {
+    pub fn setDelegate(self: Self, delegate_: ?MenuDelegate) void {
         return self.object.msgSend(void, "setDelegate:", .{delegate_});
     }
 
@@ -7560,8 +7605,8 @@ pub const Menu = extern struct {
         pub const numberOfItems = fn () objc.Integer;
         pub const autoenablesItems = fn () bool;
         pub const @"setAutoenablesItems:" = fn (bool) void;
-        pub const delegate = fn () ?objc.Object;
-        pub const @"setDelegate:" = fn (?objc.Object) void;
+        pub const delegate = fn () ?MenuDelegate;
+        pub const @"setDelegate:" = fn (?MenuDelegate) void;
         pub const menuBarHeight = fn () cg.Float;
         pub const highlightedItem = fn () ?MenuItem;
         pub const minimumWidth = fn () cg.Float;
@@ -7596,6 +7641,11 @@ pub const MenuItem = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMenuItem alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSMenuItem`.
@@ -8049,6 +8099,11 @@ pub const Image = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSImage alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSImage`.
@@ -8509,6 +8564,11 @@ pub const Cursor = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSCursor alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSCursor`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -8740,6 +8800,11 @@ pub const GraphicsContext = extern struct {
         return class().msgSend(Self, "alloc", .{});
     }
 
+    /// `[[NSGraphicsContext alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
     /// An object that came from elsewhere, taken to be a `NSGraphicsContext`.
     pub fn from(object: objc.Object) Self {
         return .{ .object = object };
@@ -8961,6 +9026,11 @@ pub const ImageRep = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSImageRep alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSImageRep`.
@@ -9270,6 +9340,11 @@ pub const BitmapImageRep = extern struct {
     /// An uninitialised instance, for an `init...` method. Yours.
     pub fn alloc() Self {
         return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSBitmapImageRep alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
     }
 
     /// An object that came from elsewhere, taken to be a `NSBitmapImageRep`.
@@ -9753,10 +9828,257 @@ pub const BitmapImageRep = extern struct {
     //   -[NSBitmapImageRep getBitmapDataPlanes:]: unsigned char * _Nullable * _Nonnull
 };
 
-/// `NSApplicationDelegate`, for the `.protocols` of an `objc.Subclass`: the class
-/// adopts it, and each method it implements is checked against it.
-pub const ApplicationDelegate = struct {
+/// An object conforming to `NSApplicationDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const ApplicationDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
     pub const protocol_name = "NSApplicationDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSApplicationDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSApplicationDelegate applicationShouldTerminate:]`
+    pub fn applicationShouldTerminate(self: Self, sender: Application) ApplicationTerminateReply {
+        return self.object.msgSend(ApplicationTerminateReply, "applicationShouldTerminate:", .{sender});
+    }
+
+    /// `-[NSApplicationDelegate application:openURLs:]`
+    pub fn applicationOpenURLs(self: Self, application: Application, urls: foundation.Array(foundation.Url)) void {
+        return self.object.msgSend(void, "application:openURLs:", .{ application, urls });
+    }
+
+    /// `-[NSApplicationDelegate application:openFile:]`
+    pub fn applicationOpenFile(self: Self, sender: Application, filename: foundation.String) bool {
+        return self.object.msgSend(bool, "application:openFile:", .{ sender, filename });
+    }
+
+    /// `-[NSApplicationDelegate application:openFiles:]`
+    pub fn applicationOpenFiles(self: Self, sender: Application, filenames: foundation.Array(foundation.String)) void {
+        return self.object.msgSend(void, "application:openFiles:", .{ sender, filenames });
+    }
+
+    /// `-[NSApplicationDelegate application:openTempFile:]`
+    pub fn applicationOpenTempFile(self: Self, sender: Application, filename: foundation.String) bool {
+        return self.object.msgSend(bool, "application:openTempFile:", .{ sender, filename });
+    }
+
+    /// `-[NSApplicationDelegate applicationShouldOpenUntitledFile:]`
+    pub fn applicationShouldOpenUntitledFile(self: Self, sender: Application) bool {
+        return self.object.msgSend(bool, "applicationShouldOpenUntitledFile:", .{sender});
+    }
+
+    /// `-[NSApplicationDelegate applicationOpenUntitledFile:]`
+    pub fn applicationOpenUntitledFile(self: Self, sender: Application) bool {
+        return self.object.msgSend(bool, "applicationOpenUntitledFile:", .{sender});
+    }
+
+    /// `-[NSApplicationDelegate application:openFileWithoutUI:]`
+    pub fn applicationOpenFileWithoutUI(self: Self, sender: objc.Object, filename: foundation.String) bool {
+        return self.object.msgSend(bool, "application:openFileWithoutUI:", .{ sender, filename });
+    }
+
+    /// `-[NSApplicationDelegate application:printFile:]`
+    pub fn applicationPrintFile(self: Self, sender: Application, filename: foundation.String) bool {
+        return self.object.msgSend(bool, "application:printFile:", .{ sender, filename });
+    }
+
+    /// `-[NSApplicationDelegate applicationShouldTerminateAfterLastWindowClosed:]`
+    pub fn applicationShouldTerminateAfterLastWindowClosed(self: Self, sender: Application) bool {
+        return self.object.msgSend(bool, "applicationShouldTerminateAfterLastWindowClosed:", .{sender});
+    }
+
+    /// `-[NSApplicationDelegate applicationShouldHandleReopen:hasVisibleWindows:]`
+    pub fn applicationShouldHandleReopenHasVisibleWindows(self: Self, sender: Application, has_visible_windows: bool) bool {
+        return self.object.msgSend(bool, "applicationShouldHandleReopen:hasVisibleWindows:", .{ sender, has_visible_windows });
+    }
+
+    /// `-[NSApplicationDelegate applicationDockMenu:]`
+    pub fn applicationDockMenu(self: Self, sender: Application) ?Menu {
+        return self.object.msgSend(?Menu, "applicationDockMenu:", .{sender});
+    }
+
+    /// `-[NSApplicationDelegate application:willPresentError:]`
+    pub fn applicationWillPresentError(self: Self, application: Application, @"error": foundation.ErrorObject) foundation.ErrorObject {
+        return self.object.msgSend(foundation.ErrorObject, "application:willPresentError:", .{ application, @"error" });
+    }
+
+    /// `-[NSApplicationDelegate application:didRegisterForRemoteNotificationsWithDeviceToken:]`
+    pub fn applicationDidRegisterForRemoteNotificationsWithDeviceToken(self: Self, application: Application, device_token: foundation.Data) void {
+        return self.object.msgSend(void, "application:didRegisterForRemoteNotificationsWithDeviceToken:", .{ application, device_token });
+    }
+
+    /// `-[NSApplicationDelegate application:didFailToRegisterForRemoteNotificationsWithError:]`
+    pub fn applicationDidFailToRegisterForRemoteNotificationsWithError(self: Self, application: Application, @"error": foundation.ErrorObject) void {
+        return self.object.msgSend(void, "application:didFailToRegisterForRemoteNotificationsWithError:", .{ application, @"error" });
+    }
+
+    /// `-[NSApplicationDelegate application:didReceiveRemoteNotification:]`
+    pub fn applicationDidReceiveRemoteNotification(self: Self, application: Application, user_info: foundation.Dictionary(foundation.String, objc.Object)) void {
+        return self.object.msgSend(void, "application:didReceiveRemoteNotification:", .{ application, user_info });
+    }
+
+    /// `-[NSApplicationDelegate applicationSupportsSecureRestorableState:]`
+    pub fn applicationSupportsSecureRestorableState(self: Self, app: Application) bool {
+        return self.object.msgSend(bool, "applicationSupportsSecureRestorableState:", .{app});
+    }
+
+    /// `-[NSApplicationDelegate application:handlerForIntent:]`
+    pub fn applicationHandlerForIntent(self: Self, application: Application, intent: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "application:handlerForIntent:", .{ application, intent });
+    }
+
+    /// `-[NSApplicationDelegate application:willEncodeRestorableState:]`
+    pub fn applicationWillEncodeRestorableState(self: Self, app: Application, coder: objc.Object) void {
+        return self.object.msgSend(void, "application:willEncodeRestorableState:", .{ app, coder });
+    }
+
+    /// `-[NSApplicationDelegate application:didDecodeRestorableState:]`
+    pub fn applicationDidDecodeRestorableState(self: Self, app: Application, coder: objc.Object) void {
+        return self.object.msgSend(void, "application:didDecodeRestorableState:", .{ app, coder });
+    }
+
+    /// `-[NSApplicationDelegate application:willContinueUserActivityWithType:]`
+    pub fn applicationWillContinueUserActivityWithType(self: Self, application: Application, user_activity_type: foundation.String) bool {
+        return self.object.msgSend(bool, "application:willContinueUserActivityWithType:", .{ application, user_activity_type });
+    }
+
+    /// `-[NSApplicationDelegate application:continueUserActivity:restorationHandler:]`
+    pub fn applicationContinueUserActivityRestorationHandler(self: Self, application: Application, user_activity: objc.Object, restoration_handler: anytype) bool {
+        return self.object.msgSend(bool, "application:continueUserActivity:restorationHandler:", .{ application, user_activity, restoration_handler });
+    }
+
+    /// `-[NSApplicationDelegate application:didFailToContinueUserActivityWithType:error:]`
+    pub fn applicationDidFailToContinueUserActivityWithTypeError(self: Self, application: Application, user_activity_type: foundation.String, @"error": foundation.ErrorObject) void {
+        return self.object.msgSend(void, "application:didFailToContinueUserActivityWithType:error:", .{ application, user_activity_type, @"error" });
+    }
+
+    /// `-[NSApplicationDelegate application:didUpdateUserActivity:]`
+    pub fn applicationDidUpdateUserActivity(self: Self, application: Application, user_activity: objc.Object) void {
+        return self.object.msgSend(void, "application:didUpdateUserActivity:", .{ application, user_activity });
+    }
+
+    /// `-[NSApplicationDelegate application:userDidAcceptCloudKitShareWithMetadata:]`
+    pub fn applicationUserDidAcceptCloudKitShareWithMetadata(self: Self, application: Application, metadata: objc.Object) void {
+        return self.object.msgSend(void, "application:userDidAcceptCloudKitShareWithMetadata:", .{ application, metadata });
+    }
+
+    /// `-[NSApplicationDelegate application:delegateHandlesKey:]`
+    pub fn applicationDelegateHandlesKey(self: Self, sender: Application, key: foundation.String) bool {
+        return self.object.msgSend(bool, "application:delegateHandlesKey:", .{ sender, key });
+    }
+
+    /// `-[NSApplicationDelegate applicationShouldAutomaticallyLocalizeKeyEquivalents:]`
+    pub fn applicationShouldAutomaticallyLocalizeKeyEquivalents(self: Self, application: Application) bool {
+        return self.object.msgSend(bool, "applicationShouldAutomaticallyLocalizeKeyEquivalents:", .{application});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillFinishLaunching:]`
+    pub fn applicationWillFinishLaunching(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillFinishLaunching:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidFinishLaunching:]`
+    pub fn applicationDidFinishLaunching(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidFinishLaunching:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillHide:]`
+    pub fn applicationWillHide(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillHide:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidHide:]`
+    pub fn applicationDidHide(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidHide:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillUnhide:]`
+    pub fn applicationWillUnhide(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillUnhide:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidUnhide:]`
+    pub fn applicationDidUnhide(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidUnhide:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillBecomeActive:]`
+    pub fn applicationWillBecomeActive(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillBecomeActive:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidBecomeActive:]`
+    pub fn applicationDidBecomeActive(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidBecomeActive:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillResignActive:]`
+    pub fn applicationWillResignActive(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillResignActive:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidResignActive:]`
+    pub fn applicationDidResignActive(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidResignActive:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillUpdate:]`
+    pub fn applicationWillUpdate(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillUpdate:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidUpdate:]`
+    pub fn applicationDidUpdate(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidUpdate:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationWillTerminate:]`
+    pub fn applicationWillTerminate(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationWillTerminate:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidChangeScreenParameters:]`
+    pub fn applicationDidChangeScreenParameters(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidChangeScreenParameters:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationDidChangeOcclusionState:]`
+    pub fn applicationDidChangeOcclusionState(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationDidChangeOcclusionState:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationProtectedDataWillBecomeUnavailable:]`
+    pub fn applicationProtectedDataWillBecomeUnavailable(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationProtectedDataWillBecomeUnavailable:", .{notification});
+    }
+
+    /// `-[NSApplicationDelegate applicationProtectedDataDidBecomeAvailable:]`
+    pub fn applicationProtectedDataDidBecomeAvailable(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "applicationProtectedDataDidBecomeAvailable:", .{notification});
+    }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
@@ -9804,12 +10126,307 @@ pub const ApplicationDelegate = struct {
         pub const @"applicationProtectedDataWillBecomeUnavailable:" = fn (objc.Object) void;
         pub const @"applicationProtectedDataDidBecomeAvailable:" = fn (objc.Object) void;
     };
+
+    // Not generated:
+    //   -[NSApplicationDelegate application:printFiles:withSettings:showPrintPanels:]: NSApplicationPrintReply
 };
 
-/// `NSWindowDelegate`, for the `.protocols` of an `objc.Subclass`: the class
-/// adopts it, and each method it implements is checked against it.
-pub const WindowDelegate = struct {
+/// An object conforming to `NSWindowDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const WindowDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
     pub const protocol_name = "NSWindowDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSWindowDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSWindowDelegate windowShouldClose:]`
+    pub fn windowShouldClose(self: Self, sender: Window) bool {
+        return self.object.msgSend(bool, "windowShouldClose:", .{sender});
+    }
+
+    /// `-[NSWindowDelegate windowWillReturnFieldEditor:toObject:]`
+    pub fn windowWillReturnFieldEditorToObject(self: Self, sender: Window, client: ?objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "windowWillReturnFieldEditor:toObject:", .{ sender, client });
+    }
+
+    /// `-[NSWindowDelegate windowWillResize:toSize:]`
+    pub fn windowWillResizeToSize(self: Self, sender: Window, frame_size: cg.Size) cg.Size {
+        return self.object.msgSend(cg.Size, "windowWillResize:toSize:", .{ sender, frame_size });
+    }
+
+    /// `-[NSWindowDelegate windowWillUseStandardFrame:defaultFrame:]`
+    pub fn windowWillUseStandardFrameDefaultFrame(self: Self, window: Window, new_frame: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "windowWillUseStandardFrame:defaultFrame:", .{ window, new_frame });
+    }
+
+    /// `-[NSWindowDelegate windowShouldZoom:toFrame:]`
+    pub fn windowShouldZoomToFrame(self: Self, window: Window, new_frame: cg.Rect) bool {
+        return self.object.msgSend(bool, "windowShouldZoom:toFrame:", .{ window, new_frame });
+    }
+
+    /// `-[NSWindowDelegate windowWillReturnUndoManager:]`
+    pub fn windowWillReturnUndoManager(self: Self, window: Window) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "windowWillReturnUndoManager:", .{window});
+    }
+
+    /// `-[NSWindowDelegate window:willPositionSheet:usingRect:]`
+    pub fn windowWillPositionSheetUsingRect(self: Self, window: Window, sheet: Window, rect: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "window:willPositionSheet:usingRect:", .{ window, sheet, rect });
+    }
+
+    /// `-[NSWindowDelegate window:shouldPopUpDocumentPathMenu:]`
+    pub fn windowShouldPopUpDocumentPathMenu(self: Self, window: Window, menu: Menu) bool {
+        return self.object.msgSend(bool, "window:shouldPopUpDocumentPathMenu:", .{ window, menu });
+    }
+
+    /// `-[NSWindowDelegate window:shouldDragDocumentWithEvent:from:withPasteboard:]`
+    pub fn windowShouldDragDocumentWithEventFromWithPasteboard(self: Self, window: Window, event: Event, drag_image_location: cg.Point, pasteboard: objc.Object) bool {
+        return self.object.msgSend(bool, "window:shouldDragDocumentWithEvent:from:withPasteboard:", .{ window, event, drag_image_location, pasteboard });
+    }
+
+    /// `-[NSWindowDelegate window:willUseFullScreenContentSize:]`
+    pub fn windowWillUseFullScreenContentSize(self: Self, window: Window, proposed_size: cg.Size) cg.Size {
+        return self.object.msgSend(cg.Size, "window:willUseFullScreenContentSize:", .{ window, proposed_size });
+    }
+
+    /// `-[NSWindowDelegate window:willUseFullScreenPresentationOptions:]`
+    pub fn windowWillUseFullScreenPresentationOptions(self: Self, window: Window, proposed_options: ApplicationPresentationOptions) ApplicationPresentationOptions {
+        return self.object.msgSend(ApplicationPresentationOptions, "window:willUseFullScreenPresentationOptions:", .{ window, proposed_options });
+    }
+
+    /// `-[NSWindowDelegate customWindowsToEnterFullScreenForWindow:]`
+    pub fn customWindowsToEnterFullScreenForWindow(self: Self, window: Window) ?foundation.Array(Window) {
+        return self.object.msgSend(?foundation.Array(Window), "customWindowsToEnterFullScreenForWindow:", .{window});
+    }
+
+    /// `-[NSWindowDelegate window:startCustomAnimationToEnterFullScreenWithDuration:]`
+    pub fn windowStartCustomAnimationToEnterFullScreenWithDuration(self: Self, window: Window, duration: f64) void {
+        return self.object.msgSend(void, "window:startCustomAnimationToEnterFullScreenWithDuration:", .{ window, duration });
+    }
+
+    /// `-[NSWindowDelegate windowDidFailToEnterFullScreen:]`
+    pub fn windowDidFailToEnterFullScreen(self: Self, window: Window) void {
+        return self.object.msgSend(void, "windowDidFailToEnterFullScreen:", .{window});
+    }
+
+    /// `-[NSWindowDelegate customWindowsToExitFullScreenForWindow:]`
+    pub fn customWindowsToExitFullScreenForWindow(self: Self, window: Window) ?foundation.Array(Window) {
+        return self.object.msgSend(?foundation.Array(Window), "customWindowsToExitFullScreenForWindow:", .{window});
+    }
+
+    /// `-[NSWindowDelegate window:startCustomAnimationToExitFullScreenWithDuration:]`
+    pub fn windowStartCustomAnimationToExitFullScreenWithDuration(self: Self, window: Window, duration: f64) void {
+        return self.object.msgSend(void, "window:startCustomAnimationToExitFullScreenWithDuration:", .{ window, duration });
+    }
+
+    /// `-[NSWindowDelegate customWindowsToEnterFullScreenForWindow:onScreen:]`
+    pub fn customWindowsToEnterFullScreenForWindowOnScreen(self: Self, window: Window, screen: Screen) ?foundation.Array(Window) {
+        return self.object.msgSend(?foundation.Array(Window), "customWindowsToEnterFullScreenForWindow:onScreen:", .{ window, screen });
+    }
+
+    /// `-[NSWindowDelegate window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:]`
+    pub fn windowStartCustomAnimationToEnterFullScreenOnScreenWithDuration(self: Self, window: Window, screen: Screen, duration: f64) void {
+        return self.object.msgSend(void, "window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:", .{ window, screen, duration });
+    }
+
+    /// `-[NSWindowDelegate windowDidFailToExitFullScreen:]`
+    pub fn windowDidFailToExitFullScreen(self: Self, window: Window) void {
+        return self.object.msgSend(void, "windowDidFailToExitFullScreen:", .{window});
+    }
+
+    /// `-[NSWindowDelegate window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:]`
+    pub fn windowWillResizeForVersionBrowserWithMaxPreferredSizeMaxAllowedSize(self: Self, window: Window, max_preferred_frame_size: cg.Size, max_allowed_frame_size: cg.Size) cg.Size {
+        return self.object.msgSend(cg.Size, "window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:", .{ window, max_preferred_frame_size, max_allowed_frame_size });
+    }
+
+    /// `-[NSWindowDelegate window:willEncodeRestorableState:]`
+    pub fn windowWillEncodeRestorableState(self: Self, window: Window, state: objc.Object) void {
+        return self.object.msgSend(void, "window:willEncodeRestorableState:", .{ window, state });
+    }
+
+    /// `-[NSWindowDelegate window:didDecodeRestorableState:]`
+    pub fn windowDidDecodeRestorableState(self: Self, window: Window, state: objc.Object) void {
+        return self.object.msgSend(void, "window:didDecodeRestorableState:", .{ window, state });
+    }
+
+    /// `-[NSWindowDelegate previewRepresentableActivityItemsForWindow:]`
+    pub fn previewRepresentableActivityItemsForWindow(self: Self, window: Window) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "previewRepresentableActivityItemsForWindow:", .{window});
+    }
+
+    /// `-[NSWindowDelegate windowForSharingRequestFromWindow:]`
+    pub fn windowForSharingRequestFromWindow(self: Self, window: Window) ?Window {
+        return self.object.msgSend(?Window, "windowForSharingRequestFromWindow:", .{window});
+    }
+
+    /// `-[NSWindowDelegate windowDidResize:]`
+    pub fn windowDidResize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidResize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidExpose:]`
+    pub fn windowDidExpose(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidExpose:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillMove:]`
+    pub fn windowWillMove(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillMove:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidMove:]`
+    pub fn windowDidMove(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidMove:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidBecomeKey:]`
+    pub fn windowDidBecomeKey(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidBecomeKey:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidResignKey:]`
+    pub fn windowDidResignKey(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidResignKey:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidBecomeMain:]`
+    pub fn windowDidBecomeMain(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidBecomeMain:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidResignMain:]`
+    pub fn windowDidResignMain(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidResignMain:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillClose:]`
+    pub fn windowWillClose(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillClose:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillMiniaturize:]`
+    pub fn windowWillMiniaturize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillMiniaturize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidMiniaturize:]`
+    pub fn windowDidMiniaturize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidMiniaturize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidDeminiaturize:]`
+    pub fn windowDidDeminiaturize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidDeminiaturize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidUpdate:]`
+    pub fn windowDidUpdate(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidUpdate:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidChangeScreen:]`
+    pub fn windowDidChangeScreen(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidChangeScreen:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidChangeScreenProfile:]`
+    pub fn windowDidChangeScreenProfile(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidChangeScreenProfile:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidChangeBackingProperties:]`
+    pub fn windowDidChangeBackingProperties(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidChangeBackingProperties:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillBeginSheet:]`
+    pub fn windowWillBeginSheet(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillBeginSheet:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidEndSheet:]`
+    pub fn windowDidEndSheet(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidEndSheet:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillStartLiveResize:]`
+    pub fn windowWillStartLiveResize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillStartLiveResize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidEndLiveResize:]`
+    pub fn windowDidEndLiveResize(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidEndLiveResize:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillEnterFullScreen:]`
+    pub fn windowWillEnterFullScreen(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillEnterFullScreen:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidEnterFullScreen:]`
+    pub fn windowDidEnterFullScreen(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidEnterFullScreen:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillExitFullScreen:]`
+    pub fn windowWillExitFullScreen(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillExitFullScreen:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidExitFullScreen:]`
+    pub fn windowDidExitFullScreen(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidExitFullScreen:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillEnterVersionBrowser:]`
+    pub fn windowWillEnterVersionBrowser(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillEnterVersionBrowser:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidEnterVersionBrowser:]`
+    pub fn windowDidEnterVersionBrowser(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidEnterVersionBrowser:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowWillExitVersionBrowser:]`
+    pub fn windowWillExitVersionBrowser(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowWillExitVersionBrowser:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidExitVersionBrowser:]`
+    pub fn windowDidExitVersionBrowser(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidExitVersionBrowser:", .{notification});
+    }
+
+    /// `-[NSWindowDelegate windowDidChangeOcclusionState:]`
+    pub fn windowDidChangeOcclusionState(self: Self, notification: objc.Object) void {
+        return self.object.msgSend(void, "windowDidChangeOcclusionState:", .{notification});
+    }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
@@ -9869,10 +10486,72 @@ pub const WindowDelegate = struct {
     };
 };
 
-/// `NSMenuDelegate`, for the `.protocols` of an `objc.Subclass`: the class
-/// adopts it, and each method it implements is checked against it.
-pub const MenuDelegate = struct {
+/// An object conforming to `NSMenuDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const MenuDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
     pub const protocol_name = "NSMenuDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSMenuDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMenuDelegate menuNeedsUpdate:]`
+    pub fn menuNeedsUpdate(self: Self, menu: Menu) void {
+        return self.object.msgSend(void, "menuNeedsUpdate:", .{menu});
+    }
+
+    /// `-[NSMenuDelegate numberOfItemsInMenu:]`
+    pub fn numberOfItemsInMenu(self: Self, menu: Menu) objc.Integer {
+        return self.object.msgSend(objc.Integer, "numberOfItemsInMenu:", .{menu});
+    }
+
+    /// `-[NSMenuDelegate menu:updateItem:atIndex:shouldCancel:]`
+    pub fn menuUpdateItemAtIndexShouldCancel(self: Self, menu: Menu, item: MenuItem, index: objc.Integer, should_cancel: bool) bool {
+        return self.object.msgSend(bool, "menu:updateItem:atIndex:shouldCancel:", .{ menu, item, index, should_cancel });
+    }
+
+    /// `-[NSMenuDelegate menuWillOpen:]`
+    pub fn menuWillOpen(self: Self, menu: Menu) void {
+        return self.object.msgSend(void, "menuWillOpen:", .{menu});
+    }
+
+    /// `-[NSMenuDelegate menuDidClose:]`
+    pub fn menuDidClose(self: Self, menu: Menu) void {
+        return self.object.msgSend(void, "menuDidClose:", .{menu});
+    }
+
+    /// `-[NSMenuDelegate menu:willHighlightItem:]`
+    pub fn menuWillHighlightItem(self: Self, menu: Menu, item: ?MenuItem) void {
+        return self.object.msgSend(void, "menu:willHighlightItem:", .{ menu, item });
+    }
+
+    /// `-[NSMenuDelegate confinementRectForMenu:onScreen:]`
+    pub fn confinementRectForMenuOnScreen(self: Self, menu: Menu, screen: ?Screen) cg.Rect {
+        return self.object.msgSend(cg.Rect, "confinementRectForMenu:onScreen:", .{ menu, screen });
+    }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
@@ -9884,4 +10563,7 @@ pub const MenuDelegate = struct {
         pub const @"menu:willHighlightItem:" = fn (Menu, ?MenuItem) void;
         pub const @"confinementRectForMenu:onScreen:" = fn (Menu, ?Screen) cg.Rect;
     };
+
+    // Not generated:
+    //   -[NSMenuDelegate menuHasKeyEquivalent:forEvent:target:action:]: id  _Nullable * _Nonnull
 };

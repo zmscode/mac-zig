@@ -13,7 +13,7 @@ test "every generated method compiles" {
     @setEvalBranchQuota(1_000_000);
     inline for (@typeInfo(generated).@"struct".decl_names) |name| {
         const T = @field(generated, name);
-        if (@TypeOf(T) == type and @typeInfo(T) == .@"struct" and @hasDecl(T, "class_name")) {
+        if (@TypeOf(T) == type and @typeInfo(T) == .@"struct" and (@hasDecl(T, "class_name") or @hasDecl(T, "protocol_name"))) {
             inline for (@typeInfo(T).@"struct".decl_names) |decl| {
                 const member = @field(T, decl);
                 const info = @typeInfo(@TypeOf(member));
@@ -281,4 +281,65 @@ test "mouse and key events reach a view through the window" {
     ).?;
     window.sendEvent(key);
     try std.testing.expectEqual(@as(?c_ushort, 53), pad.state().last_key);
+}
+
+// -- Metal on screen -----------------------------------------------------
+
+const build_options = @import("mac_build_options");
+const raw = @import("mac_raw");
+
+test "a MetalView draws frames from its display link" {
+    if (!build_options.metal) return error.SkipZigTest;
+    const metal = @import("../metal/metal.zig");
+
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+    _ = appkit.Application.sharedApplication();
+    if (metal.createSystemDefaultDevice()) |device| device.release() else return error.SkipZigTest;
+
+    const Counter = struct {
+        frames: u32 = 0,
+        last_size: cg.Size = .zero,
+        resizes: u32 = 0,
+        increasing_time: bool = true,
+        last_time: f64 = -1,
+
+        pub fn draw(self: *@This(), frame: appkit.MetalView.Frame) void {
+            self.frames += 1;
+            self.last_size = frame.size;
+            if (frame.time < self.last_time) self.increasing_time = false;
+            self.last_time = frame.time;
+            const commands = frame.queue.commandBuffer().?;
+            const encoder = commands.renderCommandEncoderWithDescriptor(frame.renderPass(metal.clearColor(0, 1, 0, 1))).?;
+            encoder.endEncoding();
+            frame.present(commands);
+        }
+
+        pub fn resized(self: *@This(), _: cg.Size) void {
+            self.resizes += 1;
+        }
+    };
+    var counter: Counter = .{};
+
+    const view = try appkit.MetalView.init(.{ .frame = .init(0, 0, 64, 32) }, &counter, Counter);
+    defer view.deinit();
+    try std.testing.expect(counter.resizes >= 1);
+
+    const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(.init(0, 0, 64, 32), .borderless, .buffered, false);
+    window.setReleasedWhenClosed(false);
+    defer window.release();
+    window.setContentView(view.asView());
+    // On screen, so the display link runs -- transparent, so nothing shows.
+    window.setAlphaValue(0);
+    window.orderFront(null);
+    defer window.orderOut(null);
+
+    _ = raw.CFRunLoopRunInMode(raw.kCFRunLoopDefaultMode, 0.5, 0);
+
+    try std.testing.expect(counter.frames >= 3);
+    try std.testing.expect(counter.increasing_time);
+    // Pixels, not points: at least the view's size, more on a Retina screen.
+    try std.testing.expect(counter.last_size.width >= 64 and counter.last_size.height >= 32);
+    try std.testing.expectEqual(counter.last_size.width / 64, counter.last_size.height / 32);
+    try std.testing.expectEqual(@as(u64, counter.frames), view.frameCount());
 }
