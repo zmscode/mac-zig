@@ -42,6 +42,9 @@ pub const Data = @import("data.zig").Data;
 pub const Url = @import("url.zig").Url;
 pub const ErrorObject = @import("error_object.zig").ErrorObject;
 pub const valueOrError = @import("error_object.zig").valueOrError;
+/// Where a wrapped call puts an `NSError *` out-parameter; see
+/// `ErrorObject`. For wrapping a generated `...Error` method by hand.
+pub const ErrorSlot = @import("error_object.zig").Slot;
 
 /// Foundation's constants and C functions, generated from its headers:
 /// `foundation.all.runLoopCommonModes()`, `foundation.all.homeDirectory()`,

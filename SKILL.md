@@ -430,7 +430,8 @@ const library = try foundation.valueOrError(try done.wait(), &details);   // Io 
 
 - `gpa` must be thread-safe (`std.heap.smp_allocator`): the handler may free the shared state
   on its own thread. **Not** `std.testing.allocator`.
-- `wait()` returns the handler's args (tuple if several); objects in it live until `deinit`.
+- `wait()` returns the handler's args (tuple if several); objects and CF handles (`cg.Image`,
+  `coremedia.SampleBuffer`) in it are retained until `deinit` — `retain` to keep longer.
 - `waitTimeout(timeout)` / cancel are safe: the handler may still run later, and state is
   reference-counted. The handler must be called once.
 
@@ -507,6 +508,43 @@ layer.setContents(objc.Object.fromCf(surface))                    // a CALayer s
 `Surface.lookup(id)` / `createMachPort` + `fromMachPort` share it with another process; a lookup
 returns a new reference to the same memory, not the same pointer.
 
+CoreVideo — video frames, and the GPU view of them with no copy (`-Dcorevideo`):
+
+```zig
+const buf = try corevideo.PixelBuffer.init(.{ .width = w, .height = h });   // .bgra, IOSurface-backed; yours
+const locked = try buf.lock(.{});   // .row(y) / .plane(i) / .initContext(); unlock before GPU use
+const cache = try corevideo.MetalTextureCache.init(device);                 // under -Dmetal
+const tex = try cache.texture(buf, .{});   // .{ .pixel_format = .r8_unorm, .plane = 0 } for 420v luma
+defer tex.deinit();                        // hold while the GPU reads; tex.texture() is borrowed
+buf.surface()                              // the IOSurface underneath, borrowed
+```
+
+- `DisplayLink.init()` + `setCallback(ptr, fn (@TypeOf(ptr), corevideo.Tick) void)` + `start()`:
+  per-refresh, on CoreVideo's thread (not main). Deprecated in macOS 15 but works; prefer
+  `MetalView` in a window.
+- `coremedia.SampleBuffer`: `imageBuffer()` (borrowed, null for audio or no new frame),
+  `presentationTime().seconds()`, `sampleAttachment(key)`. `coremedia.Time` is `CMTime`.
+
+ScreenCaptureKit (`-Dscreencapturekit`; `sck = mac.screencapturekit`):
+
+```zig
+if (!sck.hasPermission()) ...                      // no prompt; requestPermission() prompts once
+const content = try sck.shareableContent(gpa, io, .{}, &details);   // yours: release
+const filter = sck.ContentFilter.alloc().initWithDisplayExcludingWindows(content.displays().first().?, .init(&.{}));
+const config = sck.StreamConfiguration.new();      // setWidth/setHeight in pixels, setPixelFormat
+const image = try sck.screenshot(gpa, io, filter, config, &details);   // cg.Image, yours
+const stream = try sck.Stream.init(filter, config, &ctx, Handlers, &details);
+defer stream.deinit();                             // stop first; deinit drains the queue
+try stream.start(gpa, io, &details);               // fails without permission
+```
+
+- `Handlers.frame(ctx, sck.Frame)` required — complete frames only, on the stream's serial queue;
+  `frame.pixelBuffer()` → `MetalTextureCache`. Optional `audio(ctx, SampleBuffer)`,
+  `stopped(ctx, ErrorObject)`. `gpa` thread-safe, as for `Completion`.
+- Permission belongs to the app bundle or the terminal. Tests skip without it.
+- Everything else is `sck.all` (generated). SCK registers no protocols itself; `objc.Subclass`
+  defines one from its generated type when missing — so pass protocols as types, not names.
+
 An app bundle, from a dependent's `build.zig`:
 
 ```zig
@@ -559,7 +597,9 @@ appkit.app.run(.{}, &app, App);                      // menu bar, delegate, even
 | `-Dobjc=false`      | on      | Drops `mac.objc`, `mac.foundation` and their links  |
 | `-Dappkit=false`    | on      | Drops `mac.appkit` and AppKit; needs `-Dobjc`       |
 | `-Dmetal=false`     | on      | Drops `mac.metal`, `appkit.MetalView`; needs `-Dobjc` |
-| `-Diosurface=false` | on      | Drops `mac.iosurface`; `-Dmetal` needs it           |
+| `-Diosurface=false` | on      | Drops `mac.iosurface`; `-Dmetal`, `-Dcorevideo` need it |
+| `-Dcorevideo=false` | on      | Drops `mac.corevideo`, `mac.coremedia`              |
+| `-Dscreencapturekit=false` | on | Drops `mac.screencapturekit`; needs `-Dobjc`, `-Dcorevideo` |
 
 Every namespace exists either way, holding `enabled = false` when off. Check
 `mac.features.imageio` / `mac.features.coretext` / `mac.features.objc` rather than assuming.
@@ -597,7 +637,12 @@ One translation unit, one `Error` set, one `cf`. To add a C framework:
 3. put the wrappers in `src/<name>/`, importing `../errors.zig` and `../cf.zig`;
 4. add any new failure codes to the shared `Error` set.
 
-Expect header trouble: see the notes at the end of README.md for the three spellings that do
+An Objective-C framework goes through the generator instead: a manifest in
+`tools/objc_gen/<name>.zig` (copy `screencapturekit.zig`), a line in `build.zig`'s generate loop,
+`zig build generate`, and a hand-written `src/<name>/<name>.zig` over `generated.zig`. A C handle
+type it mentions (`CVPixelBufferRef`) maps to a wrapper through `cgHandle` in the generator.
+
+Expect header trouble: see the notes at the end of README.md for the spellings that do
 not survive Zig 0.17's C translator. Check a new framework's headers for blocks first --
 `grep -l '(\^' <headers>/*.h` -- because those cannot be translated at all.
 

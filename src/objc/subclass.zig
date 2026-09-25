@@ -257,8 +257,8 @@ pub fn Subclass(comptime options_: anytype, comptime State_: type) type {
             cls.addMethod("dealloc", dealloc) catch
                 std.debug.panic("{s}: defines dealloc; put cleanup in deinit instead", .{options.name});
 
-            for (options.protocol_names) |protocol_name| {
-                const adopted = protocol.getProtocol(protocol_name) orelse std.debug.panic(
+            inline for (options.protocol_names) |protocol_name| {
+                const adopted = protocol.getProtocol(protocol_name) orelse defineProtocol(protocol_name) orelse std.debug.panic(
                     "{s}: protocol {s} is not loaded -- is its framework linked?",
                     .{ options.name, protocol_name },
                 );
@@ -268,6 +268,45 @@ pub fn Subclass(comptime options_: anytype, comptime State_: type) type {
             class_.registerClassPair(cls);
             publish(cls);
             return cls;
+        }
+
+        /// A protocol the runtime does not have, registered from its
+        /// generated wrapper. A framework only registers the protocols its
+        /// own code names with `@protocol`, and a Swift-implemented one such
+        /// as ScreenCaptureKit may name none -- leaving it to each client to
+        /// bring its own definition, as the Objective-C compiler would.
+        /// Only a protocol given as a type can be defined this way: its
+        /// signature table says what the methods are. Each is registered as
+        /// optional, since the table does not say which are required.
+        fn defineProtocol(comptime protocol_name: [:0]const u8) ?protocol.Protocol {
+            inline for (options.protocols) |P| {
+                if (comptime !std.mem.eql(u8, P.protocol_name, protocol_name)) continue;
+                const created = raw.objc_allocateProtocol(protocol_name) orelse
+                    return protocol.getProtocol(protocol_name); // registered meanwhile
+                if (protocol.getProtocol("NSObject")) |base| raw.protocol_addProtocol(created, base.toRaw());
+                inline for (@typeInfo(P.signatures).@"struct".decl_names) |key| {
+                    const info = @typeInfo(@field(P.signatures, key)).@"fn";
+                    const types = comptime blk: {
+                        var args: [info.param_types.len]type = undefined;
+                        for (info.param_types, &args) |A, *slot| slot.* = A.?;
+                        break :blk encoding.methodFrom(info.return_type.?, &args);
+                    };
+                    raw.protocol_addMethodDescription(
+                        created,
+                        Sel.cached(key[1..]).value,
+                        types,
+                        cBool(false),
+                        cBool(key[0] == '-'),
+                    );
+                }
+                raw.objc_registerProtocol(created);
+                return protocol.getProtocol(protocol_name);
+            }
+            return null;
+        }
+
+        fn cBool(value: bool) raw.BOOL {
+            return if (raw.BOOL == bool) value else @intFromBool(value);
         }
 
         /// Another thread got there first, or a class of this name already

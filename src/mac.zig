@@ -38,6 +38,9 @@
 //! - `appkit` -- AppKit, from wrappers generated out of the SDK.
 //! - `metal` -- Metal, generated, and QuartzCore's Metal layer.
 //! - `iosurface` -- pixel buffers shared across processes and the GPU.
+//! - `corevideo` -- video pixel buffers, their Metal textures, and the
+//!   display link; `coremedia` -- the sample buffers frames arrive in.
+//! - `screencapturekit` -- capturing the screen, a window or an app.
 //! - `dispatch` -- Grand Central Dispatch: queues and the main thread.
 //! - `cf` -- just enough CoreFoundation to work the rest.
 
@@ -92,10 +95,29 @@ pub const iosurface = if (build_options.iosurface) @import("iosurface/iosurface.
     pub const enabled = false;
 };
 
+/// CoreVideo: pixel buffers, Metal textures over them without a copy,
+/// and the display link. Under `-Dcorevideo` (on by default).
+pub const corevideo = if (build_options.corevideo) @import("corevideo/corevideo.zig") else struct {
+    pub const enabled = false;
+};
+
+/// The corner of CoreMedia that video frames arrive in: sample buffers
+/// and their timing. Under `-Dcorevideo`.
+pub const coremedia = if (build_options.corevideo) @import("coremedia/coremedia.zig") else struct {
+    pub const enabled = false;
+};
+
 /// Metal, from wrappers generated out of the SDK, and the part of
 /// QuartzCore that shows it on screen. Under `-Dmetal` (on by default with
 /// `-Dobjc`).
 pub const metal = if (build_options.metal) @import("metal/metal.zig") else struct {
+    pub const enabled = false;
+};
+
+/// ScreenCaptureKit, from wrappers generated out of the SDK: capturing
+/// displays, windows and apps as a stream of frames. Under
+/// `-Dscreencapturekit` (on by default with `-Dobjc` and `-Dcorevideo`).
+pub const screencapturekit = if (build_options.screencapturekit) @import("screencapturekit/screencapturekit.zig") else struct {
     pub const enabled = false;
 };
 
@@ -112,9 +134,11 @@ pub const features: Features = .{
     .coretext = build_options.coretext,
     .iokit = build_options.iokit,
     .iosurface = build_options.iosurface,
+    .corevideo = build_options.corevideo,
     .objc = build_options.objc,
     .appkit = build_options.appkit,
     .metal = build_options.metal,
+    .screencapturekit = build_options.screencapturekit,
 };
 
 pub const Features = struct {
@@ -126,6 +150,8 @@ pub const Features = struct {
     iokit: bool,
     /// `mac.iosurface`: shared pixel buffers.
     iosurface: bool,
+    /// `mac.corevideo` and `mac.coremedia`: video frames.
+    corevideo: bool,
     /// `mac.objc` and `mac.foundation`: the Objective-C runtime, and
     /// Foundation.
     objc: bool,
@@ -133,6 +159,8 @@ pub const Features = struct {
     appkit: bool,
     /// `mac.metal`: Metal and QuartzCore.
     metal: bool,
+    /// `mac.screencapturekit`: screen capture.
+    screencapturekit: bool,
 };
 
 test {
@@ -149,4 +177,7 @@ test {
     _ = dispatch;
     _ = metal;
     _ = iosurface;
+    _ = corevideo;
+    _ = coremedia;
+    _ = screencapturekit;
 }

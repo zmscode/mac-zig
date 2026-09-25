@@ -541,6 +541,8 @@ const Model = struct {
             \\// Snake case, which no generated method is: `-[MTLTexture iosurface]`
             \\// would otherwise hide it.
             \\const io_surface = @import("../iosurface/iosurface.zig");
+            \\const core_video = @import("../corevideo/corevideo.zig");
+            \\const core_media = @import("../coremedia/coremedia.zig");
             \\
             \\/// Whether `Descendant` is `Ancestor`, or inherits from it.
             \\fn inherits(comptime Descendant: type, comptime Ancestor: type) bool {{
@@ -601,7 +603,7 @@ const Model = struct {
     }
 
     fn nameGlobals(self: *Model) !void {
-        for ([_][]const u8{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework", "missing" }) |n| {
+        for ([_][]const u8{ "objc", "foundation", "cg", "io_surface", "core_video", "core_media", "inherits", "lookUp", "framework", "missing" }) |n| {
             try self.file_scope.put(self.arena, n, {});
         }
         for (self.globals.values()) |g| {
@@ -1457,21 +1459,22 @@ fn structType(name: []const u8) ?[]const u8 {
         .{ "struct CGSize", "cg.Size" },                       .{ "CGVector", "cg.Vector" },
         .{ "struct CGVector", "cg.Vector" },                   .{ "CGAffineTransform", "cg.AffineTransform" },
         .{ "struct CGAffineTransform", "cg.AffineTransform" }, .{ "NSRange", "objc.Range" },
-        .{ "struct _NSRange", "objc.Range" },
+        .{ "struct _NSRange", "objc.Range" },                  .{ "CMTime", "core_media.Time" },
     };
     inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
     return null;
 }
 
-/// A CoreGraphics or IOSurface handle, as the type that wraps it. Each is a struct
+/// A CoreGraphics, IOSurface, CoreVideo or CoreMedia handle, as the type that wraps it. Each is a struct
 /// over one pointer, which `objc.abi` passes as the pointer.
 fn cgHandle(name: []const u8) ?[]const u8 {
     const table = .{
-        .{ "CGImageRef", "cg.Image" },             .{ "CGColorRef", "cg.Color" },
-        .{ "CGColorSpaceRef", "cg.ColorSpace" },   .{ "CGContextRef", "cg.Context" },
-        .{ "CGPathRef", "cg.Path" },               .{ "CGMutablePathRef", "cg.MutablePath" },
-        .{ "CGGradientRef", "cg.Gradient" },       .{ "CGLayerRef", "cg.Layer" },
-        .{ "IOSurfaceRef", "io_surface.Surface" },
+        .{ "CGImageRef", "cg.Image" },                     .{ "CGColorRef", "cg.Color" },
+        .{ "CGColorSpaceRef", "cg.ColorSpace" },           .{ "CGContextRef", "cg.Context" },
+        .{ "CGPathRef", "cg.Path" },                       .{ "CGMutablePathRef", "cg.MutablePath" },
+        .{ "CGGradientRef", "cg.Gradient" },               .{ "CGLayerRef", "cg.Layer" },
+        .{ "IOSurfaceRef", "io_surface.Surface" },         .{ "CVPixelBufferRef", "core_video.PixelBuffer" },
+        .{ "CVImageBufferRef", "core_video.PixelBuffer" }, .{ "CMSampleBufferRef", "core_media.SampleBuffer" },
     };
     inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
     return null;
@@ -1657,7 +1660,7 @@ fn contains(list: []const []const u8, name: []const u8) bool {
 /// Names declared at the top of the generated file, which a parameter
 /// may not shadow.
 fn isFileScope(name: []const u8) bool {
-    return contains(&.{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework", "missing" }, name) or
+    return contains(&.{ "objc", "foundation", "cg", "io_surface", "core_video", "core_media", "inherits", "lookUp", "framework", "missing" }, name) or
         cgHandle(name) != null;
 }
 

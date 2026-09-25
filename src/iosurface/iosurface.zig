@@ -61,9 +61,15 @@ pub const PixelFormat = enum(u32) {
     rgba_half = fourcc("RGhA"),
     /// One byte of gray.
     one_component8 = fourcc("L008"),
+    /// Two planes: a byte of luma per pixel, then interleaved Cb and Cr at
+    /// half resolution, video range -- what a camera or a video decoder
+    /// hands out. Two planes, so not for `Locked.row` or `initContext`.
+    ycbcr420_video = fourcc("420v"),
+    /// As `ycbcr420_video`, full range.
+    ycbcr420_full = fourcc("420f"),
     _,
 
-    fn fourcc(comptime code: *const [4]u8) u32 {
+    pub fn fourcc(comptime code: *const [4]u8) u32 {
         return @as(u32, code[0]) << 24 | @as(u32, code[1]) << 16 | @as(u32, code[2]) << 8 | code[3];
     }
 };

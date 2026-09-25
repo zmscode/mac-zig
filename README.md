@@ -16,6 +16,9 @@ Today that is:
 | `mac.appkit`     | AppKit            | windows, views, the application, events, menus, screens — generated from the SDK, under `-Dappkit`                                |
 | `mac.metal`      | Metal, QuartzCore | devices, queues, buffers, textures, shaders, pipelines, `CAMetalLayer` — generated from the SDK, under `-Dmetal`                  |
 | `mac.iosurface`  | IOSurface         | pixel buffers shared between processes, the CPU, the GPU and Core Animation, under `-Diosurface`                                  |
+| `mac.corevideo`  | CoreVideo         | video pixel buffers, Metal textures over them without a copy, the display link, under `-Dcorevideo`                               |
+| `mac.coremedia`  | CoreMedia         | the sample buffers video frames arrive in, and their timing, under `-Dcorevideo`                                                  |
+| `mac.screencapturekit` | ScreenCaptureKit | capturing displays, windows and apps as a stream of frames or a screenshot — generated from the SDK, under `-Dscreencapturekit` |
 | `mac.dispatch`   | libdispatch       | Grand Central Dispatch: the main queue, global and private queues, semaphores                                                     |
 | `mac.cf`         | CoreFoundation    | just enough to work the frameworks above it                                                                                       |
 
@@ -782,6 +785,78 @@ A test runs the whole round trip on one surface: `cg` draws, a Metal texture ove
 drawing, the GPU renders into it, the CPU reads that back through a lock, and a `CALayer` takes it
 as contents. Rows are padded for the GPU, so index by `bytesPerRow()`, or use `row(y)`.
 
+## CoreVideo and CoreMedia
+
+`mac.corevideo` is the form video takes on the platform. A `PixelBuffer` is what a camera, a
+decoder or ScreenCaptureKit hands out and what an encoder takes; the ones made here sit on an
+IOSurface, so a `MetalTextureCache` gives the GPU the same memory with no copy.
+
+```zig
+const buffer = try corevideo.PixelBuffer.init(.{ .width = 1280, .height = 720 });   // BGRA, on an IOSurface
+defer buffer.deinit();
+{
+    const locked = try buffer.lock(.{});
+    defer locked.unlock();
+    const ctx = try locked.initContext();      // cg into it, or locked.row(y) / locked.plane(i)
+    defer ctx.deinit();
+}
+
+const cache = try corevideo.MetalTextureCache.init(device);
+defer cache.deinit();
+const texture = try cache.texture(buffer, .{});                // .{ .pixel_format = .r8_unorm, .plane = 0 } for luma
+defer texture.deinit();                                        // hold it while the GPU reads
+encoder.setFragmentTextureAtIndex(texture.texture(), 0);
+```
+
+`DisplayLink` calls a Zig function once per refresh, on CoreVideo's own thread, with the time
+the frame will reach the screen. Apple deprecated it in macOS 15 in favour of AppKit's per-view
+display links (which `MetalView` uses); it remains the one that needs no view.
+
+```zig
+const link = try corevideo.DisplayLink.init();
+defer link.deinit();
+try link.setCallback(&renderer, Renderer.tick);   // fn (*Renderer, corevideo.Tick) void
+try link.start();
+```
+
+`mac.coremedia` has the `SampleBuffer` those frames arrive in — `imageBuffer()`,
+`presentationTime()`, `sampleAttachment(key)` — and `Time`, CoreMedia's rational `CMTime`.
+
+## ScreenCaptureKit
+
+`mac.screencapturekit` is generated from the SDK, like AppKit, with the everyday parts wrapped:
+listing content and taking a screenshot are `std.Io` waits, and a `Stream` calls Zig handlers.
+
+```zig
+const content = try sck.shareableContent(gpa, io, .{}, &details);
+defer content.release();
+const display = content.displays().first().?;
+
+const filter = sck.ContentFilter.alloc().initWithDisplayExcludingWindows(display, .init(&.{}));
+defer filter.release();
+const config = sck.StreamConfiguration.new();
+defer config.release();
+config.setWidth(1920);
+config.setHeight(1080);
+
+const image = try sck.screenshot(gpa, io, filter, config, &details);   // a cg.Image, macOS 14+
+defer image.deinit();
+
+const stream = try sck.Stream.init(filter, config, &recorder, Recorder, &details);
+defer stream.deinit();
+try stream.start(gpa, io, &details);
+// Recorder.frame(&recorder, frame) runs for each new frame, on the stream's own queue:
+// frame.pixelBuffer() is a corevideo.PixelBuffer on an IOSurface, ready for the texture cache.
+try stream.stop(gpa, io, &details);
+```
+
+Capturing needs Screen Recording permission, granted to an app (a signed bundle from
+`addAppBundle`) or to the terminal a command-line program runs in. `hasPermission()` asks without
+prompting; `requestPermission()` prompts once. The capture test skips without it.
+
+`zig build run-capture` streams the main display for two seconds and wraps every frame as a Metal
+texture: 6016x3384 at 53 fps on a Retina display. `-- --screenshot screen.png` writes a still.
+
 ## Application bundles
 
 A bare executable runs, but a Mac app is a bundle: an `Info.plist` naming it, an identifier that
@@ -855,6 +930,14 @@ zig build run-window-app    # runs it
 - **`launched` runs on the first `run` only** — AppKit finishes launching once per process.
 - **Pass the defining class's superclass to `msgSendSuper`**, spelled out — not
   `self.getClass().superclass()`, which recurses forever once your class is subclassed.
+- **ScreenCaptureKit does not register its protocols** with the Objective-C runtime — it leaves
+  that to each client, as the compiler would for `@protocol(SCStreamOutput)`. `objc.Subclass`
+  registers a missing protocol itself when it is given as a generated type; given as a name,
+  it panics.
+- **A completion handler's arguments die with the handler** unless retained. `objc.Completion`
+  retains objects and CF handles (`cg.Image`, `coremedia.SampleBuffer`) until its `deinit`.
+- **ScreenCaptureKit sends frames only when the screen changes.** A still screen gives few or
+  none; `Stream` passes on only complete frames.
 - **IOKit reports a time-to-empty of 0 while on mains**, which is not an estimate that the
   machine is about to die. `Source.time_to_empty` is null unless the source is actually
   discharging, and `time_to_full` unless it is actually charging.
@@ -871,6 +954,7 @@ zig build run-pdf         # a PDF written, read back and rasterised
 zig build run-objc        # Foundation, a class defined in Zig, exceptions, AppKit
 zig build run-window      # a window: a view drawing with cg, mouse, keys, menus, dispatch
 zig build run-metal       # Metal: a shader, a pipeline, a triangle at the display's rate
+zig build run-capture     # ScreenCaptureKit: stream the screen into Metal textures, or a screenshot
 ```
 
 ## Build options
@@ -883,7 +967,9 @@ zig build run-metal       # Metal: a shader, a pipeline, a triangle at the displ
 | `-Dobjc=false`      | on      | Drops `mac.objc` and `mac.foundation`, and their links                                    |
 | `-Dappkit=false`    | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`                                    |
 | `-Dmetal=false`     | on      | Drops `mac.metal`, `appkit.MetalView`, and the Metal and QuartzCore links; needs `-Dobjc` |
-| `-Diosurface=false` | on      | Drops `mac.iosurface` and the IOSurface link; `-Dmetal` needs it                          |
+| `-Diosurface=false` | on      | Drops `mac.iosurface` and the IOSurface link; `-Dmetal` and `-Dcorevideo` need it         |
+| `-Dcorevideo=false` | on      | Drops `mac.corevideo` and `mac.coremedia`, and their links; needs `-Diosurface`           |
+| `-Dscreencapturekit=false` | on | Drops `mac.screencapturekit` and its link; needs `-Dobjc` and `-Dcorevideo`        |
 
 Every namespace still exists when switched off, holding only `enabled = false`, so a
 dependent can check `mac.features.imageio` rather than failing to compile.
@@ -895,7 +981,7 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 | `zig build`            | Builds every example into `zig-out/bin`                |
 | `zig build test`       | Runs the inline tests and the integration tests        |
 | `zig build bindings`   | Writes the translated C bindings to `zig-out/bindings` |
-| `zig build generate`   | Regenerates `src/appkit/generated.zig` from the SDK    |
+| `zig build generate`   | Regenerates every `generated.zig` from the SDK         |
 | `zig build window-app` | Builds the window example as a signed `.app` bundle    |
 
 ## Layout
@@ -946,17 +1032,21 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 | `src/iosurface/iosurface.zig`   | `Surface` and `Locked`: shared pixel buffers                          |
 | `src/metal/generated.zig`       | The generated Metal wrappers — do not edit                            |
 | `src/appkit/metal_view.zig`     | `MetalView`: a Metal layer and a display-link render loop             |
+| `src/corevideo/`                | `PixelBuffer`, `MetalTextureCache`, `DisplayLink`                     |
+| `src/coremedia/coremedia.zig`   | `SampleBuffer` and `Time`                                             |
+| `src/screencapturekit/`         | Content, screenshots and `Stream`; `generated.zig` — do not edit      |
+| `tools/objc_gen/screencapturekit.zig` | What the generator wraps from ScreenCaptureKit                  |
 | `vendor/mac_objc_exception.m`   | The `@try` that `tryMsgSend` runs under                               |
 | `vendor/mac_translate.h`        | The umbrella header, and the header workarounds                       |
 
 ## Where the frameworks come from
 
 They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
-optionally `ImageIO`, `CoreText`, `IOKit`, `IOSurface`, `libobjc`, `Foundation`, `AppKit`,
-`Metal` and `QuartzCore`, from the macOS SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
+optionally `ImageIO`, `CoreText`, `IOKit`, `IOSurface`, `CoreVideo`, `CoreMedia`, `libobjc`,
+`Foundation`, `AppKit`, `Metal`, `QuartzCore` and `ScreenCaptureKit`, from the macOS SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
 
-The one piece worth knowing about is `vendor/mac_translate.h`. Five of Apple's spellings do
-not survive Zig 0.17's C translator, and all five are handled there rather than in
+The one piece worth knowing about is `vendor/mac_translate.h`. Several of Apple's spellings do
+not survive Zig 0.17's C translator, and all are handled there rather than in
 `build.zig`, so the workaround sits next to the thing it works around:
 
 1. **Nullability on bounded array parameters** — `const CGFloat wp[_Nonnull 3]` in
@@ -978,3 +1068,10 @@ not survive Zig 0.17's C translator, and all five are handled there rather than 
 5. **XPC's array nullability** — IOSurface's header reaches `xpc.h`, whose
    `const uuid_t XPC_NONNULL_ARRAY` parameters are the first problem again under another macro.
    `xpc/base.h` is included first, the way `xpc.h` includes it, and the macro blanked.
+6. **CoreVideo** — `CVImageBuffer.h` includes `ApplicationServices.h` "for legacy reasons",
+   which reaches CoreServices sub-frameworks the translator cannot find; its guard is claimed.
+   `CVDisplayLink.h` brackets itself in `API_DEPRECATED_BEGIN`, a `_Pragma` the translator
+   rejects, so those are blanked around the include; and it names its block type outside the
+   `__BLOCKS__` guard that defines it, so the type stands in as `void *`. The Metal texture
+   cache is declared to Objective-C only, and `mac.corevideo` declares its calls itself.
+   Only `CMSampleBuffer.h` is taken from CoreMedia; the umbrella reaches CoreAudio.

@@ -24,6 +24,11 @@ pub fn build(b: *std.Build) void {
         "iosurface",
         "Expose IOSurface, pixel buffers shared between processes and with the GPU",
     ) orelse true;
+    const corevideo = b.option(
+        bool,
+        "corevideo",
+        "Expose CoreVideo and CoreMedia: pixel buffers, the display link and video frames",
+    ) orelse iosurface;
     const objc = b.option(
         bool,
         "objc",
@@ -39,6 +44,19 @@ pub fn build(b: *std.Build) void {
         "metal",
         "Expose the generated Metal wrappers and link Metal and QuartzCore (needs -Dobjc)",
     ) orelse objc;
+    if (corevideo and !iosurface) {
+        std.debug.print("-Dcorevideo needs -Diosurface: a pixel buffer is backed by an IOSurface.\n", .{});
+        std.process.exit(1);
+    }
+    const screencapturekit = b.option(
+        bool,
+        "screencapturekit",
+        "Expose the generated ScreenCaptureKit wrappers and link ScreenCaptureKit (needs -Dobjc and -Dcorevideo)",
+    ) orelse (objc and corevideo);
+    if (screencapturekit and !(objc and corevideo)) {
+        std.debug.print("-Dscreencapturekit needs -Dobjc and -Dcorevideo: frames arrive as CoreMedia sample buffers.\n", .{});
+        std.process.exit(1);
+    }
     if (metal and !iosurface) {
         std.debug.print("-Dmetal needs -Diosurface: Metal's textures can be backed by an IOSurface.\n", .{});
         std.process.exit(1);
@@ -56,9 +74,11 @@ pub fn build(b: *std.Build) void {
         .coretext = coretext,
         .iokit = iokit,
         .iosurface = iosurface,
+        .corevideo = corevideo,
         .objc = objc,
         .appkit = appkit,
         .metal = metal,
+        .screencapturekit = screencapturekit,
     };
 
     // -----------------------------------------------------------------
@@ -91,9 +111,11 @@ pub fn build(b: *std.Build) void {
     options.addOption(bool, "coretext", coretext);
     options.addOption(bool, "iokit", iokit);
     options.addOption(bool, "iosurface", iosurface);
+    options.addOption(bool, "corevideo", corevideo);
     options.addOption(bool, "objc", objc);
     options.addOption(bool, "appkit", appkit);
     options.addOption(bool, "metal", metal);
+    options.addOption(bool, "screencapturekit", screencapturekit);
 
     // -----------------------------------------------------------------
     // The raw layer.
@@ -113,6 +135,7 @@ pub fn build(b: *std.Build) void {
     if (imageio) translate_c.defineCMacro("MAC_ZIG_IMAGEIO", "1");
     if (iokit) translate_c.defineCMacro("MAC_ZIG_IOKIT", "1");
     if (iosurface) translate_c.defineCMacro("MAC_ZIG_IOSURFACE", "1");
+    if (corevideo) translate_c.defineCMacro("MAC_ZIG_COREVIDEO", "1");
     if (objc) translate_c.defineCMacro("MAC_ZIG_OBJC", "1");
 
     // -----------------------------------------------------------------
@@ -174,7 +197,7 @@ pub fn build(b: *std.Build) void {
     const generate_step = b.step("generate", "Regenerate the Objective-C wrappers from the SDK's headers");
     // Each manifest, and where its wrappers go. The generator is built once
     // per manifest, since the manifest is compiled into it.
-    for ([_][2][]const u8{ .{ "appkit", "src/appkit" }, .{ "metal", "src/metal" }, .{ "foundation", "src/foundation" } }) |job| {
+    for ([_][2][]const u8{ .{ "appkit", "src/appkit" }, .{ "metal", "src/metal" }, .{ "foundation", "src/foundation" }, .{ "screencapturekit", "src/screencapturekit" } }) |job| {
         const generator = b.addExecutable(.{
             .name = b.fmt("objc_gen_{s}", .{job[0]}),
             .root_module = b.createModule(.{
@@ -198,7 +221,7 @@ pub fn build(b: *std.Build) void {
     }
 
     const examples_step = b.step("examples", "Build every example");
-    for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf", "objc", "window", "metal" }) |name| {
+    for ([_][]const u8{ "info", "power", "shapes", "gradient", "text", "pdf", "objc", "window", "metal", "capture" }) |name| {
         const exe = addExample(b, examples_step, mac, target, optimize, name);
 
         // The window example again, as the app it is.
@@ -407,9 +430,11 @@ const Features = struct {
     coretext: bool,
     iokit: bool,
     iosurface: bool,
+    corevideo: bool,
     objc: bool,
     appkit: bool,
     metal: bool,
+    screencapturekit: bool,
 };
 
 /// Everything a module needs to use the frameworks that are switched on:
@@ -424,6 +449,10 @@ fn linkFrameworks(b: *std.Build, module: *std.Build.Module, sdk: []const u8, fea
     if (features.coretext) module.linkFramework("CoreText", .{});
     if (features.iokit) module.linkFramework("IOKit", .{});
     if (features.iosurface) module.linkFramework("IOSurface", .{});
+    if (features.corevideo) {
+        module.linkFramework("CoreVideo", .{});
+        module.linkFramework("CoreMedia", .{});
+    }
     if (features.objc) {
         // libobjc is a library rather than a framework, and a cross build
         // does not search the SDK's usr/lib unless told to.
@@ -441,6 +470,7 @@ fn linkFrameworks(b: *std.Build, module: *std.Build.Module, sdk: []const u8, fea
         module.linkFramework("Metal", .{});
         module.linkFramework("QuartzCore", .{});
     }
+    if (features.screencapturekit) module.linkFramework("ScreenCaptureKit", .{});
 }
 
 fn addExample(

@@ -8,6 +8,8 @@ const cg = @import("../cg/cg.zig");
 // Snake case, which no generated method is: `-[MTLTexture iosurface]`
 // would otherwise hide it.
 const io_surface = @import("../iosurface/iosurface.zig");
+const core_video = @import("../corevideo/corevideo.zig");
+const core_media = @import("../coremedia/coremedia.zig");
 
 /// Whether `Descendant` is `Ancestor`, or inherits from it.
 fn inherits(comptime Descendant: type, comptime Ancestor: type) bool {

@@ -405,3 +405,44 @@ typedef struct CGImageMetadataTag *CGImageMetadataTagRef;
 #include <objc/message.h>
 #include <objc/runtime.h>
 #endif
+
+/* ------------------------------------------------------------------ */
+/* CoreVideo and CoreMedia, under -Dcorevideo: pixel buffers, the       */
+/* display link, and the sample buffers that carry video frames.        */
+/*                                                                      */
+/* The Metal texture cache is declared only to Objective-C (it takes    */
+/* id<MTLDevice>), so the translator never sees it; mac.corevideo       */
+/* declares those few calls itself. The block-taking display-link       */
+/* handler sits behind __BLOCKS__, which the translator does not define. */
+/* ------------------------------------------------------------------ */
+
+#ifdef MAC_ZIG_COREVIDEO
+/* CVImageBuffer.h includes ApplicationServices.h "for legacy reasons", which
+   reaches CoreServices and its sub-frameworks -- more than the translator
+   can find. Everything CoreVideo itself uses is CoreGraphics, which is
+   already here, so the umbrella's guard is claimed instead. */
+#define __APPLICATIONSERVICES__
+/* CVDisplayLink.h brackets itself in API_DEPRECATED_BEGIN/END, which
+   expand to `_Pragma("clang attribute push")` -- not something the
+   translator parses. Deprecation carries no ABI; the brackets are blanked
+   for CoreVideo and put back after. */
+#include <os/availability.h>
+#pragma push_macro("API_DEPRECATED_BEGIN")
+#pragma push_macro("API_DEPRECATED_END")
+#undef API_DEPRECATED_BEGIN
+#undef API_DEPRECATED_END
+#define API_DEPRECATED_BEGIN(...)
+#define API_DEPRECATED_END
+/* CVDisplayLinkSetOutputHandler names the block type outside the
+   __BLOCKS__ guard that defines it. A block is passed as a pointer, so it
+   is declared taking one; mac.corevideo uses the function-pointer
+   callback instead. */
+#define CVDisplayLinkOutputHandler void *
+#include <CoreVideo/CoreVideo.h>
+#undef CVDisplayLinkOutputHandler
+#pragma pop_macro("API_DEPRECATED_BEGIN")
+#pragma pop_macro("API_DEPRECATED_END")
+/* Only the sample buffer and what it needs; the rest of CoreMedia reaches
+   CoreAudio and, through it, CoreServices. */
+#include <CoreMedia/CMSampleBuffer.h>
+#endif

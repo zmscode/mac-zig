@@ -18,9 +18,10 @@
 //!
 //! ## What is kept
 //!
-//! The handler's arguments are kept when it runs, and objects among them
-//! are retained, so they are still there when `wait` returns -- until
-//! `deinit`. `retain` one to keep it longer.
+//! The handler's arguments are kept when it runs, and objects and handles
+//! (`cg.Image`, `coremedia.SampleBuffer`) among them are retained, so they
+//! are still there when `wait` returns -- until `deinit`. `retain` one to
+//! keep it longer.
 //!
 //! ## Giving up
 //!
@@ -34,6 +35,7 @@
 //! are; a progress or enumeration block is not.
 
 const std = @import("std");
+const raw = @import("mac_raw");
 const Io = std.Io;
 const abi = @import("abi.zig");
 const block = @import("block.zig");
@@ -151,20 +153,27 @@ pub fn Completion(comptime Signature_: type) type {
     };
 }
 
-fn objectOf(comptime T: type, value: T) ?Object {
-    if (comptime abi.isObject(T)) return abi.unwrap(value);
-    if (@typeInfo(T) == .optional and comptime abi.isObject(@typeInfo(T).optional.child)) {
-        return if (value) |present| abi.unwrap(present) else null;
+/// A CoreFoundation-style handle among the handler's arguments -- a
+/// `cg.Image`, a `coremedia.SampleBuffer` -- or an object, as the pointer
+/// to retain and release. Handles are CF types, so `CFRetain` covers both.
+fn retainedPointer(comptime T: type, value: T) ?*const anyopaque {
+    if (comptime abi.isObject(T)) return abi.unwrap(value).value;
+    if (comptime abi.handleField(T)) |field| return @ptrCast(@field(value, field));
+    if (@typeInfo(T) == .optional) {
+        const Child = @typeInfo(T).optional.child;
+        if (comptime abi.isObject(Child) or abi.handleField(Child) != null) {
+            return if (value) |present| retainedPointer(Child, present) else null;
+        }
     }
     return null;
 }
 
 fn retainObject(comptime T: type, value: T) void {
-    if (objectOf(T, value)) |object| _ = object.retain();
+    if (retainedPointer(T, value)) |pointer| _ = raw.CFRetain(pointer);
 }
 
 fn releaseObject(comptime T: type, value: T) void {
-    if (objectOf(T, value)) |object| object.release();
+    if (retainedPointer(T, value)) |pointer| raw.CFRelease(pointer);
 }
 
 // The handler may free the state on its own thread, so these use a
