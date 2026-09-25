@@ -124,3 +124,69 @@ test "a shader that does not compile is an error with the compiler's message" {
     defer std.testing.allocator.free(message);
     try std.testing.expect(message.len > 0);
 }
+
+// -- IOSurface: one buffer, three views of it ------------------------------
+
+const iosurface = @import("../iosurface/iosurface.zig");
+
+test "an IOSurface shared between cg, Metal and a layer, without copies" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+
+    const device = metal.createSystemDefaultDevice() orelse return error.SkipZigTest;
+    defer device.release();
+
+    const size = 16;
+    const surface = try iosurface.Surface.init(.{ .width = size, .height = size, .name = "mac-zig interop" });
+    defer surface.deinit();
+
+    // 1. The CPU draws: the left half green, through CoreGraphics.
+    {
+        const locked = try surface.lock(.{});
+        defer locked.unlock();
+        const ctx = try locked.initContext();
+        defer ctx.deinit();
+        ctx.setFillColor(.rgb(0, 1, 0));
+        ctx.fillRect(.init(0, 0, size / 2, size));
+    }
+
+    // 2. The GPU sees it: a texture over the same memory.
+    const descriptor = metal.TextureDescriptor.texture2DDescriptorWithPixelFormatWidthHeightMipmapped(.bgra8_unorm, size, size, false);
+    descriptor.setUsage(.{ .shader_read = true, .render_target = true });
+    descriptor.setStorageMode(.managed);
+    const texture = device.newTextureWithDescriptorIosurfacePlane(descriptor, surface, 0).?;
+    defer texture.release();
+    try std.testing.expectEqual(surface.id(), texture.iosurface().?.id());
+
+    var pixel: [4]u8 = undefined;
+    const region: metal.Region = .{ .origin = .{ .x = 2, .y = 8, .z = 0 }, .size = .{ .width = 1, .height = 1, .depth = 1 } };
+    texture.getBytesBytesPerRowFromRegionMipmapLevel(&pixel, 4, region, 0);
+    try std.testing.expectEqual([4]u8{ 0, 255, 0, 255 }, pixel); // B, G, R, A
+
+    // 3. The GPU draws: clears the whole texture to red.
+    const queue = device.newCommandQueue().?;
+    defer queue.release();
+    const commands = queue.commandBuffer().?;
+    const pass = metal.RenderPassDescriptor.renderPassDescriptor();
+    const color = pass.colorAttachments().objectAtIndexedSubscript(0);
+    color.setTexture(texture);
+    color.setLoadAction(.clear);
+    color.setClearColor(metal.clearColor(1, 0, 0, 1));
+    color.setStoreAction(.store);
+    commands.renderCommandEncoderWithDescriptor(pass).?.endEncoding();
+    commands.commit();
+    commands.waitUntilCompleted();
+
+    // 4. The CPU sees the GPU's work, through the surface.
+    {
+        const locked = try surface.lock(.{ .read_only = true });
+        defer locked.unlock();
+        try std.testing.expectEqualSlices(u8, &.{ 0, 0, 255, 255 }, locked.row(8)[2 * 4 ..][0..4]);
+    }
+
+    // 5. And a layer can show it: an IOSurface is its own Objective-C object.
+    const layer = metal.Layer.new();
+    defer layer.release();
+    layer.setContents(objc.Object.fromCf(surface));
+    try std.testing.expect(layer.contents().?.value == @as(*anyopaque, @ptrCast(surface.handle)));
+}

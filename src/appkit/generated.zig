@@ -5,6 +5,9 @@
 const objc = @import("../objc/objc.zig");
 const foundation = @import("../foundation/foundation.zig");
 const cg = @import("../cg/cg.zig");
+// Snake case, which no generated method is: `-[MTLTexture iosurface]`
+// would otherwise hide it.
+const io_surface = @import("../iosurface/iosurface.zig");
 
 /// Whether `Descendant` is `Ancestor`, or inherits from it.
 fn inherits(comptime Descendant: type, comptime Ancestor: type) bool {

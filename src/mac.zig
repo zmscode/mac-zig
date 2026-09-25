@@ -37,6 +37,7 @@
 //! - `foundation` -- Foundation's everyday classes as Zig types.
 //! - `appkit` -- AppKit, from wrappers generated out of the SDK.
 //! - `metal` -- Metal, generated, and QuartzCore's Metal layer.
+//! - `iosurface` -- pixel buffers shared across processes and the GPU.
 //! - `dispatch` -- Grand Central Dispatch: queues and the main thread.
 //! - `cf` -- just enough CoreFoundation to work the rest.
 
@@ -85,6 +86,12 @@ pub const appkit = if (build_options.appkit) @import("appkit/appkit.zig") else s
     pub const enabled = false;
 };
 
+/// IOSurface: pixel buffers shared between processes, and between the
+/// CPU and the GPU. Under `-Diosurface` (on by default).
+pub const iosurface = if (build_options.iosurface) @import("iosurface/iosurface.zig") else struct {
+    pub const enabled = false;
+};
+
 /// Metal, from wrappers generated out of the SDK, and the part of
 /// QuartzCore that shows it on screen. Under `-Dmetal` (on by default with
 /// `-Dobjc`).
@@ -104,6 +111,7 @@ pub const features: Features = .{
     .imageio = build_options.imageio,
     .coretext = build_options.coretext,
     .iokit = build_options.iokit,
+    .iosurface = build_options.iosurface,
     .objc = build_options.objc,
     .appkit = build_options.appkit,
     .metal = build_options.metal,
@@ -116,6 +124,8 @@ pub const Features = struct {
     coretext: bool,
     /// `mac.iokit`: power sources.
     iokit: bool,
+    /// `mac.iosurface`: shared pixel buffers.
+    iosurface: bool,
     /// `mac.objc` and `mac.foundation`: the Objective-C runtime, and
     /// Foundation.
     objc: bool,
@@ -138,4 +148,5 @@ test {
     _ = appkit;
     _ = dispatch;
     _ = metal;
+    _ = iosurface;
 }

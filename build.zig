@@ -19,6 +19,11 @@ pub fn build(b: *std.Build) void {
         "iokit",
         "Expose IOKit's power sources: battery charge and time remaining",
     ) orelse true;
+    const iosurface = b.option(
+        bool,
+        "iosurface",
+        "Expose IOSurface, pixel buffers shared between processes and with the GPU",
+    ) orelse true;
     const objc = b.option(
         bool,
         "objc",
@@ -34,6 +39,10 @@ pub fn build(b: *std.Build) void {
         "metal",
         "Expose the generated Metal wrappers and link Metal and QuartzCore (needs -Dobjc)",
     ) orelse objc;
+    if (metal and !iosurface) {
+        std.debug.print("-Dmetal needs -Diosurface: Metal's textures can be backed by an IOSurface.\n", .{});
+        std.process.exit(1);
+    }
     if (metal and !objc) {
         std.debug.print("-Dmetal needs -Dobjc: Metal is reached through the Objective-C runtime.\n", .{});
         std.process.exit(1);
@@ -46,6 +55,7 @@ pub fn build(b: *std.Build) void {
         .imageio = imageio,
         .coretext = coretext,
         .iokit = iokit,
+        .iosurface = iosurface,
         .objc = objc,
         .appkit = appkit,
         .metal = metal,
@@ -80,6 +90,7 @@ pub fn build(b: *std.Build) void {
     options.addOption(bool, "imageio", imageio);
     options.addOption(bool, "coretext", coretext);
     options.addOption(bool, "iokit", iokit);
+    options.addOption(bool, "iosurface", iosurface);
     options.addOption(bool, "objc", objc);
     options.addOption(bool, "appkit", appkit);
     options.addOption(bool, "metal", metal);
@@ -101,6 +112,7 @@ pub fn build(b: *std.Build) void {
     });
     if (imageio) translate_c.defineCMacro("MAC_ZIG_IMAGEIO", "1");
     if (iokit) translate_c.defineCMacro("MAC_ZIG_IOKIT", "1");
+    if (iosurface) translate_c.defineCMacro("MAC_ZIG_IOSURFACE", "1");
     if (objc) translate_c.defineCMacro("MAC_ZIG_OBJC", "1");
 
     // -----------------------------------------------------------------
@@ -394,6 +406,7 @@ const Features = struct {
     imageio: bool,
     coretext: bool,
     iokit: bool,
+    iosurface: bool,
     objc: bool,
     appkit: bool,
     metal: bool,
@@ -410,6 +423,7 @@ fn linkFrameworks(b: *std.Build, module: *std.Build.Module, sdk: []const u8, fea
     if (features.imageio) module.linkFramework("ImageIO", .{});
     if (features.coretext) module.linkFramework("CoreText", .{});
     if (features.iokit) module.linkFramework("IOKit", .{});
+    if (features.iosurface) module.linkFramework("IOSurface", .{});
     if (features.objc) {
         // libobjc is a library rather than a framework, and a cross build
         // does not search the SDK's usr/lib unless told to.

@@ -15,6 +15,7 @@ Today that is:
 | `mac.foundation` | Foundation        | strings, numbers, data, URLs, typed arrays and dictionaries, errors — as Zig types, under `-Dobjc`                                |
 | `mac.appkit`     | AppKit            | windows, views, the application, events, menus, screens — generated from the SDK, under `-Dappkit`                                |
 | `mac.metal`      | Metal, QuartzCore | devices, queues, buffers, textures, shaders, pipelines, `CAMetalLayer` — generated from the SDK, under `-Dmetal`                  |
+| `mac.iosurface`  | IOSurface         | pixel buffers shared between processes, the CPU, the GPU and Core Animation, under `-Diosurface`                                  |
 | `mac.dispatch`   | libdispatch       | Grand Central Dispatch: the main queue, global and private queues, semaphores                                                     |
 | `mac.cf`         | CoreFoundation    | just enough to work the frameworks above it                                                                                       |
 
@@ -689,6 +690,34 @@ zig build run-metal                              # a spinning triangle
 zig build run-metal -- --snapshot metal.png      # one frame, offscreen, to a PNG
 ```
 
+## IOSurface
+
+`mac.iosurface` is memory the kernel shares on everyone's behalf: the CPU through a lock, the
+GPU through a Metal texture over it, Core Animation as a layer's contents, and another process by
+ID or Mach port. Nothing is copied between them — which is how a renderer hands frames to a
+window, and how Ghostty's Metal renderer shows its output.
+
+```zig
+const surface = try iosurface.Surface.init(.{ .width = 640, .height = 480 });   // BGRA by default
+defer surface.deinit();
+
+{
+    const locked = try surface.lock(.{});      // the only way to the bytes
+    defer locked.unlock();
+    const ctx = try locked.initContext();      // cg, drawing straight into the surface
+    defer ctx.deinit();
+    ctx.fillRect(.init(0, 0, 320, 480));
+    _ = locked.row(0);                         // or the pixels themselves, row by row
+}
+
+const texture = device.newTextureWithDescriptorIosurfacePlane(descriptor, surface, 0).?;   // Metal
+layer.setContents(objc.Object.fromCf(surface));                                           // a layer
+```
+
+A test runs the whole round trip on one surface: `cg` draws, a Metal texture over it reads the
+drawing, the GPU renders into it, the CPU reads that back through a lock, and a `CALayer` takes it
+as contents. Rows are padded for the GPU, so index by `bytesPerRow()`, or use `row(y)`.
+
 ## Application bundles
 
 A bare executable runs, but a Mac app is a bundle: an `Info.plist` naming it, an identifier that
@@ -782,14 +811,15 @@ zig build run-metal       # Metal: a shader, a pipeline, a triangle at the displ
 
 ## Build options
 
-| Option             | Default | Effect                                                                                    |
-| ------------------ | ------- | ----------------------------------------------------------------------------------------- |
-| `-Dimageio=false`  | on      | Drops `mac.cg.imageio`; no reading or writing of image files                              |
-| `-Dcoretext=false` | on      | Drops `mac.cg.text`; no string drawing                                                    |
-| `-Diokit=false`    | on      | Drops `mac.iokit`; no power-source reading                                                |
-| `-Dobjc=false`     | on      | Drops `mac.objc` and `mac.foundation`, and their links                                    |
-| `-Dappkit=false`   | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`                                    |
-| `-Dmetal=false`    | on      | Drops `mac.metal`, `appkit.MetalView`, and the Metal and QuartzCore links; needs `-Dobjc` |
+| Option              | Default | Effect                                                                                    |
+| ------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `-Dimageio=false`   | on      | Drops `mac.cg.imageio`; no reading or writing of image files                              |
+| `-Dcoretext=false`  | on      | Drops `mac.cg.text`; no string drawing                                                    |
+| `-Diokit=false`     | on      | Drops `mac.iokit`; no power-source reading                                                |
+| `-Dobjc=false`      | on      | Drops `mac.objc` and `mac.foundation`, and their links                                    |
+| `-Dappkit=false`    | on      | Drops `mac.appkit` and the AppKit link; needs `-Dobjc`                                    |
+| `-Dmetal=false`     | on      | Drops `mac.metal`, `appkit.MetalView`, and the Metal and QuartzCore links; needs `-Dobjc` |
+| `-Diosurface=false` | on      | Drops `mac.iosurface` and the IOSurface link; `-Dmetal` needs it                          |
 
 Every namespace still exists when switched off, holding only `enabled = false`, so a
 dependent can check `mac.features.imageio` rather than failing to compile.
@@ -846,6 +876,7 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 | `tools/objc_gen/appkit.zig`   | What the generator wraps from AppKit                      |
 | `tools/objc_gen/metal.zig`    | What the generator wraps from Metal and QuartzCore        |
 | `src/metal/metal.zig`         | Metal namespace root, and the calls that are not methods  |
+| `src/iosurface/iosurface.zig` | `Surface` and `Locked`: shared pixel buffers              |
 | `src/metal/generated.zig`     | The generated Metal wrappers — do not edit                |
 | `src/appkit/metal_view.zig`   | `MetalView`: a Metal layer and a display-link render loop |
 | `vendor/mac_objc_exception.m` | The `@try` that `tryMsgSend` runs under                   |
@@ -854,11 +885,11 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 ## Where the frameworks come from
 
 They are already on the machine. The package links `CoreGraphics`, `CoreFoundation`, and
-optionally `ImageIO`, `CoreText`, `IOKit`, `libobjc`, `Foundation`, `AppKit`, `Metal` and
-`QuartzCore`, from the macOS SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
+optionally `ImageIO`, `CoreText`, `IOKit`, `IOSurface`, `libobjc`, `Foundation`, `AppKit`,
+`Metal` and `QuartzCore`, from the macOS SDK that `xcode-select` points at. One small Objective-C file is compiled, for `@try`.
 
-The one piece worth knowing about is `vendor/mac_translate.h`. Four of Apple's spellings do
-not survive Zig 0.17's C translator, and all four are handled there rather than in
+The one piece worth knowing about is `vendor/mac_translate.h`. Five of Apple's spellings do
+not survive Zig 0.17's C translator, and all five are handled there rather than in
 `build.zig`, so the workaround sits next to the thing it works around:
 
 1. **Nullability on bounded array parameters** — `const CGFloat wp[_Nonnull 3]` in
@@ -877,3 +908,6 @@ not survive Zig 0.17's C translator, and all four are handled there rather than 
    `__OBJC_BOOL_IS_BOOL`, which clang does for arm64 and the translator does not. Left alone,
    `BOOL` would be `signed char` on Apple silicon: the call still works, but every type
    encoding says `c` where the runtime's say `B`. The macro is defined up front, as clang would.
+5. **XPC's array nullability** — IOSurface's header reaches `xpc.h`, whose
+   `const uuid_t XPC_NONNULL_ARRAY` parameters are the first problem again under another macro.
+   `xpc/base.h` is included first, the way `xpc.h` includes it, and the macro blanked.

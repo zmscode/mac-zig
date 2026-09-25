@@ -383,6 +383,23 @@ typedef struct CGImageMetadataTag *CGImageMetadataTagRef;
 /* sits behind __BLOCKS__, which the translator does not define.         */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* IOSurface, under -Diosurface: pixel buffers shared between processes */
+/* and between the CPU and the GPU. The C API only; IOSurfaceObjC.h     */
+/* declares the same object again as an Objective-C class.              */
+/* ------------------------------------------------------------------ */
+
+#ifdef MAC_ZIG_IOSURFACE
+/* IOSurfaceRef.h reaches xpc.h, whose `const uuid_t XPC_NONNULL_ARRAY`
+   parameters are workaround 1 again under another name. */
+#define __XPC_INDIRECT__ /* as xpc.h does before including base.h */
+#include <xpc/base.h>
+#undef __XPC_INDIRECT__
+#undef XPC_NONNULL_ARRAY
+#define XPC_NONNULL_ARRAY
+#include <IOSurface/IOSurfaceRef.h>
+#endif
+
 #ifdef MAC_ZIG_OBJC
 #include <Block.h>
 #include <objc/message.h>

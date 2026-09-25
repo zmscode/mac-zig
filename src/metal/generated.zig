@@ -5,6 +5,9 @@
 const objc = @import("../objc/objc.zig");
 const foundation = @import("../foundation/foundation.zig");
 const cg = @import("../cg/cg.zig");
+// Snake case, which no generated method is: `-[MTLTexture iosurface]`
+// would otherwise hide it.
+const io_surface = @import("../iosurface/iosurface.zig");
 
 /// Whether `Descendant` is `Ancestor`, or inherits from it.
 fn inherits(comptime Descendant: type, comptime Ancestor: type) bool {
@@ -6580,7 +6583,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newTextureWithDescriptor:iosurface:plane:]`
-    pub fn newTextureWithDescriptorIosurfacePlane(self: Self, descriptor: TextureDescriptor, iosurface: ?*anyopaque, plane: objc.UInteger) ?Texture {
+    pub fn newTextureWithDescriptorIosurfacePlane(self: Self, descriptor: TextureDescriptor, iosurface: io_surface.Surface, plane: objc.UInteger) ?Texture {
         return self.object.msgSend(?Texture, "newTextureWithDescriptor:iosurface:plane:", .{ descriptor, iosurface, plane });
     }
 
@@ -7232,7 +7235,7 @@ pub const Device = extern struct {
         pub const @"newBufferWithBytes:length:options:" = fn (?*const anyopaque, objc.UInteger, ResourceOptions) ?Buffer;
         pub const @"newDepthStencilStateWithDescriptor:" = fn (DepthStencilDescriptor) ?DepthStencilState;
         pub const @"newTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
-        pub const @"newTextureWithDescriptor:iosurface:plane:" = fn (TextureDescriptor, ?*anyopaque, objc.UInteger) ?Texture;
+        pub const @"newTextureWithDescriptor:iosurface:plane:" = fn (TextureDescriptor, io_surface.Surface, objc.UInteger) ?Texture;
         pub const @"newSharedTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
         pub const @"newSharedTextureWithHandle:" = fn (objc.Object) ?Texture;
         pub const @"newSamplerStateWithDescriptor:" = fn (SamplerDescriptor) ?SamplerState;
@@ -9636,8 +9639,8 @@ pub const Texture = extern struct {
     }
 
     /// `-[MTLTexture iosurface]`
-    pub fn iosurface(self: Self) ?*anyopaque {
-        return self.object.msgSend(?*anyopaque, "iosurface", .{});
+    pub fn iosurface(self: Self) ?io_surface.Surface {
+        return self.object.msgSend(?io_surface.Surface, "iosurface", .{});
     }
 
     /// `-[MTLTexture iosurfacePlane]`
@@ -9839,7 +9842,7 @@ pub const Texture = extern struct {
         pub const buffer = fn () ?Buffer;
         pub const bufferOffset = fn () objc.UInteger;
         pub const bufferBytesPerRow = fn () objc.UInteger;
-        pub const iosurface = fn () ?*anyopaque;
+        pub const iosurface = fn () ?io_surface.Surface;
         pub const iosurfacePlane = fn () objc.UInteger;
         pub const textureType = fn () TextureType;
         pub const pixelFormat = fn () PixelFormat;

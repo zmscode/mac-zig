@@ -17,6 +17,7 @@ One package, a namespace per framework:
 | `mac.foundation` | Foundation, hand-wrapped, under `-Dobjc` |
 | `mac.appkit` | AppKit, generated from the SDK, under `-Dappkit` |
 | `mac.metal` | Metal and QuartzCore's Metal layer, generated, under `-Dmetal` |
+| `mac.iosurface` | IOSurface, shared pixel buffers, under `-Diosurface` |
 | `mac.dispatch` | Grand Central Dispatch |
 | `mac.cf` | CoreFoundation |
 
@@ -465,6 +466,21 @@ const pipeline = try metal.newRenderPipelineState(device, desc, null);        //
   `frame.queue.commandBuffer()`, `frame.renderPass(clear)`, encode, `frame.present(commands)`.
 - To wrap more of Metal, edit `tools/objc_gen/metal.zig` and `zig build generate`.
 
+IOSurface — one buffer for the CPU, the GPU, a layer and other processes:
+
+```zig
+const surface = try iosurface.Surface.init(.{ .width = w, .height = h });   // .bgra; yours
+const locked = try surface.lock(.{});           // bytes only while locked
+defer locked.unlock();
+const ctx = try locked.initContext();           // cg into the surface (bgra only); deinit before unlock
+locked.row(y)                                   // rows are padded: never index by width * 4
+device.newTextureWithDescriptorIosurfacePlane(desc, surface, 0)   // Metal view of it (.managed)
+layer.setContents(objc.Object.fromCf(surface))                    // a CALayer shows it
+```
+
+`Surface.lookup(id)` / `createMachPort` + `fromMachPort` share it with another process; a lookup
+returns a new reference to the same memory, not the same pointer.
+
 An app bundle, from a dependent's `build.zig`:
 
 ```zig
@@ -517,6 +533,7 @@ appkit.app.run(.{}, &app, App);                      // menu bar, delegate, even
 | `-Dobjc=false`      | on      | Drops `mac.objc`, `mac.foundation` and their links  |
 | `-Dappkit=false`    | on      | Drops `mac.appkit` and AppKit; needs `-Dobjc`       |
 | `-Dmetal=false`     | on      | Drops `mac.metal`, `appkit.MetalView`; needs `-Dobjc` |
+| `-Diosurface=false` | on      | Drops `mac.iosurface`; `-Dmetal` needs it           |
 
 Every namespace exists either way, holding `enabled = false` when off. Check
 `mac.features.imageio` / `mac.features.coretext` / `mac.features.objc` rather than assuming.

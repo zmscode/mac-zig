@@ -435,6 +435,9 @@ const Model = struct {
             \\const objc = @import("../objc/objc.zig");
             \\const foundation = @import("../foundation/foundation.zig");
             \\const cg = @import("../cg/cg.zig");
+            \\// Snake case, which no generated method is: `-[MTLTexture iosurface]`
+            \\// would otherwise hide it.
+            \\const io_surface = @import("../iosurface/iosurface.zig");
             \\
             \\/// Whether `Descendant` is `Ancestor`, or inherits from it.
             \\fn inherits(comptime Descendant: type, comptime Ancestor: type) bool {{
@@ -1177,14 +1180,15 @@ fn structType(name: []const u8) ?[]const u8 {
     return null;
 }
 
-/// A CoreGraphics handle, as the `cg` type that wraps it. Each is a struct
+/// A CoreGraphics or IOSurface handle, as the type that wraps it. Each is a struct
 /// over one pointer, which `objc.abi` passes as the pointer.
 fn cgHandle(name: []const u8) ?[]const u8 {
     const table = .{
-        .{ "CGImageRef", "cg.Image" },           .{ "CGColorRef", "cg.Color" },
-        .{ "CGColorSpaceRef", "cg.ColorSpace" }, .{ "CGContextRef", "cg.Context" },
-        .{ "CGPathRef", "cg.Path" },             .{ "CGMutablePathRef", "cg.MutablePath" },
-        .{ "CGGradientRef", "cg.Gradient" },     .{ "CGLayerRef", "cg.Layer" },
+        .{ "CGImageRef", "cg.Image" },             .{ "CGColorRef", "cg.Color" },
+        .{ "CGColorSpaceRef", "cg.ColorSpace" },   .{ "CGContextRef", "cg.Context" },
+        .{ "CGPathRef", "cg.Path" },               .{ "CGMutablePathRef", "cg.MutablePath" },
+        .{ "CGGradientRef", "cg.Gradient" },       .{ "CGLayerRef", "cg.Layer" },
+        .{ "IOSurfaceRef", "io_surface.Surface" },
     };
     inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
     return null;
@@ -1314,7 +1318,7 @@ fn contains(list: []const []const u8, name: []const u8) bool {
 /// Names declared at the top of the generated file, which a parameter
 /// may not shadow.
 fn isFileScope(name: []const u8) bool {
-    return contains(&.{ "objc", "foundation", "cg", "inherits", "lookUp", "framework" }, name) or
+    return contains(&.{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework" }, name) or
         cgHandle(name) != null;
 }
 
