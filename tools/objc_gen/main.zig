@@ -36,13 +36,21 @@ pub fn main(init: std.process.Init) !void {
     const scratch = args[3];
     const output = try std.fs.path.join(arena, &.{ args[4], "generated.zig" });
 
-    var names: std.ArrayList([]const u8) = .empty;
-    try names.appendSlice(arena, &manifest.classes);
-    try names.appendSlice(arena, &manifest.enums);
-    try names.appendSlice(arena, &manifest.structs);
-    try names.appendSlice(arena, &manifest.protocols);
+    // One dump per prefix: `NS` catches every AppKit and Foundation
+    // declaration, categories included whatever they are called, in a single
+    // parse. A listed name no prefix covers gets a dump of its own.
+    var filters: std.ArrayList([]const u8) = .empty;
+    try filters.appendSlice(arena, &manifest.prefixes);
+    for ([_][]const []const u8{ &manifest.classes, &manifest.protocols, &manifest.enums, &manifest.structs }) |list| {
+        for (list) |name| {
+            const covered = for (manifest.prefixes) |prefix| {
+                if (std.mem.indexOf(u8, name, prefix) != null) break true;
+            } else false;
+            if (!covered) try filters.append(arena, name);
+        }
+    }
 
-    const dumps = try dumpAll(arena, io, zig_exe, sdk, scratch, names.items);
+    const dumps = try dumpAll(arena, io, zig_exe, sdk, scratch, filters.items);
 
     var model: Model = .{ .arena = arena };
     for (dumps) |dump| try model.load(dump);
@@ -56,8 +64,9 @@ pub fn main(init: std.process.Init) !void {
 
 // -- running clang --------------------------------------------------------
 
-/// Dumps every name in parallel -- each is a full parse of the umbrella
-/// header, a few seconds apiece -- and returns the JSON text of each.
+/// Dumps the declarations matching each filter, in parallel -- a parse of
+/// the umbrella header apiece, about a second -- and returns the JSON text
+/// of each.
 fn dumpAll(
     arena: Allocator,
     io: std.Io,
@@ -214,13 +223,48 @@ const Model = struct {
 
     /// Reads one dump: a series of top-level JSON objects, one per
     /// declaration whose name matched the filter.
+    /// A dump can run to a couple of hundred megabytes, nearly all of it
+    /// declarations nobody asked for, so each is skimmed -- its kind and name
+    /// read off the text -- and only the wanted ones are parsed.
     fn load(self: *Model, text: []const u8) !void {
         var rest = text;
         while (nextObject(rest)) |span| {
             rest = rest[span.end..];
+            if (!wanted(skim(span.text))) {
+                // A nameless struct is only ever named by the very next
+                // declaration; anything else in between breaks the pair.
+                self.anonymous_fields = null;
+                continue;
+            }
             const value = try std.json.parseFromSliceLeaky(Value, self.arena, span.text, .{});
             try self.declaration(value);
         }
+    }
+
+    const Skim = struct { kind: []const u8, name: ?[]const u8, interface: ?[]const u8 };
+
+    /// The declaration's kind and name, and a category's class, from the
+    /// part of its JSON before `inner` -- where clang writes them.
+    fn skim(text: []const u8) Skim {
+        const head = text[0 .. std.mem.indexOf(u8, text, "\"inner\"") orelse text.len];
+        const interface = if (std.mem.indexOf(u8, head, "\"interface\":")) |at| stringAfter(head[at..], "\"name\": \"") else null;
+        const name_head = if (std.mem.indexOf(u8, head, "\"interface\":")) |at| head[0..at] else head;
+        return .{
+            .kind = stringAfter(head, "\"kind\": \"") orelse "",
+            .name = stringAfter(name_head, "\"name\": \""),
+            .interface = interface,
+        };
+    }
+
+    fn wanted(skimmed: Skim) bool {
+        const kind = skimmed.kind;
+        const name = skimmed.name orelse return std.mem.eql(u8, kind, "RecordDecl");
+        if (std.mem.eql(u8, kind, "ObjCInterfaceDecl")) return wantsClass(name);
+        if (std.mem.eql(u8, kind, "ObjCCategoryDecl")) return wantsClass(skimmed.interface orelse return false);
+        if (std.mem.eql(u8, kind, "ObjCProtocolDecl")) return wantsProtocol(name);
+        if (std.mem.eql(u8, kind, "EnumDecl")) return wantsEnum(name);
+        if (std.mem.eql(u8, kind, "RecordDecl") or std.mem.eql(u8, kind, "TypedefDecl")) return wantsStruct(name);
+        return false;
     }
 
     fn declaration(self: *Model, value: Value) !void {
@@ -770,7 +814,7 @@ const Model = struct {
         return error.Unsupported;
     }
 
-    fn spell(self: *Model, class: *Class, raw_type: []const u8, position: Position) !?[]const u8 {
+    fn spell(self: *Model, class: *Class, raw_type: []const u8, position: Position) Allocator.Error!?[]const u8 {
         const cleaned = try clean(self.arena, raw_type);
         const text = cleaned.text;
         const optional = !cleaned.nonnull;
@@ -780,6 +824,9 @@ const Model = struct {
             // the caller chooses; it cannot come back out.
             return if (position == .param) "anytype" else null;
         }
+        // Checked on the spelling as clang gave it: cleaning moves the
+        // spaces in `(* _Nonnull)`.
+        if (std.mem.indexOf(u8, raw_type, "(*") != null) return try self.functionPointer(class, raw_type);
         if (std.mem.indexOfScalar(u8, text, '(') != null) return null;
 
         var depth: usize = 0;
@@ -788,8 +835,12 @@ const Model = struct {
             depth += 1;
             base = std.mem.trimEnd(u8, base[0 .. base.len - 1], " ");
         }
-        const is_const = std.mem.startsWith(u8, base, "const ");
+        var is_const = std.mem.startsWith(u8, base, "const ");
         if (is_const) base = base["const ".len..];
+        if (std.mem.endsWith(u8, base, " const")) {
+            is_const = true;
+            base = base[0 .. base.len - " const".len];
+        }
 
         switch (depth) {
             0 => {
@@ -809,7 +860,9 @@ const Model = struct {
                 }
                 if (std.mem.eql(u8, base, "id")) return try self.maybeOptional("objc.Object", optional);
                 if (std.mem.eql(u8, base, "SEL")) return try self.maybeOptional("objc.Sel", optional);
-                if (std.mem.eql(u8, base, "Class")) return try self.maybeOptional("objc.Class", optional);
+                // `Class<NSWindowRestoration>` is a class that adopts a protocol.
+                if (std.mem.eql(u8, base, "Class") or std.mem.startsWith(u8, base, "Class<"))
+                    return try self.maybeOptional("objc.Class", optional);
                 if (scalar(base)) |s| return s;
                 if (structType(base)) |s| return s;
                 const struct_name = if (std.mem.startsWith(u8, base, "struct ")) base["struct ".len..] else base;
@@ -821,10 +874,15 @@ const Model = struct {
             1 => {
                 if (std.mem.eql(u8, base, "char")) return if (optional) "?[*:0]const u8" else "[*:0]const u8";
                 if (std.mem.eql(u8, base, "void")) return if (is_const) "?*const anyopaque" else "?*anyopaque";
-                if (scalar(base) orelse structType(base)) |s| {
-                    // Bytes come in buffers; everything else is one value
-                    // passed by reference -- `BOOL *stop`, `NSRect *out`.
-                    const many = std.mem.eql(u8, s, "u8") or std.mem.eql(u8, s, "i8");
+                if (std.mem.eql(u8, base, "id") or std.mem.startsWith(u8, base, "id<")) {
+                    return try self.objectArray(raw_type, base, is_const);
+                }
+                if (scalar(base) orelse structType(base) orelse self.generatedStruct(base)) |s| {
+                    // An input handed over by pointer is, in C, nearly always
+                    // an array -- offsets, viewports, lengths -- and so are
+                    // bytes. A pointer to be written through is one value:
+                    // `BOOL *stop`, `NSRect *out`.
+                    const many = is_const or std.mem.eql(u8, s, "u8") or std.mem.eql(u8, s, "i8");
                     return try std.fmt.allocPrint(self.arena, "?{s}{s}{s}", .{
                         if (many) "[*]" else "*", if (is_const) "const " else "", s,
                     });
@@ -838,10 +896,71 @@ const Model = struct {
             2 => {
                 // `NSError **` and friends: an out-parameter for an object.
                 if (try self.objectType(base) != null) return "?*objc.abi.Id";
+                // `unsigned char **`: an array of byte buffers, like the
+                // planes of a bitmap.
+                if (scalar(base)) |s| if (std.mem.eql(u8, s, "u8")) return "?[*]?[*]u8";
                 return null;
             },
             else => return null,
         }
+    }
+
+    /// A C function pointer, `R (*)(A, B)`, as a Zig one. The pieces go
+    /// through the same mapping as any other type, and since every wrapper
+    /// is the size of the pointer it holds, a Zig function taking wrappers
+    /// is what the C caller expects.
+    fn functionPointer(self: *Model, class: *Class, text: []const u8) Allocator.Error!?[]const u8 {
+        // `R (* _Nonnull)(A, B)`: the pointer's own parentheses, then the
+        // parameters'.
+        const marker = std.mem.indexOf(u8, text, "(*").?;
+        const pointer_close = std.mem.indexOfScalarPos(u8, text, marker, ')') orelse return null;
+        const result = try self.spell(class, std.mem.trim(u8, text[0..marker], " "), .result) orelse return null;
+        const open = std.mem.indexOfScalarPos(u8, text, pointer_close, '(') orelse return null;
+        const close = std.mem.lastIndexOfScalar(u8, text, ')') orelse return null;
+        var params: std.ArrayList(u8) = .empty;
+        var it = std.mem.splitScalar(u8, text[open + 1 .. close], ',');
+        var first = true;
+        while (it.next()) |piece| {
+            const trimmed = std.mem.trim(u8, piece, " ");
+            if (trimmed.len == 0 or std.mem.eql(u8, trimmed, "void")) continue;
+            const param = try self.spell(class, trimmed, .param) orelse return null;
+            if (std.mem.eql(u8, param, "anytype")) return null;
+            if (!first) try params.appendSlice(self.arena, ", ");
+            try params.appendSlice(self.arena, param);
+            first = false;
+        }
+        const optional = std.mem.indexOf(u8, text[marker..open], "_Nullable") != null;
+        return try std.fmt.allocPrint(self.arena, "{s}*const fn ({s}) callconv(.c) {s}", .{
+            if (optional) "?" else "", params.items, result,
+        });
+    }
+
+    fn generatedStruct(self: *Model, base: []const u8) ?[]const u8 {
+        const name = if (std.mem.startsWith(u8, base, "struct ")) base["struct ".len..] else base;
+        return if (self.structs.contains(name)) stripPrefix(name) else null;
+    }
+
+    /// A C array of objects, `id<MTLTexture> _Nullable const *`: a pointer
+    /// to wrappers, which are pointer-sized, or to `objc.Nullable` wrappers
+    /// where an element may be nil.
+    fn objectArray(self: *Model, raw_type: []const u8, element: []const u8, is_const: bool) ![]const u8 {
+        // Before the last `*` is the elements' nullability; after it, the
+        // pointer's own.
+        const last_star = std.mem.lastIndexOfScalar(u8, raw_type, '*').?;
+        const elements_nullable = std.mem.indexOf(u8, raw_type[0..last_star], "_Nullable") != null;
+        const optional = std.mem.indexOf(u8, raw_type[last_star..], "_Nonnull") == null;
+        var wrapper: []const u8 = "objc.Object";
+        if (std.mem.startsWith(u8, element, "id<")) {
+            const inside = std.mem.trim(u8, element[3 .. element.len - 1], " ");
+            if (std.mem.indexOfScalar(u8, inside, ',') == null and wantsProtocol(inside)) wrapper = stripPrefix(inside);
+        }
+        const item = if (elements_nullable)
+            try std.fmt.allocPrint(self.arena, "objc.Nullable({s})", .{wrapper})
+        else
+            wrapper;
+        return try std.fmt.allocPrint(self.arena, "{s}[*]{s}{s}", .{
+            if (optional) "?" else "", if (is_const) "const " else "", item,
+        });
     }
 
     fn maybeOptional(self: *Model, name: []const u8, optional: bool) ![]const u8 {
@@ -935,6 +1054,15 @@ fn nextObject(text: []const u8) ?Span {
         }
     }
     return null;
+}
+
+/// The JSON string that follows `marker` in `text`, unescaped only as far
+/// as identifiers need -- which is not at all.
+fn stringAfter(text: []const u8, marker: []const u8) ?[]const u8 {
+    const at = std.mem.indexOf(u8, text, marker) orelse return null;
+    const start = at + marker.len;
+    const end = std.mem.indexOfScalarPos(u8, text, start, '"') orelse return null;
+    return text[start..end];
 }
 
 fn hasAttr(value: Value, kind: []const u8) bool {
@@ -1117,8 +1245,12 @@ fn constantPrefix(e: Enum) []const u8 {
 }
 
 fn stripPrefix(name: []const u8) []const u8 {
+    // Only before a word: `MTL4CounterHeapType` keeps its prefix, since
+    // `4CounterHeapType` is not a name.
     for (manifest.prefixes) |prefix| {
-        if (std.mem.startsWith(u8, name, prefix)) return name[prefix.len..];
+        if (std.mem.startsWith(u8, name, prefix) and name.len > prefix.len and std.ascii.isUpper(name[prefix.len])) {
+            return name[prefix.len..];
+        }
     }
     return name;
 }

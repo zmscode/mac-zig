@@ -607,9 +607,14 @@ runs later, and a value on the caller's stack would be gone.
 ### The generator
 
 `zig build generate` runs `tools/objc_gen` once per manifest — `tools/objc_gen/appkit.zig` and
-`tools/objc_gen/metal.zig`. For each class, protocol, enum and struct listed, it has clang dump
-the declarations as JSON, in parallel, and writes `src/<framework>/generated.zig`, which is
-checked in, so building the package never needs it. Both together take a minute or two.
+`tools/objc_gen/metal.zig` — and writes `src/<framework>/generated.zig`, which is checked in, so
+building the package never needs it. It has clang dump every declaration whose name carries
+one of the manifest's prefixes (`NS`; `MTL` and `CA`) as JSON, one parse per prefix, then skims
+the dump — a couple of hundred megabytes for AppKit and Foundation — and parses only the
+declarations the manifest lists. Both frameworks take about ten seconds.
+
+Because the dump is by prefix and not by name, a class's categories are found whatever they are
+called — `-[NSView displayLinkWithTarget:selector:]` is declared in `NSView (NSDisplayLink)`.
 
 A protocol is generated like a class: `id<MTLDevice>` is a `Device`, with `MTLDevice`'s methods
 and those of any protocol it extends. Much of Metal is nothing but protocols.
@@ -620,11 +625,13 @@ iterators, `details` out-parameters. AppKit is generated: it is thousands of met
 wrapper that is a straight transcription is what is wanted. Hand-made conveniences go beside
 `generated.zig`, never in it.
 
-Anything the generator cannot type safely is left out and listed in a comment at the end of the
-struct — a C function pointer, a struct it does not know, an enum the manifest does not list.
-Fifteen classes come to about 1,200 methods of their own, with six left out. A test takes the
-address of every generated method, so each one is compiled, and each selector checked against
-its arguments, on every `zig build test`.
+C types map through as far as they go: a C array of objects, `id<MTLTexture> const *`, is a
+`[*]const Texture`, or `[*]const objc.Nullable(Texture)` where an element may be nil — a `?T` is
+not pointer-sized, `Nullable` is; a `const T *` input is a `[*]const T`; a C function pointer is
+a Zig one over the same mapped types. Anything the generator still cannot type safely is left out
+and listed in a comment at the end of the struct — at present nothing is, across about 2,000
+AppKit and 1,500 Metal methods. A test takes the address of every generated method, so each
+one is compiled, and each selector checked against its arguments, on every `zig build test`.
 
 Nullability comes from clang, with one repair. Inside Apple's `NS_ASSUME_NONNULL` regions an
 unannotated pointer is non-null, and clang says so — except for a property carrying an

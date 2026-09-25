@@ -82,6 +82,12 @@ test "a triangle, rendered offscreen and read back" {
 
     const encoder = commands.renderCommandEncoderWithDescriptor(pass).?;
     encoder.setRenderPipelineState(pipeline);
+    // C arrays, as slices' pointers: a one-viewport array covering the
+    // target, and a texture slot deliberately left empty.
+    const viewports = [_]metal.Viewport{.{ .origin_x = 0, .origin_y = 0, .width = size, .height = size, .znear = 0, .zfar = 1 }};
+    encoder.setViewportsCount(&viewports, viewports.len);
+    const textures = [_]objc.Nullable(metal.Texture){.none};
+    encoder.setFragmentTexturesWithRange(&textures, .{ .location = 0, .length = textures.len });
     encoder.drawPrimitivesVertexStartVertexCount(.triangle, 0, 3);
     encoder.endEncoding(); // MTLCommandEncoder's, inherited
 

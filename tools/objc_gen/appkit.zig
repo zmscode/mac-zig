@@ -97,6 +97,16 @@ pub const enums = [_][]const u8{
     "NSImageRepLoadStatus",
     "NSImageLayoutDirection",
     "NSColorRenderingIntent",
+    "NSImageInterpolation",
+    "NSLayoutConstraintOrientation",
+    "NSLayoutAttribute",
+    "NSWindowBackingLocation",
+    "NSViewExclusiveGestureBehavior",
+    "NSTouchTypeMask",
+    "NSRemoteNotificationType",
+    "NSApplicationPrintReply",
+    // Foundation's, which AppKit's methods take.
+    "NSComparisonResult",
 };
 
 /// C structs that methods take or return, emitted as `extern struct`s.

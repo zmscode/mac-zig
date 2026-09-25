@@ -431,9 +431,12 @@ window.into(appkit.Responder)                    // superclass methods; checked 
   only for passing a value where a superclass type is wanted.
 - **Never edit `src/appkit/generated.zig`.** To wrap more, add the class, enum, struct or
   protocol to
-  `tools/objc_gen/appkit.zig` and run `zig build generate` (about 15 s). Methods the generator
-  cannot type are listed in a `// Not generated:` comment at the end of each struct — the usual
-  fix is listing the enum they use.
+  `tools/objc_gen/appkit.zig` (or `metal.zig`) and run `zig build generate` (about 10 s). Methods
+  the generator cannot type are listed in a `// Not generated:` comment at the end of each
+  struct — the usual fix is listing the enum or struct they use.
+- C arrays of objects are `[*]const T`, or `[*]const objc.Nullable(T)` when elements may be
+  nil: `encoder.setFragmentTexturesWithRange(&.{ .of(tex), .none }, range)`. `const T *` inputs
+  are `[*]const T`. C function pointers are `*const fn (...) callconv(.c) R`.
 - Main thread only.
 
 `Subclass` instances convert with `into`, checked against the declared superclass and

@@ -249,9 +249,10 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
 
         if (instance.object.respondsTo("displayLinkWithTarget:selector:")) {
             // macOS 14: timed to whichever display the view is on.
-            const link = instance.object.msgSend(objc.Object, "displayLinkWithTarget:selector:", .{ instance.object, objc.Sel.cached("step:") });
-            link.msgSend(void, "addToRunLoop:forMode:", .{ main_loop, modes });
-            self.ticker = link.retain();
+            const view = instance.into(generated.View);
+            const link = metal.DisplayLink.from(view.displayLinkWithTargetSelector(instance.object, objc.Sel.cached("step:")));
+            link.addToRunLoopForMode(main_loop, .{ .object = modes });
+            self.ticker = link.object.retain();
         } else {
             const timer = objc.getClass("NSTimer").?.msgSend(objc.Object, "timerWithTimeInterval:target:selector:userInfo:repeats:", .{
                 @as(f64, 1.0 / 60.0), instance.object, objc.Sel.cached("step:"), @as(?objc.Object, null), true,

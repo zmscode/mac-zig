@@ -783,6 +783,91 @@ pub const ColorRenderingIntent = enum(objc.Integer) {
     _,
 };
 
+/// `NSImageInterpolation`.
+pub const ImageInterpolation = enum(objc.UInteger) {
+    default = 0,
+    none = 1,
+    low = 2,
+    medium = 4,
+    high = 3,
+    _,
+};
+
+/// `NSLayoutConstraintOrientation`.
+pub const LayoutConstraintOrientation = enum(objc.Integer) {
+    horizontal = 0,
+    vertical = 1,
+    _,
+};
+
+/// `NSLayoutAttribute`.
+pub const LayoutAttribute = enum(objc.Integer) {
+    left = 1,
+    right = 2,
+    top = 3,
+    bottom = 4,
+    leading = 5,
+    trailing = 6,
+    width = 7,
+    height = 8,
+    center_x = 9,
+    center_y = 10,
+    last_baseline = 11,
+    first_baseline = 12,
+    not_an_attribute = 0,
+    _,
+    pub const baseline: LayoutAttribute = .last_baseline;
+};
+
+/// `NSWindowBackingLocation`.
+pub const WindowBackingLocation = enum(objc.UInteger) {
+    default = 0,
+    video_memory = 1,
+    main_memory = 2,
+    _,
+};
+
+/// `NSViewExclusiveGestureBehavior`.
+pub const ViewExclusiveGestureBehavior = enum(objc.Integer) {
+    inherit = 0,
+    exclusive = 1,
+    not_exclusive = 2,
+    _,
+};
+
+/// `NSTouchTypeMask`.
+pub const TouchTypeMask = packed struct(u64) {
+    direct: bool = false,
+    indirect: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSRemoteNotificationType`.
+pub const RemoteNotificationType = packed struct(u64) {
+    badge: bool = false,
+    sound: bool = false,
+    alert: bool = false,
+    _3: u61 = 0,
+    pub const none: RemoteNotificationType = @fromBackingInt(0x0);
+};
+
+/// `NSApplicationPrintReply`.
+pub const ApplicationPrintReply = enum(objc.UInteger) {
+    cancelled = 0,
+    success = 1,
+    reply_later = 2,
+    failure = 3,
+    _,
+};
+
+/// `NSComparisonResult`.
+pub const ComparisonResult = enum(objc.Integer) {
+    ascending = -1,
+    same = 0,
+    descending = 1,
+    _,
+};
+
 /// `NSResponder`, a subclass of `NSObject`.
 pub const Responder = extern struct {
     object: objc.Object,
@@ -1103,9 +1188,119 @@ pub const Responder = extern struct {
         return self.object.msgSend(void, "setMenu:", .{menu_});
     }
 
+    /// `-[NSResponder undoManager]`
+    pub fn undoManager(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "undoManager", .{});
+    }
+
+    /// `-[NSResponder validateProposedFirstResponder:forEvent:]`
+    pub fn validateProposedFirstResponderForEvent(self: Self, responder: Responder, event: ?Event) bool {
+        return self.object.msgSend(bool, "validateProposedFirstResponder:forEvent:", .{ responder, event });
+    }
+
+    /// `-[NSResponder presentError:modalForWindow:delegate:didPresentSelector:contextInfo:]`
+    pub fn presentErrorModalForWindowDelegateDidPresentSelectorContextInfo(self: Self, @"error": foundation.ErrorObject, window: Window, delegate: ?objc.Object, did_present_selector: ?objc.Sel, context_info: ?*anyopaque) void {
+        return self.object.msgSend(void, "presentError:modalForWindow:delegate:didPresentSelector:contextInfo:", .{ @"error", window, delegate, did_present_selector, context_info });
+    }
+
+    /// `-[NSResponder presentError:]`
+    pub fn presentError(self: Self, @"error": foundation.ErrorObject) bool {
+        return self.object.msgSend(bool, "presentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder willPresentError:]`
+    pub fn willPresentError(self: Self, @"error": foundation.ErrorObject) foundation.ErrorObject {
+        return self.object.msgSend(foundation.ErrorObject, "willPresentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder performTextFinderAction:]`
+    pub fn performTextFinderAction(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "performTextFinderAction:", .{sender});
+    }
+
     /// `-[NSResponder newWindowForTab:]`
     pub fn newWindowForTab(self: Self, sender: ?objc.Object) void {
         return self.object.msgSend(void, "newWindowForTab:", .{sender});
+    }
+
+    /// `-[NSResponder showWritingTools:]`
+    pub fn showWritingTools(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "showWritingTools:", .{sender});
+    }
+
+    /// `-[NSResponder performMnemonic:]`
+    pub fn performMnemonic(self: Self, string: foundation.String) bool {
+        return self.object.msgSend(bool, "performMnemonic:", .{string});
+    }
+
+    /// `-[NSResponder updateUserActivityState:]`
+    pub fn updateUserActivityState(self: Self, user_activity: objc.Object) void {
+        return self.object.msgSend(void, "updateUserActivityState:", .{user_activity});
+    }
+
+    /// `-[NSResponder userActivity]`
+    pub fn userActivity(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "userActivity", .{});
+    }
+
+    /// `-[NSResponder setUserActivity:]`
+    pub fn setUserActivity(self: Self, user_activity: ?objc.Object) void {
+        return self.object.msgSend(void, "setUserActivity:", .{user_activity});
+    }
+
+    /// `-[NSResponder makeTouchBar]`
+    pub fn makeTouchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "makeTouchBar", .{});
+    }
+
+    /// `-[NSResponder touchBar]`
+    pub fn touchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "touchBar", .{});
+    }
+
+    /// `-[NSResponder setTouchBar:]`
+    pub fn setTouchBar(self: Self, touch_bar: ?objc.Object) void {
+        return self.object.msgSend(void, "setTouchBar:", .{touch_bar});
+    }
+
+    /// `-[NSResponder interfaceStyle]`
+    pub fn interfaceStyle(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "interfaceStyle", .{});
+    }
+
+    /// `-[NSResponder setInterfaceStyle:]`
+    pub fn setInterfaceStyle(self: Self, interface_style: objc.UInteger) void {
+        return self.object.msgSend(void, "setInterfaceStyle:", .{interface_style});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:]`
+    pub fn encodeRestorableStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:backgroundQueue:]`
+    pub fn encodeRestorableStateWithCoderBackgroundQueue(self: Self, coder: objc.Object, queue: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:backgroundQueue:", .{ coder, queue });
+    }
+
+    /// `-[NSResponder restoreStateWithCoder:]`
+    pub fn restoreStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "restoreStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder invalidateRestorableState]`
+    pub fn invalidateRestorableState(self: Self) void {
+        return self.object.msgSend(void, "invalidateRestorableState", .{});
+    }
+
+    /// `+[NSResponder allowedClassesForRestorableStateKeyPath:]`
+    pub fn allowedClassesForRestorableStateKeyPath(key_path: foundation.String) foundation.Array(objc.Object) {
+        return class().msgSend(foundation.Array(objc.Object), "allowedClassesForRestorableStateKeyPath:", .{key_path});
+    }
+
+    /// `+[NSResponder restorableStateKeyPaths]`
+    pub fn restorableStateKeyPaths() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "restorableStateKeyPaths", .{});
     }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
@@ -1165,7 +1360,29 @@ pub const Responder = extern struct {
         pub const acceptsFirstResponder = fn () bool;
         pub const menu = fn () ?Menu;
         pub const @"setMenu:" = fn (?Menu) void;
+        pub const undoManager = fn () ?objc.Object;
+        pub const @"validateProposedFirstResponder:forEvent:" = fn (Responder, ?Event) bool;
+        pub const @"presentError:modalForWindow:delegate:didPresentSelector:contextInfo:" = fn (foundation.ErrorObject, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
+        pub const @"presentError:" = fn (foundation.ErrorObject) bool;
+        pub const @"willPresentError:" = fn (foundation.ErrorObject) foundation.ErrorObject;
+        pub const @"performTextFinderAction:" = fn (?objc.Object) void;
         pub const @"newWindowForTab:" = fn (?objc.Object) void;
+        pub const @"showWritingTools:" = fn (?objc.Object) void;
+        pub const @"performMnemonic:" = fn (foundation.String) bool;
+        pub const @"updateUserActivityState:" = fn (objc.Object) void;
+        pub const userActivity = fn () ?objc.Object;
+        pub const @"setUserActivity:" = fn (?objc.Object) void;
+        pub const makeTouchBar = fn () ?objc.Object;
+        pub const touchBar = fn () ?objc.Object;
+        pub const @"setTouchBar:" = fn (?objc.Object) void;
+        pub const interfaceStyle = fn () objc.UInteger;
+        pub const @"setInterfaceStyle:" = fn (objc.UInteger) void;
+        pub const @"encodeRestorableStateWithCoder:" = fn (objc.Object) void;
+        pub const @"encodeRestorableStateWithCoder:backgroundQueue:" = fn (objc.Object, objc.Object) void;
+        pub const @"restoreStateWithCoder:" = fn (objc.Object) void;
+        pub const invalidateRestorableState = fn () void;
+        pub const @"+allowedClassesForRestorableStateKeyPath:" = fn (foundation.String) foundation.Array(objc.Object);
+        pub const @"+restorableStateKeyPaths" = fn () foundation.Array(foundation.String);
     };
 };
 
@@ -1212,31 +1429,6 @@ pub const Application = extern struct {
 
     pub fn autorelease(self: Self) Self {
         return .{ .object = self.object.autorelease() };
-    }
-
-    /// `-[NSApplication sendAction:to:from:]`
-    pub fn sendActionToFrom(self: Self, action: objc.Sel, target: ?objc.Object, sender: ?objc.Object) bool {
-        return self.object.msgSend(bool, "sendAction:to:from:", .{ action, target, sender });
-    }
-
-    /// `-[NSApplication targetForAction:]`
-    pub fn targetForAction(self: Self, action: objc.Sel) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "targetForAction:", .{action});
-    }
-
-    /// `-[NSApplication targetForAction:to:from:]`
-    pub fn targetForActionToFrom(self: Self, action: objc.Sel, target: ?objc.Object, sender: ?objc.Object) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "targetForAction:to:from:", .{ action, target, sender });
-    }
-
-    /// `-[NSApplication tryToPerform:with:]`
-    pub fn tryToPerformWith(self: Self, action: objc.Sel, object_: ?objc.Object) bool {
-        return self.object.msgSend(bool, "tryToPerform:with:", .{ action, object_ });
-    }
-
-    /// `-[NSApplication validRequestorForSendType:returnType:]`
-    pub fn validRequestorForSendTypeReturnType(self: Self, send_type: ?foundation.String, return_type: ?foundation.String) ?objc.Object {
-        return self.object.msgSend(?objc.Object, "validRequestorForSendType:returnType:", .{ send_type, return_type });
     }
 
     /// `-[NSApplication hide:]`
@@ -1529,19 +1721,69 @@ pub const Application = extern struct {
         return self.object.msgSend(bool, "isProtectedDataAvailable", .{});
     }
 
-    /// `-[NSApplication userInterfaceLayoutDirection]`
-    pub fn userInterfaceLayoutDirection(self: Self) UserInterfaceLayoutDirection {
-        return self.object.msgSend(UserInterfaceLayoutDirection, "userInterfaceLayoutDirection", .{});
+    /// `-[NSApplication appearance]`
+    pub fn appearance(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "appearance", .{});
     }
 
-    /// `-[NSApplication activateContextHelpMode:]`
-    pub fn activateContextHelpMode(self: Self, sender: ?objc.Object) void {
-        return self.object.msgSend(void, "activateContextHelpMode:", .{sender});
+    /// `-[NSApplication setAppearance:]`
+    pub fn setAppearance(self: Self, appearance_: ?objc.Object) void {
+        return self.object.msgSend(void, "setAppearance:", .{appearance_});
     }
 
-    /// `-[NSApplication showHelp:]`
-    pub fn showHelp(self: Self, sender: ?objc.Object) void {
-        return self.object.msgSend(void, "showHelp:", .{sender});
+    /// `-[NSApplication effectiveAppearance]`
+    pub fn effectiveAppearance(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "effectiveAppearance", .{});
+    }
+
+    /// `-[NSApplication sendEvent:]`
+    pub fn sendEvent(self: Self, event: Event) void {
+        return self.object.msgSend(void, "sendEvent:", .{event});
+    }
+
+    /// `-[NSApplication postEvent:atStart:]`
+    pub fn postEventAtStart(self: Self, event: Event, at_start: bool) void {
+        return self.object.msgSend(void, "postEvent:atStart:", .{ event, at_start });
+    }
+
+    /// `-[NSApplication nextEventMatchingMask:untilDate:inMode:dequeue:]`
+    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: ?foundation.String, deq_flag: bool) ?Event {
+        return self.object.msgSend(?Event, "nextEventMatchingMask:untilDate:inMode:dequeue:", .{ mask, expiration, mode, deq_flag });
+    }
+
+    /// `-[NSApplication discardEventsMatchingMask:beforeEvent:]`
+    pub fn discardEventsMatchingMaskBeforeEvent(self: Self, mask: EventMask, last_event: ?Event) void {
+        return self.object.msgSend(void, "discardEventsMatchingMask:beforeEvent:", .{ mask, last_event });
+    }
+
+    /// `-[NSApplication currentEvent]`
+    pub fn currentEvent(self: Self) ?Event {
+        return self.object.msgSend(?Event, "currentEvent", .{});
+    }
+
+    /// `-[NSApplication sendAction:to:from:]`
+    pub fn sendActionToFrom(self: Self, action: objc.Sel, target: ?objc.Object, sender: ?objc.Object) bool {
+        return self.object.msgSend(bool, "sendAction:to:from:", .{ action, target, sender });
+    }
+
+    /// `-[NSApplication targetForAction:]`
+    pub fn targetForAction(self: Self, action: objc.Sel) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "targetForAction:", .{action});
+    }
+
+    /// `-[NSApplication targetForAction:to:from:]`
+    pub fn targetForActionToFrom(self: Self, action: objc.Sel, target: ?objc.Object, sender: ?objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "targetForAction:to:from:", .{ action, target, sender });
+    }
+
+    /// `-[NSApplication tryToPerform:with:]`
+    pub fn tryToPerformWith(self: Self, action: objc.Sel, object_: ?objc.Object) bool {
+        return self.object.msgSend(bool, "tryToPerform:with:", .{ action, object_ });
+    }
+
+    /// `-[NSApplication validRequestorForSendType:returnType:]`
+    pub fn validRequestorForSendTypeReturnType(self: Self, send_type: ?foundation.String, return_type: ?foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "validRequestorForSendType:returnType:", .{ send_type, return_type });
     }
 
     /// `-[NSApplication arrangeInFront:]`
@@ -1584,9 +1826,149 @@ pub const Application = extern struct {
         return self.object.msgSend(void, "setWindowsMenu:", .{windows_menu});
     }
 
-    /// `-[NSApplication restoreWindowWithIdentifier:state:completionHandler:]`
-    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: ?foundation.String, state: objc.Object, completion_handler: anytype) bool {
-        return self.object.msgSend(bool, "restoreWindowWithIdentifier:state:completionHandler:", .{ identifier, state, completion_handler });
+    /// `-[NSApplication isFullKeyboardAccessEnabled]`
+    pub fn isFullKeyboardAccessEnabled(self: Self) bool {
+        return self.object.msgSend(bool, "isFullKeyboardAccessEnabled", .{});
+    }
+
+    /// `-[NSApplication registerServicesMenuSendTypes:returnTypes:]`
+    pub fn registerServicesMenuSendTypesReturnTypes(self: Self, send_types: foundation.Array(objc.Object), return_types: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "registerServicesMenuSendTypes:returnTypes:", .{ send_types, return_types });
+    }
+
+    /// `-[NSApplication servicesMenu]`
+    pub fn servicesMenu(self: Self) ?Menu {
+        return self.object.msgSend(?Menu, "servicesMenu", .{});
+    }
+
+    /// `-[NSApplication setServicesMenu:]`
+    pub fn setServicesMenu(self: Self, services_menu: ?Menu) void {
+        return self.object.msgSend(void, "setServicesMenu:", .{services_menu});
+    }
+
+    /// `-[NSApplication servicesProvider]`
+    pub fn servicesProvider(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "servicesProvider", .{});
+    }
+
+    /// `-[NSApplication setServicesProvider:]`
+    pub fn setServicesProvider(self: Self, services_provider: ?objc.Object) void {
+        return self.object.msgSend(void, "setServicesProvider:", .{services_provider});
+    }
+
+    /// `-[NSApplication orderFrontStandardAboutPanel:]`
+    pub fn orderFrontStandardAboutPanel(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "orderFrontStandardAboutPanel:", .{sender});
+    }
+
+    /// `-[NSApplication orderFrontStandardAboutPanelWithOptions:]`
+    pub fn orderFrontStandardAboutPanelWithOptions(self: Self, options_dictionary: foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "orderFrontStandardAboutPanelWithOptions:", .{options_dictionary});
+    }
+
+    /// `-[NSApplication userInterfaceLayoutDirection]`
+    pub fn userInterfaceLayoutDirection(self: Self) UserInterfaceLayoutDirection {
+        return self.object.msgSend(UserInterfaceLayoutDirection, "userInterfaceLayoutDirection", .{});
+    }
+
+    /// `-[NSApplication disableRelaunchOnLogin]`
+    pub fn disableRelaunchOnLogin(self: Self) void {
+        return self.object.msgSend(void, "disableRelaunchOnLogin", .{});
+    }
+
+    /// `-[NSApplication enableRelaunchOnLogin]`
+    pub fn enableRelaunchOnLogin(self: Self) void {
+        return self.object.msgSend(void, "enableRelaunchOnLogin", .{});
+    }
+
+    /// `-[NSApplication registerForRemoteNotifications]`
+    pub fn registerForRemoteNotifications(self: Self) void {
+        return self.object.msgSend(void, "registerForRemoteNotifications", .{});
+    }
+
+    /// `-[NSApplication unregisterForRemoteNotifications]`
+    pub fn unregisterForRemoteNotifications(self: Self) void {
+        return self.object.msgSend(void, "unregisterForRemoteNotifications", .{});
+    }
+
+    /// `-[NSApplication registerForRemoteNotificationTypes:]`
+    pub fn registerForRemoteNotificationTypes(self: Self, types: RemoteNotificationType) void {
+        return self.object.msgSend(void, "registerForRemoteNotificationTypes:", .{types});
+    }
+
+    /// `-[NSApplication isRegisteredForRemoteNotifications]`
+    pub fn isRegisteredForRemoteNotifications(self: Self) bool {
+        return self.object.msgSend(bool, "isRegisteredForRemoteNotifications", .{});
+    }
+
+    /// `-[NSApplication enabledRemoteNotificationTypes]`
+    pub fn enabledRemoteNotificationTypes(self: Self) RemoteNotificationType {
+        return self.object.msgSend(RemoteNotificationType, "enabledRemoteNotificationTypes", .{});
+    }
+
+    /// `-[NSApplication runModalForWindow:relativeToWindow:]`
+    pub fn runModalForWindowRelativeToWindow(self: Self, window: ?Window, doc_window: ?Window) objc.Integer {
+        return self.object.msgSend(objc.Integer, "runModalForWindow:relativeToWindow:", .{ window, doc_window });
+    }
+
+    /// `-[NSApplication beginModalSessionForWindow:relativeToWindow:]`
+    pub fn beginModalSessionForWindowRelativeToWindow(self: Self, window: ?Window, doc_window: ?Window) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "beginModalSessionForWindow:relativeToWindow:", .{ window, doc_window });
+    }
+
+    /// `-[NSApplication application:printFiles:]`
+    pub fn applicationPrintFiles(self: Self, sender: ?Application, filenames: ?foundation.Array(foundation.String)) void {
+        return self.object.msgSend(void, "application:printFiles:", .{ sender, filenames });
+    }
+
+    /// `-[NSApplication beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:]`
+    pub fn beginSheetModalForWindowModalDelegateDidEndSelectorContextInfo(self: Self, sheet: Window, doc_window: Window, modal_delegate: ?objc.Object, did_end_selector: ?objc.Sel, context_info: ?*anyopaque) void {
+        return self.object.msgSend(void, "beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:", .{ sheet, doc_window, modal_delegate, did_end_selector, context_info });
+    }
+
+    /// `-[NSApplication endSheet:]`
+    pub fn endSheet(self: Self, sheet: Window) void {
+        return self.object.msgSend(void, "endSheet:", .{sheet});
+    }
+
+    /// `-[NSApplication endSheet:returnCode:]`
+    pub fn endSheetReturnCode(self: Self, sheet: Window, return_code: objc.Integer) void {
+        return self.object.msgSend(void, "endSheet:returnCode:", .{ sheet, return_code });
+    }
+
+    /// `-[NSApplication makeWindowsPerform:inOrder:]`
+    pub fn makeWindowsPerformInOrder(self: Self, selector: objc.Sel, in_order: bool) ?Window {
+        return self.object.msgSend(?Window, "makeWindowsPerform:inOrder:", .{ selector, in_order });
+    }
+
+    /// `-[NSApplication context]`
+    pub fn context(self: Self) ?GraphicsContext {
+        return self.object.msgSend(?GraphicsContext, "context", .{});
+    }
+
+    /// `-[NSApplication activateContextHelpMode:]`
+    pub fn activateContextHelpMode(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "activateContextHelpMode:", .{sender});
+    }
+
+    /// `-[NSApplication showHelp:]`
+    pub fn showHelp(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "showHelp:", .{sender});
+    }
+
+    /// `-[NSApplication toggleTouchBarCustomizationPalette:]`
+    pub fn toggleTouchBarCustomizationPalette(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "toggleTouchBarCustomizationPalette:", .{sender});
+    }
+
+    /// `-[NSApplication isAutomaticCustomizeTouchBarMenuItemEnabled]`
+    pub fn isAutomaticCustomizeTouchBarMenuItemEnabled(self: Self) bool {
+        return self.object.msgSend(bool, "isAutomaticCustomizeTouchBarMenuItemEnabled", .{});
+    }
+
+    /// `-[NSApplication setAutomaticCustomizeTouchBarMenuItemEnabled:]`
+    pub fn setAutomaticCustomizeTouchBarMenuItemEnabled(self: Self, automatic_customize_touch_bar_menu_item_enabled: bool) void {
+        return self.object.msgSend(void, "setAutomaticCustomizeTouchBarMenuItemEnabled:", .{automatic_customize_touch_bar_menu_item_enabled});
     }
 
     /// `-[NSApplication orderFrontColorPanel:]`
@@ -1594,29 +1976,49 @@ pub const Application = extern struct {
         return self.object.msgSend(void, "orderFrontColorPanel:", .{sender});
     }
 
-    /// `-[NSApplication sendEvent:]`
-    pub fn sendEvent(self: Self, event: Event) void {
-        return self.object.msgSend(void, "sendEvent:", .{event});
+    /// `-[NSApplication runPageLayout:]`
+    pub fn runPageLayout(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "runPageLayout:", .{sender});
     }
 
-    /// `-[NSApplication postEvent:atStart:]`
-    pub fn postEventAtStart(self: Self, event: Event, at_start: bool) void {
-        return self.object.msgSend(void, "postEvent:atStart:", .{ event, at_start });
+    /// `-[NSApplication orderedDocuments]`
+    pub fn orderedDocuments(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "orderedDocuments", .{});
     }
 
-    /// `-[NSApplication nextEventMatchingMask:untilDate:inMode:dequeue:]`
-    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: ?foundation.String, deq_flag: bool) ?Event {
-        return self.object.msgSend(?Event, "nextEventMatchingMask:untilDate:inMode:dequeue:", .{ mask, expiration, mode, deq_flag });
+    /// `-[NSApplication orderedWindows]`
+    pub fn orderedWindows(self: Self) foundation.Array(Window) {
+        return self.object.msgSend(foundation.Array(Window), "orderedWindows", .{});
     }
 
-    /// `-[NSApplication discardEventsMatchingMask:beforeEvent:]`
-    pub fn discardEventsMatchingMaskBeforeEvent(self: Self, mask: EventMask, last_event: ?Event) void {
-        return self.object.msgSend(void, "discardEventsMatchingMask:beforeEvent:", .{ mask, last_event });
+    /// `-[NSApplication registerUserInterfaceItemSearchHandler:]`
+    pub fn registerUserInterfaceItemSearchHandler(self: Self, handler: objc.Object) void {
+        return self.object.msgSend(void, "registerUserInterfaceItemSearchHandler:", .{handler});
     }
 
-    /// `-[NSApplication currentEvent]`
-    pub fn currentEvent(self: Self) ?Event {
-        return self.object.msgSend(?Event, "currentEvent", .{});
+    /// `-[NSApplication unregisterUserInterfaceItemSearchHandler:]`
+    pub fn unregisterUserInterfaceItemSearchHandler(self: Self, handler: objc.Object) void {
+        return self.object.msgSend(void, "unregisterUserInterfaceItemSearchHandler:", .{handler});
+    }
+
+    /// `-[NSApplication searchString:inUserInterfaceItemString:searchRange:foundRange:]`
+    pub fn searchStringInUserInterfaceItemStringSearchRangeFoundRange(self: Self, search_string: foundation.String, string_to_search: foundation.String, search_range: objc.Range, found_range: ?*objc.Range) bool {
+        return self.object.msgSend(bool, "searchString:inUserInterfaceItemString:searchRange:foundRange:", .{ search_string, string_to_search, search_range, found_range });
+    }
+
+    /// `-[NSApplication restoreWindowWithIdentifier:state:completionHandler:]`
+    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: ?foundation.String, state: objc.Object, completion_handler: anytype) bool {
+        return self.object.msgSend(bool, "restoreWindowWithIdentifier:state:completionHandler:", .{ identifier, state, completion_handler });
+    }
+
+    /// `-[NSApplication extendStateRestoration]`
+    pub fn extendStateRestoration(self: Self) void {
+        return self.object.msgSend(void, "extendStateRestoration", .{});
+    }
+
+    /// `-[NSApplication completeStateRestoration]`
+    pub fn completeStateRestoration(self: Self) void {
+        return self.object.msgSend(void, "completeStateRestoration", .{});
     }
 
     /// `-[NSResponder init]`
@@ -1884,18 +2286,123 @@ pub const Application = extern struct {
         return self.object.msgSend(void, "setMenu:", .{menu_});
     }
 
+    /// `-[NSResponder undoManager]`
+    pub fn undoManager(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "undoManager", .{});
+    }
+
+    /// `-[NSResponder validateProposedFirstResponder:forEvent:]`
+    pub fn validateProposedFirstResponderForEvent(self: Self, responder: Responder, event: ?Event) bool {
+        return self.object.msgSend(bool, "validateProposedFirstResponder:forEvent:", .{ responder, event });
+    }
+
+    /// `-[NSResponder presentError:modalForWindow:delegate:didPresentSelector:contextInfo:]`
+    pub fn presentErrorModalForWindowDelegateDidPresentSelectorContextInfo(self: Self, @"error": foundation.ErrorObject, window: Window, delegate_: ?objc.Object, did_present_selector: ?objc.Sel, context_info: ?*anyopaque) void {
+        return self.object.msgSend(void, "presentError:modalForWindow:delegate:didPresentSelector:contextInfo:", .{ @"error", window, delegate_, did_present_selector, context_info });
+    }
+
+    /// `-[NSResponder presentError:]`
+    pub fn presentError(self: Self, @"error": foundation.ErrorObject) bool {
+        return self.object.msgSend(bool, "presentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder willPresentError:]`
+    pub fn willPresentError(self: Self, @"error": foundation.ErrorObject) foundation.ErrorObject {
+        return self.object.msgSend(foundation.ErrorObject, "willPresentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder performTextFinderAction:]`
+    pub fn performTextFinderAction(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "performTextFinderAction:", .{sender});
+    }
+
     /// `-[NSResponder newWindowForTab:]`
     pub fn newWindowForTab(self: Self, sender: ?objc.Object) void {
         return self.object.msgSend(void, "newWindowForTab:", .{sender});
     }
 
+    /// `-[NSResponder showWritingTools:]`
+    pub fn showWritingTools(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "showWritingTools:", .{sender});
+    }
+
+    /// `-[NSResponder performMnemonic:]`
+    pub fn performMnemonic(self: Self, string: foundation.String) bool {
+        return self.object.msgSend(bool, "performMnemonic:", .{string});
+    }
+
+    /// `-[NSResponder updateUserActivityState:]`
+    pub fn updateUserActivityState(self: Self, user_activity: objc.Object) void {
+        return self.object.msgSend(void, "updateUserActivityState:", .{user_activity});
+    }
+
+    /// `-[NSResponder userActivity]`
+    pub fn userActivity(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "userActivity", .{});
+    }
+
+    /// `-[NSResponder setUserActivity:]`
+    pub fn setUserActivity(self: Self, user_activity: ?objc.Object) void {
+        return self.object.msgSend(void, "setUserActivity:", .{user_activity});
+    }
+
+    /// `-[NSResponder makeTouchBar]`
+    pub fn makeTouchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "makeTouchBar", .{});
+    }
+
+    /// `-[NSResponder touchBar]`
+    pub fn touchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "touchBar", .{});
+    }
+
+    /// `-[NSResponder setTouchBar:]`
+    pub fn setTouchBar(self: Self, touch_bar: ?objc.Object) void {
+        return self.object.msgSend(void, "setTouchBar:", .{touch_bar});
+    }
+
+    /// `-[NSResponder interfaceStyle]`
+    pub fn interfaceStyle(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "interfaceStyle", .{});
+    }
+
+    /// `-[NSResponder setInterfaceStyle:]`
+    pub fn setInterfaceStyle(self: Self, interface_style: objc.UInteger) void {
+        return self.object.msgSend(void, "setInterfaceStyle:", .{interface_style});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:]`
+    pub fn encodeRestorableStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:backgroundQueue:]`
+    pub fn encodeRestorableStateWithCoderBackgroundQueue(self: Self, coder: objc.Object, queue: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:backgroundQueue:", .{ coder, queue });
+    }
+
+    /// `-[NSResponder restoreStateWithCoder:]`
+    pub fn restoreStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "restoreStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder invalidateRestorableState]`
+    pub fn invalidateRestorableState(self: Self) void {
+        return self.object.msgSend(void, "invalidateRestorableState", .{});
+    }
+
+    /// `+[NSResponder allowedClassesForRestorableStateKeyPath:]`
+    pub fn allowedClassesForRestorableStateKeyPath(key_path: foundation.String) foundation.Array(objc.Object) {
+        return class().msgSend(foundation.Array(objc.Object), "allowedClassesForRestorableStateKeyPath:", .{key_path});
+    }
+
+    /// `+[NSResponder restorableStateKeyPaths]`
+    pub fn restorableStateKeyPaths() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "restorableStateKeyPaths", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"sendAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) bool;
-        pub const @"targetForAction:" = fn (objc.Sel) ?objc.Object;
-        pub const @"targetForAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) ?objc.Object;
-        pub const @"tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
-        pub const @"validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
         pub const @"hide:" = fn (?objc.Object) void;
         pub const @"unhide:" = fn (?objc.Object) void;
         pub const unhideWithoutActivation = fn () void;
@@ -1953,9 +2460,19 @@ pub const Application = extern struct {
         pub const currentSystemPresentationOptions = fn () ApplicationPresentationOptions;
         pub const occlusionState = fn () ApplicationOcclusionState;
         pub const isProtectedDataAvailable = fn () bool;
-        pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
-        pub const @"activateContextHelpMode:" = fn (?objc.Object) void;
-        pub const @"showHelp:" = fn (?objc.Object) void;
+        pub const appearance = fn () ?objc.Object;
+        pub const @"setAppearance:" = fn (?objc.Object) void;
+        pub const effectiveAppearance = fn () objc.Object;
+        pub const @"sendEvent:" = fn (Event) void;
+        pub const @"postEvent:atStart:" = fn (Event, bool) void;
+        pub const @"nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, ?foundation.String, bool) ?Event;
+        pub const @"discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
+        pub const currentEvent = fn () ?Event;
+        pub const @"sendAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) bool;
+        pub const @"targetForAction:" = fn (objc.Sel) ?objc.Object;
+        pub const @"targetForAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) ?objc.Object;
+        pub const @"tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
+        pub const @"validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
         pub const @"arrangeInFront:" = fn (?objc.Object) void;
         pub const @"removeWindowsItem:" = fn (Window) void;
         pub const @"addWindowsItem:title:filename:" = fn (Window, foundation.String, bool) void;
@@ -1964,12 +2481,44 @@ pub const Application = extern struct {
         pub const @"miniaturizeAll:" = fn (?objc.Object) void;
         pub const windowsMenu = fn () ?Menu;
         pub const @"setWindowsMenu:" = fn (?Menu) void;
+        pub const isFullKeyboardAccessEnabled = fn () bool;
+        pub const @"registerServicesMenuSendTypes:returnTypes:" = fn (foundation.Array(objc.Object), foundation.Array(objc.Object)) void;
+        pub const servicesMenu = fn () ?Menu;
+        pub const @"setServicesMenu:" = fn (?Menu) void;
+        pub const servicesProvider = fn () ?objc.Object;
+        pub const @"setServicesProvider:" = fn (?objc.Object) void;
+        pub const @"orderFrontStandardAboutPanel:" = fn (?objc.Object) void;
+        pub const @"orderFrontStandardAboutPanelWithOptions:" = fn (foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
+        pub const disableRelaunchOnLogin = fn () void;
+        pub const enableRelaunchOnLogin = fn () void;
+        pub const registerForRemoteNotifications = fn () void;
+        pub const unregisterForRemoteNotifications = fn () void;
+        pub const @"registerForRemoteNotificationTypes:" = fn (RemoteNotificationType) void;
+        pub const isRegisteredForRemoteNotifications = fn () bool;
+        pub const enabledRemoteNotificationTypes = fn () RemoteNotificationType;
+        pub const @"runModalForWindow:relativeToWindow:" = fn (?Window, ?Window) objc.Integer;
+        pub const @"beginModalSessionForWindow:relativeToWindow:" = fn (?Window, ?Window) ?*anyopaque;
+        pub const @"application:printFiles:" = fn (?Application, ?foundation.Array(foundation.String)) void;
+        pub const @"beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:" = fn (Window, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
+        pub const @"endSheet:" = fn (Window) void;
+        pub const @"endSheet:returnCode:" = fn (Window, objc.Integer) void;
+        pub const @"makeWindowsPerform:inOrder:" = fn (objc.Sel, bool) ?Window;
+        pub const context = fn () ?GraphicsContext;
+        pub const @"activateContextHelpMode:" = fn (?objc.Object) void;
+        pub const @"showHelp:" = fn (?objc.Object) void;
+        pub const @"toggleTouchBarCustomizationPalette:" = fn (?objc.Object) void;
+        pub const isAutomaticCustomizeTouchBarMenuItemEnabled = fn () bool;
+        pub const @"setAutomaticCustomizeTouchBarMenuItemEnabled:" = fn (bool) void;
         pub const @"orderFrontColorPanel:" = fn (?objc.Object) void;
-        pub const @"sendEvent:" = fn (Event) void;
-        pub const @"postEvent:atStart:" = fn (Event, bool) void;
-        pub const @"nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, ?foundation.String, bool) ?Event;
-        pub const @"discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
-        pub const currentEvent = fn () ?Event;
+        pub const @"runPageLayout:" = fn (?objc.Object) void;
+        pub const orderedDocuments = fn () foundation.Array(objc.Object);
+        pub const orderedWindows = fn () foundation.Array(Window);
+        pub const @"registerUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
+        pub const @"unregisterUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
+        pub const @"searchString:inUserInterfaceItemString:searchRange:foundRange:" = fn (foundation.String, foundation.String, objc.Range, ?*objc.Range) bool;
+        pub const extendStateRestoration = fn () void;
+        pub const completeStateRestoration = fn () void;
     };
 };
 
@@ -3627,6 +4176,306 @@ pub const Window = extern struct {
         return self.object.msgSend(bool, "areCursorRectsEnabled", .{});
     }
 
+    /// `-[NSWindow beginDraggingSessionWithItems:event:source:]`
+    pub fn beginDraggingSessionWithItemsEventSource(self: Self, items: foundation.Array(objc.Object), event: Event, source: objc.Object) objc.Object {
+        return self.object.msgSend(objc.Object, "beginDraggingSessionWithItems:event:source:", .{ items, event, source });
+    }
+
+    /// `-[NSWindow dragImage:at:offset:event:pasteboard:source:slideBack:]`
+    pub fn dragImageAtOffsetEventPasteboardSourceSlideBack(self: Self, image: Image, base_location: cg.Point, initial_offset: cg.Size, event: Event, pboard: objc.Object, source_obj: objc.Object, slide_flag: bool) void {
+        return self.object.msgSend(void, "dragImage:at:offset:event:pasteboard:source:slideBack:", .{ image, base_location, initial_offset, event, pboard, source_obj, slide_flag });
+    }
+
+    /// `-[NSWindow registerForDraggedTypes:]`
+    pub fn registerForDraggedTypes(self: Self, new_types: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "registerForDraggedTypes:", .{new_types});
+    }
+
+    /// `-[NSWindow unregisterDraggedTypes]`
+    pub fn unregisterDraggedTypes(self: Self) void {
+        return self.object.msgSend(void, "unregisterDraggedTypes", .{});
+    }
+
+    /// `-[NSWindow displayLinkWithTarget:selector:]`
+    pub fn displayLinkWithTargetSelector(self: Self, target: objc.Object, selector: objc.Sel) objc.Object {
+        return self.object.msgSend(objc.Object, "displayLinkWithTarget:selector:", .{ target, selector });
+    }
+
+    /// `-[NSWindow cacheImageInRect:]`
+    pub fn cacheImageInRect(self: Self, rect: cg.Rect) void {
+        return self.object.msgSend(void, "cacheImageInRect:", .{rect});
+    }
+
+    /// `-[NSWindow restoreCachedImage]`
+    pub fn restoreCachedImage(self: Self) void {
+        return self.object.msgSend(void, "restoreCachedImage", .{});
+    }
+
+    /// `-[NSWindow discardCachedImage]`
+    pub fn discardCachedImage(self: Self) void {
+        return self.object.msgSend(void, "discardCachedImage", .{});
+    }
+
+    /// `+[NSWindow menuChanged:]`
+    pub fn menuChanged(menu_: Menu) void {
+        return class().msgSend(void, "menuChanged:", .{menu_});
+    }
+
+    /// `-[NSWindow gState]`
+    pub fn gState(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "gState", .{});
+    }
+
+    /// `-[NSWindow convertBaseToScreen:]`
+    pub fn convertBaseToScreen(self: Self, point: cg.Point) cg.Point {
+        return self.object.msgSend(cg.Point, "convertBaseToScreen:", .{point});
+    }
+
+    /// `-[NSWindow convertScreenToBase:]`
+    pub fn convertScreenToBase(self: Self, point: cg.Point) cg.Point {
+        return self.object.msgSend(cg.Point, "convertScreenToBase:", .{point});
+    }
+
+    /// `-[NSWindow userSpaceScaleFactor]`
+    pub fn userSpaceScaleFactor(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "userSpaceScaleFactor", .{});
+    }
+
+    /// `-[NSWindow useOptimizedDrawing:]`
+    pub fn useOptimizedDrawing(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "useOptimizedDrawing:", .{flag});
+    }
+
+    /// `-[NSWindow canStoreColor]`
+    pub fn canStoreColor(self: Self) bool {
+        return self.object.msgSend(bool, "canStoreColor", .{});
+    }
+
+    /// `-[NSWindow disableFlushWindow]`
+    pub fn disableFlushWindow(self: Self) void {
+        return self.object.msgSend(void, "disableFlushWindow", .{});
+    }
+
+    /// `-[NSWindow enableFlushWindow]`
+    pub fn enableFlushWindow(self: Self) void {
+        return self.object.msgSend(void, "enableFlushWindow", .{});
+    }
+
+    /// `-[NSWindow flushWindow]`
+    pub fn flushWindow(self: Self) void {
+        return self.object.msgSend(void, "flushWindow", .{});
+    }
+
+    /// `-[NSWindow flushWindowIfNeeded]`
+    pub fn flushWindowIfNeeded(self: Self) void {
+        return self.object.msgSend(void, "flushWindowIfNeeded", .{});
+    }
+
+    /// `-[NSWindow initWithWindowRef:]`
+    pub fn initWithWindowRef(self: Self, window_ref: ?*anyopaque) ?Window {
+        return self.object.msgSend(?Window, "initWithWindowRef:", .{window_ref});
+    }
+
+    /// `-[NSWindow disableScreenUpdatesUntilFlush]`
+    pub fn disableScreenUpdatesUntilFlush(self: Self) void {
+        return self.object.msgSend(void, "disableScreenUpdatesUntilFlush", .{});
+    }
+
+    /// `-[NSWindow isFlushWindowDisabled]`
+    pub fn isFlushWindowDisabled(self: Self) bool {
+        return self.object.msgSend(bool, "isFlushWindowDisabled", .{});
+    }
+
+    /// `-[NSWindow isAutodisplay]`
+    pub fn isAutodisplay(self: Self) bool {
+        return self.object.msgSend(bool, "isAutodisplay", .{});
+    }
+
+    /// `-[NSWindow setAutodisplay:]`
+    pub fn setAutodisplay(self: Self, autodisplay: bool) void {
+        return self.object.msgSend(void, "setAutodisplay:", .{autodisplay});
+    }
+
+    /// `-[NSWindow graphicsContext]`
+    pub fn graphicsContext(self: Self) ?GraphicsContext {
+        return self.object.msgSend(?GraphicsContext, "graphicsContext", .{});
+    }
+
+    /// `-[NSWindow isOneShot]`
+    pub fn isOneShot(self: Self) bool {
+        return self.object.msgSend(bool, "isOneShot", .{});
+    }
+
+    /// `-[NSWindow setOneShot:]`
+    pub fn setOneShot(self: Self, one_shot: bool) void {
+        return self.object.msgSend(void, "setOneShot:", .{one_shot});
+    }
+
+    /// `-[NSWindow preferredBackingLocation]`
+    pub fn preferredBackingLocation(self: Self) WindowBackingLocation {
+        return self.object.msgSend(WindowBackingLocation, "preferredBackingLocation", .{});
+    }
+
+    /// `-[NSWindow setPreferredBackingLocation:]`
+    pub fn setPreferredBackingLocation(self: Self, preferred_backing_location: WindowBackingLocation) void {
+        return self.object.msgSend(void, "setPreferredBackingLocation:", .{preferred_backing_location});
+    }
+
+    /// `-[NSWindow backingLocation]`
+    pub fn backingLocation(self: Self) WindowBackingLocation {
+        return self.object.msgSend(WindowBackingLocation, "backingLocation", .{});
+    }
+
+    /// `-[NSWindow showsResizeIndicator]`
+    pub fn showsResizeIndicator(self: Self) bool {
+        return self.object.msgSend(bool, "showsResizeIndicator", .{});
+    }
+
+    /// `-[NSWindow setShowsResizeIndicator:]`
+    pub fn setShowsResizeIndicator(self: Self, shows_resize_indicator: bool) void {
+        return self.object.msgSend(void, "setShowsResizeIndicator:", .{shows_resize_indicator});
+    }
+
+    /// `-[NSWindow windowRef]`
+    pub fn windowRef(self: Self) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "windowRef", .{});
+    }
+
+    /// `-[NSWindow updateConstraintsIfNeeded]`
+    pub fn updateConstraintsIfNeeded(self: Self) void {
+        return self.object.msgSend(void, "updateConstraintsIfNeeded", .{});
+    }
+
+    /// `-[NSWindow layoutIfNeeded]`
+    pub fn layoutIfNeeded(self: Self) void {
+        return self.object.msgSend(void, "layoutIfNeeded", .{});
+    }
+
+    /// `-[NSWindow anchorAttributeForOrientation:]`
+    pub fn anchorAttributeForOrientation(self: Self, orientation: LayoutConstraintOrientation) LayoutAttribute {
+        return self.object.msgSend(LayoutAttribute, "anchorAttributeForOrientation:", .{orientation});
+    }
+
+    /// `-[NSWindow setAnchorAttribute:forOrientation:]`
+    pub fn setAnchorAttributeForOrientation(self: Self, attr: LayoutAttribute, orientation: LayoutConstraintOrientation) void {
+        return self.object.msgSend(void, "setAnchorAttribute:forOrientation:", .{ attr, orientation });
+    }
+
+    /// `-[NSWindow visualizeConstraints:]`
+    pub fn visualizeConstraints(self: Self, constraints: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "visualizeConstraints:", .{constraints});
+    }
+
+    /// `-[NSWindow drawers]`
+    pub fn drawers(self: Self) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "drawers", .{});
+    }
+
+    /// `-[NSWindow setIsMiniaturized:]`
+    pub fn setIsMiniaturized(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "setIsMiniaturized:", .{flag});
+    }
+
+    /// `-[NSWindow setIsVisible:]`
+    pub fn setIsVisible(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "setIsVisible:", .{flag});
+    }
+
+    /// `-[NSWindow setIsZoomed:]`
+    pub fn setIsZoomed(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "setIsZoomed:", .{flag});
+    }
+
+    /// `-[NSWindow handleCloseScriptCommand:]`
+    pub fn handleCloseScriptCommand(self: Self, command: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "handleCloseScriptCommand:", .{command});
+    }
+
+    /// `-[NSWindow handlePrintScriptCommand:]`
+    pub fn handlePrintScriptCommand(self: Self, command: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "handlePrintScriptCommand:", .{command});
+    }
+
+    /// `-[NSWindow handleSaveScriptCommand:]`
+    pub fn handleSaveScriptCommand(self: Self, command: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "handleSaveScriptCommand:", .{command});
+    }
+
+    /// `-[NSWindow hasCloseBox]`
+    pub fn hasCloseBox(self: Self) bool {
+        return self.object.msgSend(bool, "hasCloseBox", .{});
+    }
+
+    /// `-[NSWindow hasTitleBar]`
+    pub fn hasTitleBar(self: Self) bool {
+        return self.object.msgSend(bool, "hasTitleBar", .{});
+    }
+
+    /// `-[NSWindow isFloatingPanel]`
+    pub fn isFloatingPanel(self: Self) bool {
+        return self.object.msgSend(bool, "isFloatingPanel", .{});
+    }
+
+    /// `-[NSWindow isMiniaturizable]`
+    pub fn isMiniaturizable(self: Self) bool {
+        return self.object.msgSend(bool, "isMiniaturizable", .{});
+    }
+
+    /// `-[NSWindow isModalPanel]`
+    pub fn isModalPanel(self: Self) bool {
+        return self.object.msgSend(bool, "isModalPanel", .{});
+    }
+
+    /// `-[NSWindow isResizable]`
+    pub fn isResizable(self: Self) bool {
+        return self.object.msgSend(bool, "isResizable", .{});
+    }
+
+    /// `-[NSWindow isZoomable]`
+    pub fn isZoomable(self: Self) bool {
+        return self.object.msgSend(bool, "isZoomable", .{});
+    }
+
+    /// `-[NSWindow orderedIndex]`
+    pub fn orderedIndex(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "orderedIndex", .{});
+    }
+
+    /// `-[NSWindow setOrderedIndex:]`
+    pub fn setOrderedIndex(self: Self, ordered_index: objc.Integer) void {
+        return self.object.msgSend(void, "setOrderedIndex:", .{ordered_index});
+    }
+
+    /// `-[NSWindow disableSnapshotRestoration]`
+    pub fn disableSnapshotRestoration(self: Self) void {
+        return self.object.msgSend(void, "disableSnapshotRestoration", .{});
+    }
+
+    /// `-[NSWindow enableSnapshotRestoration]`
+    pub fn enableSnapshotRestoration(self: Self) void {
+        return self.object.msgSend(void, "enableSnapshotRestoration", .{});
+    }
+
+    /// `-[NSWindow isRestorable]`
+    pub fn isRestorable(self: Self) bool {
+        return self.object.msgSend(bool, "isRestorable", .{});
+    }
+
+    /// `-[NSWindow setRestorable:]`
+    pub fn setRestorable(self: Self, restorable: bool) void {
+        return self.object.msgSend(void, "setRestorable:", .{restorable});
+    }
+
+    /// `-[NSWindow restorationClass]`
+    pub fn restorationClass(self: Self) ?objc.Class {
+        return self.object.msgSend(?objc.Class, "restorationClass", .{});
+    }
+
+    /// `-[NSWindow setRestorationClass:]`
+    pub fn setRestorationClass(self: Self, restoration_class: ?objc.Class) void {
+        return self.object.msgSend(void, "setRestorationClass:", .{restoration_class});
+    }
+
     /// `-[NSResponder init]`
     pub fn init(self: Self) Window {
         return self.object.msgSend(Window, "init", .{});
@@ -3892,9 +4741,119 @@ pub const Window = extern struct {
         return self.object.msgSend(void, "setMenu:", .{menu_});
     }
 
+    /// `-[NSResponder undoManager]`
+    pub fn undoManager(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "undoManager", .{});
+    }
+
+    /// `-[NSResponder validateProposedFirstResponder:forEvent:]`
+    pub fn validateProposedFirstResponderForEvent(self: Self, responder: Responder, event: ?Event) bool {
+        return self.object.msgSend(bool, "validateProposedFirstResponder:forEvent:", .{ responder, event });
+    }
+
+    /// `-[NSResponder presentError:modalForWindow:delegate:didPresentSelector:contextInfo:]`
+    pub fn presentErrorModalForWindowDelegateDidPresentSelectorContextInfo(self: Self, @"error": foundation.ErrorObject, window: Window, delegate_: ?objc.Object, did_present_selector: ?objc.Sel, context_info: ?*anyopaque) void {
+        return self.object.msgSend(void, "presentError:modalForWindow:delegate:didPresentSelector:contextInfo:", .{ @"error", window, delegate_, did_present_selector, context_info });
+    }
+
+    /// `-[NSResponder presentError:]`
+    pub fn presentError(self: Self, @"error": foundation.ErrorObject) bool {
+        return self.object.msgSend(bool, "presentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder willPresentError:]`
+    pub fn willPresentError(self: Self, @"error": foundation.ErrorObject) foundation.ErrorObject {
+        return self.object.msgSend(foundation.ErrorObject, "willPresentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder performTextFinderAction:]`
+    pub fn performTextFinderAction(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "performTextFinderAction:", .{sender});
+    }
+
     /// `-[NSResponder newWindowForTab:]`
     pub fn newWindowForTab(self: Self, sender: ?objc.Object) void {
         return self.object.msgSend(void, "newWindowForTab:", .{sender});
+    }
+
+    /// `-[NSResponder showWritingTools:]`
+    pub fn showWritingTools(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "showWritingTools:", .{sender});
+    }
+
+    /// `-[NSResponder performMnemonic:]`
+    pub fn performMnemonic(self: Self, string: foundation.String) bool {
+        return self.object.msgSend(bool, "performMnemonic:", .{string});
+    }
+
+    /// `-[NSResponder updateUserActivityState:]`
+    pub fn updateUserActivityState(self: Self, user_activity: objc.Object) void {
+        return self.object.msgSend(void, "updateUserActivityState:", .{user_activity});
+    }
+
+    /// `-[NSResponder userActivity]`
+    pub fn userActivity(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "userActivity", .{});
+    }
+
+    /// `-[NSResponder setUserActivity:]`
+    pub fn setUserActivity(self: Self, user_activity: ?objc.Object) void {
+        return self.object.msgSend(void, "setUserActivity:", .{user_activity});
+    }
+
+    /// `-[NSResponder makeTouchBar]`
+    pub fn makeTouchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "makeTouchBar", .{});
+    }
+
+    /// `-[NSResponder touchBar]`
+    pub fn touchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "touchBar", .{});
+    }
+
+    /// `-[NSResponder setTouchBar:]`
+    pub fn setTouchBar(self: Self, touch_bar: ?objc.Object) void {
+        return self.object.msgSend(void, "setTouchBar:", .{touch_bar});
+    }
+
+    /// `-[NSResponder interfaceStyle]`
+    pub fn interfaceStyle(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "interfaceStyle", .{});
+    }
+
+    /// `-[NSResponder setInterfaceStyle:]`
+    pub fn setInterfaceStyle(self: Self, interface_style: objc.UInteger) void {
+        return self.object.msgSend(void, "setInterfaceStyle:", .{interface_style});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:]`
+    pub fn encodeRestorableStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:backgroundQueue:]`
+    pub fn encodeRestorableStateWithCoderBackgroundQueue(self: Self, coder: objc.Object, queue: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:backgroundQueue:", .{ coder, queue });
+    }
+
+    /// `-[NSResponder restoreStateWithCoder:]`
+    pub fn restoreStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "restoreStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder invalidateRestorableState]`
+    pub fn invalidateRestorableState(self: Self) void {
+        return self.object.msgSend(void, "invalidateRestorableState", .{});
+    }
+
+    /// `+[NSResponder allowedClassesForRestorableStateKeyPath:]`
+    pub fn allowedClassesForRestorableStateKeyPath(key_path: foundation.String) foundation.Array(objc.Object) {
+        return class().msgSend(foundation.Array(objc.Object), "allowedClassesForRestorableStateKeyPath:", .{key_path});
+    }
+
+    /// `+[NSResponder restorableStateKeyPaths]`
+    pub fn restorableStateKeyPaths() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "restorableStateKeyPaths", .{});
     }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
@@ -4176,6 +5135,66 @@ pub const Window = extern struct {
         pub const @"invalidateCursorRectsForView:" = fn (View) void;
         pub const resetCursorRects = fn () void;
         pub const areCursorRectsEnabled = fn () bool;
+        pub const @"beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
+        pub const @"dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
+        pub const @"registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
+        pub const unregisterDraggedTypes = fn () void;
+        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const @"cacheImageInRect:" = fn (cg.Rect) void;
+        pub const restoreCachedImage = fn () void;
+        pub const discardCachedImage = fn () void;
+        pub const @"+menuChanged:" = fn (Menu) void;
+        pub const gState = fn () objc.Integer;
+        pub const @"convertBaseToScreen:" = fn (cg.Point) cg.Point;
+        pub const @"convertScreenToBase:" = fn (cg.Point) cg.Point;
+        pub const userSpaceScaleFactor = fn () cg.Float;
+        pub const @"useOptimizedDrawing:" = fn (bool) void;
+        pub const canStoreColor = fn () bool;
+        pub const disableFlushWindow = fn () void;
+        pub const enableFlushWindow = fn () void;
+        pub const flushWindow = fn () void;
+        pub const flushWindowIfNeeded = fn () void;
+        pub const @"initWithWindowRef:" = fn (?*anyopaque) ?Window;
+        pub const disableScreenUpdatesUntilFlush = fn () void;
+        pub const isFlushWindowDisabled = fn () bool;
+        pub const isAutodisplay = fn () bool;
+        pub const @"setAutodisplay:" = fn (bool) void;
+        pub const graphicsContext = fn () ?GraphicsContext;
+        pub const isOneShot = fn () bool;
+        pub const @"setOneShot:" = fn (bool) void;
+        pub const preferredBackingLocation = fn () WindowBackingLocation;
+        pub const @"setPreferredBackingLocation:" = fn (WindowBackingLocation) void;
+        pub const backingLocation = fn () WindowBackingLocation;
+        pub const showsResizeIndicator = fn () bool;
+        pub const @"setShowsResizeIndicator:" = fn (bool) void;
+        pub const windowRef = fn () ?*anyopaque;
+        pub const updateConstraintsIfNeeded = fn () void;
+        pub const layoutIfNeeded = fn () void;
+        pub const @"anchorAttributeForOrientation:" = fn (LayoutConstraintOrientation) LayoutAttribute;
+        pub const @"setAnchorAttribute:forOrientation:" = fn (LayoutAttribute, LayoutConstraintOrientation) void;
+        pub const @"visualizeConstraints:" = fn (?foundation.Array(objc.Object)) void;
+        pub const drawers = fn () ?foundation.Array(objc.Object);
+        pub const @"setIsMiniaturized:" = fn (bool) void;
+        pub const @"setIsVisible:" = fn (bool) void;
+        pub const @"setIsZoomed:" = fn (bool) void;
+        pub const @"handleCloseScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const @"handlePrintScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const @"handleSaveScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const hasCloseBox = fn () bool;
+        pub const hasTitleBar = fn () bool;
+        pub const isFloatingPanel = fn () bool;
+        pub const isMiniaturizable = fn () bool;
+        pub const isModalPanel = fn () bool;
+        pub const isResizable = fn () bool;
+        pub const isZoomable = fn () bool;
+        pub const orderedIndex = fn () objc.Integer;
+        pub const @"setOrderedIndex:" = fn (objc.Integer) void;
+        pub const disableSnapshotRestoration = fn () void;
+        pub const enableSnapshotRestoration = fn () void;
+        pub const isRestorable = fn () bool;
+        pub const @"setRestorable:" = fn (bool) void;
+        pub const restorationClass = fn () ?objc.Class;
+        pub const @"setRestorationClass:" = fn (?objc.Class) void;
     };
 };
 
@@ -4272,6 +5291,11 @@ pub const View = extern struct {
     /// `-[NSView addSubview:positioned:relativeTo:]`
     pub fn addSubviewPositionedRelativeTo(self: Self, view: View, place: WindowOrderingMode, other_view: ?View) void {
         return self.object.msgSend(void, "addSubview:positioned:relativeTo:", .{ view, place, other_view });
+    }
+
+    /// `-[NSView sortSubviewsUsingFunction:context:]`
+    pub fn sortSubviewsUsingFunctionContext(self: Self, compare: *const fn (View, View, ?*anyopaque) callconv(.c) ComparisonResult, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "sortSubviewsUsingFunction:context:", .{ compare, context });
     }
 
     /// `-[NSView viewWillMoveToWindow:]`
@@ -5129,6 +6153,301 @@ pub const View = extern struct {
         return self.object.msgSend(bool, "allowsVibrancy", .{});
     }
 
+    /// `-[NSView setKeyboardFocusRingNeedsDisplayInRect:]`
+    pub fn setKeyboardFocusRingNeedsDisplayInRect(self: Self, rect: cg.Rect) void {
+        return self.object.msgSend(void, "setKeyboardFocusRingNeedsDisplayInRect:", .{rect});
+    }
+
+    /// `-[NSView drawFocusRingMask]`
+    pub fn drawFocusRingMask(self: Self) void {
+        return self.object.msgSend(void, "drawFocusRingMask", .{});
+    }
+
+    /// `-[NSView noteFocusRingMaskChanged]`
+    pub fn noteFocusRingMaskChanged(self: Self) void {
+        return self.object.msgSend(void, "noteFocusRingMaskChanged", .{});
+    }
+
+    /// `-[NSView nextKeyView]`
+    pub fn nextKeyView(self: Self) ?View {
+        return self.object.msgSend(?View, "nextKeyView", .{});
+    }
+
+    /// `-[NSView setNextKeyView:]`
+    pub fn setNextKeyView(self: Self, next_key_view: ?View) void {
+        return self.object.msgSend(void, "setNextKeyView:", .{next_key_view});
+    }
+
+    /// `-[NSView previousKeyView]`
+    pub fn previousKeyView(self: Self) ?View {
+        return self.object.msgSend(?View, "previousKeyView", .{});
+    }
+
+    /// `-[NSView nextValidKeyView]`
+    pub fn nextValidKeyView(self: Self) ?View {
+        return self.object.msgSend(?View, "nextValidKeyView", .{});
+    }
+
+    /// `-[NSView previousValidKeyView]`
+    pub fn previousValidKeyView(self: Self) ?View {
+        return self.object.msgSend(?View, "previousValidKeyView", .{});
+    }
+
+    /// `-[NSView canBecomeKeyView]`
+    pub fn canBecomeKeyView(self: Self) bool {
+        return self.object.msgSend(bool, "canBecomeKeyView", .{});
+    }
+
+    /// `-[NSView focusRingType]`
+    pub fn focusRingType(self: Self) FocusRingType {
+        return self.object.msgSend(FocusRingType, "focusRingType", .{});
+    }
+
+    /// `-[NSView setFocusRingType:]`
+    pub fn setFocusRingType(self: Self, focus_ring_type: FocusRingType) void {
+        return self.object.msgSend(void, "setFocusRingType:", .{focus_ring_type});
+    }
+
+    /// `+[NSView defaultFocusRingType]`
+    pub fn defaultFocusRingType() FocusRingType {
+        return class().msgSend(FocusRingType, "defaultFocusRingType", .{});
+    }
+
+    /// `-[NSView focusRingMaskBounds]`
+    pub fn focusRingMaskBounds(self: Self) cg.Rect {
+        return self.object.msgSend(cg.Rect, "focusRingMaskBounds", .{});
+    }
+
+    /// `-[NSView writeEPSInsideRect:toPasteboard:]`
+    pub fn writeEPSInsideRectToPasteboard(self: Self, rect: cg.Rect, pasteboard: objc.Object) void {
+        return self.object.msgSend(void, "writeEPSInsideRect:toPasteboard:", .{ rect, pasteboard });
+    }
+
+    /// `-[NSView dataWithEPSInsideRect:]`
+    pub fn dataWithEPSInsideRect(self: Self, rect: cg.Rect) foundation.Data {
+        return self.object.msgSend(foundation.Data, "dataWithEPSInsideRect:", .{rect});
+    }
+
+    /// `-[NSView writePDFInsideRect:toPasteboard:]`
+    pub fn writePDFInsideRectToPasteboard(self: Self, rect: cg.Rect, pasteboard: objc.Object) void {
+        return self.object.msgSend(void, "writePDFInsideRect:toPasteboard:", .{ rect, pasteboard });
+    }
+
+    /// `-[NSView dataWithPDFInsideRect:]`
+    pub fn dataWithPDFInsideRect(self: Self, rect: cg.Rect) foundation.Data {
+        return self.object.msgSend(foundation.Data, "dataWithPDFInsideRect:", .{rect});
+    }
+
+    /// `-[NSView print:]`
+    pub fn print(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "print:", .{sender});
+    }
+
+    /// `-[NSView knowsPageRange:]`
+    pub fn knowsPageRange(self: Self, range: ?*objc.Range) bool {
+        return self.object.msgSend(bool, "knowsPageRange:", .{range});
+    }
+
+    /// `-[NSView adjustPageWidthNew:left:right:limit:]`
+    pub fn adjustPageWidthNewLeftRightLimit(self: Self, new_right: ?*cg.Float, old_left: cg.Float, old_right: cg.Float, right_limit: cg.Float) void {
+        return self.object.msgSend(void, "adjustPageWidthNew:left:right:limit:", .{ new_right, old_left, old_right, right_limit });
+    }
+
+    /// `-[NSView adjustPageHeightNew:top:bottom:limit:]`
+    pub fn adjustPageHeightNewTopBottomLimit(self: Self, new_bottom: ?*cg.Float, old_top: cg.Float, old_bottom: cg.Float, bottom_limit: cg.Float) void {
+        return self.object.msgSend(void, "adjustPageHeightNew:top:bottom:limit:", .{ new_bottom, old_top, old_bottom, bottom_limit });
+    }
+
+    /// `-[NSView rectForPage:]`
+    pub fn rectForPage(self: Self, page: objc.Integer) cg.Rect {
+        return self.object.msgSend(cg.Rect, "rectForPage:", .{page});
+    }
+
+    /// `-[NSView locationOfPrintRect:]`
+    pub fn locationOfPrintRect(self: Self, rect: cg.Rect) cg.Point {
+        return self.object.msgSend(cg.Point, "locationOfPrintRect:", .{rect});
+    }
+
+    /// `-[NSView drawPageBorderWithSize:]`
+    pub fn drawPageBorderWithSize(self: Self, border_size: cg.Size) void {
+        return self.object.msgSend(void, "drawPageBorderWithSize:", .{border_size});
+    }
+
+    /// `-[NSView drawSheetBorderWithSize:]`
+    pub fn drawSheetBorderWithSize(self: Self, border_size: cg.Size) void {
+        return self.object.msgSend(void, "drawSheetBorderWithSize:", .{border_size});
+    }
+
+    /// `-[NSView beginDocument]`
+    pub fn beginDocument(self: Self) void {
+        return self.object.msgSend(void, "beginDocument", .{});
+    }
+
+    /// `-[NSView endDocument]`
+    pub fn endDocument(self: Self) void {
+        return self.object.msgSend(void, "endDocument", .{});
+    }
+
+    /// `-[NSView beginPageInRect:atPlacement:]`
+    pub fn beginPageInRectAtPlacement(self: Self, rect: cg.Rect, location: cg.Point) void {
+        return self.object.msgSend(void, "beginPageInRect:atPlacement:", .{ rect, location });
+    }
+
+    /// `-[NSView endPage]`
+    pub fn endPage(self: Self) void {
+        return self.object.msgSend(void, "endPage", .{});
+    }
+
+    /// `-[NSView heightAdjustLimit]`
+    pub fn heightAdjustLimit(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "heightAdjustLimit", .{});
+    }
+
+    /// `-[NSView widthAdjustLimit]`
+    pub fn widthAdjustLimit(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "widthAdjustLimit", .{});
+    }
+
+    /// `-[NSView pageHeader]`
+    pub fn pageHeader(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "pageHeader", .{});
+    }
+
+    /// `-[NSView pageFooter]`
+    pub fn pageFooter(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "pageFooter", .{});
+    }
+
+    /// `-[NSView printJobTitle]`
+    pub fn printJobTitle(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "printJobTitle", .{});
+    }
+
+    /// `-[NSView beginDraggingSessionWithItems:gesture:source:]`
+    pub fn beginDraggingSessionWithItemsGestureSource(self: Self, items: foundation.Array(objc.Object), gesture: objc.Object, source: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "beginDraggingSessionWithItems:gesture:source:", .{ items, gesture, source });
+    }
+
+    /// `-[NSView beginDraggingSessionWithItems:event:source:]`
+    pub fn beginDraggingSessionWithItemsEventSource(self: Self, items: foundation.Array(objc.Object), event: Event, source: objc.Object) objc.Object {
+        return self.object.msgSend(objc.Object, "beginDraggingSessionWithItems:event:source:", .{ items, event, source });
+    }
+
+    /// `-[NSView registerForDraggedTypes:]`
+    pub fn registerForDraggedTypes(self: Self, new_types: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "registerForDraggedTypes:", .{new_types});
+    }
+
+    /// `-[NSView unregisterDraggedTypes]`
+    pub fn unregisterDraggedTypes(self: Self) void {
+        return self.object.msgSend(void, "unregisterDraggedTypes", .{});
+    }
+
+    /// `-[NSView registeredDraggedTypes]`
+    pub fn registeredDraggedTypes(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "registeredDraggedTypes", .{});
+    }
+
+    /// `-[NSView enterFullScreenMode:withOptions:]`
+    pub fn enterFullScreenModeWithOptions(self: Self, screen: Screen, options: ?foundation.Dictionary(objc.Object, objc.Object)) bool {
+        return self.object.msgSend(bool, "enterFullScreenMode:withOptions:", .{ screen, options });
+    }
+
+    /// `-[NSView exitFullScreenModeWithOptions:]`
+    pub fn exitFullScreenModeWithOptions(self: Self, options: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "exitFullScreenModeWithOptions:", .{options});
+    }
+
+    /// `-[NSView isInFullScreenMode]`
+    pub fn isInFullScreenMode(self: Self) bool {
+        return self.object.msgSend(bool, "isInFullScreenMode", .{});
+    }
+
+    /// `-[NSView showDefinitionForAttributedString:atPoint:]`
+    pub fn showDefinitionForAttributedStringAtPoint(self: Self, attr_string: ?objc.Object, text_baseline_origin: cg.Point) void {
+        return self.object.msgSend(void, "showDefinitionForAttributedString:atPoint:", .{ attr_string, text_baseline_origin });
+    }
+
+    /// `-[NSView showDefinitionForAttributedString:range:options:baselineOriginProvider:]`
+    pub fn showDefinitionForAttributedStringRangeOptionsBaselineOriginProvider(self: Self, attr_string: ?objc.Object, target_range: objc.Range, options: ?foundation.Dictionary(objc.Object, objc.Object), origin_provider: anytype) void {
+        return self.object.msgSend(void, "showDefinitionForAttributedString:range:options:baselineOriginProvider:", .{ attr_string, target_range, options, origin_provider });
+    }
+
+    /// `-[NSView isDrawingFindIndicator]`
+    pub fn isDrawingFindIndicator(self: Self) bool {
+        return self.object.msgSend(bool, "isDrawingFindIndicator", .{});
+    }
+
+    /// `-[NSView addGestureRecognizer:]`
+    pub fn addGestureRecognizer(self: Self, gesture_recognizer: objc.Object) void {
+        return self.object.msgSend(void, "addGestureRecognizer:", .{gesture_recognizer});
+    }
+
+    /// `-[NSView removeGestureRecognizer:]`
+    pub fn removeGestureRecognizer(self: Self, gesture_recognizer: objc.Object) void {
+        return self.object.msgSend(void, "removeGestureRecognizer:", .{gesture_recognizer});
+    }
+
+    /// `-[NSView gestureRecognizers]`
+    pub fn gestureRecognizers(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "gestureRecognizers", .{});
+    }
+
+    /// `-[NSView setGestureRecognizers:]`
+    pub fn setGestureRecognizers(self: Self, gesture_recognizers: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "setGestureRecognizers:", .{gesture_recognizers});
+    }
+
+    /// `-[NSView exclusiveGestureBehavior]`
+    pub fn exclusiveGestureBehavior(self: Self) ViewExclusiveGestureBehavior {
+        return self.object.msgSend(ViewExclusiveGestureBehavior, "exclusiveGestureBehavior", .{});
+    }
+
+    /// `-[NSView setExclusiveGestureBehavior:]`
+    pub fn setExclusiveGestureBehavior(self: Self, exclusive_gesture_behavior: ViewExclusiveGestureBehavior) void {
+        return self.object.msgSend(void, "setExclusiveGestureBehavior:", .{exclusive_gesture_behavior});
+    }
+
+    /// `-[NSView allowedTouchTypes]`
+    pub fn allowedTouchTypes(self: Self) TouchTypeMask {
+        return self.object.msgSend(TouchTypeMask, "allowedTouchTypes", .{});
+    }
+
+    /// `-[NSView setAllowedTouchTypes:]`
+    pub fn setAllowedTouchTypes(self: Self, allowed_touch_types: TouchTypeMask) void {
+        return self.object.msgSend(void, "setAllowedTouchTypes:", .{allowed_touch_types});
+    }
+
+    /// `-[NSView safeAreaInsets]`
+    pub fn safeAreaInsets(self: Self) EdgeInsets {
+        return self.object.msgSend(EdgeInsets, "safeAreaInsets", .{});
+    }
+
+    /// `-[NSView additionalSafeAreaInsets]`
+    pub fn additionalSafeAreaInsets(self: Self) EdgeInsets {
+        return self.object.msgSend(EdgeInsets, "additionalSafeAreaInsets", .{});
+    }
+
+    /// `-[NSView setAdditionalSafeAreaInsets:]`
+    pub fn setAdditionalSafeAreaInsets(self: Self, additional_safe_area_insets: EdgeInsets) void {
+        return self.object.msgSend(void, "setAdditionalSafeAreaInsets:", .{additional_safe_area_insets});
+    }
+
+    /// `-[NSView safeAreaLayoutGuide]`
+    pub fn safeAreaLayoutGuide(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "safeAreaLayoutGuide", .{});
+    }
+
+    /// `-[NSView safeAreaRect]`
+    pub fn safeAreaRect(self: Self) cg.Rect {
+        return self.object.msgSend(cg.Rect, "safeAreaRect", .{});
+    }
+
+    /// `-[NSView layoutMarginsGuide]`
+    pub fn layoutMarginsGuide(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "layoutMarginsGuide", .{});
+    }
+
     /// `-[NSView viewDidChangeEffectiveCornerRadii]`
     pub fn viewDidChangeEffectiveCornerRadii(self: Self) void {
         return self.object.msgSend(void, "viewDidChangeEffectiveCornerRadii", .{});
@@ -5149,9 +6468,504 @@ pub const View = extern struct {
         return self.object.msgSend(?objc.Object, "effectiveCornerRadii", .{});
     }
 
+    /// `-[NSView prefersCompactControlSizeMetrics]`
+    pub fn prefersCompactControlSizeMetrics(self: Self) bool {
+        return self.object.msgSend(bool, "prefersCompactControlSizeMetrics", .{});
+    }
+
+    /// `-[NSView setPrefersCompactControlSizeMetrics:]`
+    pub fn setPrefersCompactControlSizeMetrics(self: Self, prefers_compact_control_size_metrics: bool) void {
+        return self.object.msgSend(void, "setPrefersCompactControlSizeMetrics:", .{prefers_compact_control_size_metrics});
+    }
+
+    /// `-[NSView addTrackingArea:]`
+    pub fn addTrackingArea(self: Self, tracking_area: objc.Object) void {
+        return self.object.msgSend(void, "addTrackingArea:", .{tracking_area});
+    }
+
+    /// `-[NSView removeTrackingArea:]`
+    pub fn removeTrackingArea(self: Self, tracking_area: objc.Object) void {
+        return self.object.msgSend(void, "removeTrackingArea:", .{tracking_area});
+    }
+
+    /// `-[NSView updateTrackingAreas]`
+    pub fn updateTrackingAreas(self: Self) void {
+        return self.object.msgSend(void, "updateTrackingAreas", .{});
+    }
+
+    /// `-[NSView addCursorRect:cursor:]`
+    pub fn addCursorRectCursor(self: Self, rect: cg.Rect, object_: Cursor) void {
+        return self.object.msgSend(void, "addCursorRect:cursor:", .{ rect, object_ });
+    }
+
+    /// `-[NSView removeCursorRect:cursor:]`
+    pub fn removeCursorRectCursor(self: Self, rect: cg.Rect, object_: Cursor) void {
+        return self.object.msgSend(void, "removeCursorRect:cursor:", .{ rect, object_ });
+    }
+
+    /// `-[NSView discardCursorRects]`
+    pub fn discardCursorRects(self: Self) void {
+        return self.object.msgSend(void, "discardCursorRects", .{});
+    }
+
+    /// `-[NSView resetCursorRects]`
+    pub fn resetCursorRects(self: Self) void {
+        return self.object.msgSend(void, "resetCursorRects", .{});
+    }
+
+    /// `-[NSView addTrackingRect:owner:userData:assumeInside:]`
+    pub fn addTrackingRectOwnerUserDataAssumeInside(self: Self, rect: cg.Rect, owner: objc.Object, data: ?*anyopaque, flag: bool) objc.Integer {
+        return self.object.msgSend(objc.Integer, "addTrackingRect:owner:userData:assumeInside:", .{ rect, owner, data, flag });
+    }
+
+    /// `-[NSView removeTrackingRect:]`
+    pub fn removeTrackingRect(self: Self, tag_: objc.Integer) void {
+        return self.object.msgSend(void, "removeTrackingRect:", .{tag_});
+    }
+
+    /// `-[NSView trackingAreas]`
+    pub fn trackingAreas(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "trackingAreas", .{});
+    }
+
+    /// `-[NSView displayLinkWithTarget:selector:]`
+    pub fn displayLinkWithTargetSelector(self: Self, target: objc.Object, selector: objc.Sel) objc.Object {
+        return self.object.msgSend(objc.Object, "displayLinkWithTarget:selector:", .{ target, selector });
+    }
+
+    /// `-[NSView dragImage:at:offset:event:pasteboard:source:slideBack:]`
+    pub fn dragImageAtOffsetEventPasteboardSourceSlideBack(self: Self, image: Image, view_location: cg.Point, initial_offset: cg.Size, event: Event, pboard: objc.Object, source_obj: objc.Object, slide_flag: bool) void {
+        return self.object.msgSend(void, "dragImage:at:offset:event:pasteboard:source:slideBack:", .{ image, view_location, initial_offset, event, pboard, source_obj, slide_flag });
+    }
+
+    /// `-[NSView dragFile:fromRect:slideBack:event:]`
+    pub fn dragFileFromRectSlideBackEvent(self: Self, filename: foundation.String, rect: cg.Rect, flag: bool, event: Event) bool {
+        return self.object.msgSend(bool, "dragFile:fromRect:slideBack:event:", .{ filename, rect, flag, event });
+    }
+
+    /// `-[NSView dragPromisedFilesOfTypes:fromRect:source:slideBack:event:]`
+    pub fn dragPromisedFilesOfTypesFromRectSourceSlideBackEvent(self: Self, type_array: foundation.Array(foundation.String), rect: cg.Rect, source_object: objc.Object, flag: bool, event: Event) bool {
+        return self.object.msgSend(bool, "dragPromisedFilesOfTypes:fromRect:source:slideBack:event:", .{ type_array, rect, source_object, flag, event });
+    }
+
+    /// `-[NSView convertPointToBase:]`
+    pub fn convertPointToBase(self: Self, point: cg.Point) cg.Point {
+        return self.object.msgSend(cg.Point, "convertPointToBase:", .{point});
+    }
+
+    /// `-[NSView convertPointFromBase:]`
+    pub fn convertPointFromBase(self: Self, point: cg.Point) cg.Point {
+        return self.object.msgSend(cg.Point, "convertPointFromBase:", .{point});
+    }
+
+    /// `-[NSView convertSizeToBase:]`
+    pub fn convertSizeToBase(self: Self, size: cg.Size) cg.Size {
+        return self.object.msgSend(cg.Size, "convertSizeToBase:", .{size});
+    }
+
+    /// `-[NSView convertSizeFromBase:]`
+    pub fn convertSizeFromBase(self: Self, size: cg.Size) cg.Size {
+        return self.object.msgSend(cg.Size, "convertSizeFromBase:", .{size});
+    }
+
+    /// `-[NSView convertRectToBase:]`
+    pub fn convertRectToBase(self: Self, rect: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "convertRectToBase:", .{rect});
+    }
+
+    /// `-[NSView convertRectFromBase:]`
+    pub fn convertRectFromBase(self: Self, rect: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "convertRectFromBase:", .{rect});
+    }
+
+    /// `-[NSView performMnemonic:]`
+    pub fn performMnemonic(self: Self, string: foundation.String) bool {
+        return self.object.msgSend(bool, "performMnemonic:", .{string});
+    }
+
+    /// `-[NSView shouldDrawColor]`
+    pub fn shouldDrawColor(self: Self) bool {
+        return self.object.msgSend(bool, "shouldDrawColor", .{});
+    }
+
+    /// `-[NSView gState]`
+    pub fn gState(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "gState", .{});
+    }
+
+    /// `-[NSView allocateGState]`
+    pub fn allocateGState(self: Self) void {
+        return self.object.msgSend(void, "allocateGState", .{});
+    }
+
+    /// `-[NSView releaseGState]`
+    pub fn releaseGState(self: Self) void {
+        return self.object.msgSend(void, "releaseGState", .{});
+    }
+
+    /// `-[NSView setUpGState]`
+    pub fn setUpGState(self: Self) void {
+        return self.object.msgSend(void, "setUpGState", .{});
+    }
+
+    /// `-[NSView renewGState]`
+    pub fn renewGState(self: Self) void {
+        return self.object.msgSend(void, "renewGState", .{});
+    }
+
+    /// `-[NSView writingToolsCoordinator]`
+    pub fn writingToolsCoordinator(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "writingToolsCoordinator", .{});
+    }
+
+    /// `-[NSView setWritingToolsCoordinator:]`
+    pub fn setWritingToolsCoordinator(self: Self, writing_tools_coordinator: ?objc.Object) void {
+        return self.object.msgSend(void, "setWritingToolsCoordinator:", .{writing_tools_coordinator});
+    }
+
     /// `-[NSView enclosingMenuItem]`
     pub fn enclosingMenuItem(self: Self) ?MenuItem {
         return self.object.msgSend(?MenuItem, "enclosingMenuItem", .{});
+    }
+
+    /// `-[NSView candidateListTouchBarItem]`
+    pub fn candidateListTouchBarItem(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "candidateListTouchBarItem", .{});
+    }
+
+    /// `-[NSView reflectScrolledClipView:]`
+    pub fn reflectScrolledClipView(self: Self, clip_view: objc.Object) void {
+        return self.object.msgSend(void, "reflectScrolledClipView:", .{clip_view});
+    }
+
+    /// `-[NSView scrollClipView:toPoint:]`
+    pub fn scrollClipViewToPoint(self: Self, clip_view: objc.Object, point: cg.Point) void {
+        return self.object.msgSend(void, "scrollClipView:toPoint:", .{ clip_view, point });
+    }
+
+    /// `-[NSView addConstraint:]`
+    pub fn addConstraint(self: Self, constraint: objc.Object) void {
+        return self.object.msgSend(void, "addConstraint:", .{constraint});
+    }
+
+    /// `-[NSView addConstraints:]`
+    pub fn addConstraints(self: Self, constraints_: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "addConstraints:", .{constraints_});
+    }
+
+    /// `-[NSView removeConstraint:]`
+    pub fn removeConstraint(self: Self, constraint: objc.Object) void {
+        return self.object.msgSend(void, "removeConstraint:", .{constraint});
+    }
+
+    /// `-[NSView removeConstraints:]`
+    pub fn removeConstraints(self: Self, constraints_: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "removeConstraints:", .{constraints_});
+    }
+
+    /// `-[NSView leadingAnchor]`
+    pub fn leadingAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "leadingAnchor", .{});
+    }
+
+    /// `-[NSView trailingAnchor]`
+    pub fn trailingAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "trailingAnchor", .{});
+    }
+
+    /// `-[NSView leftAnchor]`
+    pub fn leftAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "leftAnchor", .{});
+    }
+
+    /// `-[NSView rightAnchor]`
+    pub fn rightAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "rightAnchor", .{});
+    }
+
+    /// `-[NSView topAnchor]`
+    pub fn topAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "topAnchor", .{});
+    }
+
+    /// `-[NSView bottomAnchor]`
+    pub fn bottomAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "bottomAnchor", .{});
+    }
+
+    /// `-[NSView widthAnchor]`
+    pub fn widthAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "widthAnchor", .{});
+    }
+
+    /// `-[NSView heightAnchor]`
+    pub fn heightAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "heightAnchor", .{});
+    }
+
+    /// `-[NSView centerXAnchor]`
+    pub fn centerXAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "centerXAnchor", .{});
+    }
+
+    /// `-[NSView centerYAnchor]`
+    pub fn centerYAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "centerYAnchor", .{});
+    }
+
+    /// `-[NSView firstBaselineAnchor]`
+    pub fn firstBaselineAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "firstBaselineAnchor", .{});
+    }
+
+    /// `-[NSView lastBaselineAnchor]`
+    pub fn lastBaselineAnchor(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "lastBaselineAnchor", .{});
+    }
+
+    /// `-[NSView constraints]`
+    pub fn constraints(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "constraints", .{});
+    }
+
+    /// `-[NSView updateConstraintsForSubtreeIfNeeded]`
+    pub fn updateConstraintsForSubtreeIfNeeded(self: Self) void {
+        return self.object.msgSend(void, "updateConstraintsForSubtreeIfNeeded", .{});
+    }
+
+    /// `-[NSView updateConstraints]`
+    pub fn updateConstraints(self: Self) void {
+        return self.object.msgSend(void, "updateConstraints", .{});
+    }
+
+    /// `-[NSView needsUpdateConstraints]`
+    pub fn needsUpdateConstraints(self: Self) bool {
+        return self.object.msgSend(bool, "needsUpdateConstraints", .{});
+    }
+
+    /// `-[NSView setNeedsUpdateConstraints:]`
+    pub fn setNeedsUpdateConstraints(self: Self, needs_update_constraints: bool) void {
+        return self.object.msgSend(void, "setNeedsUpdateConstraints:", .{needs_update_constraints});
+    }
+
+    /// `-[NSView translatesAutoresizingMaskIntoConstraints]`
+    pub fn translatesAutoresizingMaskIntoConstraints(self: Self) bool {
+        return self.object.msgSend(bool, "translatesAutoresizingMaskIntoConstraints", .{});
+    }
+
+    /// `-[NSView setTranslatesAutoresizingMaskIntoConstraints:]`
+    pub fn setTranslatesAutoresizingMaskIntoConstraints(self: Self, translates_autoresizing_mask_into_constraints: bool) void {
+        return self.object.msgSend(void, "setTranslatesAutoresizingMaskIntoConstraints:", .{translates_autoresizing_mask_into_constraints});
+    }
+
+    /// `+[NSView requiresConstraintBasedLayout]`
+    pub fn requiresConstraintBasedLayout() bool {
+        return class().msgSend(bool, "requiresConstraintBasedLayout", .{});
+    }
+
+    /// `-[NSView alignmentRectForFrame:]`
+    pub fn alignmentRectForFrame(self: Self, frame_: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "alignmentRectForFrame:", .{frame_});
+    }
+
+    /// `-[NSView frameForAlignmentRect:]`
+    pub fn frameForAlignmentRect(self: Self, alignment_rect: cg.Rect) cg.Rect {
+        return self.object.msgSend(cg.Rect, "frameForAlignmentRect:", .{alignment_rect});
+    }
+
+    /// `-[NSView invalidateIntrinsicContentSize]`
+    pub fn invalidateIntrinsicContentSize(self: Self) void {
+        return self.object.msgSend(void, "invalidateIntrinsicContentSize", .{});
+    }
+
+    /// `-[NSView contentHuggingPriorityForOrientation:]`
+    pub fn contentHuggingPriorityForOrientation(self: Self, orientation: LayoutConstraintOrientation) f32 {
+        return self.object.msgSend(f32, "contentHuggingPriorityForOrientation:", .{orientation});
+    }
+
+    /// `-[NSView setContentHuggingPriority:forOrientation:]`
+    pub fn setContentHuggingPriorityForOrientation(self: Self, priority: f32, orientation: LayoutConstraintOrientation) void {
+        return self.object.msgSend(void, "setContentHuggingPriority:forOrientation:", .{ priority, orientation });
+    }
+
+    /// `-[NSView contentCompressionResistancePriorityForOrientation:]`
+    pub fn contentCompressionResistancePriorityForOrientation(self: Self, orientation: LayoutConstraintOrientation) f32 {
+        return self.object.msgSend(f32, "contentCompressionResistancePriorityForOrientation:", .{orientation});
+    }
+
+    /// `-[NSView setContentCompressionResistancePriority:forOrientation:]`
+    pub fn setContentCompressionResistancePriorityForOrientation(self: Self, priority: f32, orientation: LayoutConstraintOrientation) void {
+        return self.object.msgSend(void, "setContentCompressionResistancePriority:forOrientation:", .{ priority, orientation });
+    }
+
+    /// `-[NSView alignmentRectInsets]`
+    pub fn alignmentRectInsets(self: Self) EdgeInsets {
+        return self.object.msgSend(EdgeInsets, "alignmentRectInsets", .{});
+    }
+
+    /// `-[NSView firstBaselineOffsetFromTop]`
+    pub fn firstBaselineOffsetFromTop(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "firstBaselineOffsetFromTop", .{});
+    }
+
+    /// `-[NSView lastBaselineOffsetFromBottom]`
+    pub fn lastBaselineOffsetFromBottom(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "lastBaselineOffsetFromBottom", .{});
+    }
+
+    /// `-[NSView baselineOffsetFromBottom]`
+    pub fn baselineOffsetFromBottom(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "baselineOffsetFromBottom", .{});
+    }
+
+    /// `-[NSView intrinsicContentSize]`
+    pub fn intrinsicContentSize(self: Self) cg.Size {
+        return self.object.msgSend(cg.Size, "intrinsicContentSize", .{});
+    }
+
+    /// `-[NSView isHorizontalContentSizeConstraintActive]`
+    pub fn isHorizontalContentSizeConstraintActive(self: Self) bool {
+        return self.object.msgSend(bool, "isHorizontalContentSizeConstraintActive", .{});
+    }
+
+    /// `-[NSView setHorizontalContentSizeConstraintActive:]`
+    pub fn setHorizontalContentSizeConstraintActive(self: Self, horizontal_content_size_constraint_active: bool) void {
+        return self.object.msgSend(void, "setHorizontalContentSizeConstraintActive:", .{horizontal_content_size_constraint_active});
+    }
+
+    /// `-[NSView isVerticalContentSizeConstraintActive]`
+    pub fn isVerticalContentSizeConstraintActive(self: Self) bool {
+        return self.object.msgSend(bool, "isVerticalContentSizeConstraintActive", .{});
+    }
+
+    /// `-[NSView setVerticalContentSizeConstraintActive:]`
+    pub fn setVerticalContentSizeConstraintActive(self: Self, vertical_content_size_constraint_active: bool) void {
+        return self.object.msgSend(void, "setVerticalContentSizeConstraintActive:", .{vertical_content_size_constraint_active});
+    }
+
+    /// `-[NSView fittingSize]`
+    pub fn fittingSize(self: Self) cg.Size {
+        return self.object.msgSend(cg.Size, "fittingSize", .{});
+    }
+
+    /// `-[NSView constraintsAffectingLayoutForOrientation:]`
+    pub fn constraintsAffectingLayoutForOrientation(self: Self, orientation: LayoutConstraintOrientation) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "constraintsAffectingLayoutForOrientation:", .{orientation});
+    }
+
+    /// `-[NSView exerciseAmbiguityInLayout]`
+    pub fn exerciseAmbiguityInLayout(self: Self) void {
+        return self.object.msgSend(void, "exerciseAmbiguityInLayout", .{});
+    }
+
+    /// `-[NSView hasAmbiguousLayout]`
+    pub fn hasAmbiguousLayout(self: Self) bool {
+        return self.object.msgSend(bool, "hasAmbiguousLayout", .{});
+    }
+
+    /// `-[NSView addLayoutGuide:]`
+    pub fn addLayoutGuide(self: Self, guide: objc.Object) void {
+        return self.object.msgSend(void, "addLayoutGuide:", .{guide});
+    }
+
+    /// `-[NSView removeLayoutGuide:]`
+    pub fn removeLayoutGuide(self: Self, guide: objc.Object) void {
+        return self.object.msgSend(void, "removeLayoutGuide:", .{guide});
+    }
+
+    /// `-[NSView layoutGuides]`
+    pub fn layoutGuides(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "layoutGuides", .{});
+    }
+
+    /// `-[NSView rulerView:shouldMoveMarker:]`
+    pub fn rulerViewShouldMoveMarker(self: Self, ruler: objc.Object, marker: objc.Object) bool {
+        return self.object.msgSend(bool, "rulerView:shouldMoveMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:willMoveMarker:toLocation:]`
+    pub fn rulerViewWillMoveMarkerToLocation(self: Self, ruler: objc.Object, marker: objc.Object, location: cg.Float) cg.Float {
+        return self.object.msgSend(cg.Float, "rulerView:willMoveMarker:toLocation:", .{ ruler, marker, location });
+    }
+
+    /// `-[NSView rulerView:didMoveMarker:]`
+    pub fn rulerViewDidMoveMarker(self: Self, ruler: objc.Object, marker: objc.Object) void {
+        return self.object.msgSend(void, "rulerView:didMoveMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:shouldRemoveMarker:]`
+    pub fn rulerViewShouldRemoveMarker(self: Self, ruler: objc.Object, marker: objc.Object) bool {
+        return self.object.msgSend(bool, "rulerView:shouldRemoveMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:didRemoveMarker:]`
+    pub fn rulerViewDidRemoveMarker(self: Self, ruler: objc.Object, marker: objc.Object) void {
+        return self.object.msgSend(void, "rulerView:didRemoveMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:shouldAddMarker:]`
+    pub fn rulerViewShouldAddMarker(self: Self, ruler: objc.Object, marker: objc.Object) bool {
+        return self.object.msgSend(bool, "rulerView:shouldAddMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:willAddMarker:atLocation:]`
+    pub fn rulerViewWillAddMarkerAtLocation(self: Self, ruler: objc.Object, marker: objc.Object, location: cg.Float) cg.Float {
+        return self.object.msgSend(cg.Float, "rulerView:willAddMarker:atLocation:", .{ ruler, marker, location });
+    }
+
+    /// `-[NSView rulerView:didAddMarker:]`
+    pub fn rulerViewDidAddMarker(self: Self, ruler: objc.Object, marker: objc.Object) void {
+        return self.object.msgSend(void, "rulerView:didAddMarker:", .{ ruler, marker });
+    }
+
+    /// `-[NSView rulerView:handleMouseDown:]`
+    pub fn rulerViewHandleMouseDown(self: Self, ruler: objc.Object, event: Event) void {
+        return self.object.msgSend(void, "rulerView:handleMouseDown:", .{ ruler, event });
+    }
+
+    /// `-[NSView rulerView:willSetClientView:]`
+    pub fn rulerViewWillSetClientView(self: Self, ruler: objc.Object, new_client: View) void {
+        return self.object.msgSend(void, "rulerView:willSetClientView:", .{ ruler, new_client });
+    }
+
+    /// `-[NSView rulerView:locationForPoint:]`
+    pub fn rulerViewLocationForPoint(self: Self, ruler: objc.Object, point: cg.Point) cg.Float {
+        return self.object.msgSend(cg.Float, "rulerView:locationForPoint:", .{ ruler, point });
+    }
+
+    /// `-[NSView rulerView:pointForLocation:]`
+    pub fn rulerViewPointForLocation(self: Self, ruler: objc.Object, point: cg.Float) cg.Point {
+        return self.object.msgSend(cg.Point, "rulerView:pointForLocation:", .{ ruler, point });
+    }
+
+    /// `-[NSView wantsBestResolutionOpenGLSurface]`
+    pub fn wantsBestResolutionOpenGLSurface(self: Self) bool {
+        return self.object.msgSend(bool, "wantsBestResolutionOpenGLSurface", .{});
+    }
+
+    /// `-[NSView setWantsBestResolutionOpenGLSurface:]`
+    pub fn setWantsBestResolutionOpenGLSurface(self: Self, wants_best_resolution_open_gl_surface: bool) void {
+        return self.object.msgSend(void, "setWantsBestResolutionOpenGLSurface:", .{wants_best_resolution_open_gl_surface});
+    }
+
+    /// `-[NSView wantsExtendedDynamicRangeOpenGLSurface]`
+    pub fn wantsExtendedDynamicRangeOpenGLSurface(self: Self) bool {
+        return self.object.msgSend(bool, "wantsExtendedDynamicRangeOpenGLSurface", .{});
+    }
+
+    /// `-[NSView setWantsExtendedDynamicRangeOpenGLSurface:]`
+    pub fn setWantsExtendedDynamicRangeOpenGLSurface(self: Self, wants_extended_dynamic_range_open_gl_surface: bool) void {
+        return self.object.msgSend(void, "setWantsExtendedDynamicRangeOpenGLSurface:", .{wants_extended_dynamic_range_open_gl_surface});
+    }
+
+    /// `-[NSView pressureConfiguration]`
+    pub fn pressureConfiguration(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "pressureConfiguration", .{});
+    }
+
+    /// `-[NSView setPressureConfiguration:]`
+    pub fn setPressureConfiguration(self: Self, pressure_configuration: ?objc.Object) void {
+        return self.object.msgSend(void, "setPressureConfiguration:", .{pressure_configuration});
     }
 
     /// `-[NSResponder init]`
@@ -5419,9 +7233,114 @@ pub const View = extern struct {
         return self.object.msgSend(void, "setMenu:", .{menu_});
     }
 
+    /// `-[NSResponder undoManager]`
+    pub fn undoManager(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "undoManager", .{});
+    }
+
+    /// `-[NSResponder validateProposedFirstResponder:forEvent:]`
+    pub fn validateProposedFirstResponderForEvent(self: Self, responder: Responder, event: ?Event) bool {
+        return self.object.msgSend(bool, "validateProposedFirstResponder:forEvent:", .{ responder, event });
+    }
+
+    /// `-[NSResponder presentError:modalForWindow:delegate:didPresentSelector:contextInfo:]`
+    pub fn presentErrorModalForWindowDelegateDidPresentSelectorContextInfo(self: Self, @"error": foundation.ErrorObject, window_: Window, delegate: ?objc.Object, did_present_selector: ?objc.Sel, context_info: ?*anyopaque) void {
+        return self.object.msgSend(void, "presentError:modalForWindow:delegate:didPresentSelector:contextInfo:", .{ @"error", window_, delegate, did_present_selector, context_info });
+    }
+
+    /// `-[NSResponder presentError:]`
+    pub fn presentError(self: Self, @"error": foundation.ErrorObject) bool {
+        return self.object.msgSend(bool, "presentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder willPresentError:]`
+    pub fn willPresentError(self: Self, @"error": foundation.ErrorObject) foundation.ErrorObject {
+        return self.object.msgSend(foundation.ErrorObject, "willPresentError:", .{@"error"});
+    }
+
+    /// `-[NSResponder performTextFinderAction:]`
+    pub fn performTextFinderAction(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "performTextFinderAction:", .{sender});
+    }
+
     /// `-[NSResponder newWindowForTab:]`
     pub fn newWindowForTab(self: Self, sender: ?objc.Object) void {
         return self.object.msgSend(void, "newWindowForTab:", .{sender});
+    }
+
+    /// `-[NSResponder showWritingTools:]`
+    pub fn showWritingTools(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "showWritingTools:", .{sender});
+    }
+
+    /// `-[NSResponder updateUserActivityState:]`
+    pub fn updateUserActivityState(self: Self, user_activity: objc.Object) void {
+        return self.object.msgSend(void, "updateUserActivityState:", .{user_activity});
+    }
+
+    /// `-[NSResponder userActivity]`
+    pub fn userActivity(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "userActivity", .{});
+    }
+
+    /// `-[NSResponder setUserActivity:]`
+    pub fn setUserActivity(self: Self, user_activity: ?objc.Object) void {
+        return self.object.msgSend(void, "setUserActivity:", .{user_activity});
+    }
+
+    /// `-[NSResponder makeTouchBar]`
+    pub fn makeTouchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "makeTouchBar", .{});
+    }
+
+    /// `-[NSResponder touchBar]`
+    pub fn touchBar(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "touchBar", .{});
+    }
+
+    /// `-[NSResponder setTouchBar:]`
+    pub fn setTouchBar(self: Self, touch_bar: ?objc.Object) void {
+        return self.object.msgSend(void, "setTouchBar:", .{touch_bar});
+    }
+
+    /// `-[NSResponder interfaceStyle]`
+    pub fn interfaceStyle(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "interfaceStyle", .{});
+    }
+
+    /// `-[NSResponder setInterfaceStyle:]`
+    pub fn setInterfaceStyle(self: Self, interface_style: objc.UInteger) void {
+        return self.object.msgSend(void, "setInterfaceStyle:", .{interface_style});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:]`
+    pub fn encodeRestorableStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder encodeRestorableStateWithCoder:backgroundQueue:]`
+    pub fn encodeRestorableStateWithCoderBackgroundQueue(self: Self, coder: objc.Object, queue: objc.Object) void {
+        return self.object.msgSend(void, "encodeRestorableStateWithCoder:backgroundQueue:", .{ coder, queue });
+    }
+
+    /// `-[NSResponder restoreStateWithCoder:]`
+    pub fn restoreStateWithCoder(self: Self, coder: objc.Object) void {
+        return self.object.msgSend(void, "restoreStateWithCoder:", .{coder});
+    }
+
+    /// `-[NSResponder invalidateRestorableState]`
+    pub fn invalidateRestorableState(self: Self) void {
+        return self.object.msgSend(void, "invalidateRestorableState", .{});
+    }
+
+    /// `+[NSResponder allowedClassesForRestorableStateKeyPath:]`
+    pub fn allowedClassesForRestorableStateKeyPath(key_path: foundation.String) foundation.Array(objc.Object) {
+        return class().msgSend(foundation.Array(objc.Object), "allowedClassesForRestorableStateKeyPath:", .{key_path});
+    }
+
+    /// `+[NSResponder restorableStateKeyPaths]`
+    pub fn restorableStateKeyPaths() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "restorableStateKeyPaths", .{});
     }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
@@ -5436,6 +7355,7 @@ pub const View = extern struct {
         pub const viewDidUnhide = fn () void;
         pub const @"addSubview:" = fn (View) void;
         pub const @"addSubview:positioned:relativeTo:" = fn (View, WindowOrderingMode, ?View) void;
+        pub const @"sortSubviewsUsingFunction:context:" = fn (*const fn (View, View, ?*anyopaque) callconv(.c) ComparisonResult, ?*anyopaque) void;
         pub const @"viewWillMoveToWindow:" = fn (?Window) void;
         pub const viewDidMoveToWindow = fn () void;
         pub const @"viewWillMoveToSuperview:" = fn (?View) void;
@@ -5607,15 +7527,169 @@ pub const View = extern struct {
         pub const preparedContentRect = fn () cg.Rect;
         pub const @"setPreparedContentRect:" = fn (cg.Rect) void;
         pub const allowsVibrancy = fn () bool;
+        pub const @"setKeyboardFocusRingNeedsDisplayInRect:" = fn (cg.Rect) void;
+        pub const drawFocusRingMask = fn () void;
+        pub const noteFocusRingMaskChanged = fn () void;
+        pub const nextKeyView = fn () ?View;
+        pub const @"setNextKeyView:" = fn (?View) void;
+        pub const previousKeyView = fn () ?View;
+        pub const nextValidKeyView = fn () ?View;
+        pub const previousValidKeyView = fn () ?View;
+        pub const canBecomeKeyView = fn () bool;
+        pub const focusRingType = fn () FocusRingType;
+        pub const @"setFocusRingType:" = fn (FocusRingType) void;
+        pub const @"+defaultFocusRingType" = fn () FocusRingType;
+        pub const focusRingMaskBounds = fn () cg.Rect;
+        pub const @"writeEPSInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
+        pub const @"dataWithEPSInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"writePDFInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
+        pub const @"dataWithPDFInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"print:" = fn (?objc.Object) void;
+        pub const @"knowsPageRange:" = fn (?*objc.Range) bool;
+        pub const @"adjustPageWidthNew:left:right:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
+        pub const @"adjustPageHeightNew:top:bottom:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
+        pub const @"rectForPage:" = fn (objc.Integer) cg.Rect;
+        pub const @"locationOfPrintRect:" = fn (cg.Rect) cg.Point;
+        pub const @"drawPageBorderWithSize:" = fn (cg.Size) void;
+        pub const @"drawSheetBorderWithSize:" = fn (cg.Size) void;
+        pub const beginDocument = fn () void;
+        pub const endDocument = fn () void;
+        pub const @"beginPageInRect:atPlacement:" = fn (cg.Rect, cg.Point) void;
+        pub const endPage = fn () void;
+        pub const heightAdjustLimit = fn () cg.Float;
+        pub const widthAdjustLimit = fn () cg.Float;
+        pub const pageHeader = fn () objc.Object;
+        pub const pageFooter = fn () objc.Object;
+        pub const printJobTitle = fn () foundation.String;
+        pub const @"beginDraggingSessionWithItems:gesture:source:" = fn (foundation.Array(objc.Object), objc.Object, objc.Object) ?objc.Object;
+        pub const @"beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
+        pub const @"registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
+        pub const unregisterDraggedTypes = fn () void;
+        pub const registeredDraggedTypes = fn () foundation.Array(objc.Object);
+        pub const @"enterFullScreenMode:withOptions:" = fn (Screen, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"exitFullScreenModeWithOptions:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const isInFullScreenMode = fn () bool;
+        pub const @"showDefinitionForAttributedString:atPoint:" = fn (?objc.Object, cg.Point) void;
+        pub const isDrawingFindIndicator = fn () bool;
+        pub const @"addGestureRecognizer:" = fn (objc.Object) void;
+        pub const @"removeGestureRecognizer:" = fn (objc.Object) void;
+        pub const gestureRecognizers = fn () foundation.Array(objc.Object);
+        pub const @"setGestureRecognizers:" = fn (foundation.Array(objc.Object)) void;
+        pub const exclusiveGestureBehavior = fn () ViewExclusiveGestureBehavior;
+        pub const @"setExclusiveGestureBehavior:" = fn (ViewExclusiveGestureBehavior) void;
+        pub const allowedTouchTypes = fn () TouchTypeMask;
+        pub const @"setAllowedTouchTypes:" = fn (TouchTypeMask) void;
+        pub const safeAreaInsets = fn () EdgeInsets;
+        pub const additionalSafeAreaInsets = fn () EdgeInsets;
+        pub const @"setAdditionalSafeAreaInsets:" = fn (EdgeInsets) void;
+        pub const safeAreaLayoutGuide = fn () objc.Object;
+        pub const safeAreaRect = fn () cg.Rect;
+        pub const layoutMarginsGuide = fn () objc.Object;
         pub const viewDidChangeEffectiveCornerRadii = fn () void;
         pub const invalidateCornerConfiguration = fn () void;
         pub const cornerConfiguration = fn () ?objc.Object;
         pub const effectiveCornerRadii = fn () ?objc.Object;
+        pub const prefersCompactControlSizeMetrics = fn () bool;
+        pub const @"setPrefersCompactControlSizeMetrics:" = fn (bool) void;
+        pub const @"addTrackingArea:" = fn (objc.Object) void;
+        pub const @"removeTrackingArea:" = fn (objc.Object) void;
+        pub const updateTrackingAreas = fn () void;
+        pub const @"addCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
+        pub const @"removeCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
+        pub const discardCursorRects = fn () void;
+        pub const resetCursorRects = fn () void;
+        pub const @"addTrackingRect:owner:userData:assumeInside:" = fn (cg.Rect, objc.Object, ?*anyopaque, bool) objc.Integer;
+        pub const @"removeTrackingRect:" = fn (objc.Integer) void;
+        pub const trackingAreas = fn () foundation.Array(objc.Object);
+        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const @"dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
+        pub const @"dragFile:fromRect:slideBack:event:" = fn (foundation.String, cg.Rect, bool, Event) bool;
+        pub const @"dragPromisedFilesOfTypes:fromRect:source:slideBack:event:" = fn (foundation.Array(foundation.String), cg.Rect, objc.Object, bool, Event) bool;
+        pub const @"convertPointToBase:" = fn (cg.Point) cg.Point;
+        pub const @"convertPointFromBase:" = fn (cg.Point) cg.Point;
+        pub const @"convertSizeToBase:" = fn (cg.Size) cg.Size;
+        pub const @"convertSizeFromBase:" = fn (cg.Size) cg.Size;
+        pub const @"convertRectToBase:" = fn (cg.Rect) cg.Rect;
+        pub const @"convertRectFromBase:" = fn (cg.Rect) cg.Rect;
+        pub const @"performMnemonic:" = fn (foundation.String) bool;
+        pub const shouldDrawColor = fn () bool;
+        pub const gState = fn () objc.Integer;
+        pub const allocateGState = fn () void;
+        pub const releaseGState = fn () void;
+        pub const setUpGState = fn () void;
+        pub const renewGState = fn () void;
+        pub const writingToolsCoordinator = fn () ?objc.Object;
+        pub const @"setWritingToolsCoordinator:" = fn (?objc.Object) void;
         pub const enclosingMenuItem = fn () ?MenuItem;
+        pub const candidateListTouchBarItem = fn () ?objc.Object;
+        pub const @"reflectScrolledClipView:" = fn (objc.Object) void;
+        pub const @"scrollClipView:toPoint:" = fn (objc.Object, cg.Point) void;
+        pub const @"addConstraint:" = fn (objc.Object) void;
+        pub const @"addConstraints:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"removeConstraint:" = fn (objc.Object) void;
+        pub const @"removeConstraints:" = fn (foundation.Array(objc.Object)) void;
+        pub const leadingAnchor = fn () objc.Object;
+        pub const trailingAnchor = fn () objc.Object;
+        pub const leftAnchor = fn () objc.Object;
+        pub const rightAnchor = fn () objc.Object;
+        pub const topAnchor = fn () objc.Object;
+        pub const bottomAnchor = fn () objc.Object;
+        pub const widthAnchor = fn () objc.Object;
+        pub const heightAnchor = fn () objc.Object;
+        pub const centerXAnchor = fn () objc.Object;
+        pub const centerYAnchor = fn () objc.Object;
+        pub const firstBaselineAnchor = fn () objc.Object;
+        pub const lastBaselineAnchor = fn () objc.Object;
+        pub const constraints = fn () foundation.Array(objc.Object);
+        pub const updateConstraintsForSubtreeIfNeeded = fn () void;
+        pub const updateConstraints = fn () void;
+        pub const needsUpdateConstraints = fn () bool;
+        pub const @"setNeedsUpdateConstraints:" = fn (bool) void;
+        pub const translatesAutoresizingMaskIntoConstraints = fn () bool;
+        pub const @"setTranslatesAutoresizingMaskIntoConstraints:" = fn (bool) void;
+        pub const @"+requiresConstraintBasedLayout" = fn () bool;
+        pub const @"alignmentRectForFrame:" = fn (cg.Rect) cg.Rect;
+        pub const @"frameForAlignmentRect:" = fn (cg.Rect) cg.Rect;
+        pub const invalidateIntrinsicContentSize = fn () void;
+        pub const @"contentHuggingPriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
+        pub const @"setContentHuggingPriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
+        pub const @"contentCompressionResistancePriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
+        pub const @"setContentCompressionResistancePriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
+        pub const alignmentRectInsets = fn () EdgeInsets;
+        pub const firstBaselineOffsetFromTop = fn () cg.Float;
+        pub const lastBaselineOffsetFromBottom = fn () cg.Float;
+        pub const baselineOffsetFromBottom = fn () cg.Float;
+        pub const intrinsicContentSize = fn () cg.Size;
+        pub const isHorizontalContentSizeConstraintActive = fn () bool;
+        pub const @"setHorizontalContentSizeConstraintActive:" = fn (bool) void;
+        pub const isVerticalContentSizeConstraintActive = fn () bool;
+        pub const @"setVerticalContentSizeConstraintActive:" = fn (bool) void;
+        pub const fittingSize = fn () cg.Size;
+        pub const @"constraintsAffectingLayoutForOrientation:" = fn (LayoutConstraintOrientation) foundation.Array(objc.Object);
+        pub const exerciseAmbiguityInLayout = fn () void;
+        pub const hasAmbiguousLayout = fn () bool;
+        pub const @"addLayoutGuide:" = fn (objc.Object) void;
+        pub const @"removeLayoutGuide:" = fn (objc.Object) void;
+        pub const layoutGuides = fn () foundation.Array(objc.Object);
+        pub const @"rulerView:shouldMoveMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"rulerView:willMoveMarker:toLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
+        pub const @"rulerView:didMoveMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"rulerView:shouldRemoveMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"rulerView:didRemoveMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"rulerView:shouldAddMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"rulerView:willAddMarker:atLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
+        pub const @"rulerView:didAddMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"rulerView:handleMouseDown:" = fn (objc.Object, Event) void;
+        pub const @"rulerView:willSetClientView:" = fn (objc.Object, View) void;
+        pub const @"rulerView:locationForPoint:" = fn (objc.Object, cg.Point) cg.Float;
+        pub const @"rulerView:pointForLocation:" = fn (objc.Object, cg.Float) cg.Point;
+        pub const wantsBestResolutionOpenGLSurface = fn () bool;
+        pub const @"setWantsBestResolutionOpenGLSurface:" = fn (bool) void;
+        pub const wantsExtendedDynamicRangeOpenGLSurface = fn () bool;
+        pub const @"setWantsExtendedDynamicRangeOpenGLSurface:" = fn (bool) void;
+        pub const pressureConfiguration = fn () ?objc.Object;
+        pub const @"setPressureConfiguration:" = fn (?objc.Object) void;
     };
-
-    // Not generated:
-    //   -[NSView sortSubviewsUsingFunction:context:]: NSComparisonResult (* _Nonnull)(__kindof NSView * _Nonnull, __kindof NSView * _Nonnull, void * _Nullable)
 };
 
 /// `NSScreen`, a subclass of `NSObject`.
@@ -5768,6 +7842,16 @@ pub const Screen = extern struct {
         return self.object.msgSend(ScreenTouchCapabilities, "touchCapabilities", .{});
     }
 
+    /// `-[NSScreen displayLinkWithTarget:selector:]`
+    pub fn displayLinkWithTargetSelector(self: Self, target: objc.Object, selector: objc.Sel) objc.Object {
+        return self.object.msgSend(objc.Object, "displayLinkWithTarget:selector:", .{ target, selector });
+    }
+
+    /// `-[NSScreen userSpaceScaleFactor]`
+    pub fn userSpaceScaleFactor(self: Self) cg.Float {
+        return self.object.msgSend(cg.Float, "userSpaceScaleFactor", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"canRepresentDisplayGamut:" = fn (DisplayGamut) bool;
@@ -5791,6 +7875,8 @@ pub const Screen = extern struct {
         pub const auxiliaryTopRightArea = fn () cg.Rect;
         pub const CGDirectDisplayID = fn () u32;
         pub const touchCapabilities = fn () ScreenTouchCapabilities;
+        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const userSpaceScaleFactor = fn () cg.Float;
     };
 };
 
@@ -5850,7 +7936,7 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithColorSpace:components:count:]`
-    pub fn colorWithColorSpaceComponentsCount(space: objc.Object, components: ?*const cg.Float, number_of_components: objc.Integer) Color {
+    pub fn colorWithColorSpaceComponentsCount(space: objc.Object, components: ?[*]const cg.Float, number_of_components: objc.Integer) Color {
         return class().msgSend(Color, "colorWithColorSpace:components:count:", .{ space, components, number_of_components });
     }
 
@@ -6544,11 +8630,96 @@ pub const Color = extern struct {
         return class().msgSend(void, "setIgnoresAlpha:", .{ignores_alpha});
     }
 
+    /// `-[NSColor colorUsingColorSpaceName:device:]`
+    pub fn colorUsingColorSpaceNameDevice(self: Self, name: ?foundation.String, device_description: ?foundation.Dictionary(objc.Object, objc.Object)) ?Color {
+        return self.object.msgSend(?Color, "colorUsingColorSpaceName:device:", .{ name, device_description });
+    }
+
+    /// `-[NSColor colorUsingColorSpaceName:]`
+    pub fn colorUsingColorSpaceName(self: Self, name: ?foundation.String) ?Color {
+        return self.object.msgSend(?Color, "colorUsingColorSpaceName:", .{name});
+    }
+
+    /// `+[NSColor controlHighlightColor]`
+    pub fn controlHighlightColor() Color {
+        return class().msgSend(Color, "controlHighlightColor", .{});
+    }
+
+    /// `+[NSColor controlLightHighlightColor]`
+    pub fn controlLightHighlightColor() Color {
+        return class().msgSend(Color, "controlLightHighlightColor", .{});
+    }
+
+    /// `+[NSColor controlShadowColor]`
+    pub fn controlShadowColor() Color {
+        return class().msgSend(Color, "controlShadowColor", .{});
+    }
+
+    /// `+[NSColor controlDarkShadowColor]`
+    pub fn controlDarkShadowColor() Color {
+        return class().msgSend(Color, "controlDarkShadowColor", .{});
+    }
+
+    /// `+[NSColor scrollBarColor]`
+    pub fn scrollBarColor() Color {
+        return class().msgSend(Color, "scrollBarColor", .{});
+    }
+
+    /// `+[NSColor knobColor]`
+    pub fn knobColor() Color {
+        return class().msgSend(Color, "knobColor", .{});
+    }
+
+    /// `+[NSColor selectedKnobColor]`
+    pub fn selectedKnobColor() Color {
+        return class().msgSend(Color, "selectedKnobColor", .{});
+    }
+
+    /// `+[NSColor windowFrameColor]`
+    pub fn windowFrameColor() Color {
+        return class().msgSend(Color, "windowFrameColor", .{});
+    }
+
+    /// `+[NSColor selectedMenuItemColor]`
+    pub fn selectedMenuItemColor() Color {
+        return class().msgSend(Color, "selectedMenuItemColor", .{});
+    }
+
+    /// `+[NSColor headerColor]`
+    pub fn headerColor() Color {
+        return class().msgSend(Color, "headerColor", .{});
+    }
+
+    /// `+[NSColor secondarySelectedControlColor]`
+    pub fn secondarySelectedControlColor() Color {
+        return class().msgSend(Color, "secondarySelectedControlColor", .{});
+    }
+
+    /// `+[NSColor alternateSelectedControlColor]`
+    pub fn alternateSelectedControlColor() Color {
+        return class().msgSend(Color, "alternateSelectedControlColor", .{});
+    }
+
+    /// `+[NSColor controlAlternatingRowBackgroundColors]`
+    pub fn controlAlternatingRowBackgroundColors() foundation.Array(Color) {
+        return class().msgSend(foundation.Array(Color), "controlAlternatingRowBackgroundColors", .{});
+    }
+
+    /// `-[NSColor colorSpaceName]`
+    pub fn colorSpaceName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "colorSpaceName", .{});
+    }
+
+    /// `+[NSColor colorWithCIColor:]`
+    pub fn colorWithCIColor(color: objc.Object) Color {
+        return class().msgSend(Color, "colorWithCIColor:", .{color});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const init = fn () Color;
         pub const @"initWithCoder:" = fn (objc.Object) ?Color;
-        pub const @"+colorWithColorSpace:components:count:" = fn (objc.Object, ?*const cg.Float, objc.Integer) Color;
+        pub const @"+colorWithColorSpace:components:count:" = fn (objc.Object, ?[*]const cg.Float, objc.Integer) Color;
         pub const @"+colorWithSRGBRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithGenericGamma22White:alpha:" = fn (cg.Float, cg.Float) Color;
         pub const @"+colorWithDisplayP3Red:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
@@ -6686,6 +8857,23 @@ pub const Color = extern struct {
         pub const CGColor = fn () cg.Color;
         pub const @"+ignoresAlpha" = fn () bool;
         pub const @"+setIgnoresAlpha:" = fn (bool) void;
+        pub const @"colorUsingColorSpaceName:device:" = fn (?foundation.String, ?foundation.Dictionary(objc.Object, objc.Object)) ?Color;
+        pub const @"colorUsingColorSpaceName:" = fn (?foundation.String) ?Color;
+        pub const @"+controlHighlightColor" = fn () Color;
+        pub const @"+controlLightHighlightColor" = fn () Color;
+        pub const @"+controlShadowColor" = fn () Color;
+        pub const @"+controlDarkShadowColor" = fn () Color;
+        pub const @"+scrollBarColor" = fn () Color;
+        pub const @"+knobColor" = fn () Color;
+        pub const @"+selectedKnobColor" = fn () Color;
+        pub const @"+windowFrameColor" = fn () Color;
+        pub const @"+selectedMenuItemColor" = fn () Color;
+        pub const @"+headerColor" = fn () Color;
+        pub const @"+secondarySelectedControlColor" = fn () Color;
+        pub const @"+alternateSelectedControlColor" = fn () Color;
+        pub const @"+controlAlternatingRowBackgroundColors" = fn () foundation.Array(Color);
+        pub const colorSpaceName = fn () ?foundation.String;
+        pub const @"+colorWithCIColor:" = fn (objc.Object) Color;
     };
 };
 
@@ -7559,9 +9747,134 @@ pub const Menu = extern struct {
         return self.object.msgSend(void, "setUserInterfaceLayoutDirection:", .{user_interface_layout_direction});
     }
 
+    /// `+[NSMenu paletteMenuWithColors:titles:selectionHandler:]`
+    pub fn paletteMenuWithColorsTitlesSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), on_selection_change: anytype) Menu {
+        return class().msgSend(Menu, "paletteMenuWithColors:titles:selectionHandler:", .{ colors, item_titles, on_selection_change });
+    }
+
+    /// `+[NSMenu paletteMenuWithColors:titles:templateImage:selectionHandler:]`
+    pub fn paletteMenuWithColorsTitlesTemplateImageSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), image: Image, on_selection_change: anytype) Menu {
+        return class().msgSend(Menu, "paletteMenuWithColors:titles:templateImage:selectionHandler:", .{ colors, item_titles, image, on_selection_change });
+    }
+
+    /// `-[NSMenu presentationStyle]`
+    pub fn presentationStyle(self: Self) MenuPresentationStyle {
+        return self.object.msgSend(MenuPresentationStyle, "presentationStyle", .{});
+    }
+
+    /// `-[NSMenu setPresentationStyle:]`
+    pub fn setPresentationStyle(self: Self, presentation_style: MenuPresentationStyle) void {
+        return self.object.msgSend(void, "setPresentationStyle:", .{presentation_style});
+    }
+
+    /// `-[NSMenu selectionMode]`
+    pub fn selectionMode(self: Self) MenuSelectionMode {
+        return self.object.msgSend(MenuSelectionMode, "selectionMode", .{});
+    }
+
+    /// `-[NSMenu setSelectionMode:]`
+    pub fn setSelectionMode(self: Self, selection_mode: MenuSelectionMode) void {
+        return self.object.msgSend(void, "setSelectionMode:", .{selection_mode});
+    }
+
+    /// `-[NSMenu selectedItems]`
+    pub fn selectedItems(self: Self) foundation.Array(MenuItem) {
+        return self.object.msgSend(foundation.Array(MenuItem), "selectedItems", .{});
+    }
+
+    /// `-[NSMenu setSelectedItems:]`
+    pub fn setSelectedItems(self: Self, selected_items: foundation.Array(MenuItem)) void {
+        return self.object.msgSend(void, "setSelectedItems:", .{selected_items});
+    }
+
+    /// `-[NSMenu submenuAction:]`
+    pub fn submenuAction(self: Self, sender: ?objc.Object) void {
+        return self.object.msgSend(void, "submenuAction:", .{sender});
+    }
+
     /// `-[NSMenu propertiesToUpdate]`
     pub fn propertiesToUpdate(self: Self) MenuProperties {
         return self.object.msgSend(MenuProperties, "propertiesToUpdate", .{});
+    }
+
+    /// `-[NSMenu setMenuRepresentation:]`
+    pub fn setMenuRepresentation(self: Self, menu_rep: ?objc.Object) void {
+        return self.object.msgSend(void, "setMenuRepresentation:", .{menu_rep});
+    }
+
+    /// `-[NSMenu menuRepresentation]`
+    pub fn menuRepresentation(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "menuRepresentation", .{});
+    }
+
+    /// `-[NSMenu setContextMenuRepresentation:]`
+    pub fn setContextMenuRepresentation(self: Self, menu_rep: ?objc.Object) void {
+        return self.object.msgSend(void, "setContextMenuRepresentation:", .{menu_rep});
+    }
+
+    /// `-[NSMenu contextMenuRepresentation]`
+    pub fn contextMenuRepresentation(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "contextMenuRepresentation", .{});
+    }
+
+    /// `-[NSMenu setTearOffMenuRepresentation:]`
+    pub fn setTearOffMenuRepresentation(self: Self, menu_rep: ?objc.Object) void {
+        return self.object.msgSend(void, "setTearOffMenuRepresentation:", .{menu_rep});
+    }
+
+    /// `-[NSMenu tearOffMenuRepresentation]`
+    pub fn tearOffMenuRepresentation(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "tearOffMenuRepresentation", .{});
+    }
+
+    /// `+[NSMenu menuZone]`
+    pub fn menuZone() ?objc.Object {
+        return class().msgSend(?objc.Object, "menuZone", .{});
+    }
+
+    /// `+[NSMenu setMenuZone:]`
+    pub fn setMenuZone(zone: ?objc.Object) void {
+        return class().msgSend(void, "setMenuZone:", .{zone});
+    }
+
+    /// `-[NSMenu attachedMenu]`
+    pub fn attachedMenu(self: Self) ?Menu {
+        return self.object.msgSend(?Menu, "attachedMenu", .{});
+    }
+
+    /// `-[NSMenu isAttached]`
+    pub fn isAttached(self: Self) bool {
+        return self.object.msgSend(bool, "isAttached", .{});
+    }
+
+    /// `-[NSMenu sizeToFit]`
+    pub fn sizeToFit(self: Self) void {
+        return self.object.msgSend(void, "sizeToFit", .{});
+    }
+
+    /// `-[NSMenu locationForSubmenu:]`
+    pub fn locationForSubmenu(self: Self, submenu: ?Menu) cg.Point {
+        return self.object.msgSend(cg.Point, "locationForSubmenu:", .{submenu});
+    }
+
+    /// `-[NSMenu helpRequested:]`
+    pub fn helpRequested(self: Self, event_ptr: Event) void {
+        return self.object.msgSend(void, "helpRequested:", .{event_ptr});
+    }
+
+    /// `-[NSMenu menuChangedMessagesEnabled]`
+    pub fn menuChangedMessagesEnabled(self: Self) bool {
+        return self.object.msgSend(bool, "menuChangedMessagesEnabled", .{});
+    }
+
+    /// `-[NSMenu setMenuChangedMessagesEnabled:]`
+    pub fn setMenuChangedMessagesEnabled(self: Self, menu_changed_messages_enabled: bool) void {
+        return self.object.msgSend(void, "setMenuChangedMessagesEnabled:", .{menu_changed_messages_enabled});
+    }
+
+    /// `-[NSMenu isTornOff]`
+    pub fn isTornOff(self: Self) bool {
+        return self.object.msgSend(bool, "isTornOff", .{});
     }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
@@ -7622,7 +9935,30 @@ pub const Menu = extern struct {
         pub const @"setShowsStateColumn:" = fn (bool) void;
         pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
         pub const @"setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
+        pub const presentationStyle = fn () MenuPresentationStyle;
+        pub const @"setPresentationStyle:" = fn (MenuPresentationStyle) void;
+        pub const selectionMode = fn () MenuSelectionMode;
+        pub const @"setSelectionMode:" = fn (MenuSelectionMode) void;
+        pub const selectedItems = fn () foundation.Array(MenuItem);
+        pub const @"setSelectedItems:" = fn (foundation.Array(MenuItem)) void;
+        pub const @"submenuAction:" = fn (?objc.Object) void;
         pub const propertiesToUpdate = fn () MenuProperties;
+        pub const @"setMenuRepresentation:" = fn (?objc.Object) void;
+        pub const menuRepresentation = fn () ?objc.Object;
+        pub const @"setContextMenuRepresentation:" = fn (?objc.Object) void;
+        pub const contextMenuRepresentation = fn () ?objc.Object;
+        pub const @"setTearOffMenuRepresentation:" = fn (?objc.Object) void;
+        pub const tearOffMenuRepresentation = fn () ?objc.Object;
+        pub const @"+menuZone" = fn () ?objc.Object;
+        pub const @"+setMenuZone:" = fn (?objc.Object) void;
+        pub const attachedMenu = fn () ?Menu;
+        pub const isAttached = fn () bool;
+        pub const sizeToFit = fn () void;
+        pub const @"locationForSubmenu:" = fn (?Menu) cg.Point;
+        pub const @"helpRequested:" = fn (Event) void;
+        pub const menuChangedMessagesEnabled = fn () bool;
+        pub const @"setMenuChangedMessagesEnabled:" = fn (bool) void;
+        pub const isTornOff = fn () bool;
     };
 };
 
@@ -8011,6 +10347,26 @@ pub const MenuItem = extern struct {
         return self.object.msgSend(void, "setBadge:", .{badge_});
     }
 
+    /// `-[NSMenuItem setMnemonicLocation:]`
+    pub fn setMnemonicLocation(self: Self, location: objc.UInteger) void {
+        return self.object.msgSend(void, "setMnemonicLocation:", .{location});
+    }
+
+    /// `-[NSMenuItem mnemonicLocation]`
+    pub fn mnemonicLocation(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "mnemonicLocation", .{});
+    }
+
+    /// `-[NSMenuItem mnemonic]`
+    pub fn mnemonic(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "mnemonic", .{});
+    }
+
+    /// `-[NSMenuItem setTitleWithMnemonic:]`
+    pub fn setTitleWithMnemonic(self: Self, string_with_ampersand: foundation.String) void {
+        return self.object.msgSend(void, "setTitleWithMnemonic:", .{string_with_ampersand});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+separatorItem" = fn () MenuItem;
@@ -8081,6 +10437,10 @@ pub const MenuItem = extern struct {
         pub const @"setToolTip:" = fn (?foundation.String) void;
         pub const badge = fn () ?objc.Object;
         pub const @"setBadge:" = fn (?objc.Object) void;
+        pub const @"setMnemonicLocation:" = fn (objc.UInteger) void;
+        pub const mnemonicLocation = fn () objc.UInteger;
+        pub const mnemonic = fn () ?foundation.String;
+        pub const @"setTitleWithMnemonic:" = fn (foundation.String) void;
     };
 };
 
@@ -8747,6 +11107,41 @@ pub const Cursor = extern struct {
         return class().msgSend(Cursor, "rowResizeCursor", .{});
     }
 
+    /// `-[NSCursor initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:]`
+    pub fn initWithImageForegroundColorHintBackgroundColorHintHotSpot(self: Self, new_image: Image, fg: ?Color, bg: ?Color, hot_spot: cg.Point) Cursor {
+        return self.object.msgSend(Cursor, "initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:", .{ new_image, fg, bg, hot_spot });
+    }
+
+    /// `-[NSCursor setOnMouseExited:]`
+    pub fn setOnMouseExited(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "setOnMouseExited:", .{flag});
+    }
+
+    /// `-[NSCursor setOnMouseEntered:]`
+    pub fn setOnMouseEntered(self: Self, flag: bool) void {
+        return self.object.msgSend(void, "setOnMouseEntered:", .{flag});
+    }
+
+    /// `-[NSCursor mouseEntered:]`
+    pub fn mouseEntered(self: Self, event: Event) void {
+        return self.object.msgSend(void, "mouseEntered:", .{event});
+    }
+
+    /// `-[NSCursor mouseExited:]`
+    pub fn mouseExited(self: Self, event: Event) void {
+        return self.object.msgSend(void, "mouseExited:", .{event});
+    }
+
+    /// `-[NSCursor isSetOnMouseExited]`
+    pub fn isSetOnMouseExited(self: Self) bool {
+        return self.object.msgSend(bool, "isSetOnMouseExited", .{});
+    }
+
+    /// `-[NSCursor isSetOnMouseEntered]`
+    pub fn isSetOnMouseEntered(self: Self) bool {
+        return self.object.msgSend(bool, "isSetOnMouseEntered", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"initWithImage:hotSpot:" = fn (Image, cg.Point) Cursor;
@@ -8780,6 +11175,13 @@ pub const Cursor = extern struct {
         pub const @"+zoomOutCursor" = fn () Cursor;
         pub const @"+columnResizeCursor" = fn () Cursor;
         pub const @"+rowResizeCursor" = fn () Cursor;
+        pub const @"initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:" = fn (Image, ?Color, ?Color, cg.Point) Cursor;
+        pub const @"setOnMouseExited:" = fn (bool) void;
+        pub const @"setOnMouseEntered:" = fn (bool) void;
+        pub const @"mouseEntered:" = fn (Event) void;
+        pub const @"mouseExited:" = fn (Event) void;
+        pub const isSetOnMouseExited = fn () bool;
+        pub const isSetOnMouseEntered = fn () bool;
     };
 };
 
@@ -8913,6 +11315,16 @@ pub const GraphicsContext = extern struct {
         return self.object.msgSend(void, "setShouldAntialias:", .{should_antialias});
     }
 
+    /// `-[NSGraphicsContext imageInterpolation]`
+    pub fn imageInterpolation(self: Self) ImageInterpolation {
+        return self.object.msgSend(ImageInterpolation, "imageInterpolation", .{});
+    }
+
+    /// `-[NSGraphicsContext setImageInterpolation:]`
+    pub fn setImageInterpolation(self: Self, image_interpolation: ImageInterpolation) void {
+        return self.object.msgSend(void, "setImageInterpolation:", .{image_interpolation});
+    }
+
     /// `-[NSGraphicsContext patternPhase]`
     pub fn patternPhase(self: Self) cg.Point {
         return self.object.msgSend(cg.Point, "patternPhase", .{});
@@ -8941,6 +11353,11 @@ pub const GraphicsContext = extern struct {
     /// `-[NSGraphicsContext setColorRenderingIntent:]`
     pub fn setColorRenderingIntent(self: Self, color_rendering_intent: ColorRenderingIntent) void {
         return self.object.msgSend(void, "setColorRenderingIntent:", .{color_rendering_intent});
+    }
+
+    /// `-[NSGraphicsContext CIContext]`
+    pub fn CIContext(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "CIContext", .{});
     }
 
     /// `+[NSGraphicsContext setGraphicsState:]`
@@ -8992,12 +11409,15 @@ pub const GraphicsContext = extern struct {
         pub const isFlipped = fn () bool;
         pub const shouldAntialias = fn () bool;
         pub const @"setShouldAntialias:" = fn (bool) void;
+        pub const imageInterpolation = fn () ImageInterpolation;
+        pub const @"setImageInterpolation:" = fn (ImageInterpolation) void;
         pub const patternPhase = fn () cg.Point;
         pub const @"setPatternPhase:" = fn (cg.Point) void;
         pub const compositingOperation = fn () CompositingOperation;
         pub const @"setCompositingOperation:" = fn (CompositingOperation) void;
         pub const colorRenderingIntent = fn () ColorRenderingIntent;
         pub const @"setColorRenderingIntent:" = fn (ColorRenderingIntent) void;
+        pub const CIContext = fn () ?objc.Object;
         pub const @"+setGraphicsState:" = fn (objc.Integer) void;
         pub const focusStack = fn () ?objc.Object;
         pub const @"setFocusStack:" = fn (?objc.Object) void;
@@ -9005,10 +11425,6 @@ pub const GraphicsContext = extern struct {
         pub const @"+graphicsContextWithWindow:" = fn (Window) GraphicsContext;
         pub const graphicsPort = fn () ?*anyopaque;
     };
-
-    // Not generated:
-    //   -[NSGraphicsContext imageInterpolation]: NSImageInterpolation
-    //   -[NSGraphicsContext setImageInterpolation:]: NSImageInterpolation
 };
 
 /// `NSImageRep`, a subclass of `NSObject`.
@@ -9375,6 +11791,16 @@ pub const BitmapImageRep = extern struct {
         return self.object.msgSend(?BitmapImageRep, "initWithFocusedViewRect:", .{rect});
     }
 
+    /// `-[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:]`
+    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: ?foundation.String, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
+        return self.object.msgSend(?BitmapImageRep, "initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:", .{ planes, width, height, bps, spp, alpha, is_planar, color_space_name, r_bytes, p_bits });
+    }
+
+    /// `-[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:]`
+    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBitmapFormatBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: ?foundation.String, bitmap_format: BitmapFormat, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
+        return self.object.msgSend(?BitmapImageRep, "initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:", .{ planes, width, height, bps, spp, alpha, is_planar, color_space_name, bitmap_format, r_bytes, p_bits });
+    }
+
     /// `-[NSBitmapImageRep initWithCGImage:]`
     pub fn initWithCGImage(self: Self, cg_image: cg.Image) BitmapImageRep {
         return self.object.msgSend(BitmapImageRep, "initWithCGImage:", .{cg_image});
@@ -9398,6 +11824,11 @@ pub const BitmapImageRep = extern struct {
     /// `-[NSBitmapImageRep initWithData:]`
     pub fn initWithData(self: Self, data: foundation.Data) ?BitmapImageRep {
         return self.object.msgSend(?BitmapImageRep, "initWithData:", .{data});
+    }
+
+    /// `-[NSBitmapImageRep getBitmapDataPlanes:]`
+    pub fn getBitmapDataPlanes(self: Self, data: ?[*]?[*]u8) void {
+        return self.object.msgSend(void, "getBitmapDataPlanes:", .{data});
     }
 
     /// `-[NSBitmapImageRep getCompression:factor:]`
@@ -9783,11 +12214,14 @@ pub const BitmapImageRep = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"initWithFocusedViewRect:" = fn (cg.Rect) ?BitmapImageRep;
+        pub const @"initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, ?foundation.String, objc.Integer, objc.Integer) ?BitmapImageRep;
+        pub const @"initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, ?foundation.String, BitmapFormat, objc.Integer, objc.Integer) ?BitmapImageRep;
         pub const @"initWithCGImage:" = fn (cg.Image) BitmapImageRep;
         pub const @"initWithCIImage:" = fn (objc.Object) BitmapImageRep;
         pub const @"+imageRepsWithData:" = fn (foundation.Data) foundation.Array(ImageRep);
         pub const @"+imageRepWithData:" = fn (foundation.Data) ?BitmapImageRep;
         pub const @"initWithData:" = fn (foundation.Data) ?BitmapImageRep;
+        pub const @"getBitmapDataPlanes:" = fn (?[*]?[*]u8) void;
         pub const @"getCompression:factor:" = fn (?objc.Object, ?*f32) void;
         pub const @"setCompression:factor:" = fn (TIFFCompression, f32) void;
         pub const @"TIFFRepresentationUsingCompression:factor:" = fn (TIFFCompression, f32) ?foundation.Data;
@@ -9821,11 +12255,6 @@ pub const BitmapImageRep = extern struct {
         pub const @"setProperty:withValue:" = fn (?foundation.String, ?objc.Object) void;
         pub const @"valueForProperty:" = fn (?foundation.String) ?objc.Object;
     };
-
-    // Not generated:
-    //   -[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:]: unsigned char * _Nullable * _Nullable
-    //   -[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:]: unsigned char * _Nullable * _Nullable
-    //   -[NSBitmapImageRep getBitmapDataPlanes:]: unsigned char * _Nullable * _Nonnull
 };
 
 /// An object conforming to `NSApplicationDelegate`. As an `objc.Subclass`
@@ -9903,6 +12332,11 @@ pub const ApplicationDelegate = extern struct {
     /// `-[NSApplicationDelegate application:printFile:]`
     pub fn applicationPrintFile(self: Self, sender: Application, filename: foundation.String) bool {
         return self.object.msgSend(bool, "application:printFile:", .{ sender, filename });
+    }
+
+    /// `-[NSApplicationDelegate application:printFiles:withSettings:showPrintPanels:]`
+    pub fn applicationPrintFilesWithSettingsShowPrintPanels(self: Self, application: Application, file_names: foundation.Array(foundation.String), print_settings: foundation.Dictionary(objc.Object, objc.Object), show_print_panels: bool) ApplicationPrintReply {
+        return self.object.msgSend(ApplicationPrintReply, "application:printFiles:withSettings:showPrintPanels:", .{ application, file_names, print_settings, show_print_panels });
     }
 
     /// `-[NSApplicationDelegate applicationShouldTerminateAfterLastWindowClosed:]`
@@ -10091,6 +12525,7 @@ pub const ApplicationDelegate = extern struct {
         pub const @"applicationOpenUntitledFile:" = fn (Application) bool;
         pub const @"application:openFileWithoutUI:" = fn (objc.Object, foundation.String) bool;
         pub const @"application:printFile:" = fn (Application, foundation.String) bool;
+        pub const @"application:printFiles:withSettings:showPrintPanels:" = fn (Application, foundation.Array(foundation.String), foundation.Dictionary(objc.Object, objc.Object), bool) ApplicationPrintReply;
         pub const @"applicationShouldTerminateAfterLastWindowClosed:" = fn (Application) bool;
         pub const @"applicationShouldHandleReopen:hasVisibleWindows:" = fn (Application, bool) bool;
         pub const @"applicationDockMenu:" = fn (Application) ?Menu;
@@ -10126,9 +12561,6 @@ pub const ApplicationDelegate = extern struct {
         pub const @"applicationProtectedDataWillBecomeUnavailable:" = fn (objc.Object) void;
         pub const @"applicationProtectedDataDidBecomeAvailable:" = fn (objc.Object) void;
     };
-
-    // Not generated:
-    //   -[NSApplicationDelegate application:printFiles:withSettings:showPrintPanels:]: NSApplicationPrintReply
 };
 
 /// An object conforming to `NSWindowDelegate`. As an `objc.Subclass`
@@ -10533,6 +12965,11 @@ pub const MenuDelegate = extern struct {
         return self.object.msgSend(bool, "menu:updateItem:atIndex:shouldCancel:", .{ menu, item, index, should_cancel });
     }
 
+    /// `-[NSMenuDelegate menuHasKeyEquivalent:forEvent:target:action:]`
+    pub fn menuHasKeyEquivalentForEventTargetAction(self: Self, menu: Menu, event: Event, target: [*]objc.Nullable(objc.Object), action: objc.Object) bool {
+        return self.object.msgSend(bool, "menuHasKeyEquivalent:forEvent:target:action:", .{ menu, event, target, action });
+    }
+
     /// `-[NSMenuDelegate menuWillOpen:]`
     pub fn menuWillOpen(self: Self, menu: Menu) void {
         return self.object.msgSend(void, "menuWillOpen:", .{menu});
@@ -10558,12 +12995,10 @@ pub const MenuDelegate = extern struct {
         pub const @"menuNeedsUpdate:" = fn (Menu) void;
         pub const @"numberOfItemsInMenu:" = fn (Menu) objc.Integer;
         pub const @"menu:updateItem:atIndex:shouldCancel:" = fn (Menu, MenuItem, objc.Integer, bool) bool;
+        pub const @"menuHasKeyEquivalent:forEvent:target:action:" = fn (Menu, Event, [*]objc.Nullable(objc.Object), objc.Object) bool;
         pub const @"menuWillOpen:" = fn (Menu) void;
         pub const @"menuDidClose:" = fn (Menu) void;
         pub const @"menu:willHighlightItem:" = fn (Menu, ?MenuItem) void;
         pub const @"confinementRectForMenu:onScreen:" = fn (Menu, ?Screen) cg.Rect;
     };
-
-    // Not generated:
-    //   -[NSMenuDelegate menuHasKeyEquivalent:forEvent:target:action:]: id  _Nullable * _Nonnull
 };

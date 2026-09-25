@@ -90,6 +90,42 @@ pub const allocateClassPair = class.allocateClassPair;
 pub const registerClassPair = class.registerClassPair;
 pub const disposeClassPair = class.disposeClassPair;
 
+/// An element of a C array of objects that may hold nil, such as the
+/// textures in `setFragmentTextures:withRange:` -- `id<MTLTexture>
+/// _Nullable const *`. It is exactly the size of the pointer it holds,
+/// which `?T` is not, so a slice of these is the C array itself.
+///
+/// ```zig
+/// encoder.setFragmentTexturesWithRange(&.{ .of(albedo), .none, .of(normals) }, .{ .location = 0, .length = 3 });
+/// ```
+pub fn Nullable(comptime T: type) type {
+    if (!abi.isObject(T)) @compileError("objc.Nullable holds an object wrapper; found " ++ @typeName(T));
+    return extern struct {
+        value: ?*anyopaque,
+
+        const Self = @This();
+
+        pub const none: Self = .{ .value = null };
+
+        pub fn of(item: ?T) Self {
+            return .{ .value = if (item) |present| abi.unwrap(present).value else null };
+        }
+
+        pub fn get(self: Self) ?T {
+            return abi.wrap(T, .{ .value = self.value orelse return null });
+        }
+    };
+}
+
+test "Nullable is the size of a pointer" {
+    const N = Nullable(Object);
+    try std.testing.expectEqual(@sizeOf(*anyopaque), @sizeOf(N));
+    try std.testing.expect(N.none.get() == null);
+    var byte: u8 = 0;
+    const item: Object = .{ .value = &byte };
+    try std.testing.expect(N.of(item).get().?.value == item.value);
+}
+
 /// `NSInteger`: the signed integer Foundation counts in.
 pub const Integer = c_long;
 /// `NSUInteger`: counts, indices, option sets.

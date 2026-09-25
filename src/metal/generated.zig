@@ -69,6 +69,59 @@ pub const Region = extern struct {
     size: Size,
 };
 
+/// `MTLSizeAndAlign`.
+pub const SizeAndAlign = extern struct {
+    size: objc.UInteger,
+    @"align": objc.UInteger,
+};
+
+/// `MTLResourceID`.
+pub const ResourceID = extern struct {
+    _impl: u64,
+};
+
+/// `MTLTextureSwizzleChannels`.
+pub const TextureSwizzleChannels = extern struct {
+    red: TextureSwizzle,
+    green: TextureSwizzle,
+    blue: TextureSwizzle,
+    alpha: TextureSwizzle,
+};
+
+/// `MTLAccelerationStructureSizes`.
+pub const AccelerationStructureSizes = extern struct {
+    acceleration_structure_size: objc.UInteger,
+    build_scratch_buffer_size: objc.UInteger,
+    refit_scratch_buffer_size: objc.UInteger,
+};
+
+/// `CATransform3D`.
+pub const Transform3D = extern struct {
+    m11: cg.Float,
+    m12: cg.Float,
+    m13: cg.Float,
+    m14: cg.Float,
+    m21: cg.Float,
+    m22: cg.Float,
+    m23: cg.Float,
+    m24: cg.Float,
+    m31: cg.Float,
+    m32: cg.Float,
+    m33: cg.Float,
+    m34: cg.Float,
+    m41: cg.Float,
+    m42: cg.Float,
+    m43: cg.Float,
+    m44: cg.Float,
+};
+
+/// `CAFrameRateRange`.
+pub const FrameRateRange = extern struct {
+    minimum: f32,
+    maximum: f32,
+    preferred: f32,
+};
+
 /// `MTLPixelFormat`.
 pub const PixelFormat = enum(objc.UInteger) {
     invalid = 0,
@@ -831,6 +884,208 @@ pub const IOCompressionMethod = enum(objc.Integer) {
     _,
 };
 
+/// `MTLForwardProgressUsage`.
+pub const ForwardProgressUsage = enum(objc.Integer) {
+    automatic = 0,
+    weak = 1,
+    simd_group_parallel = 2,
+    _,
+};
+
+/// `MTLVisibilityResultType`.
+pub const VisibilityResultType = enum(objc.Integer) {
+    reset = 0,
+    accumulate = 1,
+    _,
+};
+
+/// `MTLTessellationPartitionMode`.
+pub const TessellationPartitionMode = enum(objc.UInteger) {
+    pow2 = 0,
+    integer = 1,
+    fractional_odd = 2,
+    fractional_even = 3,
+    _,
+};
+
+/// `MTLTessellationFactorStepFunction`.
+pub const TessellationFactorStepFunction = enum(objc.UInteger) {
+    constant = 0,
+    per_patch = 1,
+    per_instance = 2,
+    per_patch_and_per_instance = 3,
+    _,
+};
+
+/// `MTLTessellationFactorFormat`.
+pub const TessellationFactorFormat = enum(objc.UInteger) {
+    half = 0,
+    _,
+};
+
+/// `MTLTessellationControlPointIndexType`.
+pub const TessellationControlPointIndexType = enum(objc.UInteger) {
+    none = 0,
+    u_int16 = 1,
+    u_int32 = 2,
+    _,
+};
+
+/// `MTLSamplerReductionMode`.
+pub const SamplerReductionMode = enum(objc.UInteger) {
+    weighted_average = 0,
+    minimum = 1,
+    maximum = 2,
+    _,
+};
+
+/// `MTLFloatingPointConversionRoundingMode`.
+pub const FloatingPointConversionRoundingMode = enum(objc.Integer) {
+    to_nearest_even = 0,
+    toward_zero = 1,
+    _,
+};
+
+/// `MTLContentionRelief`.
+pub const ContentionRelief = enum(objc.Integer) {
+    automatic = 0,
+    none = 1,
+    _,
+};
+
+/// `MTLTextureSparseTier`.
+pub const TextureSparseTier = enum(objc.Integer) {
+    none = 0,
+    @"1" = 1,
+    @"2" = 2,
+    _,
+};
+
+/// `MTLBufferSparseTier`.
+pub const BufferSparseTier = enum(objc.Integer) {
+    none = 0,
+    @"1" = 1,
+    _,
+};
+
+/// `MTLTensorPlaneType`.
+pub const TensorPlaneType = enum(objc.Integer) {
+    data = 0,
+    scales = 1,
+    _,
+};
+
+/// `MTLStages`.
+pub const Stages = packed struct(u64) {
+    vertex: bool = false,
+    fragment: bool = false,
+    tile: bool = false,
+    object: bool = false,
+    mesh: bool = false,
+    _5: u21 = 0,
+    resource_state: bool = false,
+    dispatch: bool = false,
+    blit: bool = false,
+    acceleration_structure: bool = false,
+    machine_learning: bool = false,
+    _31: u33 = 0,
+    pub const all: Stages = @fromBackingInt(0x7fffffffffffffff);
+};
+
+/// `MTLPatchType`.
+pub const PatchType = enum(objc.UInteger) {
+    none = 0,
+    triangle = 1,
+    quad = 2,
+    _,
+};
+
+/// `MTLFunctionOptions`.
+pub const FunctionOptions = packed struct(u64) {
+    compile_to_binary: bool = false,
+    store_function_in_metal_pipelines_script: bool = false,
+    fail_on_binary_archive_miss: bool = false,
+    pipeline_independent: bool = false,
+    _4: u60 = 0,
+    pub const none: FunctionOptions = @fromBackingInt(0x0);
+    pub const store_function_in_metal_script: FunctionOptions = @fromBackingInt(0x2);
+};
+
+/// `MTLFeatureSet`.
+pub const FeatureSet = enum(objc.UInteger) {
+    set_i_os_gpu_family1_v1 = 0,
+    set_i_os_gpu_family2_v1 = 1,
+    set_i_os_gpu_family1_v2 = 2,
+    set_i_os_gpu_family2_v2 = 3,
+    set_i_os_gpu_family3_v1 = 4,
+    set_i_os_gpu_family1_v3 = 5,
+    set_i_os_gpu_family2_v3 = 6,
+    set_i_os_gpu_family3_v2 = 7,
+    set_i_os_gpu_family1_v4 = 8,
+    set_i_os_gpu_family2_v4 = 9,
+    set_i_os_gpu_family3_v3 = 10,
+    set_i_os_gpu_family4_v1 = 11,
+    set_i_os_gpu_family1_v5 = 12,
+    set_i_os_gpu_family2_v5 = 13,
+    set_i_os_gpu_family3_v4 = 14,
+    set_i_os_gpu_family4_v2 = 15,
+    set_i_os_gpu_family5_v1 = 16,
+    set_mac_os_gpu_family1_v1 = 10000,
+    set_mac_os_gpu_family1_v2 = 10001,
+    set_mac_os_read_write_texture_tier2 = 10002,
+    set_mac_os_gpu_family1_v3 = 10003,
+    set_mac_os_gpu_family1_v4 = 10004,
+    set_mac_os_gpu_family2_v1 = 10005,
+    set_tv_os_gpu_family1_v1 = 30000,
+    set_tv_os_gpu_family1_v2 = 30001,
+    set_tv_os_gpu_family1_v3 = 30002,
+    set_tv_os_gpu_family2_v1 = 30003,
+    set_tv_os_gpu_family1_v4 = 30004,
+    set_tv_os_gpu_family2_v2 = 30005,
+    _,
+    pub const set_osx_gpu_family1_v1: FeatureSet = .set_mac_os_gpu_family1_v1;
+    pub const set_osx_gpu_family1_v2: FeatureSet = .set_mac_os_gpu_family1_v2;
+    pub const set_osx_read_write_texture_tier2: FeatureSet = .set_mac_os_read_write_texture_tier2;
+    pub const set_tvos_gpu_family1_v1: FeatureSet = .set_tv_os_gpu_family1_v1;
+};
+
+/// `MTL4CounterHeapType`.
+pub const MTL4CounterHeapType = enum(objc.Integer) {
+    invalid = 0,
+    timestamp = 1,
+    _,
+};
+
+/// `CAEdgeAntialiasingMask`.
+pub const EdgeAntialiasingMask = packed struct(u32) {
+    left_edge: bool = false,
+    right_edge: bool = false,
+    bottom_edge: bool = false,
+    top_edge: bool = false,
+    _4: u28 = 0,
+};
+
+/// `CACornerMask`.
+pub const CornerMask = packed struct(u64) {
+    min_x_min_y_corner: bool = false,
+    max_x_min_y_corner: bool = false,
+    min_x_max_y_corner: bool = false,
+    max_x_max_y_corner: bool = false,
+    _4: u60 = 0,
+};
+
+/// `CAAutoresizingMask`.
+pub const AutoresizingMask = packed struct(u32) {
+    min_x_margin: bool = false,
+    width_sizable: bool = false,
+    max_x_margin: bool = false,
+    min_y_margin: bool = false,
+    height_sizable: bool = false,
+    max_y_margin: bool = false,
+    _6: u26 = 0,
+    pub const not_sizable: AutoresizingMask = @fromBackingInt(0x0);
+};
+
 /// `MTLRenderPassDescriptor`, a subclass of `NSObject`.
 pub const RenderPassDescriptor = extern struct {
     object: objc.Object,
@@ -1021,6 +1276,16 @@ pub const RenderPassDescriptor = extern struct {
         return self.object.msgSend(objc.Object, "sampleBufferAttachments", .{});
     }
 
+    /// `-[MTLRenderPassDescriptor visibilityResultType]`
+    pub fn visibilityResultType(self: Self) VisibilityResultType {
+        return self.object.msgSend(VisibilityResultType, "visibilityResultType", .{});
+    }
+
+    /// `-[MTLRenderPassDescriptor setVisibilityResultType:]`
+    pub fn setVisibilityResultType(self: Self, visibility_result_type: VisibilityResultType) void {
+        return self.object.msgSend(void, "setVisibilityResultType:", .{visibility_result_type});
+    }
+
     /// `-[MTLRenderPassDescriptor supportColorAttachmentMapping]`
     pub fn supportColorAttachmentMapping(self: Self) bool {
         return self.object.msgSend(bool, "supportColorAttachmentMapping", .{});
@@ -1062,13 +1327,11 @@ pub const RenderPassDescriptor = extern struct {
         pub const rasterizationRateMap = fn () ?objc.Object;
         pub const @"setRasterizationRateMap:" = fn (?objc.Object) void;
         pub const sampleBufferAttachments = fn () objc.Object;
+        pub const visibilityResultType = fn () VisibilityResultType;
+        pub const @"setVisibilityResultType:" = fn (VisibilityResultType) void;
         pub const supportColorAttachmentMapping = fn () bool;
         pub const @"setSupportColorAttachmentMapping:" = fn (bool) void;
     };
-
-    // Not generated:
-    //   -[MTLRenderPassDescriptor visibilityResultType]: MTLVisibilityResultType
-    //   -[MTLRenderPassDescriptor setVisibilityResultType:]: MTLVisibilityResultType
 };
 
 /// `MTLRenderPassAttachmentDescriptor`, a subclass of `NSObject`.
@@ -1856,6 +2119,16 @@ pub const RenderPipelineDescriptor = extern struct {
         return self.object.msgSend(void, "setInputPrimitiveTopology:", .{input_primitive_topology});
     }
 
+    /// `-[MTLRenderPipelineDescriptor tessellationPartitionMode]`
+    pub fn tessellationPartitionMode(self: Self) TessellationPartitionMode {
+        return self.object.msgSend(TessellationPartitionMode, "tessellationPartitionMode", .{});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor setTessellationPartitionMode:]`
+    pub fn setTessellationPartitionMode(self: Self, tessellation_partition_mode: TessellationPartitionMode) void {
+        return self.object.msgSend(void, "setTessellationPartitionMode:", .{tessellation_partition_mode});
+    }
+
     /// `-[MTLRenderPipelineDescriptor maxTessellationFactor]`
     pub fn maxTessellationFactor(self: Self) objc.UInteger {
         return self.object.msgSend(objc.UInteger, "maxTessellationFactor", .{});
@@ -1874,6 +2147,36 @@ pub const RenderPipelineDescriptor = extern struct {
     /// `-[MTLRenderPipelineDescriptor setTessellationFactorScaleEnabled:]`
     pub fn setTessellationFactorScaleEnabled(self: Self, tessellation_factor_scale_enabled: bool) void {
         return self.object.msgSend(void, "setTessellationFactorScaleEnabled:", .{tessellation_factor_scale_enabled});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor tessellationFactorFormat]`
+    pub fn tessellationFactorFormat(self: Self) TessellationFactorFormat {
+        return self.object.msgSend(TessellationFactorFormat, "tessellationFactorFormat", .{});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor setTessellationFactorFormat:]`
+    pub fn setTessellationFactorFormat(self: Self, tessellation_factor_format: TessellationFactorFormat) void {
+        return self.object.msgSend(void, "setTessellationFactorFormat:", .{tessellation_factor_format});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor tessellationControlPointIndexType]`
+    pub fn tessellationControlPointIndexType(self: Self) TessellationControlPointIndexType {
+        return self.object.msgSend(TessellationControlPointIndexType, "tessellationControlPointIndexType", .{});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor setTessellationControlPointIndexType:]`
+    pub fn setTessellationControlPointIndexType(self: Self, tessellation_control_point_index_type: TessellationControlPointIndexType) void {
+        return self.object.msgSend(void, "setTessellationControlPointIndexType:", .{tessellation_control_point_index_type});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor tessellationFactorStepFunction]`
+    pub fn tessellationFactorStepFunction(self: Self) TessellationFactorStepFunction {
+        return self.object.msgSend(TessellationFactorStepFunction, "tessellationFactorStepFunction", .{});
+    }
+
+    /// `-[MTLRenderPipelineDescriptor setTessellationFactorStepFunction:]`
+    pub fn setTessellationFactorStepFunction(self: Self, tessellation_factor_step_function: TessellationFactorStepFunction) void {
+        return self.object.msgSend(void, "setTessellationFactorStepFunction:", .{tessellation_factor_step_function});
     }
 
     /// `-[MTLRenderPipelineDescriptor tessellationOutputWindingOrder]`
@@ -2036,10 +2339,18 @@ pub const RenderPipelineDescriptor = extern struct {
         pub const @"setStencilAttachmentPixelFormat:" = fn (PixelFormat) void;
         pub const inputPrimitiveTopology = fn () PrimitiveTopologyClass;
         pub const @"setInputPrimitiveTopology:" = fn (PrimitiveTopologyClass) void;
+        pub const tessellationPartitionMode = fn () TessellationPartitionMode;
+        pub const @"setTessellationPartitionMode:" = fn (TessellationPartitionMode) void;
         pub const maxTessellationFactor = fn () objc.UInteger;
         pub const @"setMaxTessellationFactor:" = fn (objc.UInteger) void;
         pub const isTessellationFactorScaleEnabled = fn () bool;
         pub const @"setTessellationFactorScaleEnabled:" = fn (bool) void;
+        pub const tessellationFactorFormat = fn () TessellationFactorFormat;
+        pub const @"setTessellationFactorFormat:" = fn (TessellationFactorFormat) void;
+        pub const tessellationControlPointIndexType = fn () TessellationControlPointIndexType;
+        pub const @"setTessellationControlPointIndexType:" = fn (TessellationControlPointIndexType) void;
+        pub const tessellationFactorStepFunction = fn () TessellationFactorStepFunction;
+        pub const @"setTessellationFactorStepFunction:" = fn (TessellationFactorStepFunction) void;
         pub const tessellationOutputWindingOrder = fn () Winding;
         pub const @"setTessellationOutputWindingOrder:" = fn (Winding) void;
         pub const vertexBuffers = fn () objc.Object;
@@ -2067,16 +2378,6 @@ pub const RenderPipelineDescriptor = extern struct {
         pub const shaderValidation = fn () ShaderValidation;
         pub const @"setShaderValidation:" = fn (ShaderValidation) void;
     };
-
-    // Not generated:
-    //   -[MTLRenderPipelineDescriptor tessellationPartitionMode]: MTLTessellationPartitionMode
-    //   -[MTLRenderPipelineDescriptor setTessellationPartitionMode:]: MTLTessellationPartitionMode
-    //   -[MTLRenderPipelineDescriptor tessellationFactorFormat]: MTLTessellationFactorFormat
-    //   -[MTLRenderPipelineDescriptor setTessellationFactorFormat:]: MTLTessellationFactorFormat
-    //   -[MTLRenderPipelineDescriptor tessellationControlPointIndexType]: MTLTessellationControlPointIndexType
-    //   -[MTLRenderPipelineDescriptor setTessellationControlPointIndexType:]: MTLTessellationControlPointIndexType
-    //   -[MTLRenderPipelineDescriptor tessellationFactorStepFunction]: MTLTessellationFactorStepFunction
-    //   -[MTLRenderPipelineDescriptor setTessellationFactorStepFunction:]: MTLTessellationFactorStepFunction
 };
 
 /// `MTLRenderPipelineColorAttachmentDescriptor`, a subclass of `NSObject`.
@@ -2494,6 +2795,26 @@ pub const ComputePipelineDescriptor = extern struct {
         return self.object.msgSend(void, "setRequiredThreadsPerThreadgroup:", .{required_threads_per_threadgroup});
     }
 
+    /// `-[MTLComputePipelineDescriptor forwardProgressUsage]`
+    pub fn forwardProgressUsage(self: Self) ForwardProgressUsage {
+        return self.object.msgSend(ForwardProgressUsage, "forwardProgressUsage", .{});
+    }
+
+    /// `-[MTLComputePipelineDescriptor setForwardProgressUsage:]`
+    pub fn setForwardProgressUsage(self: Self, forward_progress_usage: ForwardProgressUsage) void {
+        return self.object.msgSend(void, "setForwardProgressUsage:", .{forward_progress_usage});
+    }
+
+    /// `-[MTLComputePipelineDescriptor contentionRelief]`
+    pub fn contentionRelief(self: Self) ContentionRelief {
+        return self.object.msgSend(ContentionRelief, "contentionRelief", .{});
+    }
+
+    /// `-[MTLComputePipelineDescriptor setContentionRelief:]`
+    pub fn setContentionRelief(self: Self, contention_relief: ContentionRelief) void {
+        return self.object.msgSend(void, "setContentionRelief:", .{contention_relief});
+    }
+
     /// `-[MTLComputePipelineDescriptor optimizeForPersistentKernel]`
     pub fn optimizeForPersistentKernel(self: Self) bool {
         return self.object.msgSend(bool, "optimizeForPersistentKernel", .{});
@@ -2536,15 +2857,13 @@ pub const ComputePipelineDescriptor = extern struct {
         pub const @"setShaderValidation:" = fn (ShaderValidation) void;
         pub const requiredThreadsPerThreadgroup = fn () Size;
         pub const @"setRequiredThreadsPerThreadgroup:" = fn (Size) void;
+        pub const forwardProgressUsage = fn () ForwardProgressUsage;
+        pub const @"setForwardProgressUsage:" = fn (ForwardProgressUsage) void;
+        pub const contentionRelief = fn () ContentionRelief;
+        pub const @"setContentionRelief:" = fn (ContentionRelief) void;
         pub const optimizeForPersistentKernel = fn () bool;
         pub const @"setOptimizeForPersistentKernel:" = fn (bool) void;
     };
-
-    // Not generated:
-    //   -[MTLComputePipelineDescriptor forwardProgressUsage]: MTLForwardProgressUsage
-    //   -[MTLComputePipelineDescriptor setForwardProgressUsage:]: MTLForwardProgressUsage
-    //   -[MTLComputePipelineDescriptor contentionRelief]: MTLContentionRelief
-    //   -[MTLComputePipelineDescriptor setContentionRelief:]: MTLContentionRelief
 };
 
 /// `MTLVertexDescriptor`, a subclass of `NSObject`.
@@ -3274,6 +3593,16 @@ pub const SamplerDescriptor = extern struct {
         return self.object.msgSend(void, "setBorderColor:", .{border_color});
     }
 
+    /// `-[MTLSamplerDescriptor reductionMode]`
+    pub fn reductionMode(self: Self) SamplerReductionMode {
+        return self.object.msgSend(SamplerReductionMode, "reductionMode", .{});
+    }
+
+    /// `-[MTLSamplerDescriptor setReductionMode:]`
+    pub fn setReductionMode(self: Self, reduction_mode: SamplerReductionMode) void {
+        return self.object.msgSend(void, "setReductionMode:", .{reduction_mode});
+    }
+
     /// `-[MTLSamplerDescriptor normalizedCoordinates]`
     pub fn normalizedCoordinates(self: Self) bool {
         return self.object.msgSend(bool, "normalizedCoordinates", .{});
@@ -3372,6 +3701,8 @@ pub const SamplerDescriptor = extern struct {
         pub const @"setRAddressMode:" = fn (SamplerAddressMode) void;
         pub const borderColor = fn () SamplerBorderColor;
         pub const @"setBorderColor:" = fn (SamplerBorderColor) void;
+        pub const reductionMode = fn () SamplerReductionMode;
+        pub const @"setReductionMode:" = fn (SamplerReductionMode) void;
         pub const normalizedCoordinates = fn () bool;
         pub const @"setNormalizedCoordinates:" = fn (bool) void;
         pub const lodMinClamp = fn () f32;
@@ -3389,10 +3720,6 @@ pub const SamplerDescriptor = extern struct {
         pub const label = fn () ?foundation.String;
         pub const @"setLabel:" = fn (?foundation.String) void;
     };
-
-    // Not generated:
-    //   -[MTLSamplerDescriptor reductionMode]: MTLSamplerReductionMode
-    //   -[MTLSamplerDescriptor setReductionMode:]: MTLSamplerReductionMode
 };
 
 /// `MTLTextureDescriptor`, a subclass of `NSObject`.
@@ -3605,6 +3932,16 @@ pub const TextureDescriptor = extern struct {
         return self.object.msgSend(void, "setCompressionType:", .{compression_type});
     }
 
+    /// `-[MTLTextureDescriptor swizzle]`
+    pub fn swizzle(self: Self) TextureSwizzleChannels {
+        return self.object.msgSend(TextureSwizzleChannels, "swizzle", .{});
+    }
+
+    /// `-[MTLTextureDescriptor setSwizzle:]`
+    pub fn setSwizzle(self: Self, swizzle_: TextureSwizzleChannels) void {
+        return self.object.msgSend(void, "setSwizzle:", .{swizzle_});
+    }
+
     /// `-[MTLTextureDescriptor placementSparsePageSize]`
     pub fn placementSparsePageSize(self: Self) SparsePageSize {
         return self.object.msgSend(SparsePageSize, "placementSparsePageSize", .{});
@@ -3650,13 +3987,11 @@ pub const TextureDescriptor = extern struct {
         pub const @"setAllowGPUOptimizedContents:" = fn (bool) void;
         pub const compressionType = fn () TextureCompressionType;
         pub const @"setCompressionType:" = fn (TextureCompressionType) void;
+        pub const swizzle = fn () TextureSwizzleChannels;
+        pub const @"setSwizzle:" = fn (TextureSwizzleChannels) void;
         pub const placementSparsePageSize = fn () SparsePageSize;
         pub const @"setPlacementSparsePageSize:" = fn (SparsePageSize) void;
     };
-
-    // Not generated:
-    //   -[MTLTextureDescriptor swizzle]: MTLTextureSwizzleChannels
-    //   -[MTLTextureDescriptor setSwizzle:]: MTLTextureSwizzleChannels
 };
 
 /// `MTLCompileOptions`, a subclass of `NSObject`.
@@ -3854,6 +4189,16 @@ pub const CompileOptions = extern struct {
         return self.object.msgSend(void, "setEnableLogging:", .{enable_logging});
     }
 
+    /// `-[MTLCompileOptions floatingPointConversionRoundingMode]`
+    pub fn floatingPointConversionRoundingMode(self: Self) FloatingPointConversionRoundingMode {
+        return self.object.msgSend(FloatingPointConversionRoundingMode, "floatingPointConversionRoundingMode", .{});
+    }
+
+    /// `-[MTLCompileOptions setFloatingPointConversionRoundingMode:]`
+    pub fn setFloatingPointConversionRoundingMode(self: Self, floating_point_conversion_rounding_mode: FloatingPointConversionRoundingMode) void {
+        return self.object.msgSend(void, "setFloatingPointConversionRoundingMode:", .{floating_point_conversion_rounding_mode});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const preprocessorMacros = fn () ?foundation.Dictionary(foundation.String, objc.Object);
@@ -3886,11 +4231,9 @@ pub const CompileOptions = extern struct {
         pub const @"setRequiredThreadsPerThreadgroup:" = fn (Size) void;
         pub const enableLogging = fn () bool;
         pub const @"setEnableLogging:" = fn (bool) void;
+        pub const floatingPointConversionRoundingMode = fn () FloatingPointConversionRoundingMode;
+        pub const @"setFloatingPointConversionRoundingMode:" = fn (FloatingPointConversionRoundingMode) void;
     };
-
-    // Not generated:
-    //   -[MTLCompileOptions floatingPointConversionRoundingMode]: MTLFloatingPointConversionRoundingMode
-    //   -[MTLCompileOptions setFloatingPointConversionRoundingMode:]: MTLFloatingPointConversionRoundingMode
 };
 
 /// `CALayer`, a subclass of `NSObject`.
@@ -4223,6 +4566,16 @@ pub const Layer = extern struct {
         return self.object.msgSend(void, "setAnchorPointZ:", .{anchor_point_z});
     }
 
+    /// `-[CALayer transform]`
+    pub fn transform(self: Self) Transform3D {
+        return self.object.msgSend(Transform3D, "transform", .{});
+    }
+
+    /// `-[CALayer setTransform:]`
+    pub fn setTransform(self: Self, transform_: Transform3D) void {
+        return self.object.msgSend(void, "setTransform:", .{transform_});
+    }
+
     /// `-[CALayer frame]`
     pub fn frame(self: Self) cg.Rect {
         return self.object.msgSend(cg.Rect, "frame", .{});
@@ -4276,6 +4629,16 @@ pub const Layer = extern struct {
     /// `-[CALayer setSublayers:]`
     pub fn setSublayers(self: Self, sublayers_: ?foundation.Array(Layer)) void {
         return self.object.msgSend(void, "setSublayers:", .{sublayers_});
+    }
+
+    /// `-[CALayer sublayerTransform]`
+    pub fn sublayerTransform(self: Self) Transform3D {
+        return self.object.msgSend(Transform3D, "sublayerTransform", .{});
+    }
+
+    /// `-[CALayer setSublayerTransform:]`
+    pub fn setSublayerTransform(self: Self, sublayer_transform: Transform3D) void {
+        return self.object.msgSend(void, "setSublayerTransform:", .{sublayer_transform});
     }
 
     /// `-[CALayer mask]`
@@ -4468,6 +4831,16 @@ pub const Layer = extern struct {
         return self.object.msgSend(void, "setDrawsAsynchronously:", .{draws_asynchronously});
     }
 
+    /// `-[CALayer edgeAntialiasingMask]`
+    pub fn edgeAntialiasingMask(self: Self) EdgeAntialiasingMask {
+        return self.object.msgSend(EdgeAntialiasingMask, "edgeAntialiasingMask", .{});
+    }
+
+    /// `-[CALayer setEdgeAntialiasingMask:]`
+    pub fn setEdgeAntialiasingMask(self: Self, edge_antialiasing_mask: EdgeAntialiasingMask) void {
+        return self.object.msgSend(void, "setEdgeAntialiasingMask:", .{edge_antialiasing_mask});
+    }
+
     /// `-[CALayer allowsEdgeAntialiasing]`
     pub fn allowsEdgeAntialiasing(self: Self) bool {
         return self.object.msgSend(bool, "allowsEdgeAntialiasing", .{});
@@ -4496,6 +4869,16 @@ pub const Layer = extern struct {
     /// `-[CALayer setCornerRadius:]`
     pub fn setCornerRadius(self: Self, corner_radius: cg.Float) void {
         return self.object.msgSend(void, "setCornerRadius:", .{corner_radius});
+    }
+
+    /// `-[CALayer maskedCorners]`
+    pub fn maskedCorners(self: Self) CornerMask {
+        return self.object.msgSend(CornerMask, "maskedCorners", .{});
+    }
+
+    /// `-[CALayer setMaskedCorners:]`
+    pub fn setMaskedCorners(self: Self, masked_corners: CornerMask) void {
+        return self.object.msgSend(void, "setMaskedCorners:", .{masked_corners});
     }
 
     /// `-[CALayer cornerCurve]`
@@ -4648,6 +5031,16 @@ pub const Layer = extern struct {
         return self.object.msgSend(void, "setShadowPath:", .{shadow_path});
     }
 
+    /// `-[CALayer autoresizingMask]`
+    pub fn autoresizingMask(self: Self) AutoresizingMask {
+        return self.object.msgSend(AutoresizingMask, "autoresizingMask", .{});
+    }
+
+    /// `-[CALayer setAutoresizingMask:]`
+    pub fn setAutoresizingMask(self: Self, autoresizing_mask: AutoresizingMask) void {
+        return self.object.msgSend(void, "setAutoresizingMask:", .{autoresizing_mask});
+    }
+
     /// `-[CALayer layoutManager]`
     pub fn layoutManager(self: Self) ?objc.Object {
         return self.object.msgSend(?objc.Object, "layoutManager", .{});
@@ -4696,6 +5089,26 @@ pub const Layer = extern struct {
     /// `-[CALayer setStyle:]`
     pub fn setStyle(self: Self, style_: ?foundation.Dictionary(objc.Object, objc.Object)) void {
         return self.object.msgSend(void, "setStyle:", .{style_});
+    }
+
+    /// `-[CALayer addConstraint:]`
+    pub fn addConstraint(self: Self, c: objc.Object) void {
+        return self.object.msgSend(void, "addConstraint:", .{c});
+    }
+
+    /// `-[CALayer constraints]`
+    pub fn constraints(self: Self) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "constraints", .{});
+    }
+
+    /// `-[CALayer setConstraints:]`
+    pub fn setConstraints(self: Self, constraints_: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "setConstraints:", .{constraints_});
+    }
+
+    /// `+[CALayer layerWithRemoteClientId:]`
+    pub fn layerWithRemoteClientId(client_id: u32) Layer {
+        return class().msgSend(Layer, "layerWithRemoteClientId:", .{client_id});
     }
 
     /// `-[CALayer scrollPoint:]`
@@ -4772,6 +5185,8 @@ pub const Layer = extern struct {
         pub const @"setAnchorPoint:" = fn (cg.Point) void;
         pub const anchorPointZ = fn () cg.Float;
         pub const @"setAnchorPointZ:" = fn (cg.Float) void;
+        pub const transform = fn () Transform3D;
+        pub const @"setTransform:" = fn (Transform3D) void;
         pub const frame = fn () cg.Rect;
         pub const @"setFrame:" = fn (cg.Rect) void;
         pub const isHidden = fn () bool;
@@ -4783,6 +5198,8 @@ pub const Layer = extern struct {
         pub const superlayer = fn () ?Layer;
         pub const sublayers = fn () ?foundation.Array(Layer);
         pub const @"setSublayers:" = fn (?foundation.Array(Layer)) void;
+        pub const sublayerTransform = fn () Transform3D;
+        pub const @"setSublayerTransform:" = fn (Transform3D) void;
         pub const mask = fn () ?Layer;
         pub const @"setMask:" = fn (?Layer) void;
         pub const masksToBounds = fn () bool;
@@ -4821,12 +5238,16 @@ pub const Layer = extern struct {
         pub const @"setNeedsDisplayOnBoundsChange:" = fn (bool) void;
         pub const drawsAsynchronously = fn () bool;
         pub const @"setDrawsAsynchronously:" = fn (bool) void;
+        pub const edgeAntialiasingMask = fn () EdgeAntialiasingMask;
+        pub const @"setEdgeAntialiasingMask:" = fn (EdgeAntialiasingMask) void;
         pub const allowsEdgeAntialiasing = fn () bool;
         pub const @"setAllowsEdgeAntialiasing:" = fn (bool) void;
         pub const backgroundColor = fn () ?cg.Color;
         pub const @"setBackgroundColor:" = fn (?cg.Color) void;
         pub const cornerRadius = fn () cg.Float;
         pub const @"setCornerRadius:" = fn (cg.Float) void;
+        pub const maskedCorners = fn () CornerMask;
+        pub const @"setMaskedCorners:" = fn (CornerMask) void;
         pub const cornerCurve = fn () ?foundation.String;
         pub const @"setCornerCurve:" = fn (?foundation.String) void;
         pub const borderWidth = fn () cg.Float;
@@ -4857,6 +5278,8 @@ pub const Layer = extern struct {
         pub const @"setShadowRadius:" = fn (cg.Float) void;
         pub const shadowPath = fn () ?cg.Path;
         pub const @"setShadowPath:" = fn (?cg.Path) void;
+        pub const autoresizingMask = fn () AutoresizingMask;
+        pub const @"setAutoresizingMask:" = fn (AutoresizingMask) void;
         pub const layoutManager = fn () ?objc.Object;
         pub const @"setLayoutManager:" = fn (?objc.Object) void;
         pub const actions = fn () ?foundation.Dictionary(foundation.String, objc.Object);
@@ -4867,22 +5290,14 @@ pub const Layer = extern struct {
         pub const @"setDelegate:" = fn (?objc.Object) void;
         pub const style = fn () ?foundation.Dictionary(objc.Object, objc.Object);
         pub const @"setStyle:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"addConstraint:" = fn (objc.Object) void;
+        pub const constraints = fn () ?foundation.Array(objc.Object);
+        pub const @"setConstraints:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"+layerWithRemoteClientId:" = fn (u32) Layer;
         pub const @"scrollPoint:" = fn (cg.Point) void;
         pub const @"scrollRectToVisible:" = fn (cg.Rect) void;
         pub const visibleRect = fn () cg.Rect;
     };
-
-    // Not generated:
-    //   -[CALayer transform]: CATransform3D
-    //   -[CALayer setTransform:]: CATransform3D
-    //   -[CALayer sublayerTransform]: CATransform3D
-    //   -[CALayer setSublayerTransform:]: CATransform3D
-    //   -[CALayer edgeAntialiasingMask]: CAEdgeAntialiasingMask
-    //   -[CALayer setEdgeAntialiasingMask:]: CAEdgeAntialiasingMask
-    //   -[CALayer maskedCorners]: CACornerMask
-    //   -[CALayer setMaskedCorners:]: CACornerMask
-    //   -[CALayer autoresizingMask]: CAAutoresizingMask
-    //   -[CALayer setAutoresizingMask:]: CAAutoresizingMask
 };
 
 /// `CAMetalLayer`, a subclass of `CALayer`.
@@ -5350,6 +5765,16 @@ pub const MetalLayer = extern struct {
         return self.object.msgSend(void, "setAnchorPointZ:", .{anchor_point_z});
     }
 
+    /// `-[CALayer transform]`
+    pub fn transform(self: Self) Transform3D {
+        return self.object.msgSend(Transform3D, "transform", .{});
+    }
+
+    /// `-[CALayer setTransform:]`
+    pub fn setTransform(self: Self, transform_: Transform3D) void {
+        return self.object.msgSend(void, "setTransform:", .{transform_});
+    }
+
     /// `-[CALayer frame]`
     pub fn frame(self: Self) cg.Rect {
         return self.object.msgSend(cg.Rect, "frame", .{});
@@ -5403,6 +5828,16 @@ pub const MetalLayer = extern struct {
     /// `-[CALayer setSublayers:]`
     pub fn setSublayers(self: Self, sublayers_: ?foundation.Array(Layer)) void {
         return self.object.msgSend(void, "setSublayers:", .{sublayers_});
+    }
+
+    /// `-[CALayer sublayerTransform]`
+    pub fn sublayerTransform(self: Self) Transform3D {
+        return self.object.msgSend(Transform3D, "sublayerTransform", .{});
+    }
+
+    /// `-[CALayer setSublayerTransform:]`
+    pub fn setSublayerTransform(self: Self, sublayer_transform: Transform3D) void {
+        return self.object.msgSend(void, "setSublayerTransform:", .{sublayer_transform});
     }
 
     /// `-[CALayer mask]`
@@ -5585,6 +6020,16 @@ pub const MetalLayer = extern struct {
         return self.object.msgSend(void, "setDrawsAsynchronously:", .{draws_asynchronously});
     }
 
+    /// `-[CALayer edgeAntialiasingMask]`
+    pub fn edgeAntialiasingMask(self: Self) EdgeAntialiasingMask {
+        return self.object.msgSend(EdgeAntialiasingMask, "edgeAntialiasingMask", .{});
+    }
+
+    /// `-[CALayer setEdgeAntialiasingMask:]`
+    pub fn setEdgeAntialiasingMask(self: Self, edge_antialiasing_mask: EdgeAntialiasingMask) void {
+        return self.object.msgSend(void, "setEdgeAntialiasingMask:", .{edge_antialiasing_mask});
+    }
+
     /// `-[CALayer allowsEdgeAntialiasing]`
     pub fn allowsEdgeAntialiasing(self: Self) bool {
         return self.object.msgSend(bool, "allowsEdgeAntialiasing", .{});
@@ -5613,6 +6058,16 @@ pub const MetalLayer = extern struct {
     /// `-[CALayer setCornerRadius:]`
     pub fn setCornerRadius(self: Self, corner_radius: cg.Float) void {
         return self.object.msgSend(void, "setCornerRadius:", .{corner_radius});
+    }
+
+    /// `-[CALayer maskedCorners]`
+    pub fn maskedCorners(self: Self) CornerMask {
+        return self.object.msgSend(CornerMask, "maskedCorners", .{});
+    }
+
+    /// `-[CALayer setMaskedCorners:]`
+    pub fn setMaskedCorners(self: Self, masked_corners: CornerMask) void {
+        return self.object.msgSend(void, "setMaskedCorners:", .{masked_corners});
     }
 
     /// `-[CALayer cornerCurve]`
@@ -5765,6 +6220,16 @@ pub const MetalLayer = extern struct {
         return self.object.msgSend(void, "setShadowPath:", .{shadow_path});
     }
 
+    /// `-[CALayer autoresizingMask]`
+    pub fn autoresizingMask(self: Self) AutoresizingMask {
+        return self.object.msgSend(AutoresizingMask, "autoresizingMask", .{});
+    }
+
+    /// `-[CALayer setAutoresizingMask:]`
+    pub fn setAutoresizingMask(self: Self, autoresizing_mask: AutoresizingMask) void {
+        return self.object.msgSend(void, "setAutoresizingMask:", .{autoresizing_mask});
+    }
+
     /// `-[CALayer layoutManager]`
     pub fn layoutManager(self: Self) ?objc.Object {
         return self.object.msgSend(?objc.Object, "layoutManager", .{});
@@ -5813,6 +6278,26 @@ pub const MetalLayer = extern struct {
     /// `-[CALayer setStyle:]`
     pub fn setStyle(self: Self, style_: ?foundation.Dictionary(objc.Object, objc.Object)) void {
         return self.object.msgSend(void, "setStyle:", .{style_});
+    }
+
+    /// `-[CALayer addConstraint:]`
+    pub fn addConstraint(self: Self, c: objc.Object) void {
+        return self.object.msgSend(void, "addConstraint:", .{c});
+    }
+
+    /// `-[CALayer constraints]`
+    pub fn constraints(self: Self) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "constraints", .{});
+    }
+
+    /// `-[CALayer setConstraints:]`
+    pub fn setConstraints(self: Self, constraints_: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "setConstraints:", .{constraints_});
+    }
+
+    /// `+[CALayer layerWithRemoteClientId:]`
+    pub fn layerWithRemoteClientId(client_id: u32) Layer {
+        return class().msgSend(Layer, "layerWithRemoteClientId:", .{client_id});
     }
 
     /// `-[CALayer scrollPoint:]`
@@ -5972,6 +6457,16 @@ pub const DisplayLink = extern struct {
         return self.object.msgSend(void, "setPreferredFramesPerSecond:", .{preferred_frames_per_second});
     }
 
+    /// `-[CADisplayLink preferredFrameRateRange]`
+    pub fn preferredFrameRateRange(self: Self) FrameRateRange {
+        return self.object.msgSend(FrameRateRange, "preferredFrameRateRange", .{});
+    }
+
+    /// `-[CADisplayLink setPreferredFrameRateRange:]`
+    pub fn setPreferredFrameRateRange(self: Self, preferred_frame_rate_range: FrameRateRange) void {
+        return self.object.msgSend(void, "setPreferredFrameRateRange:", .{preferred_frame_rate_range});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) DisplayLink;
@@ -5987,11 +6482,9 @@ pub const DisplayLink = extern struct {
         pub const @"setFrameInterval:" = fn (objc.Integer) void;
         pub const preferredFramesPerSecond = fn () objc.Integer;
         pub const @"setPreferredFramesPerSecond:" = fn (objc.Integer) void;
+        pub const preferredFrameRateRange = fn () FrameRateRange;
+        pub const @"setPreferredFrameRateRange:" = fn (FrameRateRange) void;
     };
-
-    // Not generated:
-    //   -[CADisplayLink preferredFrameRateRange]: CAFrameRateRange
-    //   -[CADisplayLink setPreferredFrameRateRange:]: CAFrameRateRange
 };
 
 /// An object conforming to `MTLDevice`. As an `objc.Subclass`
@@ -6044,6 +6537,16 @@ pub const Device = extern struct {
     /// `-[MTLDevice newCommandQueueWithDescriptor:]`
     pub fn newCommandQueueWithDescriptor(self: Self, descriptor: objc.Object) ?CommandQueue {
         return self.object.msgSend(?CommandQueue, "newCommandQueueWithDescriptor:", .{descriptor});
+    }
+
+    /// `-[MTLDevice heapTextureSizeAndAlignWithDescriptor:]`
+    pub fn heapTextureSizeAndAlignWithDescriptor(self: Self, desc: TextureDescriptor) SizeAndAlign {
+        return self.object.msgSend(SizeAndAlign, "heapTextureSizeAndAlignWithDescriptor:", .{desc});
+    }
+
+    /// `-[MTLDevice heapBufferSizeAndAlignWithLength:options:]`
+    pub fn heapBufferSizeAndAlignWithLengthOptions(self: Self, length: objc.UInteger, options: ResourceOptions) SizeAndAlign {
+        return self.object.msgSend(SizeAndAlign, "heapBufferSizeAndAlignWithLength:options:", .{ length, options });
     }
 
     /// `-[MTLDevice newHeapWithDescriptor:]`
@@ -6196,6 +6699,11 @@ pub const Device = extern struct {
         return self.object.msgSend(?objc.Object, "newFence", .{});
     }
 
+    /// `-[MTLDevice supportsFeatureSet:]`
+    pub fn supportsFeatureSet(self: Self, feature_set: FeatureSet) bool {
+        return self.object.msgSend(bool, "supportsFeatureSet:", .{feature_set});
+    }
+
     /// `-[MTLDevice supportsFamily:]`
     pub fn supportsFamily(self: Self, gpu_family: GPUFamily) bool {
         return self.object.msgSend(bool, "supportsFamily:", .{gpu_family});
@@ -6307,12 +6815,12 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:]`
-    pub fn convertSparsePixelRegionsToTileRegionsWithTileSizeAlignmentModeNumRegions(self: Self, pixel_regions: objc.Object, tile_regions: objc.Object, tile_size: Size, mode: SparseTextureRegionAlignmentMode, num_regions: objc.UInteger) void {
+    pub fn convertSparsePixelRegionsToTileRegionsWithTileSizeAlignmentModeNumRegions(self: Self, pixel_regions: ?[*]const Region, tile_regions: ?*Region, tile_size: Size, mode: SparseTextureRegionAlignmentMode, num_regions: objc.UInteger) void {
         return self.object.msgSend(void, "convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:", .{ pixel_regions, tile_regions, tile_size, mode, num_regions });
     }
 
     /// `-[MTLDevice convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:]`
-    pub fn convertSparseTileRegionsToPixelRegionsWithTileSizeNumRegions(self: Self, tile_regions: objc.Object, pixel_regions: objc.Object, tile_size: Size, num_regions: objc.UInteger) void {
+    pub fn convertSparseTileRegionsToPixelRegionsWithTileSizeNumRegions(self: Self, tile_regions: ?[*]const Region, pixel_regions: ?*Region, tile_size: Size, num_regions: objc.UInteger) void {
         return self.object.msgSend(void, "convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:", .{ tile_regions, pixel_regions, tile_size, num_regions });
     }
 
@@ -6366,6 +6874,11 @@ pub const Device = extern struct {
         return self.object.msgSend(?objc.Object, "newBinaryArchiveWithDescriptor:error:", .{ descriptor, @"error" });
     }
 
+    /// `-[MTLDevice accelerationStructureSizesWithDescriptor:]`
+    pub fn accelerationStructureSizesWithDescriptor(self: Self, descriptor: objc.Object) AccelerationStructureSizes {
+        return self.object.msgSend(AccelerationStructureSizes, "accelerationStructureSizesWithDescriptor:", .{descriptor});
+    }
+
     /// `-[MTLDevice newAccelerationStructureWithSize:]`
     pub fn newAccelerationStructureWithSize(self: Self, size: objc.UInteger) ?objc.Object {
         return self.object.msgSend(?objc.Object, "newAccelerationStructureWithSize:", .{size});
@@ -6376,9 +6889,24 @@ pub const Device = extern struct {
         return self.object.msgSend(?objc.Object, "newAccelerationStructureWithDescriptor:", .{descriptor});
     }
 
+    /// `-[MTLDevice heapAccelerationStructureSizeAndAlignWithSize:]`
+    pub fn heapAccelerationStructureSizeAndAlignWithSize(self: Self, size: objc.UInteger) SizeAndAlign {
+        return self.object.msgSend(SizeAndAlign, "heapAccelerationStructureSizeAndAlignWithSize:", .{size});
+    }
+
+    /// `-[MTLDevice heapAccelerationStructureSizeAndAlignWithDescriptor:]`
+    pub fn heapAccelerationStructureSizeAndAlignWithDescriptor(self: Self, descriptor: objc.Object) SizeAndAlign {
+        return self.object.msgSend(SizeAndAlign, "heapAccelerationStructureSizeAndAlignWithDescriptor:", .{descriptor});
+    }
+
     /// `-[MTLDevice newResidencySetWithDescriptor:error:]`
     pub fn newResidencySetWithDescriptorError(self: Self, desc: objc.Object, @"error": ?*objc.abi.Id) ?objc.Object {
         return self.object.msgSend(?objc.Object, "newResidencySetWithDescriptor:error:", .{ desc, @"error" });
+    }
+
+    /// `-[MTLDevice tensorSizeAndAlignWithDescriptor:]`
+    pub fn tensorSizeAndAlignWithDescriptor(self: Self, descriptor: objc.Object) SizeAndAlign {
+        return self.object.msgSend(SizeAndAlign, "tensorSizeAndAlignWithDescriptor:", .{descriptor});
     }
 
     /// `-[MTLDevice newTensorWithDescriptor:error:]`
@@ -6454,6 +6982,11 @@ pub const Device = extern struct {
     /// `-[MTLDevice newCounterHeapWithDescriptor:error:]`
     pub fn newCounterHeapWithDescriptorError(self: Self, descriptor: objc.Object, @"error": ?*objc.abi.Id) ?objc.Object {
         return self.object.msgSend(?objc.Object, "newCounterHeapWithDescriptor:error:", .{ descriptor, @"error" });
+    }
+
+    /// `-[MTLDevice sizeOfCounterHeapEntry:]`
+    pub fn sizeOfCounterHeapEntry(self: Self, @"type": MTL4CounterHeapType) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "sizeOfCounterHeapEntry:", .{@"type"});
     }
 
     /// `-[MTLDevice queryTimestampFrequency]`
@@ -6692,6 +7225,8 @@ pub const Device = extern struct {
         pub const newCommandQueue = fn () ?CommandQueue;
         pub const @"newCommandQueueWithMaxCommandBufferCount:" = fn (objc.UInteger) ?CommandQueue;
         pub const @"newCommandQueueWithDescriptor:" = fn (objc.Object) ?CommandQueue;
+        pub const @"heapTextureSizeAndAlignWithDescriptor:" = fn (TextureDescriptor) SizeAndAlign;
+        pub const @"heapBufferSizeAndAlignWithLength:options:" = fn (objc.UInteger, ResourceOptions) SizeAndAlign;
         pub const @"newHeapWithDescriptor:" = fn (objc.Object) ?objc.Object;
         pub const @"newBufferWithLength:options:" = fn (objc.UInteger, ResourceOptions) ?Buffer;
         pub const @"newBufferWithBytes:length:options:" = fn (?*const anyopaque, objc.UInteger, ResourceOptions) ?Buffer;
@@ -6714,6 +7249,7 @@ pub const Device = extern struct {
         pub const @"newComputePipelineStateWithFunction:options:reflection:error:" = fn (Function, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
         pub const @"newComputePipelineStateWithDescriptor:options:reflection:error:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
         pub const newFence = fn () ?objc.Object;
+        pub const @"supportsFeatureSet:" = fn (FeatureSet) bool;
         pub const @"supportsFamily:" = fn (GPUFamily) bool;
         pub const @"supportsTextureSampleCount:" = fn (objc.UInteger) bool;
         pub const @"minimumLinearTextureAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
@@ -6734,8 +7270,8 @@ pub const Device = extern struct {
         pub const @"newIOFileHandleWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
         pub const @"newIOFileHandleWithURL:compressionMethod:error:" = fn (foundation.Url, IOCompressionMethod, ?*objc.abi.Id) ?objc.Object;
         pub const @"sparseTileSizeWithTextureType:pixelFormat:sampleCount:" = fn (TextureType, PixelFormat, objc.UInteger) Size;
-        pub const @"convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:" = fn (objc.Object, objc.Object, Size, SparseTextureRegionAlignmentMode, objc.UInteger) void;
-        pub const @"convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:" = fn (objc.Object, objc.Object, Size, objc.UInteger) void;
+        pub const @"convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:" = fn (?[*]const Region, ?*Region, Size, SparseTextureRegionAlignmentMode, objc.UInteger) void;
+        pub const @"convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:" = fn (?[*]const Region, ?*Region, Size, objc.UInteger) void;
         pub const @"sparseTileSizeInBytesForSparsePageSize:" = fn (SparsePageSize) objc.UInteger;
         pub const @"sparseTileSizeWithTextureType:pixelFormat:sampleCount:sparsePageSize:" = fn (TextureType, PixelFormat, objc.UInteger, SparsePageSize) Size;
         pub const @"newCounterSampleBufferWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
@@ -6746,9 +7282,13 @@ pub const Device = extern struct {
         pub const @"newDynamicLibrary:error:" = fn (Library, ?*objc.abi.Id) ?objc.Object;
         pub const @"newDynamicLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
         pub const @"newBinaryArchiveWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"accelerationStructureSizesWithDescriptor:" = fn (objc.Object) AccelerationStructureSizes;
         pub const @"newAccelerationStructureWithSize:" = fn (objc.UInteger) ?objc.Object;
         pub const @"newAccelerationStructureWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"heapAccelerationStructureSizeAndAlignWithSize:" = fn (objc.UInteger) SizeAndAlign;
+        pub const @"heapAccelerationStructureSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
         pub const @"newResidencySetWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"tensorSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
         pub const @"newTensorWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
         pub const @"newTensorWithDescriptor:attachments:error:" = fn (objc.Object, objc.Object, ?*objc.abi.Id) ?objc.Object;
         pub const @"functionHandleWithFunction:" = fn (Function) ?objc.Object;
@@ -6764,6 +7304,7 @@ pub const Device = extern struct {
         pub const @"newPipelineDataSetSerializerWithDescriptor:" = fn (objc.Object) objc.Object;
         pub const @"newBufferWithLength:options:placementSparsePageSize:" = fn (objc.UInteger, ResourceOptions, SparsePageSize) ?Buffer;
         pub const @"newCounterHeapWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"sizeOfCounterHeapEntry:" = fn (MTL4CounterHeapType) objc.UInteger;
         pub const queryTimestampFrequency = fn () u64;
         pub const @"functionHandleWithBinaryFunction:" = fn (objc.Object) ?objc.Object;
         pub const name = fn () foundation.String;
@@ -6811,16 +7352,6 @@ pub const Device = extern struct {
         pub const @"setShouldMaximizeConcurrentCompilation:" = fn (bool) void;
         pub const maximumConcurrentCompilationTaskCount = fn () objc.UInteger;
     };
-
-    // Not generated:
-    //   -[MTLDevice heapTextureSizeAndAlignWithDescriptor:]: MTLSizeAndAlign
-    //   -[MTLDevice heapBufferSizeAndAlignWithLength:options:]: MTLSizeAndAlign
-    //   -[MTLDevice supportsFeatureSet:]: MTLFeatureSet
-    //   -[MTLDevice accelerationStructureSizesWithDescriptor:]: MTLAccelerationStructureSizes
-    //   -[MTLDevice heapAccelerationStructureSizeAndAlignWithSize:]: MTLSizeAndAlign
-    //   -[MTLDevice heapAccelerationStructureSizeAndAlignWithDescriptor:]: MTLSizeAndAlign
-    //   -[MTLDevice tensorSizeAndAlignWithDescriptor:]: MTLSizeAndAlign
-    //   -[MTLDevice sizeOfCounterHeapEntry:]: MTL4CounterHeapType
 };
 
 /// An object conforming to `MTLCommandQueue`. As an `objc.Subclass`
@@ -6880,9 +7411,19 @@ pub const CommandQueue = extern struct {
         return self.object.msgSend(void, "addResidencySet:", .{residency_set});
     }
 
+    /// `-[MTLCommandQueue addResidencySets:count:]`
+    pub fn addResidencySetsCount(self: Self, residency_sets: [*]const objc.Object, count: objc.UInteger) void {
+        return self.object.msgSend(void, "addResidencySets:count:", .{ residency_sets, count });
+    }
+
     /// `-[MTLCommandQueue removeResidencySet:]`
     pub fn removeResidencySet(self: Self, residency_set: objc.Object) void {
         return self.object.msgSend(void, "removeResidencySet:", .{residency_set});
+    }
+
+    /// `-[MTLCommandQueue removeResidencySets:count:]`
+    pub fn removeResidencySetsCount(self: Self, residency_sets: [*]const objc.Object, count: objc.UInteger) void {
+        return self.object.msgSend(void, "removeResidencySets:count:", .{ residency_sets, count });
     }
 
     /// `-[MTLCommandQueue label]`
@@ -6907,15 +7448,13 @@ pub const CommandQueue = extern struct {
         pub const commandBufferWithUnretainedReferences = fn () ?CommandBuffer;
         pub const insertDebugCaptureBoundary = fn () void;
         pub const @"addResidencySet:" = fn (objc.Object) void;
+        pub const @"addResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
         pub const @"removeResidencySet:" = fn (objc.Object) void;
+        pub const @"removeResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
         pub const label = fn () ?foundation.String;
         pub const @"setLabel:" = fn (?foundation.String) void;
         pub const device = fn () Device;
     };
-
-    // Not generated:
-    //   -[MTLCommandQueue addResidencySets:count:]: id<MTLResidencySet>  _Nonnull const * _Nonnull
-    //   -[MTLCommandQueue removeResidencySets:count:]: id<MTLResidencySet>  _Nonnull const * _Nonnull
 };
 
 /// An object conforming to `MTLCommandBuffer`. As an `objc.Subclass`
@@ -7075,6 +7614,11 @@ pub const CommandBuffer = extern struct {
         return self.object.msgSend(void, "useResidencySet:", .{residency_set});
     }
 
+    /// `-[MTLCommandBuffer useResidencySets:count:]`
+    pub fn useResidencySetsCount(self: Self, residency_sets: [*]const objc.Object, count: objc.UInteger) void {
+        return self.object.msgSend(void, "useResidencySets:count:", .{ residency_sets, count });
+    }
+
     /// `-[MTLCommandBuffer device]`
     pub fn device(self: Self) Device {
         return self.object.msgSend(Device, "device", .{});
@@ -7165,6 +7709,7 @@ pub const CommandBuffer = extern struct {
         pub const @"pushDebugGroup:" = fn (foundation.String) void;
         pub const popDebugGroup = fn () void;
         pub const @"useResidencySet:" = fn (objc.Object) void;
+        pub const @"useResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
         pub const device = fn () Device;
         pub const commandQueue = fn () CommandQueue;
         pub const retainedReferences = fn () bool;
@@ -7179,9 +7724,6 @@ pub const CommandBuffer = extern struct {
         pub const status = fn () CommandBufferStatus;
         pub const @"error" = fn () ?foundation.ErrorObject;
     };
-
-    // Not generated:
-    //   -[MTLCommandBuffer useResidencySets:count:]: id<MTLResidencySet>  _Nonnull const * _Nonnull
 };
 
 /// An object conforming to `MTLCommandEncoder`. As an `objc.Subclass`
@@ -7221,6 +7763,11 @@ pub const CommandEncoder = extern struct {
         return self.object.msgSend(void, "endEncoding", .{});
     }
 
+    /// `-[MTLCommandEncoder barrierAfterQueueStages:beforeStages:]`
+    pub fn barrierAfterQueueStagesBeforeStages(self: Self, after_queue_stages: Stages, before_stages: Stages) void {
+        return self.object.msgSend(void, "barrierAfterQueueStages:beforeStages:", .{ after_queue_stages, before_stages });
+    }
+
     /// `-[MTLCommandEncoder insertDebugSignpost:]`
     pub fn insertDebugSignpost(self: Self, string: foundation.String) void {
         return self.object.msgSend(void, "insertDebugSignpost:", .{string});
@@ -7254,6 +7801,7 @@ pub const CommandEncoder = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const endEncoding = fn () void;
+        pub const @"barrierAfterQueueStages:beforeStages:" = fn (Stages, Stages) void;
         pub const @"insertDebugSignpost:" = fn (foundation.String) void;
         pub const @"pushDebugGroup:" = fn (foundation.String) void;
         pub const popDebugGroup = fn () void;
@@ -7261,9 +7809,6 @@ pub const CommandEncoder = extern struct {
         pub const label = fn () ?foundation.String;
         pub const @"setLabel:" = fn (?foundation.String) void;
     };
-
-    // Not generated:
-    //   -[MTLCommandEncoder barrierAfterQueueStages:beforeStages:]: MTLStages
 };
 
 /// An object conforming to `MTLRenderCommandEncoder`, which extends `MTLCommandEncoder`. As an `objc.Subclass`
@@ -7318,9 +7863,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setVertexBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setVertexBuffers:offsets:withRange:]`
+    pub fn setVertexBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setVertexBuffer:offset:attributeStride:atIndex:]`
     pub fn setVertexBufferOffsetAttributeStrideAtIndex(self: Self, buffer: ?Buffer, offset: objc.UInteger, stride: objc.UInteger, index: objc.UInteger) void {
         return self.object.msgSend(void, "setVertexBuffer:offset:attributeStride:atIndex:", .{ buffer, offset, stride, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setVertexBuffers:offsets:attributeStrides:withRange:]`
+    pub fn setVertexBuffersOffsetsAttributeStridesWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, strides: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexBuffers:offsets:attributeStrides:withRange:", .{ buffers, offsets, strides, range });
     }
 
     /// `-[MTLRenderCommandEncoder setVertexBufferOffset:attributeStride:atIndex:]`
@@ -7338,9 +7893,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setVertexTexture:atIndex:", .{ texture, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setVertexTextures:withRange:]`
+    pub fn setVertexTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexTextures:withRange:", .{ textures, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setVertexSamplerState:atIndex:]`
     pub fn setVertexSamplerStateAtIndex(self: Self, sampler: ?SamplerState, index: objc.UInteger) void {
         return self.object.msgSend(void, "setVertexSamplerState:atIndex:", .{ sampler, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setVertexSamplerStates:withRange:]`
+    pub fn setVertexSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexSamplerStates:withRange:", .{ samplers, range });
     }
 
     /// `-[MTLRenderCommandEncoder setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
@@ -7348,14 +7913,29 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setVertexSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setVertexVisibleFunctionTable:atBufferIndex:]`
     pub fn setVertexVisibleFunctionTableAtBufferIndex(self: Self, function_table: ?objc.Object, buffer_index: objc.UInteger) void {
         return self.object.msgSend(void, "setVertexVisibleFunctionTable:atBufferIndex:", .{ function_table, buffer_index });
     }
 
+    /// `-[MTLRenderCommandEncoder setVertexVisibleFunctionTables:withBufferRange:]`
+    pub fn setVertexVisibleFunctionTablesWithBufferRange(self: Self, function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexVisibleFunctionTables:withBufferRange:", .{ function_tables, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setVertexIntersectionFunctionTable:atBufferIndex:]`
     pub fn setVertexIntersectionFunctionTableAtBufferIndex(self: Self, intersection_function_table: ?objc.Object, buffer_index: objc.UInteger) void {
         return self.object.msgSend(void, "setVertexIntersectionFunctionTable:atBufferIndex:", .{ intersection_function_table, buffer_index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setVertexIntersectionFunctionTables:withBufferRange:]`
+    pub fn setVertexIntersectionFunctionTablesWithBufferRange(self: Self, intersection_function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setVertexIntersectionFunctionTables:withBufferRange:", .{ intersection_function_tables, range });
     }
 
     /// `-[MTLRenderCommandEncoder setVertexAccelerationStructure:atBufferIndex:]`
@@ -7369,7 +7949,7 @@ pub const RenderCommandEncoder = extern struct {
     }
 
     /// `-[MTLRenderCommandEncoder setViewports:count:]`
-    pub fn setViewportsCount(self: Self, viewports: objc.Object, count: objc.UInteger) void {
+    pub fn setViewportsCount(self: Self, viewports: ?[*]const Viewport, count: objc.UInteger) void {
         return self.object.msgSend(void, "setViewports:count:", .{ viewports, count });
     }
 
@@ -7409,7 +7989,7 @@ pub const RenderCommandEncoder = extern struct {
     }
 
     /// `-[MTLRenderCommandEncoder setScissorRects:count:]`
-    pub fn setScissorRectsCount(self: Self, scissor_rects: objc.Object, count: objc.UInteger) void {
+    pub fn setScissorRectsCount(self: Self, scissor_rects: ?[*]const ScissorRect, count: objc.UInteger) void {
         return self.object.msgSend(void, "setScissorRects:count:", .{ scissor_rects, count });
     }
 
@@ -7433,9 +8013,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setFragmentBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setFragmentBuffers:offsets:withRange:]`
+    pub fn setFragmentBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setFragmentTexture:atIndex:]`
     pub fn setFragmentTextureAtIndex(self: Self, texture: ?Texture, index: objc.UInteger) void {
         return self.object.msgSend(void, "setFragmentTexture:atIndex:", .{ texture, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setFragmentTextures:withRange:]`
+    pub fn setFragmentTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentTextures:withRange:", .{ textures, range });
     }
 
     /// `-[MTLRenderCommandEncoder setFragmentSamplerState:atIndex:]`
@@ -7443,9 +8033,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setFragmentSamplerState:atIndex:", .{ sampler, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setFragmentSamplerStates:withRange:]`
+    pub fn setFragmentSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentSamplerStates:withRange:", .{ samplers, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
     pub fn setFragmentSamplerStateLodMinClampLodMaxClampAtIndex(self: Self, sampler: ?SamplerState, lod_min_clamp: f32, lod_max_clamp: f32, index: objc.UInteger) void {
         return self.object.msgSend(void, "setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setFragmentSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
     }
 
     /// `-[MTLRenderCommandEncoder setFragmentVisibleFunctionTable:atBufferIndex:]`
@@ -7453,9 +8053,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setFragmentVisibleFunctionTable:atBufferIndex:", .{ function_table, buffer_index });
     }
 
+    /// `-[MTLRenderCommandEncoder setFragmentVisibleFunctionTables:withBufferRange:]`
+    pub fn setFragmentVisibleFunctionTablesWithBufferRange(self: Self, function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentVisibleFunctionTables:withBufferRange:", .{ function_tables, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setFragmentIntersectionFunctionTable:atBufferIndex:]`
     pub fn setFragmentIntersectionFunctionTableAtBufferIndex(self: Self, intersection_function_table: ?objc.Object, buffer_index: objc.UInteger) void {
         return self.object.msgSend(void, "setFragmentIntersectionFunctionTable:atBufferIndex:", .{ intersection_function_table, buffer_index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setFragmentIntersectionFunctionTables:withBufferRange:]`
+    pub fn setFragmentIntersectionFunctionTablesWithBufferRange(self: Self, intersection_function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setFragmentIntersectionFunctionTables:withBufferRange:", .{ intersection_function_tables, range });
     }
 
     /// `-[MTLRenderCommandEncoder setFragmentAccelerationStructure:atBufferIndex:]`
@@ -7533,9 +8143,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setObjectBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setObjectBuffers:offsets:withRange:]`
+    pub fn setObjectBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setObjectBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setObjectTexture:atIndex:]`
     pub fn setObjectTextureAtIndex(self: Self, texture: ?Texture, index: objc.UInteger) void {
         return self.object.msgSend(void, "setObjectTexture:atIndex:", .{ texture, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setObjectTextures:withRange:]`
+    pub fn setObjectTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setObjectTextures:withRange:", .{ textures, range });
     }
 
     /// `-[MTLRenderCommandEncoder setObjectSamplerState:atIndex:]`
@@ -7543,9 +8163,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setObjectSamplerState:atIndex:", .{ sampler, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setObjectSamplerStates:withRange:]`
+    pub fn setObjectSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setObjectSamplerStates:withRange:", .{ samplers, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
     pub fn setObjectSamplerStateLodMinClampLodMaxClampAtIndex(self: Self, sampler: ?SamplerState, lod_min_clamp: f32, lod_max_clamp: f32, index: objc.UInteger) void {
         return self.object.msgSend(void, "setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setObjectSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
     }
 
     /// `-[MTLRenderCommandEncoder setObjectThreadgroupMemoryLength:atIndex:]`
@@ -7568,9 +8198,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setMeshBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setMeshBuffers:offsets:withRange:]`
+    pub fn setMeshBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setMeshBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setMeshTexture:atIndex:]`
     pub fn setMeshTextureAtIndex(self: Self, texture: ?Texture, index: objc.UInteger) void {
         return self.object.msgSend(void, "setMeshTexture:atIndex:", .{ texture, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setMeshTextures:withRange:]`
+    pub fn setMeshTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setMeshTextures:withRange:", .{ textures, range });
     }
 
     /// `-[MTLRenderCommandEncoder setMeshSamplerState:atIndex:]`
@@ -7578,9 +8218,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setMeshSamplerState:atIndex:", .{ sampler, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setMeshSamplerStates:withRange:]`
+    pub fn setMeshSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setMeshSamplerStates:withRange:", .{ samplers, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
     pub fn setMeshSamplerStateLodMinClampLodMaxClampAtIndex(self: Self, sampler: ?SamplerState, lod_min_clamp: f32, lod_max_clamp: f32, index: objc.UInteger) void {
         return self.object.msgSend(void, "setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setMeshSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
     }
 
     /// `-[MTLRenderCommandEncoder drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:]`
@@ -7698,9 +8348,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setTileBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setTileBuffers:offsets:withRange:]`
+    pub fn setTileBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setTileBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setTileTexture:atIndex:]`
     pub fn setTileTextureAtIndex(self: Self, texture: ?Texture, index: objc.UInteger) void {
         return self.object.msgSend(void, "setTileTexture:atIndex:", .{ texture, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setTileTextures:withRange:]`
+    pub fn setTileTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setTileTextures:withRange:", .{ textures, range });
     }
 
     /// `-[MTLRenderCommandEncoder setTileSamplerState:atIndex:]`
@@ -7708,9 +8368,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setTileSamplerState:atIndex:", .{ sampler, index });
     }
 
+    /// `-[MTLRenderCommandEncoder setTileSamplerStates:withRange:]`
+    pub fn setTileSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setTileSamplerStates:withRange:", .{ samplers, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
     pub fn setTileSamplerStateLodMinClampLodMaxClampAtIndex(self: Self, sampler: ?SamplerState, lod_min_clamp: f32, lod_max_clamp: f32, index: objc.UInteger) void {
         return self.object.msgSend(void, "setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setTileSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
     }
 
     /// `-[MTLRenderCommandEncoder setTileVisibleFunctionTable:atBufferIndex:]`
@@ -7718,9 +8388,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "setTileVisibleFunctionTable:atBufferIndex:", .{ function_table, buffer_index });
     }
 
+    /// `-[MTLRenderCommandEncoder setTileVisibleFunctionTables:withBufferRange:]`
+    pub fn setTileVisibleFunctionTablesWithBufferRange(self: Self, function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setTileVisibleFunctionTables:withBufferRange:", .{ function_tables, range });
+    }
+
     /// `-[MTLRenderCommandEncoder setTileIntersectionFunctionTable:atBufferIndex:]`
     pub fn setTileIntersectionFunctionTableAtBufferIndex(self: Self, intersection_function_table: ?objc.Object, buffer_index: objc.UInteger) void {
         return self.object.msgSend(void, "setTileIntersectionFunctionTable:atBufferIndex:", .{ intersection_function_table, buffer_index });
+    }
+
+    /// `-[MTLRenderCommandEncoder setTileIntersectionFunctionTables:withBufferRange:]`
+    pub fn setTileIntersectionFunctionTablesWithBufferRange(self: Self, intersection_function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setTileIntersectionFunctionTables:withBufferRange:", .{ intersection_function_tables, range });
     }
 
     /// `-[MTLRenderCommandEncoder setTileAccelerationStructure:atBufferIndex:]`
@@ -7743,9 +8423,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "useResource:usage:", .{ resource, usage });
     }
 
+    /// `-[MTLRenderCommandEncoder useResources:count:usage:]`
+    pub fn useResourcesCountUsage(self: Self, resources: [*]const Resource, count: objc.UInteger, usage: ResourceUsage) void {
+        return self.object.msgSend(void, "useResources:count:usage:", .{ resources, count, usage });
+    }
+
     /// `-[MTLRenderCommandEncoder useResource:usage:stages:]`
     pub fn useResourceUsageStages(self: Self, resource: Resource, usage: ResourceUsage, stages: RenderStages) void {
         return self.object.msgSend(void, "useResource:usage:stages:", .{ resource, usage, stages });
+    }
+
+    /// `-[MTLRenderCommandEncoder useResources:count:usage:stages:]`
+    pub fn useResourcesCountUsageStages(self: Self, resources: [*]const Resource, count: objc.UInteger, usage: ResourceUsage, stages: RenderStages) void {
+        return self.object.msgSend(void, "useResources:count:usage:stages:", .{ resources, count, usage, stages });
     }
 
     /// `-[MTLRenderCommandEncoder useHeap:]`
@@ -7753,9 +8443,19 @@ pub const RenderCommandEncoder = extern struct {
         return self.object.msgSend(void, "useHeap:", .{heap});
     }
 
+    /// `-[MTLRenderCommandEncoder useHeaps:count:]`
+    pub fn useHeapsCount(self: Self, heaps: [*]const objc.Object, count: objc.UInteger) void {
+        return self.object.msgSend(void, "useHeaps:count:", .{ heaps, count });
+    }
+
     /// `-[MTLRenderCommandEncoder useHeap:stages:]`
     pub fn useHeapStages(self: Self, heap: objc.Object, stages: RenderStages) void {
         return self.object.msgSend(void, "useHeap:stages:", .{ heap, stages });
+    }
+
+    /// `-[MTLRenderCommandEncoder useHeaps:count:stages:]`
+    pub fn useHeapsCountStages(self: Self, heaps: [*]const objc.Object, count: objc.UInteger, stages: RenderStages) void {
+        return self.object.msgSend(void, "useHeaps:count:stages:", .{ heaps, count, stages });
     }
 
     /// `-[MTLRenderCommandEncoder executeCommandsInBuffer:withRange:]`
@@ -7771,6 +8471,11 @@ pub const RenderCommandEncoder = extern struct {
     /// `-[MTLRenderCommandEncoder memoryBarrierWithScope:afterStages:beforeStages:]`
     pub fn memoryBarrierWithScopeAfterStagesBeforeStages(self: Self, scope: BarrierScope, after: RenderStages, before: RenderStages) void {
         return self.object.msgSend(void, "memoryBarrierWithScope:afterStages:beforeStages:", .{ scope, after, before });
+    }
+
+    /// `-[MTLRenderCommandEncoder memoryBarrierWithResources:count:afterStages:beforeStages:]`
+    pub fn memoryBarrierWithResourcesCountAfterStagesBeforeStages(self: Self, resources: [*]const Resource, count: objc.UInteger, after: RenderStages, before: RenderStages) void {
+        return self.object.msgSend(void, "memoryBarrierWithResources:count:afterStages:beforeStages:", .{ resources, count, after, before });
     }
 
     /// `-[MTLRenderCommandEncoder sampleCountersInBuffer:atSampleIndex:withBarrier:]`
@@ -7796,6 +8501,11 @@ pub const RenderCommandEncoder = extern struct {
     /// `-[MTLCommandEncoder endEncoding]`
     pub fn endEncoding(self: Self) void {
         return self.object.msgSend(void, "endEncoding", .{});
+    }
+
+    /// `-[MTLCommandEncoder barrierAfterQueueStages:beforeStages:]`
+    pub fn barrierAfterQueueStagesBeforeStages(self: Self, after_queue_stages: Stages, before_stages: Stages) void {
+        return self.object.msgSend(void, "barrierAfterQueueStages:beforeStages:", .{ after_queue_stages, before_stages });
     }
 
     /// `-[MTLCommandEncoder insertDebugSignpost:]`
@@ -7834,17 +8544,24 @@ pub const RenderCommandEncoder = extern struct {
         pub const @"setVertexBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setVertexBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setVertexBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setVertexBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setVertexBuffer:offset:attributeStride:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"setVertexBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setVertexBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
         pub const @"setVertexBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
         pub const @"setVertexTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setVertexTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setVertexSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setVertexSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"setVertexVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setVertexVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setVertexIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setVertexIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setVertexAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
         pub const @"setViewport:" = fn (Viewport) void;
-        pub const @"setViewports:count:" = fn (objc.Object, objc.UInteger) void;
+        pub const @"setViewports:count:" = fn (?[*]const Viewport, objc.UInteger) void;
         pub const @"setFrontFacingWinding:" = fn (Winding) void;
         pub const @"setVertexAmplificationCount:viewMappings:" = fn (objc.UInteger, ?objc.Object) void;
         pub const @"setCullMode:" = fn (CullMode) void;
@@ -7852,16 +8569,22 @@ pub const RenderCommandEncoder = extern struct {
         pub const @"setDepthBias:slopeScale:clamp:" = fn (f32, f32, f32) void;
         pub const @"setDepthTestMinBound:maxBound:" = fn (f32, f32) void;
         pub const @"setScissorRect:" = fn (ScissorRect) void;
-        pub const @"setScissorRects:count:" = fn (objc.Object, objc.UInteger) void;
+        pub const @"setScissorRects:count:" = fn (?[*]const ScissorRect, objc.UInteger) void;
         pub const @"setTriangleFillMode:" = fn (TriangleFillMode) void;
         pub const @"setFragmentBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setFragmentBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setFragmentBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setFragmentBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setFragmentTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setFragmentTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setFragmentSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setFragmentSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"setFragmentVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setFragmentVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setFragmentIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setFragmentIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setFragmentAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
         pub const @"setBlendColorRed:green:blue:alpha:" = fn (f32, f32, f32, f32) void;
         pub const @"setDepthStencilState:" = fn (?DepthStencilState) void;
@@ -7877,16 +8600,24 @@ pub const RenderCommandEncoder = extern struct {
         pub const @"setObjectBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setObjectBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setObjectBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setObjectBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setObjectTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setObjectTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setObjectSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setObjectSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"setObjectThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
         pub const @"setMeshBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setMeshBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setMeshBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setMeshBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setMeshTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setMeshTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setMeshSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setMeshSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
         pub const @"drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
         pub const @"drawMeshThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Buffer, objc.UInteger, Size, Size) void;
@@ -7910,60 +8641,37 @@ pub const RenderCommandEncoder = extern struct {
         pub const @"setTileBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setTileBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setTileBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setTileBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setTileTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setTileTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setTileSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setTileSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"setTileVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setTileVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setTileIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setTileIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setTileAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
         pub const @"dispatchThreadsPerTile:" = fn (Size) void;
         pub const @"setThreadgroupMemoryLength:offset:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
         pub const @"useResource:usage:" = fn (Resource, ResourceUsage) void;
+        pub const @"useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
         pub const @"useResource:usage:stages:" = fn (Resource, ResourceUsage, RenderStages) void;
+        pub const @"useResources:count:usage:stages:" = fn ([*]const Resource, objc.UInteger, ResourceUsage, RenderStages) void;
         pub const @"useHeap:" = fn (objc.Object) void;
+        pub const @"useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
         pub const @"useHeap:stages:" = fn (objc.Object, RenderStages) void;
+        pub const @"useHeaps:count:stages:" = fn ([*]const objc.Object, objc.UInteger, RenderStages) void;
         pub const @"executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
         pub const @"executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
         pub const @"memoryBarrierWithScope:afterStages:beforeStages:" = fn (BarrierScope, RenderStages, RenderStages) void;
+        pub const @"memoryBarrierWithResources:count:afterStages:beforeStages:" = fn ([*]const Resource, objc.UInteger, RenderStages, RenderStages) void;
         pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
         pub const @"setColorAttachmentMap:" = fn (?objc.Object) void;
         pub const tileWidth = fn () objc.UInteger;
         pub const tileHeight = fn () objc.UInteger;
     };
-
-    // Not generated:
-    //   -[MTLRenderCommandEncoder setVertexBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexBuffers:offsets:attributeStrides:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexVisibleFunctionTables:withBufferRange:]: id<MTLVisibleFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setVertexIntersectionFunctionTables:withBufferRange:]: id<MTLIntersectionFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentVisibleFunctionTables:withBufferRange:]: id<MTLVisibleFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setFragmentIntersectionFunctionTables:withBufferRange:]: id<MTLIntersectionFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setObjectBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setObjectTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setObjectSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setMeshBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setMeshTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setMeshSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileVisibleFunctionTables:withBufferRange:]: id<MTLVisibleFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder setTileIntersectionFunctionTables:withBufferRange:]: id<MTLIntersectionFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLRenderCommandEncoder useResources:count:usage:]: id<MTLResource>  _Nonnull const * _Nonnull
-    //   -[MTLRenderCommandEncoder useResources:count:usage:stages:]: id<MTLResource>  _Nonnull const * _Nonnull
-    //   -[MTLRenderCommandEncoder useHeaps:count:]: id<MTLHeap>  _Nonnull const * _Nonnull
-    //   -[MTLRenderCommandEncoder useHeaps:count:stages:]: id<MTLHeap>  _Nonnull const * _Nonnull
-    //   -[MTLRenderCommandEncoder memoryBarrierWithResources:count:afterStages:beforeStages:]: id<MTLResource>  _Nonnull const * _Nonnull
 };
 
 /// An object conforming to `MTLComputeCommandEncoder`, which extends `MTLCommandEncoder`. As an `objc.Subclass`
@@ -8018,9 +8726,19 @@ pub const ComputeCommandEncoder = extern struct {
         return self.object.msgSend(void, "setBufferOffset:atIndex:", .{ offset, index });
     }
 
+    /// `-[MTLComputeCommandEncoder setBuffers:offsets:withRange:]`
+    pub fn setBuffersOffsetsWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setBuffers:offsets:withRange:", .{ buffers, offsets, range });
+    }
+
     /// `-[MTLComputeCommandEncoder setBuffer:offset:attributeStride:atIndex:]`
     pub fn setBufferOffsetAttributeStrideAtIndex(self: Self, buffer: Buffer, offset: objc.UInteger, stride: objc.UInteger, index: objc.UInteger) void {
         return self.object.msgSend(void, "setBuffer:offset:attributeStride:atIndex:", .{ buffer, offset, stride, index });
+    }
+
+    /// `-[MTLComputeCommandEncoder setBuffers:offsets:attributeStrides:withRange:]`
+    pub fn setBuffersOffsetsAttributeStridesWithRange(self: Self, buffers: [*]const objc.Nullable(Buffer), offsets: ?[*]const objc.UInteger, strides: ?[*]const objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "setBuffers:offsets:attributeStrides:withRange:", .{ buffers, offsets, strides, range });
     }
 
     /// `-[MTLComputeCommandEncoder setBufferOffset:attributeStride:atIndex:]`
@@ -8038,9 +8756,19 @@ pub const ComputeCommandEncoder = extern struct {
         return self.object.msgSend(void, "setVisibleFunctionTable:atBufferIndex:", .{ visible_function_table, buffer_index });
     }
 
+    /// `-[MTLComputeCommandEncoder setVisibleFunctionTables:withBufferRange:]`
+    pub fn setVisibleFunctionTablesWithBufferRange(self: Self, visible_function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setVisibleFunctionTables:withBufferRange:", .{ visible_function_tables, range });
+    }
+
     /// `-[MTLComputeCommandEncoder setIntersectionFunctionTable:atBufferIndex:]`
     pub fn setIntersectionFunctionTableAtBufferIndex(self: Self, intersection_function_table: ?objc.Object, buffer_index: objc.UInteger) void {
         return self.object.msgSend(void, "setIntersectionFunctionTable:atBufferIndex:", .{ intersection_function_table, buffer_index });
+    }
+
+    /// `-[MTLComputeCommandEncoder setIntersectionFunctionTables:withBufferRange:]`
+    pub fn setIntersectionFunctionTablesWithBufferRange(self: Self, intersection_function_tables: [*]const objc.Nullable(objc.Object), range: objc.Range) void {
+        return self.object.msgSend(void, "setIntersectionFunctionTables:withBufferRange:", .{ intersection_function_tables, range });
     }
 
     /// `-[MTLComputeCommandEncoder setAccelerationStructure:atBufferIndex:]`
@@ -8053,14 +8781,29 @@ pub const ComputeCommandEncoder = extern struct {
         return self.object.msgSend(void, "setTexture:atIndex:", .{ texture, index });
     }
 
+    /// `-[MTLComputeCommandEncoder setTextures:withRange:]`
+    pub fn setTexturesWithRange(self: Self, textures: [*]const objc.Nullable(Texture), range: objc.Range) void {
+        return self.object.msgSend(void, "setTextures:withRange:", .{ textures, range });
+    }
+
     /// `-[MTLComputeCommandEncoder setSamplerState:atIndex:]`
     pub fn setSamplerStateAtIndex(self: Self, sampler: ?SamplerState, index: objc.UInteger) void {
         return self.object.msgSend(void, "setSamplerState:atIndex:", .{ sampler, index });
     }
 
+    /// `-[MTLComputeCommandEncoder setSamplerStates:withRange:]`
+    pub fn setSamplerStatesWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), range: objc.Range) void {
+        return self.object.msgSend(void, "setSamplerStates:withRange:", .{ samplers, range });
+    }
+
     /// `-[MTLComputeCommandEncoder setSamplerState:lodMinClamp:lodMaxClamp:atIndex:]`
     pub fn setSamplerStateLodMinClampLodMaxClampAtIndex(self: Self, sampler: ?SamplerState, lod_min_clamp: f32, lod_max_clamp: f32, index: objc.UInteger) void {
         return self.object.msgSend(void, "setSamplerState:lodMinClamp:lodMaxClamp:atIndex:", .{ sampler, lod_min_clamp, lod_max_clamp, index });
+    }
+
+    /// `-[MTLComputeCommandEncoder setSamplerStates:lodMinClamps:lodMaxClamps:withRange:]`
+    pub fn setSamplerStatesLodMinClampsLodMaxClampsWithRange(self: Self, samplers: [*]const objc.Nullable(SamplerState), lod_min_clamps: ?[*]const f32, lod_max_clamps: ?[*]const f32, range: objc.Range) void {
+        return self.object.msgSend(void, "setSamplerStates:lodMinClamps:lodMaxClamps:withRange:", .{ samplers, lod_min_clamps, lod_max_clamps, range });
     }
 
     /// `-[MTLComputeCommandEncoder setThreadgroupMemoryLength:atIndex:]`
@@ -8113,9 +8856,19 @@ pub const ComputeCommandEncoder = extern struct {
         return self.object.msgSend(void, "useResource:usage:", .{ resource, usage });
     }
 
+    /// `-[MTLComputeCommandEncoder useResources:count:usage:]`
+    pub fn useResourcesCountUsage(self: Self, resources: [*]const Resource, count: objc.UInteger, usage: ResourceUsage) void {
+        return self.object.msgSend(void, "useResources:count:usage:", .{ resources, count, usage });
+    }
+
     /// `-[MTLComputeCommandEncoder useHeap:]`
     pub fn useHeap(self: Self, heap: objc.Object) void {
         return self.object.msgSend(void, "useHeap:", .{heap});
+    }
+
+    /// `-[MTLComputeCommandEncoder useHeaps:count:]`
+    pub fn useHeapsCount(self: Self, heaps: [*]const objc.Object, count: objc.UInteger) void {
+        return self.object.msgSend(void, "useHeaps:count:", .{ heaps, count });
     }
 
     /// `-[MTLComputeCommandEncoder executeCommandsInBuffer:withRange:]`
@@ -8133,6 +8886,11 @@ pub const ComputeCommandEncoder = extern struct {
         return self.object.msgSend(void, "memoryBarrierWithScope:", .{scope});
     }
 
+    /// `-[MTLComputeCommandEncoder memoryBarrierWithResources:count:]`
+    pub fn memoryBarrierWithResourcesCount(self: Self, resources: [*]const Resource, count: objc.UInteger) void {
+        return self.object.msgSend(void, "memoryBarrierWithResources:count:", .{ resources, count });
+    }
+
     /// `-[MTLComputeCommandEncoder sampleCountersInBuffer:atSampleIndex:withBarrier:]`
     pub fn sampleCountersInBufferAtSampleIndexWithBarrier(self: Self, sample_buffer: objc.Object, sample_index: objc.UInteger, barrier: bool) void {
         return self.object.msgSend(void, "sampleCountersInBuffer:atSampleIndex:withBarrier:", .{ sample_buffer, sample_index, barrier });
@@ -8146,6 +8904,11 @@ pub const ComputeCommandEncoder = extern struct {
     /// `-[MTLCommandEncoder endEncoding]`
     pub fn endEncoding(self: Self) void {
         return self.object.msgSend(void, "endEncoding", .{});
+    }
+
+    /// `-[MTLCommandEncoder barrierAfterQueueStages:beforeStages:]`
+    pub fn barrierAfterQueueStagesBeforeStages(self: Self, after_queue_stages: Stages, before_stages: Stages) void {
+        return self.object.msgSend(void, "barrierAfterQueueStages:beforeStages:", .{ after_queue_stages, before_stages });
     }
 
     /// `-[MTLCommandEncoder insertDebugSignpost:]`
@@ -8184,15 +8947,22 @@ pub const ComputeCommandEncoder = extern struct {
         pub const @"setBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
         pub const @"setBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
         pub const @"setBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"setBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setBuffer:offset:attributeStride:atIndex:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"setBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
         pub const @"setBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
         pub const @"setBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
         pub const @"setVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"setIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
         pub const @"setAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
         pub const @"setTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"setTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
         pub const @"setSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"setSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
         pub const @"setSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"setSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
         pub const @"setThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
         pub const @"setImageblockWidth:height:" = fn (objc.UInteger, objc.UInteger) void;
         pub const @"setStageInRegion:" = fn (Region) void;
@@ -8203,25 +8973,16 @@ pub const ComputeCommandEncoder = extern struct {
         pub const @"updateFence:" = fn (objc.Object) void;
         pub const @"waitForFence:" = fn (objc.Object) void;
         pub const @"useResource:usage:" = fn (Resource, ResourceUsage) void;
+        pub const @"useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
         pub const @"useHeap:" = fn (objc.Object) void;
+        pub const @"useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
         pub const @"executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
         pub const @"executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
         pub const @"memoryBarrierWithScope:" = fn (BarrierScope) void;
+        pub const @"memoryBarrierWithResources:count:" = fn ([*]const Resource, objc.UInteger) void;
         pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
         pub const dispatchType = fn () DispatchType;
     };
-
-    // Not generated:
-    //   -[MTLComputeCommandEncoder setBuffers:offsets:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setBuffers:offsets:attributeStrides:withRange:]: id<MTLBuffer>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setVisibleFunctionTables:withBufferRange:]: id<MTLVisibleFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setIntersectionFunctionTables:withBufferRange:]: id<MTLIntersectionFunctionTable>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setTextures:withRange:]: id<MTLTexture>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setSamplerStates:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder setSamplerStates:lodMinClamps:lodMaxClamps:withRange:]: id<MTLSamplerState>  _Nullable const * _Nonnull
-    //   -[MTLComputeCommandEncoder useResources:count:usage:]: id<MTLResource>  _Nonnull const * _Nonnull
-    //   -[MTLComputeCommandEncoder useHeaps:count:]: id<MTLHeap>  _Nonnull const * _Nonnull
-    //   -[MTLComputeCommandEncoder memoryBarrierWithResources:count:]: id<MTLResource>  _Nonnull const * _Nonnull
 };
 
 /// An object conforming to `MTLBlitCommandEncoder`, which extends `MTLCommandEncoder`. As an `objc.Subclass`
@@ -8386,9 +9147,19 @@ pub const BlitCommandEncoder = extern struct {
         return self.object.msgSend(void, "copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:", .{ source_tensor, source_origin, source_dimensions, destination_tensor, destination_origin, destination_dimensions });
     }
 
+    /// `-[MTLBlitCommandEncoder copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:]`
+    pub fn copyFromTensorSourceOriginSourceDimensionsSourcePlaneToTensorDestinationOriginDestinationDimensionsDestinationPlane(self: Self, source_tensor: objc.Object, source_origin: objc.Object, source_dimensions: objc.Object, source_plane: TensorPlaneType, destination_tensor: objc.Object, destination_origin: objc.Object, destination_dimensions: objc.Object, destination_plane: TensorPlaneType) void {
+        return self.object.msgSend(void, "copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:", .{ source_tensor, source_origin, source_dimensions, source_plane, destination_tensor, destination_origin, destination_dimensions, destination_plane });
+    }
+
     /// `-[MTLCommandEncoder endEncoding]`
     pub fn endEncoding(self: Self) void {
         return self.object.msgSend(void, "endEncoding", .{});
+    }
+
+    /// `-[MTLCommandEncoder barrierAfterQueueStages:beforeStages:]`
+    pub fn barrierAfterQueueStagesBeforeStages(self: Self, after_queue_stages: Stages, before_stages: Stages) void {
+        return self.object.msgSend(void, "barrierAfterQueueStages:beforeStages:", .{ after_queue_stages, before_stages });
     }
 
     /// `-[MTLCommandEncoder insertDebugSignpost:]`
@@ -8449,10 +9220,8 @@ pub const BlitCommandEncoder = extern struct {
         pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
         pub const @"resolveCounters:inRange:destinationBuffer:destinationOffset:" = fn (objc.Object, objc.Range, Buffer, objc.UInteger) void;
         pub const @"copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:" = fn (objc.Object, objc.Object, objc.Object, objc.Object, objc.Object, objc.Object) void;
+        pub const @"copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:" = fn (objc.Object, objc.Object, objc.Object, TensorPlaneType, objc.Object, objc.Object, objc.Object, TensorPlaneType) void;
     };
-
-    // Not generated:
-    //   -[MTLBlitCommandEncoder copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:]: MTLTensorPlaneType
 };
 
 /// An object conforming to `MTLResource`. As an `objc.Subclass`
@@ -8658,6 +9427,11 @@ pub const Buffer = extern struct {
         return self.object.msgSend(c_ulonglong, "gpuAddress", .{});
     }
 
+    /// `-[MTLBuffer sparseBufferTier]`
+    pub fn sparseBufferTier(self: Self) BufferSparseTier {
+        return self.object.msgSend(BufferSparseTier, "sparseBufferTier", .{});
+    }
+
     /// `-[MTLResource setPurgeableState:]`
     pub fn setPurgeableState(self: Self, state: PurgeableState) PurgeableState {
         return self.object.msgSend(PurgeableState, "setPurgeableState:", .{state});
@@ -8740,10 +9514,8 @@ pub const Buffer = extern struct {
         pub const length = fn () objc.UInteger;
         pub const remoteStorageBuffer = fn () ?Buffer;
         pub const gpuAddress = fn () c_ulonglong;
+        pub const sparseBufferTier = fn () BufferSparseTier;
     };
-
-    // Not generated:
-    //   -[MTLBuffer sparseBufferTier]: MTLBufferSparseTier
 };
 
 /// An object conforming to `MTLTexture`, which extends `MTLResource`. As an `objc.Subclass`
@@ -8821,6 +9593,11 @@ pub const Texture = extern struct {
     /// `-[MTLTexture newRemoteTextureViewForDevice:]`
     pub fn newRemoteTextureViewForDevice(self: Self, device_: Device) ?Texture {
         return self.object.msgSend(?Texture, "newRemoteTextureViewForDevice:", .{device_});
+    }
+
+    /// `-[MTLTexture newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:]`
+    pub fn newTextureViewWithPixelFormatTextureTypeLevelsSlicesSwizzle(self: Self, pixel_format: PixelFormat, texture_type: TextureType, level_range: objc.Range, slice_range: objc.Range, swizzle_: TextureSwizzleChannels) ?Texture {
+        return self.object.msgSend(?Texture, "newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:", .{ pixel_format, texture_type, level_range, slice_range, swizzle_ });
     }
 
     /// `-[MTLTexture rootResource]`
@@ -8948,9 +9725,24 @@ pub const Texture = extern struct {
         return self.object.msgSend(TextureCompressionType, "compressionType", .{});
     }
 
+    /// `-[MTLTexture gpuResourceID]`
+    pub fn gpuResourceID(self: Self) ResourceID {
+        return self.object.msgSend(ResourceID, "gpuResourceID", .{});
+    }
+
     /// `-[MTLTexture remoteStorageTexture]`
     pub fn remoteStorageTexture(self: Self) ?Texture {
         return self.object.msgSend(?Texture, "remoteStorageTexture", .{});
+    }
+
+    /// `-[MTLTexture swizzle]`
+    pub fn swizzle(self: Self) TextureSwizzleChannels {
+        return self.object.msgSend(TextureSwizzleChannels, "swizzle", .{});
+    }
+
+    /// `-[MTLTexture sparseTextureTier]`
+    pub fn sparseTextureTier(self: Self) TextureSparseTier {
+        return self.object.msgSend(TextureSparseTier, "sparseTextureTier", .{});
     }
 
     /// `-[MTLTexture minLOD]`
@@ -9039,6 +9831,7 @@ pub const Texture = extern struct {
         pub const newSharedTextureHandle = fn () ?objc.Object;
         pub const @"newTextureViewWithDescriptor:" = fn (objc.Object) ?Texture;
         pub const @"newRemoteTextureViewForDevice:" = fn (Device) ?Texture;
+        pub const @"newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:" = fn (PixelFormat, TextureType, objc.Range, objc.Range, TextureSwizzleChannels) ?Texture;
         pub const rootResource = fn () ?Resource;
         pub const parentTexture = fn () ?Texture;
         pub const parentRelativeLevel = fn () objc.UInteger;
@@ -9064,15 +9857,12 @@ pub const Texture = extern struct {
         pub const isSparse = fn () bool;
         pub const allowGPUOptimizedContents = fn () bool;
         pub const compressionType = fn () TextureCompressionType;
+        pub const gpuResourceID = fn () ResourceID;
         pub const remoteStorageTexture = fn () ?Texture;
+        pub const swizzle = fn () TextureSwizzleChannels;
+        pub const sparseTextureTier = fn () TextureSparseTier;
         pub const minLOD = fn () f32;
     };
-
-    // Not generated:
-    //   -[MTLTexture newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:]: MTLTextureSwizzleChannels
-    //   -[MTLTexture gpuResourceID]: MTLResourceID
-    //   -[MTLTexture swizzle]: MTLTextureSwizzleChannels
-    //   -[MTLTexture sparseTextureTier]: MTLTextureSparseTier
 };
 
 /// An object conforming to `MTLLibrary`. As an `objc.Subclass`
@@ -9255,6 +10045,11 @@ pub const Function = extern struct {
         return self.object.msgSend(FunctionType, "functionType", .{});
     }
 
+    /// `-[MTLFunction patchType]`
+    pub fn patchType(self: Self) PatchType {
+        return self.object.msgSend(PatchType, "patchType", .{});
+    }
+
     /// `-[MTLFunction patchControlPointCount]`
     pub fn patchControlPointCount(self: Self) objc.Integer {
         return self.object.msgSend(objc.Integer, "patchControlPointCount", .{});
@@ -9280,6 +10075,11 @@ pub const Function = extern struct {
         return self.object.msgSend(foundation.Dictionary(foundation.String, objc.Object), "functionConstantsDictionary", .{});
     }
 
+    /// `-[MTLFunction options]`
+    pub fn options(self: Self) FunctionOptions {
+        return self.object.msgSend(FunctionOptions, "options", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"newArgumentEncoderWithBufferIndex:" = fn (objc.UInteger) objc.Object;
@@ -9288,16 +10088,14 @@ pub const Function = extern struct {
         pub const @"setLabel:" = fn (?foundation.String) void;
         pub const device = fn () Device;
         pub const functionType = fn () FunctionType;
+        pub const patchType = fn () PatchType;
         pub const patchControlPointCount = fn () objc.Integer;
         pub const vertexAttributes = fn () ?foundation.Array(objc.Object);
         pub const stageInputAttributes = fn () ?foundation.Array(objc.Object);
         pub const name = fn () foundation.String;
         pub const functionConstantsDictionary = fn () foundation.Dictionary(foundation.String, objc.Object);
+        pub const options = fn () FunctionOptions;
     };
-
-    // Not generated:
-    //   -[MTLFunction patchType]: MTLPatchType
-    //   -[MTLFunction options]: MTLFunctionOptions
 };
 
 /// An object conforming to `MTLRenderPipelineState`. As an `objc.Subclass`
@@ -9437,6 +10235,11 @@ pub const RenderPipelineState = extern struct {
         return self.object.msgSend(objc.UInteger, "maxTotalThreadgroupsPerMeshGrid", .{});
     }
 
+    /// `-[MTLRenderPipelineState gpuResourceID]`
+    pub fn gpuResourceID(self: Self) ResourceID {
+        return self.object.msgSend(ResourceID, "gpuResourceID", .{});
+    }
+
     /// `-[MTLRenderPipelineState shaderValidation]`
     pub fn shaderValidation(self: Self) ShaderValidation {
         return self.object.msgSend(ShaderValidation, "shaderValidation", .{});
@@ -9480,14 +10283,12 @@ pub const RenderPipelineState = extern struct {
         pub const objectThreadExecutionWidth = fn () objc.UInteger;
         pub const meshThreadExecutionWidth = fn () objc.UInteger;
         pub const maxTotalThreadgroupsPerMeshGrid = fn () objc.UInteger;
+        pub const gpuResourceID = fn () ResourceID;
         pub const shaderValidation = fn () ShaderValidation;
         pub const requiredThreadsPerTileThreadgroup = fn () Size;
         pub const requiredThreadsPerObjectThreadgroup = fn () Size;
         pub const requiredThreadsPerMeshThreadgroup = fn () Size;
     };
-
-    // Not generated:
-    //   -[MTLRenderPipelineState gpuResourceID]: MTLResourceID
 };
 
 /// An object conforming to `MTLComputePipelineState`. As an `objc.Subclass`
@@ -9602,6 +10403,11 @@ pub const ComputePipelineState = extern struct {
         return self.object.msgSend(bool, "supportIndirectCommandBuffers", .{});
     }
 
+    /// `-[MTLComputePipelineState gpuResourceID]`
+    pub fn gpuResourceID(self: Self) ResourceID {
+        return self.object.msgSend(ResourceID, "gpuResourceID", .{});
+    }
+
     /// `-[MTLComputePipelineState shaderValidation]`
     pub fn shaderValidation(self: Self) ShaderValidation {
         return self.object.msgSend(ShaderValidation, "shaderValidation", .{});
@@ -9610,6 +10416,11 @@ pub const ComputePipelineState = extern struct {
     /// `-[MTLComputePipelineState requiredThreadsPerThreadgroup]`
     pub fn requiredThreadsPerThreadgroup(self: Self) Size {
         return self.object.msgSend(Size, "requiredThreadsPerThreadgroup", .{});
+    }
+
+    /// `-[MTLComputePipelineState forwardProgressUsage]`
+    pub fn forwardProgressUsage(self: Self) ForwardProgressUsage {
+        return self.object.msgSend(ForwardProgressUsage, "forwardProgressUsage", .{});
     }
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
@@ -9630,13 +10441,11 @@ pub const ComputePipelineState = extern struct {
         pub const threadExecutionWidth = fn () objc.UInteger;
         pub const staticThreadgroupMemoryLength = fn () objc.UInteger;
         pub const supportIndirectCommandBuffers = fn () bool;
+        pub const gpuResourceID = fn () ResourceID;
         pub const shaderValidation = fn () ShaderValidation;
         pub const requiredThreadsPerThreadgroup = fn () Size;
+        pub const forwardProgressUsage = fn () ForwardProgressUsage;
     };
-
-    // Not generated:
-    //   -[MTLComputePipelineState gpuResourceID]: MTLResourceID
-    //   -[MTLComputePipelineState forwardProgressUsage]: MTLForwardProgressUsage
 };
 
 /// An object conforming to `MTLDepthStencilState`. As an `objc.Subclass`
@@ -9681,14 +10490,17 @@ pub const DepthStencilState = extern struct {
         return self.object.msgSend(Device, "device", .{});
     }
 
+    /// `-[MTLDepthStencilState gpuResourceID]`
+    pub fn gpuResourceID(self: Self) ResourceID {
+        return self.object.msgSend(ResourceID, "gpuResourceID", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const label = fn () ?foundation.String;
         pub const device = fn () Device;
+        pub const gpuResourceID = fn () ResourceID;
     };
-
-    // Not generated:
-    //   -[MTLDepthStencilState gpuResourceID]: MTLResourceID
 };
 
 /// An object conforming to `MTLSamplerState`. As an `objc.Subclass`
@@ -9733,14 +10545,17 @@ pub const SamplerState = extern struct {
         return self.object.msgSend(Device, "device", .{});
     }
 
+    /// `-[MTLSamplerState gpuResourceID]`
+    pub fn gpuResourceID(self: Self) ResourceID {
+        return self.object.msgSend(ResourceID, "gpuResourceID", .{});
+    }
+
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const label = fn () ?foundation.String;
         pub const device = fn () Device;
+        pub const gpuResourceID = fn () ResourceID;
     };
-
-    // Not generated:
-    //   -[MTLSamplerState gpuResourceID]: MTLResourceID
 };
 
 /// An object conforming to `MTLDrawable`. As an `objc.Subclass`
