@@ -215,6 +215,9 @@ const Model = struct {
     /// parameters.
     typedefs: std.StringHashMapUnmanaged([]const u8) = .empty,
     globals: std.StringArrayHashMapUnmanaged(Global) = .empty,
+    /// The type parameters of generic classes -- `ObjectType`, `KeyType` --
+    /// which are `id` wherever they appear.
+    type_params: std.StringHashMapUnmanaged(void) = .empty,
     /// Each global's Zig name, by its C name -- worked out before anything is
     /// written, since a parameter anywhere in the file may not shadow one.
     global_names: std.StringArrayHashMapUnmanaged([]const u8) = .empty,
@@ -281,7 +284,10 @@ const Model = struct {
         const name = skimmed.name orelse return;
         const head = text[0 .. std.mem.indexOf(u8, text, "\"inner\"") orelse text.len];
         const target = stringAfter(head, "\"desugaredQualType\": \"") orelse stringAfter(head, "\"qualType\": \"") orelse return;
-        if (scalar(target) != null) try self.typedefs.put(self.arena, name, target);
+        // Not a typedef of itself (`typedef struct X X`), which would loop.
+        if (!std.mem.eql(u8, target, name) and std.mem.indexOf(u8, target, name) == null) {
+            try self.typedefs.put(self.arena, name, target);
+        }
     }
 
     const Skim = struct { kind: []const u8, name: ?[]const u8, interface: ?[]const u8, file: ?[]const u8 };
@@ -457,6 +463,10 @@ const Model = struct {
         var explicit: std.StringHashMapUnmanaged(bool) = .empty;
         for (inner.array.items) |child| {
             const object = child.object;
+            if (std.mem.eql(u8, object.get("kind").?.string, "ObjCTypeParamDecl")) {
+                try self.type_params.put(self.arena, object.get("name").?.string, {});
+                continue;
+            }
             if (!std.mem.eql(u8, object.get("kind").?.string, "ObjCPropertyDecl")) continue;
             const flagged = if (object.get("nullability")) |n| n.bool else false;
             try explicit.put(self.arena, object.get("name").?.string, flagged);
@@ -694,7 +704,7 @@ const Model = struct {
     }
 
     /// `pub const signatures`: each method's Zig function type, without
-    /// the receiver, keyed by selector -- `+` first for a class method.
+    /// the receiver, keyed `-selector` or `+selector`.
     /// `objc.Subclass` checks an override against these. A method with a
     /// block parameter has no single type and is left out.
     fn emitSignatures(self: *Model, w: *std.Io.Writer, class: *Class, list: []const Method) !void {
@@ -712,8 +722,10 @@ const Model = struct {
                 try params.appendSlice(self.arena, t);
             }
             if (generic) continue;
-            try w.print("        pub const @\"{s}{s}\" = fn ({s}) {s};\n", .{
-                if (m.instance) "" else "+", m.selector, params.items, result,
+            // Keyed as Objective-C writes them, `-drawRect:` and `+new`, so
+            // that no key can be the name of a type.
+            try w.print("        pub const @\"{c}{s}\" = fn ({s}) {s};\n", .{
+                @as(u8, if (m.instance) '-' else '+'), m.selector, params.items, result,
             });
         }
         try w.writeAll("    };\n");
@@ -1062,13 +1074,23 @@ const Model = struct {
                         "objc.Object";
                     return try self.maybeOptional(wrapper, optional);
                 }
-                if (std.mem.eql(u8, base, "id")) return try self.maybeOptional("objc.Object", optional);
+                if (std.mem.eql(u8, base, "id") or self.type_params.contains(base))
+                    return try self.maybeOptional("objc.Object", optional);
                 if (std.mem.eql(u8, base, "SEL")) return try self.maybeOptional("objc.Sel", optional);
                 // `Class<NSWindowRestoration>` is a class that adopts a protocol.
                 if (std.mem.eql(u8, base, "Class") or std.mem.startsWith(u8, base, "Class<"))
                     return try self.maybeOptional("objc.Class", optional);
                 if (scalar(base)) |s| return s;
-                if (self.typedefs.get(base)) |target| return scalar(target);
+                if (self.typedefs.get(base)) |target| {
+                    // Inside a block's parameters, where clang did not
+                    // desugar it: `NSModalResponse`, `NSErrorUserInfoKey`.
+                    if (scalar(target)) |s| return s;
+                    if (std.mem.indexOfScalar(u8, target, '*') != null and std.mem.indexOfScalar(u8, target, '(') == null) {
+                        return try self.spell(class, try std.fmt.allocPrint(self.arena, "{s}{s}", .{
+                            target, if (optional) " _Nullable" else " _Nonnull",
+                        }), .param);
+                    }
+                }
                 if (structType(base)) |s| return s;
                 const struct_name = if (std.mem.startsWith(u8, base, "struct ")) base["struct ".len..] else base;
                 if (self.structs.contains(struct_name)) return stripPrefix(struct_name);
@@ -1079,7 +1101,8 @@ const Model = struct {
             1 => {
                 if (std.mem.eql(u8, base, "char")) return if (optional) "?[*:0]const u8" else "[*:0]const u8";
                 if (std.mem.eql(u8, base, "void")) return if (is_const) "?*const anyopaque" else "?*anyopaque";
-                if (std.mem.eql(u8, base, "id") or std.mem.startsWith(u8, base, "id<")) {
+                const unqualified = if (std.mem.indexOfScalar(u8, base, '<')) |a| base[0..a] else base;
+                if (std.mem.eql(u8, base, "id") or std.mem.startsWith(u8, base, "id<") or self.type_params.contains(unqualified)) {
                     return try self.objectArray(raw_type, base, is_const);
                 }
                 if (scalar(base) orelse structType(base) orelse self.generatedStruct(base)) |s| {
@@ -1100,7 +1123,7 @@ const Model = struct {
             },
             2 => {
                 // `NSError **` and friends: an out-parameter for an object.
-                if (try self.objectType(base) != null) return "?*objc.abi.Id";
+                if (try self.objectType(base) != null or self.type_params.contains(base)) return "?*objc.abi.Id";
                 // `unsigned char **`: an array of byte buffers, like the
                 // planes of a bitmap.
                 if (scalar(base)) |s| if (std.mem.eql(u8, s, "u8")) return "?[*]?[*]u8";
@@ -1551,6 +1574,18 @@ fn globalName(arena: Allocator, c_name: []const u8) ![]const u8 {
 /// `initWithContentRect:styleMask:backing:defer:` to
 /// `initWithContentRectStyleMaskBackingDefer`.
 fn methodName(arena: Allocator, selector: []const u8) ![]const u8 {
+    const name = try joinedSelector(arena, selector);
+    // Lower camel case, as Zig functions are: `UUID` to `uuid`,
+    // `CGContext` to `cgContext`, `URLByAppendingPathComponent` to
+    // `urlByAppendingPathComponent` -- and never the name of a type.
+    var run: usize = 0;
+    while (run < name.len and std.ascii.isUpper(name[run])) run += 1;
+    const lower = if (run > 1 and run < name.len and std.ascii.isLower(name[run])) run - 1 else run;
+    for (name[0..lower]) |*c| c.* = std.ascii.toLower(c.*);
+    return name;
+}
+
+fn joinedSelector(arena: Allocator, selector: []const u8) ![]u8 {
     var out: std.ArrayList(u8) = .empty;
     var it = std.mem.splitScalar(u8, selector, ':');
     var first = true;

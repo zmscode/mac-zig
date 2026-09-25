@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 const cf = @import("../cf.zig");
 const errors = @import("../errors.zig");
 const error_object = @import("error_object.zig");
@@ -85,6 +86,12 @@ pub const String = extern struct {
             &slot.id,
         });
         try slot.finish(ok, details);
+    }
+
+    /// Every method `NSString` has -- this is the everyday part -- as the
+    /// generated wrapper for the same object.
+    pub fn all(self: String) generated.String {
+        return .from(self.object);
     }
 
     pub fn deinit(self: String) void {

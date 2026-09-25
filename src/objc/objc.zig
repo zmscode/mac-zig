@@ -71,6 +71,7 @@ const block = @import("block.zig");
 const autorelease = @import("autorelease.zig");
 const exception = @import("exception.zig");
 const subclass = @import("subclass.zig");
+const completion = @import("completion.zig");
 
 pub const Object = object.Object;
 pub const Class = class.Class;
@@ -81,6 +82,7 @@ pub const Block = block.Block;
 pub const BlockRef = block.BlockRef;
 pub const Exception = exception.Exception;
 pub const Subclass = subclass.Subclass;
+pub const Completion = completion.Completion;
 
 pub const sel = sel_.sel;
 pub const tryCall = exception.tryCall;
@@ -158,5 +160,6 @@ test {
     _ = autorelease;
     _ = exception;
     _ = subclass;
+    _ = completion;
     _ = @import("tests.zig");
 }

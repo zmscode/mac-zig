@@ -41,6 +41,7 @@ pub const Number = @import("number.zig").Number;
 pub const Data = @import("data.zig").Data;
 pub const Url = @import("url.zig").Url;
 pub const ErrorObject = @import("error_object.zig").ErrorObject;
+pub const valueOrError = @import("error_object.zig").valueOrError;
 
 /// Foundation's constants and C functions, generated from its headers:
 /// `foundation.all.runLoopCommonModes()`, `foundation.all.homeDirectory()`,

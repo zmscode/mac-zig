@@ -171,7 +171,7 @@ pub fn onMain(context: anytype, comptime f: fn (@TypeOf(context)) void) void {
 /// drawing.
 pub fn currentContext() ?cg.Context {
     const graphics = generated.GraphicsContext.currentContext() orelse return null;
-    return graphics.CGContext();
+    return graphics.cgContext();
 }
 
 // -- the delegate -----------------------------------------------------------

@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 const errors = @import("../errors.zig");
 const String = @import("string.zig").String;
 
@@ -26,6 +27,12 @@ pub const ErrorObject = extern struct {
     object: Object,
 
     /// Yours, when it came through a `details` parameter.
+    /// Every method `NSError` has -- this is the everyday part -- as the
+    /// generated wrapper for the same object.
+    pub fn all(self: ErrorObject) generated.Error {
+        return .from(self.object);
+    }
+
     pub fn deinit(self: ErrorObject) void {
         self.object.release();
     }
@@ -54,6 +61,30 @@ pub const ErrorObject = extern struct {
     }
 };
 
+/// The value from a completion handler's `(value, NSError)` pair -- the
+/// shape of most of them -- as a Zig error union: the value, or
+/// `error.Failed` with the `NSError` in `details` (retained, yours to
+/// `deinit`) when given.
+///
+/// ```zig
+/// var done = try objc.Completion(fn (?metal.Library, ?foundation.ErrorObject) void).init(gpa, io);
+/// defer done.deinit();
+/// device.newLibraryWithSourceOptionsCompletionHandler(source, null, done.handler());
+/// const library = try foundation.valueOrError(try done.wait(), &details);
+/// ```
+///
+/// The value is the completion's, and lives until its `deinit`.
+pub fn valueOrError(result: anytype, details: ?*ErrorObject) errors.Error!@typeInfo(@TypeOf(result[0])).optional.child {
+    if (result[0]) |value| return value;
+    if (details) |out| {
+        out.* = if (result[1]) |failure|
+            .{ .object = failure.object.retain() }
+        else
+            .{ .object = Slot.makeUnknown() };
+    }
+    return errors.Error.Failed;
+}
+
 /// Where a wrapped call puts an `NSError *` out-parameter. Pass `&slot.id`
 /// as the `error:` argument, then `finish` with whether the call worked.
 pub const Slot = struct {
@@ -77,7 +108,7 @@ pub const Slot = struct {
 
     /// A stand-in for a failure that reported no `NSError`, so a caller
     /// who asked for details always gets something to `deinit`.
-    fn makeUnknown() Object {
+    pub fn makeUnknown() Object {
         const domain = String.literal("MacZigUnknownError");
         return objc.getClass("NSError").?.msgSend(Object, "alloc", .{})
             .msgSend(Object, "initWithDomain:code:userInfo:", .{ domain, @as(objc.Integer, 0), @as(?Object, null) });

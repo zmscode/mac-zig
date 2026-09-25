@@ -16,6 +16,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 
 const Object = objc.Object;
 
@@ -40,6 +41,12 @@ pub fn Array(comptime T: type) type {
 
         pub fn class() objc.Class {
             return objc.getClass("NSArray").?;
+        }
+
+        /// Every method `NSArray` has, as the generated wrapper for the same
+        /// object -- whose elements are untyped `objc.Object`s.
+        pub fn all(self: Self) generated.Array {
+            return .from(self.object);
         }
 
         /// An array holding `items`, each retained. Yours.
@@ -153,6 +160,12 @@ pub fn MutableArray(comptime T: type) type {
             return objc.getClass("NSMutableArray").?;
         }
 
+        /// Every method `NSMutableArray` has, as the generated wrapper for the same
+        /// object -- whose elements are untyped `objc.Object`s.
+        pub fn all(self: Self) generated.MutableArray {
+            return .from(self.object);
+        }
+
         /// An empty array with room for `capacity` without growing. Yours.
         pub fn init(capacity: usize) Self {
             return class().msgSend(Object, "alloc", .{})
@@ -224,6 +237,12 @@ pub fn Dictionary(comptime K: type, comptime V: type) type {
 
         pub fn class() objc.Class {
             return objc.getClass("NSDictionary").?;
+        }
+
+        /// Every method `NSDictionary` has, as the generated wrapper for the same
+        /// object -- whose elements are untyped `objc.Object`s.
+        pub fn all(self: Self) generated.Dictionary {
+            return .from(self.object);
         }
 
         /// A dictionary mapping `key_items[i]` to `value_items[i]`. The two slices
@@ -303,6 +322,12 @@ pub fn MutableDictionary(comptime K: type, comptime V: type) type {
 
         pub fn class() objc.Class {
             return objc.getClass("NSMutableDictionary").?;
+        }
+
+        /// Every method `NSMutableDictionary` has, as the generated wrapper for the same
+        /// object -- whose elements are untyped `objc.Object`s.
+        pub fn all(self: Self) generated.MutableDictionary {
+            return .from(self.object);
         }
 
         /// An empty dictionary. Yours.

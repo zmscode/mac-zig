@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 
 const Object = objc.Object;
 
@@ -27,6 +28,12 @@ pub const Number = extern struct {
     /// Yours.
     pub fn initBool(value: bool) Number {
         return class().msgSend(Object, "alloc", .{}).msgSend(Number, "initWithBool:", .{value});
+    }
+
+    /// Every method `NSNumber` has -- this is the everyday part -- as the
+    /// generated wrapper for the same object.
+    pub fn all(self: Number) generated.Number {
+        return .from(self.object);
     }
 
     pub fn deinit(self: Number) void {

@@ -247,3 +247,39 @@ test "QuartzCore's constants and functions, called" {
     const scale = metal.all.transform3DMakeScale(2, 3, 4);
     try std.testing.expectEqual(@as(f64, 3), scale.m22);
 }
+
+test "an asynchronous API, waited on with std.Io" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+
+    const device = metal.createSystemDefaultDevice() orelse return error.SkipZigTest;
+    defer device.release();
+
+    const Compiled = objc.Completion(fn (?metal.Library, ?foundation.ErrorObject) void);
+
+    // Compiles on Metal's own threads; `wait` is an ordinary Io wait.
+    {
+        var done = try Compiled.init(std.heap.smp_allocator, std.testing.io);
+        defer done.deinit();
+        const text = try foundation.String.init(shader);
+        defer text.deinit();
+        device.newLibraryWithSourceOptionsCompletionHandler(text, null, done.handler());
+
+        const library = try foundation.valueOrError(try done.wait(), null);
+        const vertex_fn = metal.function(library, "vertex_main").?;
+        defer vertex_fn.release();
+        try std.testing.expect(vertex_fn.name().eql(.literal("vertex_main")));
+    }
+
+    // And a compile error comes back as a Zig error, with the NSError.
+    {
+        var done = try Compiled.init(std.heap.smp_allocator, std.testing.io);
+        defer done.deinit();
+        device.newLibraryWithSourceOptionsCompletionHandler(.literal("not metal"), null, done.handler());
+
+        var details: foundation.ErrorObject = undefined;
+        try std.testing.expectError(error.Failed, foundation.valueOrError(try done.wait(), &details));
+        defer details.deinit();
+        try std.testing.expect(details.localizedDescription().length() > 0);
+    }
+}

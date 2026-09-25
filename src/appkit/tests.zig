@@ -65,7 +65,7 @@ test "inherited methods need no conversion, and structs and cg types come throug
 
     // CGColorRef comes back as cg.Color, not a bare pointer.
     const red = appkit.Color.redColor();
-    const cg_color: cg.Color = red.CGColor();
+    const cg_color: cg.Color = red.cgColor();
     try std.testing.expectEqual(@as(cg.Float, 1), cg_color.components()[0]);
 }
 

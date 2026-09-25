@@ -513,6 +513,51 @@ defer text.deinit();
 - **Anything from an `init...` is yours to `deinit`**; everything else is autoreleased.
   `String.literal("...")` is made once and never freed, like `@"..."`.
 
+### The rest of Foundation
+
+Behind the hand-written types, `foundation.all` is generated from the headers: the full method
+lists of those same classes, reached with `.all()`, and the long tail nobody wraps by hand —
+`FileManager`, `UserDefaults`, `NotificationCenter`, `Timer`, `RunLoop`, `Bundle`,
+`ProcessInfo`, `Task`, `FileHandle`, `JSONSerialization`, `URLSession` and more:
+
+```zig
+const text = foundation.String.literal("Mac, Zig");
+_ = text.all().lowercaseString();                       // every NSString method
+
+const files = foundation.all.FileManager.defaultManager();
+const listing = files.contentsOfDirectoryAtPathError(path, null).?;   // Array(String)
+_ = foundation.all.ProcessInfo.processInfo().operatingSystemVersion();
+_ = foundation.all.UUID.uuid().uuidString();
+```
+
+Generated methods take and return the hand-written types, so the two mix freely. Methods whose
+selectors start with an acronym are lower camel case, as Zig functions are: `+[NSUUID UUID]` is
+`uuid()`, `URLByAppendingPathComponent:` is `urlByAppendingPathComponent`.
+
+### Waiting on a completion handler
+
+Apple's asynchronous APIs call a block when they are done, on a thread of their choosing.
+`objc.Completion` is that block and a `std.Io` wait for it:
+
+```zig
+var done = try objc.Completion(fn (?metal.Library, ?foundation.ErrorObject) void).init(gpa, io);
+defer done.deinit();
+
+device.newLibraryWithSourceOptionsCompletionHandler(source, null, done.handler());
+const library = try foundation.valueOrError(try done.wait(), &details);
+```
+
+`wait` is an ordinary `Io` wait — it blocks a thread on `Io.Threaded` and suspends a task on an
+evented `Io` — so it is cancelable, and `waitTimeout` bounds it. It returns the handler's
+arguments (a tuple when there are several: `const a, const b = try done.wait();`), with objects
+among them retained until `deinit`. `foundation.valueOrError` turns the common `(value, NSError)`
+pair into a Zig error union.
+
+Giving up — a timeout, a cancel — does not stop the handler running later, so the state the two
+share is reference-counted and freed by whichever finishes last. That is why the allocator must be
+usable from another thread (`std.heap.smp_allocator`, not `std.testing.allocator`), and why the
+handler must be one that is called once.
+
 ## AppKit
 
 `mac.appkit` is generated from the SDK's headers:
@@ -616,8 +661,8 @@ runs later, and a value on the caller's stack would be gone.
 
 ### The generator
 
-`zig build generate` runs `tools/objc_gen` once per manifest — `tools/objc_gen/appkit.zig` and
-`tools/objc_gen/metal.zig` — and writes `src/<framework>/generated.zig`, which is checked in, so
+`zig build generate` runs `tools/objc_gen` once per manifest — `tools/objc_gen/appkit.zig`,
+`tools/objc_gen/metal.zig` and `tools/objc_gen/foundation.zig` — and writes `src/<framework>/generated.zig`, which is checked in, so
 building the package never needs it. It has clang dump every declaration whose name carries
 one of the manifest's prefixes (`NS`; `MTL` and `CA`) as JSON, one parse per prefix, then skims
 the dump — a couple of hundred megabytes for AppKit and Foundation — and parses only the
@@ -855,51 +900,54 @@ dependent can check `mac.features.imageio` rather than failing to compile.
 
 ## Layout
 
-| Path                          | What is in it                                             |
-| ----------------------------- | --------------------------------------------------------- |
-| `src/mac.zig`                 | Umbrella root: the framework namespaces and feature flags |
-| `src/errors.zig`              | The `Error` set, shared by every framework                |
-| `src/cf.zig`                  | Just enough CoreFoundation to work the rest               |
-| `src/cg/cg.zig`               | CoreGraphics namespace root and re-exports                |
-| `src/cg/geometry.zig`         | `Point`, `Size`, `Rect`, `AffineTransform`                |
-| `src/cg/color.zig`            | `ColorSpace`, `Color`, `Rgba`                             |
-| `src/cg/image.zig`            | `Image`, `BitmapInfo`, `DataProvider`                     |
-| `src/cg/path.zig`             | `Path`, `MutablePath`, `Element`                          |
-| `src/cg/context.zig`          | `Context`, `Gradient`, `Layer` — the drawing surface      |
-| `src/cg/pdf.zig`              | Reading PDFs                                              |
-| `src/cg/display.zig`          | Displays and display modes                                |
-| `src/cg/window.zig`           | The window list                                           |
-| `src/cg/event.zig`            | Synthetic input and event taps                            |
-| `src/cg/imageio.zig`          | Image files, under `-Dimageio`                            |
-| `src/cg/text.zig`             | The CoreText bridge, under `-Dcoretext`                   |
-| `src/iokit/iokit.zig`         | IOKit namespace root                                      |
-| `src/iokit/power.zig`         | Power sources, under `-Diokit`                            |
-| `src/objc/objc.zig`           | Objective-C runtime namespace root, `Range`, `Integer`    |
-| `src/objc/object.zig`         | `Object`: messages, properties, ivars, bridging to `cf`   |
-| `src/objc/class.zig`          | `Class`, and defining classes from Zig                    |
-| `src/objc/message.zig`        | The `objc_msgSend` call, typed at compile time            |
-| `src/objc/block.zig`          | `Block` and `BlockRef`, laid out by the Block ABI         |
-| `src/objc/abi.zig`            | Zig types to C types and back; method trampolines         |
-| `src/objc/encoding.zig`       | Type encodings, computed from Zig types                   |
-| `src/objc/sel.zig`            | `Sel`, cached per call site                               |
-| `src/objc/protocol.zig`       | `Protocol`                                                |
-| `src/objc/autorelease.zig`    | `AutoreleasePool`                                         |
-| `src/objc/subclass.zig`       | `Subclass`: a class defined as a Zig struct               |
-| `src/objc/exception.zig`      | `Exception`, `tryCall`, and `tryMsgSend` underneath       |
-| `src/foundation/`             | `String`, `Number`, `Data`, `Url`, collections, errors    |
-| `src/appkit/appkit.zig`       | AppKit namespace root                                     |
-| `src/appkit/generated.zig`    | The generated wrappers — do not edit                      |
-| `src/appkit/app.zig`          | `run`, the delegate and menu bar, `currentContext`        |
-| `src/dispatch/dispatch.zig`   | Grand Central Dispatch                                    |
-| `tools/objc_gen/main.zig`     | The generator behind `zig build generate`                 |
-| `tools/objc_gen/appkit.zig`   | What the generator wraps from AppKit                      |
-| `tools/objc_gen/metal.zig`    | What the generator wraps from Metal and QuartzCore        |
-| `src/metal/metal.zig`         | Metal namespace root, and the calls that are not methods  |
-| `src/iosurface/iosurface.zig` | `Surface` and `Locked`: shared pixel buffers              |
-| `src/metal/generated.zig`     | The generated Metal wrappers — do not edit                |
-| `src/appkit/metal_view.zig`   | `MetalView`: a Metal layer and a display-link render loop |
-| `vendor/mac_objc_exception.m` | The `@try` that `tryMsgSend` runs under                   |
-| `vendor/mac_translate.h`      | The umbrella header, and the header workarounds           |
+| Path                            | What is in it                                                         |
+| ------------------------------- | --------------------------------------------------------------------- |
+| `src/mac.zig`                   | Umbrella root: the framework namespaces and feature flags             |
+| `src/errors.zig`                | The `Error` set, shared by every framework                            |
+| `src/cf.zig`                    | Just enough CoreFoundation to work the rest                           |
+| `src/cg/cg.zig`                 | CoreGraphics namespace root and re-exports                            |
+| `src/cg/geometry.zig`           | `Point`, `Size`, `Rect`, `AffineTransform`                            |
+| `src/cg/color.zig`              | `ColorSpace`, `Color`, `Rgba`                                         |
+| `src/cg/image.zig`              | `Image`, `BitmapInfo`, `DataProvider`                                 |
+| `src/cg/path.zig`               | `Path`, `MutablePath`, `Element`                                      |
+| `src/cg/context.zig`            | `Context`, `Gradient`, `Layer` — the drawing surface                  |
+| `src/cg/pdf.zig`                | Reading PDFs                                                          |
+| `src/cg/display.zig`            | Displays and display modes                                            |
+| `src/cg/window.zig`             | The window list                                                       |
+| `src/cg/event.zig`              | Synthetic input and event taps                                        |
+| `src/cg/imageio.zig`            | Image files, under `-Dimageio`                                        |
+| `src/cg/text.zig`               | The CoreText bridge, under `-Dcoretext`                               |
+| `src/iokit/iokit.zig`           | IOKit namespace root                                                  |
+| `src/iokit/power.zig`           | Power sources, under `-Diokit`                                        |
+| `src/objc/objc.zig`             | Objective-C runtime namespace root, `Range`, `Integer`                |
+| `src/objc/object.zig`           | `Object`: messages, properties, ivars, bridging to `cf`               |
+| `src/objc/class.zig`            | `Class`, and defining classes from Zig                                |
+| `src/objc/message.zig`          | The `objc_msgSend` call, typed at compile time                        |
+| `src/objc/block.zig`            | `Block` and `BlockRef`, laid out by the Block ABI                     |
+| `src/objc/abi.zig`              | Zig types to C types and back; method trampolines                     |
+| `src/objc/encoding.zig`         | Type encodings, computed from Zig types                               |
+| `src/objc/sel.zig`              | `Sel`, cached per call site                                           |
+| `src/objc/protocol.zig`         | `Protocol`                                                            |
+| `src/objc/autorelease.zig`      | `AutoreleasePool`                                                     |
+| `src/objc/subclass.zig`         | `Subclass`: a class defined as a Zig struct                           |
+| `src/objc/exception.zig`        | `Exception`, `tryCall`, and `tryMsgSend` underneath                   |
+| `src/objc/completion.zig`       | `Completion`: a completion handler to wait on with `std.Io`           |
+| `src/foundation/generated.zig`  | Foundation's full method lists, long tail and constants — do not edit |
+| `src/foundation/`               | `String`, `Number`, `Data`, `Url`, collections, errors                |
+| `src/appkit/appkit.zig`         | AppKit namespace root                                                 |
+| `src/appkit/generated.zig`      | The generated wrappers — do not edit                                  |
+| `src/appkit/app.zig`            | `run`, the delegate and menu bar, `currentContext`                    |
+| `src/dispatch/dispatch.zig`     | Grand Central Dispatch                                                |
+| `tools/objc_gen/main.zig`       | The generator behind `zig build generate`                             |
+| `tools/objc_gen/appkit.zig`     | What the generator wraps from AppKit                                  |
+| `tools/objc_gen/metal.zig`      | What the generator wraps from Metal and QuartzCore                    |
+| `tools/objc_gen/foundation.zig` | What the generator wraps from Foundation                              |
+| `src/metal/metal.zig`           | Metal namespace root, and the calls that are not methods              |
+| `src/iosurface/iosurface.zig`   | `Surface` and `Locked`: shared pixel buffers                          |
+| `src/metal/generated.zig`       | The generated Metal wrappers — do not edit                            |
+| `src/appkit/metal_view.zig`     | `MetalView`: a Metal layer and a display-link render loop             |
+| `vendor/mac_objc_exception.m`   | The `@try` that `tryMsgSend` runs under                               |
+| `vendor/mac_translate.h`        | The umbrella header, and the header workarounds                       |
 
 ## Where the frameworks come from
 

@@ -129,6 +129,36 @@ pub fn Block(comptime Captures_: type, comptime Signature_: type) type {
             return self;
         }
 
+        /// `init`, for a body that takes the arguments as one tuple --
+        /// `fn (captures: *const Captures, args: Arguments) Return` -- which
+        /// is what generic code can write when it does not know how many
+        /// there are.
+        pub fn initTuple(captures_value: Captures, comptime body: fn (*const Captures, Arguments) Return) Self {
+            var self: Self = .{
+                .isa = @ptrCast(&raw._NSConcreteStackBlock),
+                .flags = block_flags,
+                .invoke = invokeTupleFor(body),
+                .descriptor = &block_descriptor,
+                .captured = undefined,
+            };
+            self.captures().* = captures_value;
+            return self;
+        }
+
+        /// The signature's parameters, as a tuple type.
+        pub const Arguments = @Tuple(Args);
+
+        fn invokeTupleFor(comptime body: fn (*const Captures, Arguments) Return) *const Invoke {
+            const Body = struct {
+                fn run(c_args: anytype) abi.Abi(Return) {
+                    var args: Arguments = undefined;
+                    inline for (Args, 1..) |A, i| args[i - 1] = abi.fromAbi(A, c_args[i]);
+                    return abi.toAbi(Return, body(c_args[0].captures(), args));
+                }
+            };
+            return abi.cFunction(invokeParams(*Self, Args), abi.Abi(Return), Body.run);
+        }
+
         /// This block, for a method that takes a `BlockRef` of its
         /// signature. A stack block is copied by the method if it keeps it.
         pub fn ref(self: *const Self) Ref {

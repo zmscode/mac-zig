@@ -168,7 +168,7 @@ fn saveSnapshot(view: appkit.View, path: []const u8) !void {
     const bounds = view.bounds();
     const rep = view.bitmapImageRepForCachingDisplayInRect(bounds) orelse return error.Failed;
     view.cacheDisplayInRectToBitmapImageRep(bounds, rep);
-    const image = rep.CGImage() orelse return error.Failed; // borrowed from the rep
+    const image = rep.cgImage() orelse return error.Failed; // borrowed from the rep
     try cg.imageio.writeImage(image, path, .png, .{});
     print("wrote {s} ({d}x{d})\n", .{ path, image.width(), image.height() });
 }

@@ -1309,38 +1309,38 @@ pub const RenderPassDescriptor = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+renderPassDescriptor" = fn () RenderPassDescriptor;
-        pub const @"setSamplePositions:count:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"getSamplePositions:count:" = fn (?objc.Object, objc.UInteger) objc.UInteger;
-        pub const colorAttachments = fn () RenderPassColorAttachmentDescriptorArray;
-        pub const depthAttachment = fn () RenderPassDepthAttachmentDescriptor;
-        pub const @"setDepthAttachment:" = fn (?RenderPassDepthAttachmentDescriptor) void;
-        pub const stencilAttachment = fn () objc.Object;
-        pub const @"setStencilAttachment:" = fn (?objc.Object) void;
-        pub const visibilityResultBuffer = fn () ?Buffer;
-        pub const @"setVisibilityResultBuffer:" = fn (?Buffer) void;
-        pub const renderTargetArrayLength = fn () objc.UInteger;
-        pub const @"setRenderTargetArrayLength:" = fn (objc.UInteger) void;
-        pub const imageblockSampleLength = fn () objc.UInteger;
-        pub const @"setImageblockSampleLength:" = fn (objc.UInteger) void;
-        pub const threadgroupMemoryLength = fn () objc.UInteger;
-        pub const @"setThreadgroupMemoryLength:" = fn (objc.UInteger) void;
-        pub const tileWidth = fn () objc.UInteger;
-        pub const @"setTileWidth:" = fn (objc.UInteger) void;
-        pub const tileHeight = fn () objc.UInteger;
-        pub const @"setTileHeight:" = fn (objc.UInteger) void;
-        pub const defaultRasterSampleCount = fn () objc.UInteger;
-        pub const @"setDefaultRasterSampleCount:" = fn (objc.UInteger) void;
-        pub const renderTargetWidth = fn () objc.UInteger;
-        pub const @"setRenderTargetWidth:" = fn (objc.UInteger) void;
-        pub const renderTargetHeight = fn () objc.UInteger;
-        pub const @"setRenderTargetHeight:" = fn (objc.UInteger) void;
-        pub const rasterizationRateMap = fn () ?objc.Object;
-        pub const @"setRasterizationRateMap:" = fn (?objc.Object) void;
-        pub const sampleBufferAttachments = fn () objc.Object;
-        pub const visibilityResultType = fn () VisibilityResultType;
-        pub const @"setVisibilityResultType:" = fn (VisibilityResultType) void;
-        pub const supportColorAttachmentMapping = fn () bool;
-        pub const @"setSupportColorAttachmentMapping:" = fn (bool) void;
+        pub const @"-setSamplePositions:count:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-getSamplePositions:count:" = fn (?objc.Object, objc.UInteger) objc.UInteger;
+        pub const @"-colorAttachments" = fn () RenderPassColorAttachmentDescriptorArray;
+        pub const @"-depthAttachment" = fn () RenderPassDepthAttachmentDescriptor;
+        pub const @"-setDepthAttachment:" = fn (?RenderPassDepthAttachmentDescriptor) void;
+        pub const @"-stencilAttachment" = fn () objc.Object;
+        pub const @"-setStencilAttachment:" = fn (?objc.Object) void;
+        pub const @"-visibilityResultBuffer" = fn () ?Buffer;
+        pub const @"-setVisibilityResultBuffer:" = fn (?Buffer) void;
+        pub const @"-renderTargetArrayLength" = fn () objc.UInteger;
+        pub const @"-setRenderTargetArrayLength:" = fn (objc.UInteger) void;
+        pub const @"-imageblockSampleLength" = fn () objc.UInteger;
+        pub const @"-setImageblockSampleLength:" = fn (objc.UInteger) void;
+        pub const @"-threadgroupMemoryLength" = fn () objc.UInteger;
+        pub const @"-setThreadgroupMemoryLength:" = fn (objc.UInteger) void;
+        pub const @"-tileWidth" = fn () objc.UInteger;
+        pub const @"-setTileWidth:" = fn (objc.UInteger) void;
+        pub const @"-tileHeight" = fn () objc.UInteger;
+        pub const @"-setTileHeight:" = fn (objc.UInteger) void;
+        pub const @"-defaultRasterSampleCount" = fn () objc.UInteger;
+        pub const @"-setDefaultRasterSampleCount:" = fn (objc.UInteger) void;
+        pub const @"-renderTargetWidth" = fn () objc.UInteger;
+        pub const @"-setRenderTargetWidth:" = fn (objc.UInteger) void;
+        pub const @"-renderTargetHeight" = fn () objc.UInteger;
+        pub const @"-setRenderTargetHeight:" = fn (objc.UInteger) void;
+        pub const @"-rasterizationRateMap" = fn () ?objc.Object;
+        pub const @"-setRasterizationRateMap:" = fn (?objc.Object) void;
+        pub const @"-sampleBufferAttachments" = fn () objc.Object;
+        pub const @"-visibilityResultType" = fn () VisibilityResultType;
+        pub const @"-setVisibilityResultType:" = fn (VisibilityResultType) void;
+        pub const @"-supportColorAttachmentMapping" = fn () bool;
+        pub const @"-setSupportColorAttachmentMapping:" = fn (bool) void;
     };
 };
 
@@ -1501,28 +1501,28 @@ pub const RenderPassAttachmentDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const texture = fn () ?Texture;
-        pub const @"setTexture:" = fn (?Texture) void;
-        pub const level = fn () objc.UInteger;
-        pub const @"setLevel:" = fn (objc.UInteger) void;
-        pub const slice = fn () objc.UInteger;
-        pub const @"setSlice:" = fn (objc.UInteger) void;
-        pub const depthPlane = fn () objc.UInteger;
-        pub const @"setDepthPlane:" = fn (objc.UInteger) void;
-        pub const resolveTexture = fn () ?Texture;
-        pub const @"setResolveTexture:" = fn (?Texture) void;
-        pub const resolveLevel = fn () objc.UInteger;
-        pub const @"setResolveLevel:" = fn (objc.UInteger) void;
-        pub const resolveSlice = fn () objc.UInteger;
-        pub const @"setResolveSlice:" = fn (objc.UInteger) void;
-        pub const resolveDepthPlane = fn () objc.UInteger;
-        pub const @"setResolveDepthPlane:" = fn (objc.UInteger) void;
-        pub const loadAction = fn () LoadAction;
-        pub const @"setLoadAction:" = fn (LoadAction) void;
-        pub const storeAction = fn () StoreAction;
-        pub const @"setStoreAction:" = fn (StoreAction) void;
-        pub const storeActionOptions = fn () StoreActionOptions;
-        pub const @"setStoreActionOptions:" = fn (StoreActionOptions) void;
+        pub const @"-texture" = fn () ?Texture;
+        pub const @"-setTexture:" = fn (?Texture) void;
+        pub const @"-level" = fn () objc.UInteger;
+        pub const @"-setLevel:" = fn (objc.UInteger) void;
+        pub const @"-slice" = fn () objc.UInteger;
+        pub const @"-setSlice:" = fn (objc.UInteger) void;
+        pub const @"-depthPlane" = fn () objc.UInteger;
+        pub const @"-setDepthPlane:" = fn (objc.UInteger) void;
+        pub const @"-resolveTexture" = fn () ?Texture;
+        pub const @"-setResolveTexture:" = fn (?Texture) void;
+        pub const @"-resolveLevel" = fn () objc.UInteger;
+        pub const @"-setResolveLevel:" = fn (objc.UInteger) void;
+        pub const @"-resolveSlice" = fn () objc.UInteger;
+        pub const @"-setResolveSlice:" = fn (objc.UInteger) void;
+        pub const @"-resolveDepthPlane" = fn () objc.UInteger;
+        pub const @"-setResolveDepthPlane:" = fn (objc.UInteger) void;
+        pub const @"-loadAction" = fn () LoadAction;
+        pub const @"-setLoadAction:" = fn (LoadAction) void;
+        pub const @"-storeAction" = fn () StoreAction;
+        pub const @"-setStoreAction:" = fn (StoreAction) void;
+        pub const @"-storeActionOptions" = fn () StoreActionOptions;
+        pub const @"-setStoreActionOptions:" = fn (StoreActionOptions) void;
     };
 };
 
@@ -1693,8 +1693,8 @@ pub const RenderPassColorAttachmentDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const clearColor = fn () ClearColor;
-        pub const @"setClearColor:" = fn (ClearColor) void;
+        pub const @"-clearColor" = fn () ClearColor;
+        pub const @"-setClearColor:" = fn (ClearColor) void;
     };
 };
 
@@ -1755,8 +1755,8 @@ pub const RenderPassColorAttachmentDescriptorArray = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"objectAtIndexedSubscript:" = fn (objc.UInteger) RenderPassColorAttachmentDescriptor;
-        pub const @"setObject:atIndexedSubscript:" = fn (?RenderPassColorAttachmentDescriptor, objc.UInteger) void;
+        pub const @"-objectAtIndexedSubscript:" = fn (objc.UInteger) RenderPassColorAttachmentDescriptor;
+        pub const @"-setObject:atIndexedSubscript:" = fn (?RenderPassColorAttachmentDescriptor, objc.UInteger) void;
     };
 };
 
@@ -1937,10 +1937,10 @@ pub const RenderPassDepthAttachmentDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const clearDepth = fn () f64;
-        pub const @"setClearDepth:" = fn (f64) void;
-        pub const depthResolveFilter = fn () MultisampleDepthResolveFilter;
-        pub const @"setDepthResolveFilter:" = fn (MultisampleDepthResolveFilter) void;
+        pub const @"-clearDepth" = fn () f64;
+        pub const @"-setClearDepth:" = fn (f64) void;
+        pub const @"-depthResolveFilter" = fn () MultisampleDepthResolveFilter;
+        pub const @"-setDepthResolveFilter:" = fn (MultisampleDepthResolveFilter) void;
     };
 };
 
@@ -2321,72 +2321,72 @@ pub const RenderPipelineDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const reset = fn () void;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const vertexFunction = fn () ?Function;
-        pub const @"setVertexFunction:" = fn (?Function) void;
-        pub const fragmentFunction = fn () ?Function;
-        pub const @"setFragmentFunction:" = fn (?Function) void;
-        pub const vertexDescriptor = fn () ?VertexDescriptor;
-        pub const @"setVertexDescriptor:" = fn (?VertexDescriptor) void;
-        pub const sampleCount = fn () objc.UInteger;
-        pub const @"setSampleCount:" = fn (objc.UInteger) void;
-        pub const rasterSampleCount = fn () objc.UInteger;
-        pub const @"setRasterSampleCount:" = fn (objc.UInteger) void;
-        pub const isAlphaToCoverageEnabled = fn () bool;
-        pub const @"setAlphaToCoverageEnabled:" = fn (bool) void;
-        pub const isAlphaToOneEnabled = fn () bool;
-        pub const @"setAlphaToOneEnabled:" = fn (bool) void;
-        pub const isRasterizationEnabled = fn () bool;
-        pub const @"setRasterizationEnabled:" = fn (bool) void;
-        pub const maxVertexAmplificationCount = fn () objc.UInteger;
-        pub const @"setMaxVertexAmplificationCount:" = fn (objc.UInteger) void;
-        pub const colorAttachments = fn () RenderPipelineColorAttachmentDescriptorArray;
-        pub const depthAttachmentPixelFormat = fn () PixelFormat;
-        pub const @"setDepthAttachmentPixelFormat:" = fn (PixelFormat) void;
-        pub const stencilAttachmentPixelFormat = fn () PixelFormat;
-        pub const @"setStencilAttachmentPixelFormat:" = fn (PixelFormat) void;
-        pub const inputPrimitiveTopology = fn () PrimitiveTopologyClass;
-        pub const @"setInputPrimitiveTopology:" = fn (PrimitiveTopologyClass) void;
-        pub const tessellationPartitionMode = fn () TessellationPartitionMode;
-        pub const @"setTessellationPartitionMode:" = fn (TessellationPartitionMode) void;
-        pub const maxTessellationFactor = fn () objc.UInteger;
-        pub const @"setMaxTessellationFactor:" = fn (objc.UInteger) void;
-        pub const isTessellationFactorScaleEnabled = fn () bool;
-        pub const @"setTessellationFactorScaleEnabled:" = fn (bool) void;
-        pub const tessellationFactorFormat = fn () TessellationFactorFormat;
-        pub const @"setTessellationFactorFormat:" = fn (TessellationFactorFormat) void;
-        pub const tessellationControlPointIndexType = fn () TessellationControlPointIndexType;
-        pub const @"setTessellationControlPointIndexType:" = fn (TessellationControlPointIndexType) void;
-        pub const tessellationFactorStepFunction = fn () TessellationFactorStepFunction;
-        pub const @"setTessellationFactorStepFunction:" = fn (TessellationFactorStepFunction) void;
-        pub const tessellationOutputWindingOrder = fn () Winding;
-        pub const @"setTessellationOutputWindingOrder:" = fn (Winding) void;
-        pub const vertexBuffers = fn () objc.Object;
-        pub const fragmentBuffers = fn () objc.Object;
-        pub const supportIndirectCommandBuffers = fn () bool;
-        pub const @"setSupportIndirectCommandBuffers:" = fn (bool) void;
-        pub const binaryArchives = fn () ?foundation.Array(objc.Object);
-        pub const @"setBinaryArchives:" = fn (?foundation.Array(objc.Object)) void;
-        pub const vertexPreloadedLibraries = fn () foundation.Array(objc.Object);
-        pub const @"setVertexPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
-        pub const fragmentPreloadedLibraries = fn () foundation.Array(objc.Object);
-        pub const @"setFragmentPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
-        pub const vertexLinkedFunctions = fn () objc.Object;
-        pub const @"setVertexLinkedFunctions:" = fn (?objc.Object) void;
-        pub const fragmentLinkedFunctions = fn () objc.Object;
-        pub const @"setFragmentLinkedFunctions:" = fn (?objc.Object) void;
-        pub const supportAddingVertexBinaryFunctions = fn () bool;
-        pub const @"setSupportAddingVertexBinaryFunctions:" = fn (bool) void;
-        pub const supportAddingFragmentBinaryFunctions = fn () bool;
-        pub const @"setSupportAddingFragmentBinaryFunctions:" = fn (bool) void;
-        pub const maxVertexCallStackDepth = fn () objc.UInteger;
-        pub const @"setMaxVertexCallStackDepth:" = fn (objc.UInteger) void;
-        pub const maxFragmentCallStackDepth = fn () objc.UInteger;
-        pub const @"setMaxFragmentCallStackDepth:" = fn (objc.UInteger) void;
-        pub const shaderValidation = fn () ShaderValidation;
-        pub const @"setShaderValidation:" = fn (ShaderValidation) void;
+        pub const @"-reset" = fn () void;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-vertexFunction" = fn () ?Function;
+        pub const @"-setVertexFunction:" = fn (?Function) void;
+        pub const @"-fragmentFunction" = fn () ?Function;
+        pub const @"-setFragmentFunction:" = fn (?Function) void;
+        pub const @"-vertexDescriptor" = fn () ?VertexDescriptor;
+        pub const @"-setVertexDescriptor:" = fn (?VertexDescriptor) void;
+        pub const @"-sampleCount" = fn () objc.UInteger;
+        pub const @"-setSampleCount:" = fn (objc.UInteger) void;
+        pub const @"-rasterSampleCount" = fn () objc.UInteger;
+        pub const @"-setRasterSampleCount:" = fn (objc.UInteger) void;
+        pub const @"-isAlphaToCoverageEnabled" = fn () bool;
+        pub const @"-setAlphaToCoverageEnabled:" = fn (bool) void;
+        pub const @"-isAlphaToOneEnabled" = fn () bool;
+        pub const @"-setAlphaToOneEnabled:" = fn (bool) void;
+        pub const @"-isRasterizationEnabled" = fn () bool;
+        pub const @"-setRasterizationEnabled:" = fn (bool) void;
+        pub const @"-maxVertexAmplificationCount" = fn () objc.UInteger;
+        pub const @"-setMaxVertexAmplificationCount:" = fn (objc.UInteger) void;
+        pub const @"-colorAttachments" = fn () RenderPipelineColorAttachmentDescriptorArray;
+        pub const @"-depthAttachmentPixelFormat" = fn () PixelFormat;
+        pub const @"-setDepthAttachmentPixelFormat:" = fn (PixelFormat) void;
+        pub const @"-stencilAttachmentPixelFormat" = fn () PixelFormat;
+        pub const @"-setStencilAttachmentPixelFormat:" = fn (PixelFormat) void;
+        pub const @"-inputPrimitiveTopology" = fn () PrimitiveTopologyClass;
+        pub const @"-setInputPrimitiveTopology:" = fn (PrimitiveTopologyClass) void;
+        pub const @"-tessellationPartitionMode" = fn () TessellationPartitionMode;
+        pub const @"-setTessellationPartitionMode:" = fn (TessellationPartitionMode) void;
+        pub const @"-maxTessellationFactor" = fn () objc.UInteger;
+        pub const @"-setMaxTessellationFactor:" = fn (objc.UInteger) void;
+        pub const @"-isTessellationFactorScaleEnabled" = fn () bool;
+        pub const @"-setTessellationFactorScaleEnabled:" = fn (bool) void;
+        pub const @"-tessellationFactorFormat" = fn () TessellationFactorFormat;
+        pub const @"-setTessellationFactorFormat:" = fn (TessellationFactorFormat) void;
+        pub const @"-tessellationControlPointIndexType" = fn () TessellationControlPointIndexType;
+        pub const @"-setTessellationControlPointIndexType:" = fn (TessellationControlPointIndexType) void;
+        pub const @"-tessellationFactorStepFunction" = fn () TessellationFactorStepFunction;
+        pub const @"-setTessellationFactorStepFunction:" = fn (TessellationFactorStepFunction) void;
+        pub const @"-tessellationOutputWindingOrder" = fn () Winding;
+        pub const @"-setTessellationOutputWindingOrder:" = fn (Winding) void;
+        pub const @"-vertexBuffers" = fn () objc.Object;
+        pub const @"-fragmentBuffers" = fn () objc.Object;
+        pub const @"-supportIndirectCommandBuffers" = fn () bool;
+        pub const @"-setSupportIndirectCommandBuffers:" = fn (bool) void;
+        pub const @"-binaryArchives" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setBinaryArchives:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-vertexPreloadedLibraries" = fn () foundation.Array(objc.Object);
+        pub const @"-setVertexPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-fragmentPreloadedLibraries" = fn () foundation.Array(objc.Object);
+        pub const @"-setFragmentPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-vertexLinkedFunctions" = fn () objc.Object;
+        pub const @"-setVertexLinkedFunctions:" = fn (?objc.Object) void;
+        pub const @"-fragmentLinkedFunctions" = fn () objc.Object;
+        pub const @"-setFragmentLinkedFunctions:" = fn (?objc.Object) void;
+        pub const @"-supportAddingVertexBinaryFunctions" = fn () bool;
+        pub const @"-setSupportAddingVertexBinaryFunctions:" = fn (bool) void;
+        pub const @"-supportAddingFragmentBinaryFunctions" = fn () bool;
+        pub const @"-setSupportAddingFragmentBinaryFunctions:" = fn (bool) void;
+        pub const @"-maxVertexCallStackDepth" = fn () objc.UInteger;
+        pub const @"-setMaxVertexCallStackDepth:" = fn (objc.UInteger) void;
+        pub const @"-maxFragmentCallStackDepth" = fn () objc.UInteger;
+        pub const @"-setMaxFragmentCallStackDepth:" = fn (objc.UInteger) void;
+        pub const @"-shaderValidation" = fn () ShaderValidation;
+        pub const @"-setShaderValidation:" = fn (ShaderValidation) void;
     };
 };
 
@@ -2527,24 +2527,24 @@ pub const RenderPipelineColorAttachmentDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const pixelFormat = fn () PixelFormat;
-        pub const @"setPixelFormat:" = fn (PixelFormat) void;
-        pub const isBlendingEnabled = fn () bool;
-        pub const @"setBlendingEnabled:" = fn (bool) void;
-        pub const sourceRGBBlendFactor = fn () BlendFactor;
-        pub const @"setSourceRGBBlendFactor:" = fn (BlendFactor) void;
-        pub const destinationRGBBlendFactor = fn () BlendFactor;
-        pub const @"setDestinationRGBBlendFactor:" = fn (BlendFactor) void;
-        pub const rgbBlendOperation = fn () BlendOperation;
-        pub const @"setRgbBlendOperation:" = fn (BlendOperation) void;
-        pub const sourceAlphaBlendFactor = fn () BlendFactor;
-        pub const @"setSourceAlphaBlendFactor:" = fn (BlendFactor) void;
-        pub const destinationAlphaBlendFactor = fn () BlendFactor;
-        pub const @"setDestinationAlphaBlendFactor:" = fn (BlendFactor) void;
-        pub const alphaBlendOperation = fn () BlendOperation;
-        pub const @"setAlphaBlendOperation:" = fn (BlendOperation) void;
-        pub const writeMask = fn () ColorWriteMask;
-        pub const @"setWriteMask:" = fn (ColorWriteMask) void;
+        pub const @"-pixelFormat" = fn () PixelFormat;
+        pub const @"-setPixelFormat:" = fn (PixelFormat) void;
+        pub const @"-isBlendingEnabled" = fn () bool;
+        pub const @"-setBlendingEnabled:" = fn (bool) void;
+        pub const @"-sourceRGBBlendFactor" = fn () BlendFactor;
+        pub const @"-setSourceRGBBlendFactor:" = fn (BlendFactor) void;
+        pub const @"-destinationRGBBlendFactor" = fn () BlendFactor;
+        pub const @"-setDestinationRGBBlendFactor:" = fn (BlendFactor) void;
+        pub const @"-rgbBlendOperation" = fn () BlendOperation;
+        pub const @"-setRgbBlendOperation:" = fn (BlendOperation) void;
+        pub const @"-sourceAlphaBlendFactor" = fn () BlendFactor;
+        pub const @"-setSourceAlphaBlendFactor:" = fn (BlendFactor) void;
+        pub const @"-destinationAlphaBlendFactor" = fn () BlendFactor;
+        pub const @"-setDestinationAlphaBlendFactor:" = fn (BlendFactor) void;
+        pub const @"-alphaBlendOperation" = fn () BlendOperation;
+        pub const @"-setAlphaBlendOperation:" = fn (BlendOperation) void;
+        pub const @"-writeMask" = fn () ColorWriteMask;
+        pub const @"-setWriteMask:" = fn (ColorWriteMask) void;
     };
 };
 
@@ -2605,8 +2605,8 @@ pub const RenderPipelineColorAttachmentDescriptorArray = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"objectAtIndexedSubscript:" = fn (objc.UInteger) RenderPipelineColorAttachmentDescriptor;
-        pub const @"setObject:atIndexedSubscript:" = fn (?RenderPipelineColorAttachmentDescriptor, objc.UInteger) void;
+        pub const @"-objectAtIndexedSubscript:" = fn (objc.UInteger) RenderPipelineColorAttachmentDescriptor;
+        pub const @"-setObject:atIndexedSubscript:" = fn (?RenderPipelineColorAttachmentDescriptor, objc.UInteger) void;
     };
 };
 
@@ -2837,42 +2837,42 @@ pub const ComputePipelineDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const reset = fn () void;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const computeFunction = fn () ?Function;
-        pub const @"setComputeFunction:" = fn (?Function) void;
-        pub const threadGroupSizeIsMultipleOfThreadExecutionWidth = fn () bool;
-        pub const @"setThreadGroupSizeIsMultipleOfThreadExecutionWidth:" = fn (bool) void;
-        pub const maxTotalThreadsPerThreadgroup = fn () objc.UInteger;
-        pub const @"setMaxTotalThreadsPerThreadgroup:" = fn (objc.UInteger) void;
-        pub const stageInputDescriptor = fn () ?objc.Object;
-        pub const @"setStageInputDescriptor:" = fn (?objc.Object) void;
-        pub const buffers = fn () objc.Object;
-        pub const supportIndirectCommandBuffers = fn () bool;
-        pub const @"setSupportIndirectCommandBuffers:" = fn (bool) void;
-        pub const insertLibraries = fn () ?foundation.Array(objc.Object);
-        pub const @"setInsertLibraries:" = fn (?foundation.Array(objc.Object)) void;
-        pub const preloadedLibraries = fn () foundation.Array(objc.Object);
-        pub const @"setPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
-        pub const binaryArchives = fn () ?foundation.Array(objc.Object);
-        pub const @"setBinaryArchives:" = fn (?foundation.Array(objc.Object)) void;
-        pub const linkedFunctions = fn () ?objc.Object;
-        pub const @"setLinkedFunctions:" = fn (?objc.Object) void;
-        pub const supportAddingBinaryFunctions = fn () bool;
-        pub const @"setSupportAddingBinaryFunctions:" = fn (bool) void;
-        pub const maxCallStackDepth = fn () objc.UInteger;
-        pub const @"setMaxCallStackDepth:" = fn (objc.UInteger) void;
-        pub const shaderValidation = fn () ShaderValidation;
-        pub const @"setShaderValidation:" = fn (ShaderValidation) void;
-        pub const requiredThreadsPerThreadgroup = fn () Size;
-        pub const @"setRequiredThreadsPerThreadgroup:" = fn (Size) void;
-        pub const forwardProgressUsage = fn () ForwardProgressUsage;
-        pub const @"setForwardProgressUsage:" = fn (ForwardProgressUsage) void;
-        pub const contentionRelief = fn () ContentionRelief;
-        pub const @"setContentionRelief:" = fn (ContentionRelief) void;
-        pub const optimizeForPersistentKernel = fn () bool;
-        pub const @"setOptimizeForPersistentKernel:" = fn (bool) void;
+        pub const @"-reset" = fn () void;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-computeFunction" = fn () ?Function;
+        pub const @"-setComputeFunction:" = fn (?Function) void;
+        pub const @"-threadGroupSizeIsMultipleOfThreadExecutionWidth" = fn () bool;
+        pub const @"-setThreadGroupSizeIsMultipleOfThreadExecutionWidth:" = fn (bool) void;
+        pub const @"-maxTotalThreadsPerThreadgroup" = fn () objc.UInteger;
+        pub const @"-setMaxTotalThreadsPerThreadgroup:" = fn (objc.UInteger) void;
+        pub const @"-stageInputDescriptor" = fn () ?objc.Object;
+        pub const @"-setStageInputDescriptor:" = fn (?objc.Object) void;
+        pub const @"-buffers" = fn () objc.Object;
+        pub const @"-supportIndirectCommandBuffers" = fn () bool;
+        pub const @"-setSupportIndirectCommandBuffers:" = fn (bool) void;
+        pub const @"-insertLibraries" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setInsertLibraries:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-preloadedLibraries" = fn () foundation.Array(objc.Object);
+        pub const @"-setPreloadedLibraries:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-binaryArchives" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setBinaryArchives:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-linkedFunctions" = fn () ?objc.Object;
+        pub const @"-setLinkedFunctions:" = fn (?objc.Object) void;
+        pub const @"-supportAddingBinaryFunctions" = fn () bool;
+        pub const @"-setSupportAddingBinaryFunctions:" = fn (bool) void;
+        pub const @"-maxCallStackDepth" = fn () objc.UInteger;
+        pub const @"-setMaxCallStackDepth:" = fn (objc.UInteger) void;
+        pub const @"-shaderValidation" = fn () ShaderValidation;
+        pub const @"-setShaderValidation:" = fn (ShaderValidation) void;
+        pub const @"-requiredThreadsPerThreadgroup" = fn () Size;
+        pub const @"-setRequiredThreadsPerThreadgroup:" = fn (Size) void;
+        pub const @"-forwardProgressUsage" = fn () ForwardProgressUsage;
+        pub const @"-setForwardProgressUsage:" = fn (ForwardProgressUsage) void;
+        pub const @"-contentionRelief" = fn () ContentionRelief;
+        pub const @"-setContentionRelief:" = fn (ContentionRelief) void;
+        pub const @"-optimizeForPersistentKernel" = fn () bool;
+        pub const @"-setOptimizeForPersistentKernel:" = fn (bool) void;
     };
 };
 
@@ -2944,9 +2944,9 @@ pub const VertexDescriptor = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+vertexDescriptor" = fn () VertexDescriptor;
-        pub const reset = fn () void;
-        pub const layouts = fn () VertexBufferLayoutDescriptorArray;
-        pub const attributes = fn () VertexAttributeDescriptorArray;
+        pub const @"-reset" = fn () void;
+        pub const @"-layouts" = fn () VertexBufferLayoutDescriptorArray;
+        pub const @"-attributes" = fn () VertexAttributeDescriptorArray;
     };
 };
 
@@ -3027,12 +3027,12 @@ pub const VertexAttributeDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const format = fn () VertexFormat;
-        pub const @"setFormat:" = fn (VertexFormat) void;
-        pub const offset = fn () objc.UInteger;
-        pub const @"setOffset:" = fn (objc.UInteger) void;
-        pub const bufferIndex = fn () objc.UInteger;
-        pub const @"setBufferIndex:" = fn (objc.UInteger) void;
+        pub const @"-format" = fn () VertexFormat;
+        pub const @"-setFormat:" = fn (VertexFormat) void;
+        pub const @"-offset" = fn () objc.UInteger;
+        pub const @"-setOffset:" = fn (objc.UInteger) void;
+        pub const @"-bufferIndex" = fn () objc.UInteger;
+        pub const @"-setBufferIndex:" = fn (objc.UInteger) void;
     };
 };
 
@@ -3093,8 +3093,8 @@ pub const VertexAttributeDescriptorArray = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"objectAtIndexedSubscript:" = fn (objc.UInteger) VertexAttributeDescriptor;
-        pub const @"setObject:atIndexedSubscript:" = fn (?VertexAttributeDescriptor, objc.UInteger) void;
+        pub const @"-objectAtIndexedSubscript:" = fn (objc.UInteger) VertexAttributeDescriptor;
+        pub const @"-setObject:atIndexedSubscript:" = fn (?VertexAttributeDescriptor, objc.UInteger) void;
     };
 };
 
@@ -3175,12 +3175,12 @@ pub const VertexBufferLayoutDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const stride = fn () objc.UInteger;
-        pub const @"setStride:" = fn (objc.UInteger) void;
-        pub const stepFunction = fn () VertexStepFunction;
-        pub const @"setStepFunction:" = fn (VertexStepFunction) void;
-        pub const stepRate = fn () objc.UInteger;
-        pub const @"setStepRate:" = fn (objc.UInteger) void;
+        pub const @"-stride" = fn () objc.UInteger;
+        pub const @"-setStride:" = fn (objc.UInteger) void;
+        pub const @"-stepFunction" = fn () VertexStepFunction;
+        pub const @"-setStepFunction:" = fn (VertexStepFunction) void;
+        pub const @"-stepRate" = fn () objc.UInteger;
+        pub const @"-setStepRate:" = fn (objc.UInteger) void;
     };
 };
 
@@ -3241,8 +3241,8 @@ pub const VertexBufferLayoutDescriptorArray = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"objectAtIndexedSubscript:" = fn (objc.UInteger) VertexBufferLayoutDescriptor;
-        pub const @"setObject:atIndexedSubscript:" = fn (?VertexBufferLayoutDescriptor, objc.UInteger) void;
+        pub const @"-objectAtIndexedSubscript:" = fn (objc.UInteger) VertexBufferLayoutDescriptor;
+        pub const @"-setObject:atIndexedSubscript:" = fn (?VertexBufferLayoutDescriptor, objc.UInteger) void;
     };
 };
 
@@ -3343,16 +3343,16 @@ pub const DepthStencilDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const depthCompareFunction = fn () CompareFunction;
-        pub const @"setDepthCompareFunction:" = fn (CompareFunction) void;
-        pub const isDepthWriteEnabled = fn () bool;
-        pub const @"setDepthWriteEnabled:" = fn (bool) void;
-        pub const frontFaceStencil = fn () StencilDescriptor;
-        pub const @"setFrontFaceStencil:" = fn (?StencilDescriptor) void;
-        pub const backFaceStencil = fn () StencilDescriptor;
-        pub const @"setBackFaceStencil:" = fn (?StencilDescriptor) void;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
+        pub const @"-depthCompareFunction" = fn () CompareFunction;
+        pub const @"-setDepthCompareFunction:" = fn (CompareFunction) void;
+        pub const @"-isDepthWriteEnabled" = fn () bool;
+        pub const @"-setDepthWriteEnabled:" = fn (bool) void;
+        pub const @"-frontFaceStencil" = fn () StencilDescriptor;
+        pub const @"-setFrontFaceStencil:" = fn (?StencilDescriptor) void;
+        pub const @"-backFaceStencil" = fn () StencilDescriptor;
+        pub const @"-setBackFaceStencil:" = fn (?StencilDescriptor) void;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
     };
 };
 
@@ -3463,18 +3463,18 @@ pub const StencilDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const stencilCompareFunction = fn () CompareFunction;
-        pub const @"setStencilCompareFunction:" = fn (CompareFunction) void;
-        pub const stencilFailureOperation = fn () StencilOperation;
-        pub const @"setStencilFailureOperation:" = fn (StencilOperation) void;
-        pub const depthFailureOperation = fn () StencilOperation;
-        pub const @"setDepthFailureOperation:" = fn (StencilOperation) void;
-        pub const depthStencilPassOperation = fn () StencilOperation;
-        pub const @"setDepthStencilPassOperation:" = fn (StencilOperation) void;
-        pub const readMask = fn () u32;
-        pub const @"setReadMask:" = fn (u32) void;
-        pub const writeMask = fn () u32;
-        pub const @"setWriteMask:" = fn (u32) void;
+        pub const @"-stencilCompareFunction" = fn () CompareFunction;
+        pub const @"-setStencilCompareFunction:" = fn (CompareFunction) void;
+        pub const @"-stencilFailureOperation" = fn () StencilOperation;
+        pub const @"-setStencilFailureOperation:" = fn (StencilOperation) void;
+        pub const @"-depthFailureOperation" = fn () StencilOperation;
+        pub const @"-setDepthFailureOperation:" = fn (StencilOperation) void;
+        pub const @"-depthStencilPassOperation" = fn () StencilOperation;
+        pub const @"-setDepthStencilPassOperation:" = fn (StencilOperation) void;
+        pub const @"-readMask" = fn () u32;
+        pub const @"-setReadMask:" = fn (u32) void;
+        pub const @"-writeMask" = fn () u32;
+        pub const @"-setWriteMask:" = fn (u32) void;
     };
 };
 
@@ -3695,40 +3695,40 @@ pub const SamplerDescriptor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const minFilter = fn () SamplerMinMagFilter;
-        pub const @"setMinFilter:" = fn (SamplerMinMagFilter) void;
-        pub const magFilter = fn () SamplerMinMagFilter;
-        pub const @"setMagFilter:" = fn (SamplerMinMagFilter) void;
-        pub const mipFilter = fn () SamplerMipFilter;
-        pub const @"setMipFilter:" = fn (SamplerMipFilter) void;
-        pub const maxAnisotropy = fn () objc.UInteger;
-        pub const @"setMaxAnisotropy:" = fn (objc.UInteger) void;
-        pub const sAddressMode = fn () SamplerAddressMode;
-        pub const @"setSAddressMode:" = fn (SamplerAddressMode) void;
-        pub const tAddressMode = fn () SamplerAddressMode;
-        pub const @"setTAddressMode:" = fn (SamplerAddressMode) void;
-        pub const rAddressMode = fn () SamplerAddressMode;
-        pub const @"setRAddressMode:" = fn (SamplerAddressMode) void;
-        pub const borderColor = fn () SamplerBorderColor;
-        pub const @"setBorderColor:" = fn (SamplerBorderColor) void;
-        pub const reductionMode = fn () SamplerReductionMode;
-        pub const @"setReductionMode:" = fn (SamplerReductionMode) void;
-        pub const normalizedCoordinates = fn () bool;
-        pub const @"setNormalizedCoordinates:" = fn (bool) void;
-        pub const lodMinClamp = fn () f32;
-        pub const @"setLodMinClamp:" = fn (f32) void;
-        pub const lodMaxClamp = fn () f32;
-        pub const @"setLodMaxClamp:" = fn (f32) void;
-        pub const lodAverage = fn () bool;
-        pub const @"setLodAverage:" = fn (bool) void;
-        pub const lodBias = fn () f32;
-        pub const @"setLodBias:" = fn (f32) void;
-        pub const compareFunction = fn () CompareFunction;
-        pub const @"setCompareFunction:" = fn (CompareFunction) void;
-        pub const supportArgumentBuffers = fn () bool;
-        pub const @"setSupportArgumentBuffers:" = fn (bool) void;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
+        pub const @"-minFilter" = fn () SamplerMinMagFilter;
+        pub const @"-setMinFilter:" = fn (SamplerMinMagFilter) void;
+        pub const @"-magFilter" = fn () SamplerMinMagFilter;
+        pub const @"-setMagFilter:" = fn (SamplerMinMagFilter) void;
+        pub const @"-mipFilter" = fn () SamplerMipFilter;
+        pub const @"-setMipFilter:" = fn (SamplerMipFilter) void;
+        pub const @"-maxAnisotropy" = fn () objc.UInteger;
+        pub const @"-setMaxAnisotropy:" = fn (objc.UInteger) void;
+        pub const @"-sAddressMode" = fn () SamplerAddressMode;
+        pub const @"-setSAddressMode:" = fn (SamplerAddressMode) void;
+        pub const @"-tAddressMode" = fn () SamplerAddressMode;
+        pub const @"-setTAddressMode:" = fn (SamplerAddressMode) void;
+        pub const @"-rAddressMode" = fn () SamplerAddressMode;
+        pub const @"-setRAddressMode:" = fn (SamplerAddressMode) void;
+        pub const @"-borderColor" = fn () SamplerBorderColor;
+        pub const @"-setBorderColor:" = fn (SamplerBorderColor) void;
+        pub const @"-reductionMode" = fn () SamplerReductionMode;
+        pub const @"-setReductionMode:" = fn (SamplerReductionMode) void;
+        pub const @"-normalizedCoordinates" = fn () bool;
+        pub const @"-setNormalizedCoordinates:" = fn (bool) void;
+        pub const @"-lodMinClamp" = fn () f32;
+        pub const @"-setLodMinClamp:" = fn (f32) void;
+        pub const @"-lodMaxClamp" = fn () f32;
+        pub const @"-setLodMaxClamp:" = fn (f32) void;
+        pub const @"-lodAverage" = fn () bool;
+        pub const @"-setLodAverage:" = fn (bool) void;
+        pub const @"-lodBias" = fn () f32;
+        pub const @"-setLodBias:" = fn (f32) void;
+        pub const @"-compareFunction" = fn () CompareFunction;
+        pub const @"-setCompareFunction:" = fn (CompareFunction) void;
+        pub const @"-supportArgumentBuffers" = fn () bool;
+        pub const @"-setSupportArgumentBuffers:" = fn (bool) void;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
     };
 };
 
@@ -3967,40 +3967,40 @@ pub const TextureDescriptor = extern struct {
         pub const @"+texture2DDescriptorWithPixelFormat:width:height:mipmapped:" = fn (PixelFormat, objc.UInteger, objc.UInteger, bool) TextureDescriptor;
         pub const @"+textureCubeDescriptorWithPixelFormat:size:mipmapped:" = fn (PixelFormat, objc.UInteger, bool) TextureDescriptor;
         pub const @"+textureBufferDescriptorWithPixelFormat:width:resourceOptions:usage:" = fn (PixelFormat, objc.UInteger, ResourceOptions, TextureUsage) TextureDescriptor;
-        pub const textureType = fn () TextureType;
-        pub const @"setTextureType:" = fn (TextureType) void;
-        pub const pixelFormat = fn () PixelFormat;
-        pub const @"setPixelFormat:" = fn (PixelFormat) void;
-        pub const width = fn () objc.UInteger;
-        pub const @"setWidth:" = fn (objc.UInteger) void;
-        pub const height = fn () objc.UInteger;
-        pub const @"setHeight:" = fn (objc.UInteger) void;
-        pub const depth = fn () objc.UInteger;
-        pub const @"setDepth:" = fn (objc.UInteger) void;
-        pub const mipmapLevelCount = fn () objc.UInteger;
-        pub const @"setMipmapLevelCount:" = fn (objc.UInteger) void;
-        pub const sampleCount = fn () objc.UInteger;
-        pub const @"setSampleCount:" = fn (objc.UInteger) void;
-        pub const arrayLength = fn () objc.UInteger;
-        pub const @"setArrayLength:" = fn (objc.UInteger) void;
-        pub const resourceOptions = fn () ResourceOptions;
-        pub const @"setResourceOptions:" = fn (ResourceOptions) void;
-        pub const cpuCacheMode = fn () CPUCacheMode;
-        pub const @"setCpuCacheMode:" = fn (CPUCacheMode) void;
-        pub const storageMode = fn () StorageMode;
-        pub const @"setStorageMode:" = fn (StorageMode) void;
-        pub const hazardTrackingMode = fn () HazardTrackingMode;
-        pub const @"setHazardTrackingMode:" = fn (HazardTrackingMode) void;
-        pub const usage = fn () TextureUsage;
-        pub const @"setUsage:" = fn (TextureUsage) void;
-        pub const allowGPUOptimizedContents = fn () bool;
-        pub const @"setAllowGPUOptimizedContents:" = fn (bool) void;
-        pub const compressionType = fn () TextureCompressionType;
-        pub const @"setCompressionType:" = fn (TextureCompressionType) void;
-        pub const swizzle = fn () TextureSwizzleChannels;
-        pub const @"setSwizzle:" = fn (TextureSwizzleChannels) void;
-        pub const placementSparsePageSize = fn () SparsePageSize;
-        pub const @"setPlacementSparsePageSize:" = fn (SparsePageSize) void;
+        pub const @"-textureType" = fn () TextureType;
+        pub const @"-setTextureType:" = fn (TextureType) void;
+        pub const @"-pixelFormat" = fn () PixelFormat;
+        pub const @"-setPixelFormat:" = fn (PixelFormat) void;
+        pub const @"-width" = fn () objc.UInteger;
+        pub const @"-setWidth:" = fn (objc.UInteger) void;
+        pub const @"-height" = fn () objc.UInteger;
+        pub const @"-setHeight:" = fn (objc.UInteger) void;
+        pub const @"-depth" = fn () objc.UInteger;
+        pub const @"-setDepth:" = fn (objc.UInteger) void;
+        pub const @"-mipmapLevelCount" = fn () objc.UInteger;
+        pub const @"-setMipmapLevelCount:" = fn (objc.UInteger) void;
+        pub const @"-sampleCount" = fn () objc.UInteger;
+        pub const @"-setSampleCount:" = fn (objc.UInteger) void;
+        pub const @"-arrayLength" = fn () objc.UInteger;
+        pub const @"-setArrayLength:" = fn (objc.UInteger) void;
+        pub const @"-resourceOptions" = fn () ResourceOptions;
+        pub const @"-setResourceOptions:" = fn (ResourceOptions) void;
+        pub const @"-cpuCacheMode" = fn () CPUCacheMode;
+        pub const @"-setCpuCacheMode:" = fn (CPUCacheMode) void;
+        pub const @"-storageMode" = fn () StorageMode;
+        pub const @"-setStorageMode:" = fn (StorageMode) void;
+        pub const @"-hazardTrackingMode" = fn () HazardTrackingMode;
+        pub const @"-setHazardTrackingMode:" = fn (HazardTrackingMode) void;
+        pub const @"-usage" = fn () TextureUsage;
+        pub const @"-setUsage:" = fn (TextureUsage) void;
+        pub const @"-allowGPUOptimizedContents" = fn () bool;
+        pub const @"-setAllowGPUOptimizedContents:" = fn (bool) void;
+        pub const @"-compressionType" = fn () TextureCompressionType;
+        pub const @"-setCompressionType:" = fn (TextureCompressionType) void;
+        pub const @"-swizzle" = fn () TextureSwizzleChannels;
+        pub const @"-setSwizzle:" = fn (TextureSwizzleChannels) void;
+        pub const @"-placementSparsePageSize" = fn () SparsePageSize;
+        pub const @"-setPlacementSparsePageSize:" = fn (SparsePageSize) void;
     };
 };
 
@@ -4211,38 +4211,38 @@ pub const CompileOptions = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const preprocessorMacros = fn () ?foundation.Dictionary(foundation.String, objc.Object);
-        pub const @"setPreprocessorMacros:" = fn (?foundation.Dictionary(foundation.String, objc.Object)) void;
-        pub const fastMathEnabled = fn () bool;
-        pub const @"setFastMathEnabled:" = fn (bool) void;
-        pub const mathMode = fn () MathMode;
-        pub const @"setMathMode:" = fn (MathMode) void;
-        pub const mathFloatingPointFunctions = fn () MathFloatingPointFunctions;
-        pub const @"setMathFloatingPointFunctions:" = fn (MathFloatingPointFunctions) void;
-        pub const languageVersion = fn () LanguageVersion;
-        pub const @"setLanguageVersion:" = fn (LanguageVersion) void;
-        pub const libraryType = fn () LibraryType;
-        pub const @"setLibraryType:" = fn (LibraryType) void;
-        pub const installName = fn () ?foundation.String;
-        pub const @"setInstallName:" = fn (?foundation.String) void;
-        pub const libraries = fn () ?foundation.Array(objc.Object);
-        pub const @"setLibraries:" = fn (?foundation.Array(objc.Object)) void;
-        pub const preserveInvariance = fn () bool;
-        pub const @"setPreserveInvariance:" = fn (bool) void;
-        pub const optimizationLevel = fn () LibraryOptimizationLevel;
-        pub const @"setOptimizationLevel:" = fn (LibraryOptimizationLevel) void;
-        pub const compileSymbolVisibility = fn () CompileSymbolVisibility;
-        pub const @"setCompileSymbolVisibility:" = fn (CompileSymbolVisibility) void;
-        pub const allowReferencingUndefinedSymbols = fn () bool;
-        pub const @"setAllowReferencingUndefinedSymbols:" = fn (bool) void;
-        pub const maxTotalThreadsPerThreadgroup = fn () objc.UInteger;
-        pub const @"setMaxTotalThreadsPerThreadgroup:" = fn (objc.UInteger) void;
-        pub const requiredThreadsPerThreadgroup = fn () Size;
-        pub const @"setRequiredThreadsPerThreadgroup:" = fn (Size) void;
-        pub const enableLogging = fn () bool;
-        pub const @"setEnableLogging:" = fn (bool) void;
-        pub const floatingPointConversionRoundingMode = fn () FloatingPointConversionRoundingMode;
-        pub const @"setFloatingPointConversionRoundingMode:" = fn (FloatingPointConversionRoundingMode) void;
+        pub const @"-preprocessorMacros" = fn () ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-setPreprocessorMacros:" = fn (?foundation.Dictionary(foundation.String, objc.Object)) void;
+        pub const @"-fastMathEnabled" = fn () bool;
+        pub const @"-setFastMathEnabled:" = fn (bool) void;
+        pub const @"-mathMode" = fn () MathMode;
+        pub const @"-setMathMode:" = fn (MathMode) void;
+        pub const @"-mathFloatingPointFunctions" = fn () MathFloatingPointFunctions;
+        pub const @"-setMathFloatingPointFunctions:" = fn (MathFloatingPointFunctions) void;
+        pub const @"-languageVersion" = fn () LanguageVersion;
+        pub const @"-setLanguageVersion:" = fn (LanguageVersion) void;
+        pub const @"-libraryType" = fn () LibraryType;
+        pub const @"-setLibraryType:" = fn (LibraryType) void;
+        pub const @"-installName" = fn () ?foundation.String;
+        pub const @"-setInstallName:" = fn (?foundation.String) void;
+        pub const @"-libraries" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setLibraries:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-preserveInvariance" = fn () bool;
+        pub const @"-setPreserveInvariance:" = fn (bool) void;
+        pub const @"-optimizationLevel" = fn () LibraryOptimizationLevel;
+        pub const @"-setOptimizationLevel:" = fn (LibraryOptimizationLevel) void;
+        pub const @"-compileSymbolVisibility" = fn () CompileSymbolVisibility;
+        pub const @"-setCompileSymbolVisibility:" = fn (CompileSymbolVisibility) void;
+        pub const @"-allowReferencingUndefinedSymbols" = fn () bool;
+        pub const @"-setAllowReferencingUndefinedSymbols:" = fn (bool) void;
+        pub const @"-maxTotalThreadsPerThreadgroup" = fn () objc.UInteger;
+        pub const @"-setMaxTotalThreadsPerThreadgroup:" = fn (objc.UInteger) void;
+        pub const @"-requiredThreadsPerThreadgroup" = fn () Size;
+        pub const @"-setRequiredThreadsPerThreadgroup:" = fn (Size) void;
+        pub const @"-enableLogging" = fn () bool;
+        pub const @"-setEnableLogging:" = fn (bool) void;
+        pub const @"-floatingPointConversionRoundingMode" = fn () FloatingPointConversionRoundingMode;
+        pub const @"-setFloatingPointConversionRoundingMode:" = fn (FloatingPointConversionRoundingMode) void;
     };
 };
 
@@ -4452,7 +4452,7 @@ pub const Layer = extern struct {
     }
 
     /// `+[CALayer cornerCurveExpansionFactor:]`
-    pub fn cornerCurveExpansionFactor(curve: ?foundation.String) cg.Float {
+    pub fn cornerCurveExpansionFactor(curve: foundation.String) cg.Float {
         return class().msgSend(cg.Float, "cornerCurveExpansionFactor:", .{curve});
     }
 
@@ -4692,12 +4692,12 @@ pub const Layer = extern struct {
     }
 
     /// `-[CALayer contentsGravity]`
-    pub fn contentsGravity(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "contentsGravity", .{});
+    pub fn contentsGravity(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "contentsGravity", .{});
     }
 
     /// `-[CALayer setContentsGravity:]`
-    pub fn setContentsGravity(self: Self, contents_gravity: ?foundation.String) void {
+    pub fn setContentsGravity(self: Self, contents_gravity: foundation.String) void {
         return self.object.msgSend(void, "setContentsGravity:", .{contents_gravity});
     }
 
@@ -4722,12 +4722,12 @@ pub const Layer = extern struct {
     }
 
     /// `-[CALayer contentsFormat]`
-    pub fn contentsFormat(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "contentsFormat", .{});
+    pub fn contentsFormat(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "contentsFormat", .{});
     }
 
     /// `-[CALayer setContentsFormat:]`
-    pub fn setContentsFormat(self: Self, contents_format: ?foundation.String) void {
+    pub fn setContentsFormat(self: Self, contents_format: foundation.String) void {
         return self.object.msgSend(void, "setContentsFormat:", .{contents_format});
     }
 
@@ -4742,22 +4742,22 @@ pub const Layer = extern struct {
     }
 
     /// `-[CALayer toneMapMode]`
-    pub fn toneMapMode(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "toneMapMode", .{});
+    pub fn toneMapMode(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "toneMapMode", .{});
     }
 
     /// `-[CALayer setToneMapMode:]`
-    pub fn setToneMapMode(self: Self, tone_map_mode: ?foundation.String) void {
+    pub fn setToneMapMode(self: Self, tone_map_mode: foundation.String) void {
         return self.object.msgSend(void, "setToneMapMode:", .{tone_map_mode});
     }
 
     /// `-[CALayer preferredDynamicRange]`
-    pub fn preferredDynamicRange(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "preferredDynamicRange", .{});
+    pub fn preferredDynamicRange(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "preferredDynamicRange", .{});
     }
 
     /// `-[CALayer setPreferredDynamicRange:]`
-    pub fn setPreferredDynamicRange(self: Self, preferred_dynamic_range: ?foundation.String) void {
+    pub fn setPreferredDynamicRange(self: Self, preferred_dynamic_range: foundation.String) void {
         return self.object.msgSend(void, "setPreferredDynamicRange:", .{preferred_dynamic_range});
     }
 
@@ -4782,22 +4782,22 @@ pub const Layer = extern struct {
     }
 
     /// `-[CALayer minificationFilter]`
-    pub fn minificationFilter(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "minificationFilter", .{});
+    pub fn minificationFilter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "minificationFilter", .{});
     }
 
     /// `-[CALayer setMinificationFilter:]`
-    pub fn setMinificationFilter(self: Self, minification_filter: ?foundation.String) void {
+    pub fn setMinificationFilter(self: Self, minification_filter: foundation.String) void {
         return self.object.msgSend(void, "setMinificationFilter:", .{minification_filter});
     }
 
     /// `-[CALayer magnificationFilter]`
-    pub fn magnificationFilter(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "magnificationFilter", .{});
+    pub fn magnificationFilter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "magnificationFilter", .{});
     }
 
     /// `-[CALayer setMagnificationFilter:]`
-    pub fn setMagnificationFilter(self: Self, magnification_filter: ?foundation.String) void {
+    pub fn setMagnificationFilter(self: Self, magnification_filter: foundation.String) void {
         return self.object.msgSend(void, "setMagnificationFilter:", .{magnification_filter});
     }
 
@@ -4892,12 +4892,12 @@ pub const Layer = extern struct {
     }
 
     /// `-[CALayer cornerCurve]`
-    pub fn cornerCurve(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "cornerCurve", .{});
+    pub fn cornerCurve(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "cornerCurve", .{});
     }
 
     /// `-[CALayer setCornerCurve:]`
-    pub fn setCornerCurve(self: Self, corner_curve: ?foundation.String) void {
+    pub fn setCornerCurve(self: Self, corner_curve: foundation.String) void {
         return self.object.msgSend(void, "setCornerCurve:", .{corner_curve});
     }
 
@@ -5139,174 +5139,174 @@ pub const Layer = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+layer" = fn () Layer;
-        pub const init = fn () Layer;
-        pub const @"initWithLayer:" = fn (objc.Object) Layer;
-        pub const presentationLayer = fn () ?Layer;
-        pub const modelLayer = fn () Layer;
+        pub const @"-init" = fn () Layer;
+        pub const @"-initWithLayer:" = fn (objc.Object) Layer;
+        pub const @"-presentationLayer" = fn () ?Layer;
+        pub const @"-modelLayer" = fn () Layer;
         pub const @"+defaultValueForKey:" = fn (foundation.String) ?objc.Object;
         pub const @"+needsDisplayForKey:" = fn (foundation.String) bool;
-        pub const @"shouldArchiveValueForKey:" = fn (foundation.String) bool;
-        pub const affineTransform = fn () cg.AffineTransform;
-        pub const @"setAffineTransform:" = fn (cg.AffineTransform) void;
-        pub const contentsAreFlipped = fn () bool;
-        pub const removeFromSuperlayer = fn () void;
-        pub const @"addSublayer:" = fn (Layer) void;
-        pub const @"insertSublayer:atIndex:" = fn (Layer, c_uint) void;
-        pub const @"insertSublayer:below:" = fn (Layer, ?Layer) void;
-        pub const @"insertSublayer:above:" = fn (Layer, ?Layer) void;
-        pub const @"replaceSublayer:with:" = fn (Layer, Layer) void;
-        pub const @"convertPoint:fromLayer:" = fn (cg.Point, ?Layer) cg.Point;
-        pub const @"convertPoint:toLayer:" = fn (cg.Point, ?Layer) cg.Point;
-        pub const @"convertRect:fromLayer:" = fn (cg.Rect, ?Layer) cg.Rect;
-        pub const @"convertRect:toLayer:" = fn (cg.Rect, ?Layer) cg.Rect;
-        pub const @"convertTime:fromLayer:" = fn (f64, ?Layer) f64;
-        pub const @"convertTime:toLayer:" = fn (f64, ?Layer) f64;
-        pub const @"hitTest:" = fn (cg.Point) ?Layer;
-        pub const @"containsPoint:" = fn (cg.Point) bool;
-        pub const display = fn () void;
-        pub const setNeedsDisplay = fn () void;
-        pub const @"setNeedsDisplayInRect:" = fn (cg.Rect) void;
-        pub const needsDisplay = fn () bool;
-        pub const displayIfNeeded = fn () void;
-        pub const @"drawInContext:" = fn (cg.Context) void;
-        pub const @"renderInContext:" = fn (cg.Context) void;
-        pub const @"+cornerCurveExpansionFactor:" = fn (?foundation.String) cg.Float;
-        pub const preferredFrameSize = fn () cg.Size;
-        pub const setNeedsLayout = fn () void;
-        pub const needsLayout = fn () bool;
-        pub const layoutIfNeeded = fn () void;
-        pub const layoutSublayers = fn () void;
-        pub const @"resizeSublayersWithOldSize:" = fn (cg.Size) void;
-        pub const @"resizeWithOldSuperlayerSize:" = fn (cg.Size) void;
+        pub const @"-shouldArchiveValueForKey:" = fn (foundation.String) bool;
+        pub const @"-affineTransform" = fn () cg.AffineTransform;
+        pub const @"-setAffineTransform:" = fn (cg.AffineTransform) void;
+        pub const @"-contentsAreFlipped" = fn () bool;
+        pub const @"-removeFromSuperlayer" = fn () void;
+        pub const @"-addSublayer:" = fn (Layer) void;
+        pub const @"-insertSublayer:atIndex:" = fn (Layer, c_uint) void;
+        pub const @"-insertSublayer:below:" = fn (Layer, ?Layer) void;
+        pub const @"-insertSublayer:above:" = fn (Layer, ?Layer) void;
+        pub const @"-replaceSublayer:with:" = fn (Layer, Layer) void;
+        pub const @"-convertPoint:fromLayer:" = fn (cg.Point, ?Layer) cg.Point;
+        pub const @"-convertPoint:toLayer:" = fn (cg.Point, ?Layer) cg.Point;
+        pub const @"-convertRect:fromLayer:" = fn (cg.Rect, ?Layer) cg.Rect;
+        pub const @"-convertRect:toLayer:" = fn (cg.Rect, ?Layer) cg.Rect;
+        pub const @"-convertTime:fromLayer:" = fn (f64, ?Layer) f64;
+        pub const @"-convertTime:toLayer:" = fn (f64, ?Layer) f64;
+        pub const @"-hitTest:" = fn (cg.Point) ?Layer;
+        pub const @"-containsPoint:" = fn (cg.Point) bool;
+        pub const @"-display" = fn () void;
+        pub const @"-setNeedsDisplay" = fn () void;
+        pub const @"-setNeedsDisplayInRect:" = fn (cg.Rect) void;
+        pub const @"-needsDisplay" = fn () bool;
+        pub const @"-displayIfNeeded" = fn () void;
+        pub const @"-drawInContext:" = fn (cg.Context) void;
+        pub const @"-renderInContext:" = fn (cg.Context) void;
+        pub const @"+cornerCurveExpansionFactor:" = fn (foundation.String) cg.Float;
+        pub const @"-preferredFrameSize" = fn () cg.Size;
+        pub const @"-setNeedsLayout" = fn () void;
+        pub const @"-needsLayout" = fn () bool;
+        pub const @"-layoutIfNeeded" = fn () void;
+        pub const @"-layoutSublayers" = fn () void;
+        pub const @"-resizeSublayersWithOldSize:" = fn (cg.Size) void;
+        pub const @"-resizeWithOldSuperlayerSize:" = fn (cg.Size) void;
         pub const @"+defaultActionForKey:" = fn (foundation.String) ?objc.Object;
-        pub const @"actionForKey:" = fn (foundation.String) ?objc.Object;
-        pub const @"addAnimation:forKey:" = fn (objc.Object, ?foundation.String) void;
-        pub const removeAllAnimations = fn () void;
-        pub const @"removeAnimationForKey:" = fn (foundation.String) void;
-        pub const animationKeys = fn () ?foundation.Array(foundation.String);
-        pub const @"animationForKey:" = fn (foundation.String) ?objc.Object;
-        pub const bounds = fn () cg.Rect;
-        pub const @"setBounds:" = fn (cg.Rect) void;
-        pub const position = fn () cg.Point;
-        pub const @"setPosition:" = fn (cg.Point) void;
-        pub const zPosition = fn () cg.Float;
-        pub const @"setZPosition:" = fn (cg.Float) void;
-        pub const anchorPoint = fn () cg.Point;
-        pub const @"setAnchorPoint:" = fn (cg.Point) void;
-        pub const anchorPointZ = fn () cg.Float;
-        pub const @"setAnchorPointZ:" = fn (cg.Float) void;
-        pub const transform = fn () Transform3D;
-        pub const @"setTransform:" = fn (Transform3D) void;
-        pub const frame = fn () cg.Rect;
-        pub const @"setFrame:" = fn (cg.Rect) void;
-        pub const isHidden = fn () bool;
-        pub const @"setHidden:" = fn (bool) void;
-        pub const isDoubleSided = fn () bool;
-        pub const @"setDoubleSided:" = fn (bool) void;
-        pub const isGeometryFlipped = fn () bool;
-        pub const @"setGeometryFlipped:" = fn (bool) void;
-        pub const superlayer = fn () ?Layer;
-        pub const sublayers = fn () ?foundation.Array(Layer);
-        pub const @"setSublayers:" = fn (?foundation.Array(Layer)) void;
-        pub const sublayerTransform = fn () Transform3D;
-        pub const @"setSublayerTransform:" = fn (Transform3D) void;
-        pub const mask = fn () ?Layer;
-        pub const @"setMask:" = fn (?Layer) void;
-        pub const masksToBounds = fn () bool;
-        pub const @"setMasksToBounds:" = fn (bool) void;
-        pub const contents = fn () ?objc.Object;
-        pub const @"setContents:" = fn (?objc.Object) void;
-        pub const contentsRect = fn () cg.Rect;
-        pub const @"setContentsRect:" = fn (cg.Rect) void;
-        pub const contentsGravity = fn () ?foundation.String;
-        pub const @"setContentsGravity:" = fn (?foundation.String) void;
-        pub const contentsScale = fn () cg.Float;
-        pub const @"setContentsScale:" = fn (cg.Float) void;
-        pub const contentsCenter = fn () cg.Rect;
-        pub const @"setContentsCenter:" = fn (cg.Rect) void;
-        pub const contentsFormat = fn () ?foundation.String;
-        pub const @"setContentsFormat:" = fn (?foundation.String) void;
-        pub const wantsExtendedDynamicRangeContent = fn () bool;
-        pub const @"setWantsExtendedDynamicRangeContent:" = fn (bool) void;
-        pub const toneMapMode = fn () ?foundation.String;
-        pub const @"setToneMapMode:" = fn (?foundation.String) void;
-        pub const preferredDynamicRange = fn () ?foundation.String;
-        pub const @"setPreferredDynamicRange:" = fn (?foundation.String) void;
-        pub const contentsHeadroom = fn () cg.Float;
-        pub const @"setContentsHeadroom:" = fn (cg.Float) void;
-        pub const wantsDynamicContentScaling = fn () bool;
-        pub const @"setWantsDynamicContentScaling:" = fn (bool) void;
-        pub const minificationFilter = fn () ?foundation.String;
-        pub const @"setMinificationFilter:" = fn (?foundation.String) void;
-        pub const magnificationFilter = fn () ?foundation.String;
-        pub const @"setMagnificationFilter:" = fn (?foundation.String) void;
-        pub const minificationFilterBias = fn () f32;
-        pub const @"setMinificationFilterBias:" = fn (f32) void;
-        pub const isOpaque = fn () bool;
-        pub const @"setOpaque:" = fn (bool) void;
-        pub const needsDisplayOnBoundsChange = fn () bool;
-        pub const @"setNeedsDisplayOnBoundsChange:" = fn (bool) void;
-        pub const drawsAsynchronously = fn () bool;
-        pub const @"setDrawsAsynchronously:" = fn (bool) void;
-        pub const edgeAntialiasingMask = fn () EdgeAntialiasingMask;
-        pub const @"setEdgeAntialiasingMask:" = fn (EdgeAntialiasingMask) void;
-        pub const allowsEdgeAntialiasing = fn () bool;
-        pub const @"setAllowsEdgeAntialiasing:" = fn (bool) void;
-        pub const backgroundColor = fn () ?cg.Color;
-        pub const @"setBackgroundColor:" = fn (?cg.Color) void;
-        pub const cornerRadius = fn () cg.Float;
-        pub const @"setCornerRadius:" = fn (cg.Float) void;
-        pub const maskedCorners = fn () CornerMask;
-        pub const @"setMaskedCorners:" = fn (CornerMask) void;
-        pub const cornerCurve = fn () ?foundation.String;
-        pub const @"setCornerCurve:" = fn (?foundation.String) void;
-        pub const borderWidth = fn () cg.Float;
-        pub const @"setBorderWidth:" = fn (cg.Float) void;
-        pub const borderColor = fn () ?cg.Color;
-        pub const @"setBorderColor:" = fn (?cg.Color) void;
-        pub const opacity = fn () f32;
-        pub const @"setOpacity:" = fn (f32) void;
-        pub const allowsGroupOpacity = fn () bool;
-        pub const @"setAllowsGroupOpacity:" = fn (bool) void;
-        pub const compositingFilter = fn () ?objc.Object;
-        pub const @"setCompositingFilter:" = fn (?objc.Object) void;
-        pub const filters = fn () ?foundation.Array(objc.Object);
-        pub const @"setFilters:" = fn (?foundation.Array(objc.Object)) void;
-        pub const backgroundFilters = fn () ?foundation.Array(objc.Object);
-        pub const @"setBackgroundFilters:" = fn (?foundation.Array(objc.Object)) void;
-        pub const shouldRasterize = fn () bool;
-        pub const @"setShouldRasterize:" = fn (bool) void;
-        pub const rasterizationScale = fn () cg.Float;
-        pub const @"setRasterizationScale:" = fn (cg.Float) void;
-        pub const shadowColor = fn () ?cg.Color;
-        pub const @"setShadowColor:" = fn (?cg.Color) void;
-        pub const shadowOpacity = fn () f32;
-        pub const @"setShadowOpacity:" = fn (f32) void;
-        pub const shadowOffset = fn () cg.Size;
-        pub const @"setShadowOffset:" = fn (cg.Size) void;
-        pub const shadowRadius = fn () cg.Float;
-        pub const @"setShadowRadius:" = fn (cg.Float) void;
-        pub const shadowPath = fn () ?cg.Path;
-        pub const @"setShadowPath:" = fn (?cg.Path) void;
-        pub const autoresizingMask = fn () AutoresizingMask;
-        pub const @"setAutoresizingMask:" = fn (AutoresizingMask) void;
-        pub const layoutManager = fn () ?objc.Object;
-        pub const @"setLayoutManager:" = fn (?objc.Object) void;
-        pub const actions = fn () ?foundation.Dictionary(foundation.String, objc.Object);
-        pub const @"setActions:" = fn (?foundation.Dictionary(foundation.String, objc.Object)) void;
-        pub const name = fn () ?foundation.String;
-        pub const @"setName:" = fn (?foundation.String) void;
-        pub const delegate = fn () ?objc.Object;
-        pub const @"setDelegate:" = fn (?objc.Object) void;
-        pub const style = fn () ?foundation.Dictionary(objc.Object, objc.Object);
-        pub const @"setStyle:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
-        pub const @"addConstraint:" = fn (objc.Object) void;
-        pub const constraints = fn () ?foundation.Array(objc.Object);
-        pub const @"setConstraints:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-actionForKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-addAnimation:forKey:" = fn (objc.Object, ?foundation.String) void;
+        pub const @"-removeAllAnimations" = fn () void;
+        pub const @"-removeAnimationForKey:" = fn (foundation.String) void;
+        pub const @"-animationKeys" = fn () ?foundation.Array(foundation.String);
+        pub const @"-animationForKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-bounds" = fn () cg.Rect;
+        pub const @"-setBounds:" = fn (cg.Rect) void;
+        pub const @"-position" = fn () cg.Point;
+        pub const @"-setPosition:" = fn (cg.Point) void;
+        pub const @"-zPosition" = fn () cg.Float;
+        pub const @"-setZPosition:" = fn (cg.Float) void;
+        pub const @"-anchorPoint" = fn () cg.Point;
+        pub const @"-setAnchorPoint:" = fn (cg.Point) void;
+        pub const @"-anchorPointZ" = fn () cg.Float;
+        pub const @"-setAnchorPointZ:" = fn (cg.Float) void;
+        pub const @"-transform" = fn () Transform3D;
+        pub const @"-setTransform:" = fn (Transform3D) void;
+        pub const @"-frame" = fn () cg.Rect;
+        pub const @"-setFrame:" = fn (cg.Rect) void;
+        pub const @"-isHidden" = fn () bool;
+        pub const @"-setHidden:" = fn (bool) void;
+        pub const @"-isDoubleSided" = fn () bool;
+        pub const @"-setDoubleSided:" = fn (bool) void;
+        pub const @"-isGeometryFlipped" = fn () bool;
+        pub const @"-setGeometryFlipped:" = fn (bool) void;
+        pub const @"-superlayer" = fn () ?Layer;
+        pub const @"-sublayers" = fn () ?foundation.Array(Layer);
+        pub const @"-setSublayers:" = fn (?foundation.Array(Layer)) void;
+        pub const @"-sublayerTransform" = fn () Transform3D;
+        pub const @"-setSublayerTransform:" = fn (Transform3D) void;
+        pub const @"-mask" = fn () ?Layer;
+        pub const @"-setMask:" = fn (?Layer) void;
+        pub const @"-masksToBounds" = fn () bool;
+        pub const @"-setMasksToBounds:" = fn (bool) void;
+        pub const @"-contents" = fn () ?objc.Object;
+        pub const @"-setContents:" = fn (?objc.Object) void;
+        pub const @"-contentsRect" = fn () cg.Rect;
+        pub const @"-setContentsRect:" = fn (cg.Rect) void;
+        pub const @"-contentsGravity" = fn () foundation.String;
+        pub const @"-setContentsGravity:" = fn (foundation.String) void;
+        pub const @"-contentsScale" = fn () cg.Float;
+        pub const @"-setContentsScale:" = fn (cg.Float) void;
+        pub const @"-contentsCenter" = fn () cg.Rect;
+        pub const @"-setContentsCenter:" = fn (cg.Rect) void;
+        pub const @"-contentsFormat" = fn () foundation.String;
+        pub const @"-setContentsFormat:" = fn (foundation.String) void;
+        pub const @"-wantsExtendedDynamicRangeContent" = fn () bool;
+        pub const @"-setWantsExtendedDynamicRangeContent:" = fn (bool) void;
+        pub const @"-toneMapMode" = fn () foundation.String;
+        pub const @"-setToneMapMode:" = fn (foundation.String) void;
+        pub const @"-preferredDynamicRange" = fn () foundation.String;
+        pub const @"-setPreferredDynamicRange:" = fn (foundation.String) void;
+        pub const @"-contentsHeadroom" = fn () cg.Float;
+        pub const @"-setContentsHeadroom:" = fn (cg.Float) void;
+        pub const @"-wantsDynamicContentScaling" = fn () bool;
+        pub const @"-setWantsDynamicContentScaling:" = fn (bool) void;
+        pub const @"-minificationFilter" = fn () foundation.String;
+        pub const @"-setMinificationFilter:" = fn (foundation.String) void;
+        pub const @"-magnificationFilter" = fn () foundation.String;
+        pub const @"-setMagnificationFilter:" = fn (foundation.String) void;
+        pub const @"-minificationFilterBias" = fn () f32;
+        pub const @"-setMinificationFilterBias:" = fn (f32) void;
+        pub const @"-isOpaque" = fn () bool;
+        pub const @"-setOpaque:" = fn (bool) void;
+        pub const @"-needsDisplayOnBoundsChange" = fn () bool;
+        pub const @"-setNeedsDisplayOnBoundsChange:" = fn (bool) void;
+        pub const @"-drawsAsynchronously" = fn () bool;
+        pub const @"-setDrawsAsynchronously:" = fn (bool) void;
+        pub const @"-edgeAntialiasingMask" = fn () EdgeAntialiasingMask;
+        pub const @"-setEdgeAntialiasingMask:" = fn (EdgeAntialiasingMask) void;
+        pub const @"-allowsEdgeAntialiasing" = fn () bool;
+        pub const @"-setAllowsEdgeAntialiasing:" = fn (bool) void;
+        pub const @"-backgroundColor" = fn () ?cg.Color;
+        pub const @"-setBackgroundColor:" = fn (?cg.Color) void;
+        pub const @"-cornerRadius" = fn () cg.Float;
+        pub const @"-setCornerRadius:" = fn (cg.Float) void;
+        pub const @"-maskedCorners" = fn () CornerMask;
+        pub const @"-setMaskedCorners:" = fn (CornerMask) void;
+        pub const @"-cornerCurve" = fn () foundation.String;
+        pub const @"-setCornerCurve:" = fn (foundation.String) void;
+        pub const @"-borderWidth" = fn () cg.Float;
+        pub const @"-setBorderWidth:" = fn (cg.Float) void;
+        pub const @"-borderColor" = fn () ?cg.Color;
+        pub const @"-setBorderColor:" = fn (?cg.Color) void;
+        pub const @"-opacity" = fn () f32;
+        pub const @"-setOpacity:" = fn (f32) void;
+        pub const @"-allowsGroupOpacity" = fn () bool;
+        pub const @"-setAllowsGroupOpacity:" = fn (bool) void;
+        pub const @"-compositingFilter" = fn () ?objc.Object;
+        pub const @"-setCompositingFilter:" = fn (?objc.Object) void;
+        pub const @"-filters" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setFilters:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-backgroundFilters" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setBackgroundFilters:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-shouldRasterize" = fn () bool;
+        pub const @"-setShouldRasterize:" = fn (bool) void;
+        pub const @"-rasterizationScale" = fn () cg.Float;
+        pub const @"-setRasterizationScale:" = fn (cg.Float) void;
+        pub const @"-shadowColor" = fn () ?cg.Color;
+        pub const @"-setShadowColor:" = fn (?cg.Color) void;
+        pub const @"-shadowOpacity" = fn () f32;
+        pub const @"-setShadowOpacity:" = fn (f32) void;
+        pub const @"-shadowOffset" = fn () cg.Size;
+        pub const @"-setShadowOffset:" = fn (cg.Size) void;
+        pub const @"-shadowRadius" = fn () cg.Float;
+        pub const @"-setShadowRadius:" = fn (cg.Float) void;
+        pub const @"-shadowPath" = fn () ?cg.Path;
+        pub const @"-setShadowPath:" = fn (?cg.Path) void;
+        pub const @"-autoresizingMask" = fn () AutoresizingMask;
+        pub const @"-setAutoresizingMask:" = fn (AutoresizingMask) void;
+        pub const @"-layoutManager" = fn () ?objc.Object;
+        pub const @"-setLayoutManager:" = fn (?objc.Object) void;
+        pub const @"-actions" = fn () ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-setActions:" = fn (?foundation.Dictionary(foundation.String, objc.Object)) void;
+        pub const @"-name" = fn () ?foundation.String;
+        pub const @"-setName:" = fn (?foundation.String) void;
+        pub const @"-delegate" = fn () ?objc.Object;
+        pub const @"-setDelegate:" = fn (?objc.Object) void;
+        pub const @"-style" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-setStyle:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-addConstraint:" = fn (objc.Object) void;
+        pub const @"-constraints" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setConstraints:" = fn (?foundation.Array(objc.Object)) void;
         pub const @"+layerWithRemoteClientId:" = fn (u32) Layer;
-        pub const @"scrollPoint:" = fn (cg.Point) void;
-        pub const @"scrollRectToVisible:" = fn (cg.Rect) void;
-        pub const visibleRect = fn () cg.Rect;
+        pub const @"-scrollPoint:" = fn (cg.Point) void;
+        pub const @"-scrollRectToVisible:" = fn (cg.Rect) void;
+        pub const @"-visibleRect" = fn () cg.Rect;
     };
 };
 
@@ -5446,7 +5446,7 @@ pub const MetalLayer = extern struct {
     }
 
     /// `-[CAMetalLayer EDRMetadata]`
-    pub fn EDRMetadata(self: Self) ?objc.Object {
+    pub fn edrMetadata(self: Self) ?objc.Object {
         return self.object.msgSend(?objc.Object, "EDRMetadata", .{});
     }
 
@@ -5651,7 +5651,7 @@ pub const MetalLayer = extern struct {
     }
 
     /// `+[CALayer cornerCurveExpansionFactor:]`
-    pub fn cornerCurveExpansionFactor(curve: ?foundation.String) cg.Float {
+    pub fn cornerCurveExpansionFactor(curve: foundation.String) cg.Float {
         return class().msgSend(cg.Float, "cornerCurveExpansionFactor:", .{curve});
     }
 
@@ -5891,12 +5891,12 @@ pub const MetalLayer = extern struct {
     }
 
     /// `-[CALayer contentsGravity]`
-    pub fn contentsGravity(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "contentsGravity", .{});
+    pub fn contentsGravity(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "contentsGravity", .{});
     }
 
     /// `-[CALayer setContentsGravity:]`
-    pub fn setContentsGravity(self: Self, contents_gravity: ?foundation.String) void {
+    pub fn setContentsGravity(self: Self, contents_gravity: foundation.String) void {
         return self.object.msgSend(void, "setContentsGravity:", .{contents_gravity});
     }
 
@@ -5921,32 +5921,32 @@ pub const MetalLayer = extern struct {
     }
 
     /// `-[CALayer contentsFormat]`
-    pub fn contentsFormat(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "contentsFormat", .{});
+    pub fn contentsFormat(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "contentsFormat", .{});
     }
 
     /// `-[CALayer setContentsFormat:]`
-    pub fn setContentsFormat(self: Self, contents_format: ?foundation.String) void {
+    pub fn setContentsFormat(self: Self, contents_format: foundation.String) void {
         return self.object.msgSend(void, "setContentsFormat:", .{contents_format});
     }
 
     /// `-[CALayer toneMapMode]`
-    pub fn toneMapMode(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "toneMapMode", .{});
+    pub fn toneMapMode(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "toneMapMode", .{});
     }
 
     /// `-[CALayer setToneMapMode:]`
-    pub fn setToneMapMode(self: Self, tone_map_mode: ?foundation.String) void {
+    pub fn setToneMapMode(self: Self, tone_map_mode: foundation.String) void {
         return self.object.msgSend(void, "setToneMapMode:", .{tone_map_mode});
     }
 
     /// `-[CALayer preferredDynamicRange]`
-    pub fn preferredDynamicRange(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "preferredDynamicRange", .{});
+    pub fn preferredDynamicRange(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "preferredDynamicRange", .{});
     }
 
     /// `-[CALayer setPreferredDynamicRange:]`
-    pub fn setPreferredDynamicRange(self: Self, preferred_dynamic_range: ?foundation.String) void {
+    pub fn setPreferredDynamicRange(self: Self, preferred_dynamic_range: foundation.String) void {
         return self.object.msgSend(void, "setPreferredDynamicRange:", .{preferred_dynamic_range});
     }
 
@@ -5971,22 +5971,22 @@ pub const MetalLayer = extern struct {
     }
 
     /// `-[CALayer minificationFilter]`
-    pub fn minificationFilter(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "minificationFilter", .{});
+    pub fn minificationFilter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "minificationFilter", .{});
     }
 
     /// `-[CALayer setMinificationFilter:]`
-    pub fn setMinificationFilter(self: Self, minification_filter: ?foundation.String) void {
+    pub fn setMinificationFilter(self: Self, minification_filter: foundation.String) void {
         return self.object.msgSend(void, "setMinificationFilter:", .{minification_filter});
     }
 
     /// `-[CALayer magnificationFilter]`
-    pub fn magnificationFilter(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "magnificationFilter", .{});
+    pub fn magnificationFilter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "magnificationFilter", .{});
     }
 
     /// `-[CALayer setMagnificationFilter:]`
-    pub fn setMagnificationFilter(self: Self, magnification_filter: ?foundation.String) void {
+    pub fn setMagnificationFilter(self: Self, magnification_filter: foundation.String) void {
         return self.object.msgSend(void, "setMagnificationFilter:", .{magnification_filter});
     }
 
@@ -6081,12 +6081,12 @@ pub const MetalLayer = extern struct {
     }
 
     /// `-[CALayer cornerCurve]`
-    pub fn cornerCurve(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "cornerCurve", .{});
+    pub fn cornerCurve(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "cornerCurve", .{});
     }
 
     /// `-[CALayer setCornerCurve:]`
-    pub fn setCornerCurve(self: Self, corner_curve: ?foundation.String) void {
+    pub fn setCornerCurve(self: Self, corner_curve: foundation.String) void {
         return self.object.msgSend(void, "setCornerCurve:", .{corner_curve});
     }
 
@@ -6327,33 +6327,33 @@ pub const MetalLayer = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const nextDrawable = fn () ?MetalDrawable;
-        pub const device = fn () ?Device;
-        pub const @"setDevice:" = fn (?Device) void;
-        pub const preferredDevice = fn () ?Device;
-        pub const pixelFormat = fn () PixelFormat;
-        pub const @"setPixelFormat:" = fn (PixelFormat) void;
-        pub const framebufferOnly = fn () bool;
-        pub const @"setFramebufferOnly:" = fn (bool) void;
-        pub const drawableSize = fn () cg.Size;
-        pub const @"setDrawableSize:" = fn (cg.Size) void;
-        pub const maximumDrawableCount = fn () objc.UInteger;
-        pub const @"setMaximumDrawableCount:" = fn (objc.UInteger) void;
-        pub const presentsWithTransaction = fn () bool;
-        pub const @"setPresentsWithTransaction:" = fn (bool) void;
-        pub const colorspace = fn () ?cg.ColorSpace;
-        pub const @"setColorspace:" = fn (?cg.ColorSpace) void;
-        pub const wantsExtendedDynamicRangeContent = fn () bool;
-        pub const @"setWantsExtendedDynamicRangeContent:" = fn (bool) void;
-        pub const EDRMetadata = fn () ?objc.Object;
-        pub const @"setEDRMetadata:" = fn (?objc.Object) void;
-        pub const displaySyncEnabled = fn () bool;
-        pub const @"setDisplaySyncEnabled:" = fn (bool) void;
-        pub const allowsNextDrawableTimeout = fn () bool;
-        pub const @"setAllowsNextDrawableTimeout:" = fn (bool) void;
-        pub const developerHUDProperties = fn () ?foundation.Dictionary(objc.Object, objc.Object);
-        pub const @"setDeveloperHUDProperties:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
-        pub const residencySet = fn () objc.Object;
+        pub const @"-nextDrawable" = fn () ?MetalDrawable;
+        pub const @"-device" = fn () ?Device;
+        pub const @"-setDevice:" = fn (?Device) void;
+        pub const @"-preferredDevice" = fn () ?Device;
+        pub const @"-pixelFormat" = fn () PixelFormat;
+        pub const @"-setPixelFormat:" = fn (PixelFormat) void;
+        pub const @"-framebufferOnly" = fn () bool;
+        pub const @"-setFramebufferOnly:" = fn (bool) void;
+        pub const @"-drawableSize" = fn () cg.Size;
+        pub const @"-setDrawableSize:" = fn (cg.Size) void;
+        pub const @"-maximumDrawableCount" = fn () objc.UInteger;
+        pub const @"-setMaximumDrawableCount:" = fn (objc.UInteger) void;
+        pub const @"-presentsWithTransaction" = fn () bool;
+        pub const @"-setPresentsWithTransaction:" = fn (bool) void;
+        pub const @"-colorspace" = fn () ?cg.ColorSpace;
+        pub const @"-setColorspace:" = fn (?cg.ColorSpace) void;
+        pub const @"-wantsExtendedDynamicRangeContent" = fn () bool;
+        pub const @"-setWantsExtendedDynamicRangeContent:" = fn (bool) void;
+        pub const @"-EDRMetadata" = fn () ?objc.Object;
+        pub const @"-setEDRMetadata:" = fn (?objc.Object) void;
+        pub const @"-displaySyncEnabled" = fn () bool;
+        pub const @"-setDisplaySyncEnabled:" = fn (bool) void;
+        pub const @"-allowsNextDrawableTimeout" = fn () bool;
+        pub const @"-setAllowsNextDrawableTimeout:" = fn (bool) void;
+        pub const @"-developerHUDProperties" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-setDeveloperHUDProperties:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-residencySet" = fn () objc.Object;
     };
 };
 
@@ -6480,20 +6480,20 @@ pub const DisplayLink = extern struct {
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
         pub const @"+displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) DisplayLink;
-        pub const @"addToRunLoop:forMode:" = fn (objc.Object, ?foundation.String) void;
-        pub const @"removeFromRunLoop:forMode:" = fn (objc.Object, ?foundation.String) void;
-        pub const invalidate = fn () void;
-        pub const timestamp = fn () f64;
-        pub const duration = fn () f64;
-        pub const targetTimestamp = fn () f64;
-        pub const isPaused = fn () bool;
-        pub const @"setPaused:" = fn (bool) void;
-        pub const frameInterval = fn () objc.Integer;
-        pub const @"setFrameInterval:" = fn (objc.Integer) void;
-        pub const preferredFramesPerSecond = fn () objc.Integer;
-        pub const @"setPreferredFramesPerSecond:" = fn (objc.Integer) void;
-        pub const preferredFrameRateRange = fn () FrameRateRange;
-        pub const @"setPreferredFrameRateRange:" = fn (FrameRateRange) void;
+        pub const @"-addToRunLoop:forMode:" = fn (objc.Object, ?foundation.String) void;
+        pub const @"-removeFromRunLoop:forMode:" = fn (objc.Object, ?foundation.String) void;
+        pub const @"-invalidate" = fn () void;
+        pub const @"-timestamp" = fn () f64;
+        pub const @"-duration" = fn () f64;
+        pub const @"-targetTimestamp" = fn () f64;
+        pub const @"-isPaused" = fn () bool;
+        pub const @"-setPaused:" = fn (bool) void;
+        pub const @"-frameInterval" = fn () objc.Integer;
+        pub const @"-setFrameInterval:" = fn (objc.Integer) void;
+        pub const @"-preferredFramesPerSecond" = fn () objc.Integer;
+        pub const @"-setPreferredFramesPerSecond:" = fn (objc.Integer) void;
+        pub const @"-preferredFrameRateRange" = fn () FrameRateRange;
+        pub const @"-setPreferredFrameRateRange:" = fn (FrameRateRange) void;
     };
 };
 
@@ -7231,146 +7231,146 @@ pub const Device = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"newLogStateWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const newCommandQueue = fn () ?CommandQueue;
-        pub const @"newCommandQueueWithMaxCommandBufferCount:" = fn (objc.UInteger) ?CommandQueue;
-        pub const @"newCommandQueueWithDescriptor:" = fn (objc.Object) ?CommandQueue;
-        pub const @"heapTextureSizeAndAlignWithDescriptor:" = fn (TextureDescriptor) SizeAndAlign;
-        pub const @"heapBufferSizeAndAlignWithLength:options:" = fn (objc.UInteger, ResourceOptions) SizeAndAlign;
-        pub const @"newHeapWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const @"newBufferWithLength:options:" = fn (objc.UInteger, ResourceOptions) ?Buffer;
-        pub const @"newBufferWithBytes:length:options:" = fn (?*const anyopaque, objc.UInteger, ResourceOptions) ?Buffer;
-        pub const @"newBufferWithBytesNoCopy:length:options:deallocator:" = fn (?*anyopaque, objc.UInteger, ResourceOptions, ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?Buffer;
-        pub const @"newDepthStencilStateWithDescriptor:" = fn (DepthStencilDescriptor) ?DepthStencilState;
-        pub const @"newTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
-        pub const @"newTextureWithDescriptor:iosurface:plane:" = fn (TextureDescriptor, io_surface.Surface, objc.UInteger) ?Texture;
-        pub const @"newSharedTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
-        pub const @"newSharedTextureWithHandle:" = fn (objc.Object) ?Texture;
-        pub const @"newSamplerStateWithDescriptor:" = fn (SamplerDescriptor) ?SamplerState;
-        pub const newDefaultLibrary = fn () ?Library;
-        pub const @"newDefaultLibraryWithBundle:error:" = fn (objc.Object, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithFile:error:" = fn (foundation.String, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithData:error:" = fn (?objc.Object, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithSource:options:error:" = fn (foundation.String, ?CompileOptions, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithSource:options:completionHandler:" = fn (foundation.String, ?CompileOptions, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
-        pub const @"newLibraryWithStitchedDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Library;
-        pub const @"newLibraryWithStitchedDescriptor:completionHandler:" = fn (objc.Object, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
-        pub const @"newRenderPipelineStateWithDescriptor:error:" = fn (RenderPipelineDescriptor, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const @"newRenderPipelineStateWithDescriptor:options:reflection:error:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const @"newRenderPipelineStateWithDescriptor:completionHandler:" = fn (RenderPipelineDescriptor, ?objc.BlockRef(fn (?RenderPipelineState, ?foundation.ErrorObject) void)) void;
-        pub const @"newRenderPipelineStateWithDescriptor:options:completionHandler:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
-        pub const @"newComputePipelineStateWithFunction:error:" = fn (Function, ?*objc.abi.Id) ?ComputePipelineState;
-        pub const @"newComputePipelineStateWithFunction:options:reflection:error:" = fn (Function, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
-        pub const @"newComputePipelineStateWithFunction:completionHandler:" = fn (Function, ?objc.BlockRef(fn (?ComputePipelineState, ?foundation.ErrorObject) void)) void;
-        pub const @"newComputePipelineStateWithFunction:options:completionHandler:" = fn (Function, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
-        pub const @"newComputePipelineStateWithDescriptor:options:reflection:error:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
-        pub const @"newComputePipelineStateWithDescriptor:options:completionHandler:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
-        pub const newFence = fn () ?objc.Object;
-        pub const @"supportsFeatureSet:" = fn (FeatureSet) bool;
-        pub const @"supportsFamily:" = fn (GPUFamily) bool;
-        pub const @"supportsTextureSampleCount:" = fn (objc.UInteger) bool;
-        pub const @"minimumLinearTextureAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
-        pub const @"minimumTextureBufferAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
-        pub const @"newRenderPipelineStateWithTileDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const @"newRenderPipelineStateWithTileDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
-        pub const @"newRenderPipelineStateWithMeshDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const @"newRenderPipelineStateWithMeshDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
-        pub const @"getDefaultSamplePositions:count:" = fn (objc.Object, objc.UInteger) void;
-        pub const @"newArgumentEncoderWithArguments:" = fn (foundation.Array(objc.Object)) ?objc.Object;
-        pub const @"supportsRasterizationRateMapWithLayerCount:" = fn (objc.UInteger) bool;
-        pub const @"newRasterizationRateMapWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const @"newIndirectCommandBufferWithDescriptor:maxCommandCount:options:" = fn (objc.Object, objc.UInteger, ResourceOptions) ?objc.Object;
-        pub const newEvent = fn () ?objc.Object;
-        pub const newSharedEvent = fn () ?objc.Object;
-        pub const @"newSharedEventWithHandle:" = fn (objc.Object) ?objc.Object;
-        pub const @"newIOHandleWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newIOCommandQueueWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newIOHandleWithURL:compressionMethod:error:" = fn (foundation.Url, IOCompressionMethod, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newIOFileHandleWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newIOFileHandleWithURL:compressionMethod:error:" = fn (foundation.Url, IOCompressionMethod, ?*objc.abi.Id) ?objc.Object;
-        pub const @"sparseTileSizeWithTextureType:pixelFormat:sampleCount:" = fn (TextureType, PixelFormat, objc.UInteger) Size;
-        pub const @"convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:" = fn (?[*]const Region, ?*Region, Size, SparseTextureRegionAlignmentMode, objc.UInteger) void;
-        pub const @"convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:" = fn (?[*]const Region, ?*Region, Size, objc.UInteger) void;
-        pub const @"sparseTileSizeInBytesForSparsePageSize:" = fn (SparsePageSize) objc.UInteger;
-        pub const @"sparseTileSizeWithTextureType:pixelFormat:sampleCount:sparsePageSize:" = fn (TextureType, PixelFormat, objc.UInteger, SparsePageSize) Size;
-        pub const @"newCounterSampleBufferWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"sampleTimestamps:gpuTimestamp:" = fn (objc.Object, objc.Object) void;
-        pub const @"newArgumentEncoderWithBufferBinding:" = fn (objc.Object) objc.Object;
-        pub const @"supportsCounterSampling:" = fn (CounterSamplingPoint) bool;
-        pub const @"supportsVertexAmplificationCount:" = fn (objc.UInteger) bool;
-        pub const @"newDynamicLibrary:error:" = fn (Library, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newDynamicLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newBinaryArchiveWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"accelerationStructureSizesWithDescriptor:" = fn (objc.Object) AccelerationStructureSizes;
-        pub const @"newAccelerationStructureWithSize:" = fn (objc.UInteger) ?objc.Object;
-        pub const @"newAccelerationStructureWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const @"heapAccelerationStructureSizeAndAlignWithSize:" = fn (objc.UInteger) SizeAndAlign;
-        pub const @"heapAccelerationStructureSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
-        pub const @"newResidencySetWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"tensorSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
-        pub const @"newTensorWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newTensorWithDescriptor:attachments:error:" = fn (objc.Object, objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"functionHandleWithFunction:" = fn (Function) ?objc.Object;
-        pub const newCommandAllocator = fn () ?objc.Object;
-        pub const @"newCommandAllocatorWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const newMTL4CommandQueue = fn () ?objc.Object;
-        pub const @"newMTL4CommandQueueWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const newCommandBuffer = fn () ?objc.Object;
-        pub const @"newArgumentTableWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newTextureViewPoolWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newCompilerWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newArchiveWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
-        pub const @"newPipelineDataSetSerializerWithDescriptor:" = fn (objc.Object) objc.Object;
-        pub const @"newBufferWithLength:options:placementSparsePageSize:" = fn (objc.UInteger, ResourceOptions, SparsePageSize) ?Buffer;
-        pub const @"newCounterHeapWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
-        pub const @"sizeOfCounterHeapEntry:" = fn (MTL4CounterHeapType) objc.UInteger;
-        pub const queryTimestampFrequency = fn () u64;
-        pub const @"functionHandleWithBinaryFunction:" = fn (objc.Object) ?objc.Object;
-        pub const name = fn () foundation.String;
-        pub const registryID = fn () u64;
-        pub const architecture = fn () objc.Object;
-        pub const maxThreadsPerThreadgroup = fn () Size;
-        pub const isLowPower = fn () bool;
-        pub const isHeadless = fn () bool;
-        pub const isRemovable = fn () bool;
-        pub const hasUnifiedMemory = fn () bool;
-        pub const recommendedMaxWorkingSetSize = fn () u64;
-        pub const location = fn () DeviceLocation;
-        pub const locationNumber = fn () objc.UInteger;
-        pub const maxTransferRate = fn () u64;
-        pub const isDepth24Stencil8PixelFormatSupported = fn () bool;
-        pub const readWriteTextureSupport = fn () ReadWriteTextureTier;
-        pub const argumentBuffersSupport = fn () ArgumentBuffersTier;
-        pub const areRasterOrderGroupsSupported = fn () bool;
-        pub const supports32BitFloatFiltering = fn () bool;
-        pub const supports32BitMSAA = fn () bool;
-        pub const supportsQueryTextureLOD = fn () bool;
-        pub const supportsBCTextureCompression = fn () bool;
-        pub const supportsPullModelInterpolation = fn () bool;
-        pub const areBarycentricCoordsSupported = fn () bool;
-        pub const supportsShaderBarycentricCoordinates = fn () bool;
-        pub const currentAllocatedSize = fn () objc.UInteger;
-        pub const maxThreadgroupMemoryLength = fn () objc.UInteger;
-        pub const maxArgumentBufferSamplerCount = fn () objc.UInteger;
-        pub const areProgrammableSamplePositionsSupported = fn () bool;
-        pub const peerGroupID = fn () u64;
-        pub const peerIndex = fn () u32;
-        pub const peerCount = fn () u32;
-        pub const sparseTileSizeInBytes = fn () objc.UInteger;
-        pub const maxBufferLength = fn () objc.UInteger;
-        pub const counterSets = fn () ?foundation.Array(objc.Object);
-        pub const supportsDynamicLibraries = fn () bool;
-        pub const supportsRenderDynamicLibraries = fn () bool;
-        pub const supportsPlacementSparse = fn () bool;
-        pub const supportsRaytracing = fn () bool;
-        pub const supportsFunctionPointers = fn () bool;
-        pub const supportsFunctionPointersFromRender = fn () bool;
-        pub const supportsRaytracingFromRender = fn () bool;
-        pub const supportsPrimitiveMotionBlur = fn () bool;
-        pub const shouldMaximizeConcurrentCompilation = fn () bool;
-        pub const @"setShouldMaximizeConcurrentCompilation:" = fn (bool) void;
-        pub const maximumConcurrentCompilationTaskCount = fn () objc.UInteger;
+        pub const @"-newLogStateWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newCommandQueue" = fn () ?CommandQueue;
+        pub const @"-newCommandQueueWithMaxCommandBufferCount:" = fn (objc.UInteger) ?CommandQueue;
+        pub const @"-newCommandQueueWithDescriptor:" = fn (objc.Object) ?CommandQueue;
+        pub const @"-heapTextureSizeAndAlignWithDescriptor:" = fn (TextureDescriptor) SizeAndAlign;
+        pub const @"-heapBufferSizeAndAlignWithLength:options:" = fn (objc.UInteger, ResourceOptions) SizeAndAlign;
+        pub const @"-newHeapWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-newBufferWithLength:options:" = fn (objc.UInteger, ResourceOptions) ?Buffer;
+        pub const @"-newBufferWithBytes:length:options:" = fn (?*const anyopaque, objc.UInteger, ResourceOptions) ?Buffer;
+        pub const @"-newBufferWithBytesNoCopy:length:options:deallocator:" = fn (?*anyopaque, objc.UInteger, ResourceOptions, ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?Buffer;
+        pub const @"-newDepthStencilStateWithDescriptor:" = fn (DepthStencilDescriptor) ?DepthStencilState;
+        pub const @"-newTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
+        pub const @"-newTextureWithDescriptor:iosurface:plane:" = fn (TextureDescriptor, io_surface.Surface, objc.UInteger) ?Texture;
+        pub const @"-newSharedTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
+        pub const @"-newSharedTextureWithHandle:" = fn (objc.Object) ?Texture;
+        pub const @"-newSamplerStateWithDescriptor:" = fn (SamplerDescriptor) ?SamplerState;
+        pub const @"-newDefaultLibrary" = fn () ?Library;
+        pub const @"-newDefaultLibraryWithBundle:error:" = fn (objc.Object, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithFile:error:" = fn (foundation.String, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithData:error:" = fn (?objc.Object, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithSource:options:error:" = fn (foundation.String, ?CompileOptions, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithSource:options:completionHandler:" = fn (foundation.String, ?CompileOptions, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
+        pub const @"-newLibraryWithStitchedDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Library;
+        pub const @"-newLibraryWithStitchedDescriptor:completionHandler:" = fn (objc.Object, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
+        pub const @"-newRenderPipelineStateWithDescriptor:error:" = fn (RenderPipelineDescriptor, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-newRenderPipelineStateWithDescriptor:options:reflection:error:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-newRenderPipelineStateWithDescriptor:completionHandler:" = fn (RenderPipelineDescriptor, ?objc.BlockRef(fn (?RenderPipelineState, ?foundation.ErrorObject) void)) void;
+        pub const @"-newRenderPipelineStateWithDescriptor:options:completionHandler:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-newComputePipelineStateWithFunction:error:" = fn (Function, ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"-newComputePipelineStateWithFunction:options:reflection:error:" = fn (Function, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"-newComputePipelineStateWithFunction:completionHandler:" = fn (Function, ?objc.BlockRef(fn (?ComputePipelineState, ?foundation.ErrorObject) void)) void;
+        pub const @"-newComputePipelineStateWithFunction:options:completionHandler:" = fn (Function, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-newComputePipelineStateWithDescriptor:options:reflection:error:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"-newComputePipelineStateWithDescriptor:options:completionHandler:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-newFence" = fn () ?objc.Object;
+        pub const @"-supportsFeatureSet:" = fn (FeatureSet) bool;
+        pub const @"-supportsFamily:" = fn (GPUFamily) bool;
+        pub const @"-supportsTextureSampleCount:" = fn (objc.UInteger) bool;
+        pub const @"-minimumLinearTextureAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
+        pub const @"-minimumTextureBufferAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
+        pub const @"-newRenderPipelineStateWithTileDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-newRenderPipelineStateWithTileDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-newRenderPipelineStateWithMeshDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-newRenderPipelineStateWithMeshDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-getDefaultSamplePositions:count:" = fn (objc.Object, objc.UInteger) void;
+        pub const @"-newArgumentEncoderWithArguments:" = fn (foundation.Array(objc.Object)) ?objc.Object;
+        pub const @"-supportsRasterizationRateMapWithLayerCount:" = fn (objc.UInteger) bool;
+        pub const @"-newRasterizationRateMapWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-newIndirectCommandBufferWithDescriptor:maxCommandCount:options:" = fn (objc.Object, objc.UInteger, ResourceOptions) ?objc.Object;
+        pub const @"-newEvent" = fn () ?objc.Object;
+        pub const @"-newSharedEvent" = fn () ?objc.Object;
+        pub const @"-newSharedEventWithHandle:" = fn (objc.Object) ?objc.Object;
+        pub const @"-newIOHandleWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newIOCommandQueueWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newIOHandleWithURL:compressionMethod:error:" = fn (foundation.Url, IOCompressionMethod, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newIOFileHandleWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newIOFileHandleWithURL:compressionMethod:error:" = fn (foundation.Url, IOCompressionMethod, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-sparseTileSizeWithTextureType:pixelFormat:sampleCount:" = fn (TextureType, PixelFormat, objc.UInteger) Size;
+        pub const @"-convertSparsePixelRegions:toTileRegions:withTileSize:alignmentMode:numRegions:" = fn (?[*]const Region, ?*Region, Size, SparseTextureRegionAlignmentMode, objc.UInteger) void;
+        pub const @"-convertSparseTileRegions:toPixelRegions:withTileSize:numRegions:" = fn (?[*]const Region, ?*Region, Size, objc.UInteger) void;
+        pub const @"-sparseTileSizeInBytesForSparsePageSize:" = fn (SparsePageSize) objc.UInteger;
+        pub const @"-sparseTileSizeWithTextureType:pixelFormat:sampleCount:sparsePageSize:" = fn (TextureType, PixelFormat, objc.UInteger, SparsePageSize) Size;
+        pub const @"-newCounterSampleBufferWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-sampleTimestamps:gpuTimestamp:" = fn (objc.Object, objc.Object) void;
+        pub const @"-newArgumentEncoderWithBufferBinding:" = fn (objc.Object) objc.Object;
+        pub const @"-supportsCounterSampling:" = fn (CounterSamplingPoint) bool;
+        pub const @"-supportsVertexAmplificationCount:" = fn (objc.UInteger) bool;
+        pub const @"-newDynamicLibrary:error:" = fn (Library, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newDynamicLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newBinaryArchiveWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-accelerationStructureSizesWithDescriptor:" = fn (objc.Object) AccelerationStructureSizes;
+        pub const @"-newAccelerationStructureWithSize:" = fn (objc.UInteger) ?objc.Object;
+        pub const @"-newAccelerationStructureWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-heapAccelerationStructureSizeAndAlignWithSize:" = fn (objc.UInteger) SizeAndAlign;
+        pub const @"-heapAccelerationStructureSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
+        pub const @"-newResidencySetWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-tensorSizeAndAlignWithDescriptor:" = fn (objc.Object) SizeAndAlign;
+        pub const @"-newTensorWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newTensorWithDescriptor:attachments:error:" = fn (objc.Object, objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-functionHandleWithFunction:" = fn (Function) ?objc.Object;
+        pub const @"-newCommandAllocator" = fn () ?objc.Object;
+        pub const @"-newCommandAllocatorWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newMTL4CommandQueue" = fn () ?objc.Object;
+        pub const @"-newMTL4CommandQueueWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newCommandBuffer" = fn () ?objc.Object;
+        pub const @"-newArgumentTableWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newTextureViewPoolWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newCompilerWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newArchiveWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-newPipelineDataSetSerializerWithDescriptor:" = fn (objc.Object) objc.Object;
+        pub const @"-newBufferWithLength:options:placementSparsePageSize:" = fn (objc.UInteger, ResourceOptions, SparsePageSize) ?Buffer;
+        pub const @"-newCounterHeapWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-sizeOfCounterHeapEntry:" = fn (MTL4CounterHeapType) objc.UInteger;
+        pub const @"-queryTimestampFrequency" = fn () u64;
+        pub const @"-functionHandleWithBinaryFunction:" = fn (objc.Object) ?objc.Object;
+        pub const @"-name" = fn () foundation.String;
+        pub const @"-registryID" = fn () u64;
+        pub const @"-architecture" = fn () objc.Object;
+        pub const @"-maxThreadsPerThreadgroup" = fn () Size;
+        pub const @"-isLowPower" = fn () bool;
+        pub const @"-isHeadless" = fn () bool;
+        pub const @"-isRemovable" = fn () bool;
+        pub const @"-hasUnifiedMemory" = fn () bool;
+        pub const @"-recommendedMaxWorkingSetSize" = fn () u64;
+        pub const @"-location" = fn () DeviceLocation;
+        pub const @"-locationNumber" = fn () objc.UInteger;
+        pub const @"-maxTransferRate" = fn () u64;
+        pub const @"-isDepth24Stencil8PixelFormatSupported" = fn () bool;
+        pub const @"-readWriteTextureSupport" = fn () ReadWriteTextureTier;
+        pub const @"-argumentBuffersSupport" = fn () ArgumentBuffersTier;
+        pub const @"-areRasterOrderGroupsSupported" = fn () bool;
+        pub const @"-supports32BitFloatFiltering" = fn () bool;
+        pub const @"-supports32BitMSAA" = fn () bool;
+        pub const @"-supportsQueryTextureLOD" = fn () bool;
+        pub const @"-supportsBCTextureCompression" = fn () bool;
+        pub const @"-supportsPullModelInterpolation" = fn () bool;
+        pub const @"-areBarycentricCoordsSupported" = fn () bool;
+        pub const @"-supportsShaderBarycentricCoordinates" = fn () bool;
+        pub const @"-currentAllocatedSize" = fn () objc.UInteger;
+        pub const @"-maxThreadgroupMemoryLength" = fn () objc.UInteger;
+        pub const @"-maxArgumentBufferSamplerCount" = fn () objc.UInteger;
+        pub const @"-areProgrammableSamplePositionsSupported" = fn () bool;
+        pub const @"-peerGroupID" = fn () u64;
+        pub const @"-peerIndex" = fn () u32;
+        pub const @"-peerCount" = fn () u32;
+        pub const @"-sparseTileSizeInBytes" = fn () objc.UInteger;
+        pub const @"-maxBufferLength" = fn () objc.UInteger;
+        pub const @"-counterSets" = fn () ?foundation.Array(objc.Object);
+        pub const @"-supportsDynamicLibraries" = fn () bool;
+        pub const @"-supportsRenderDynamicLibraries" = fn () bool;
+        pub const @"-supportsPlacementSparse" = fn () bool;
+        pub const @"-supportsRaytracing" = fn () bool;
+        pub const @"-supportsFunctionPointers" = fn () bool;
+        pub const @"-supportsFunctionPointersFromRender" = fn () bool;
+        pub const @"-supportsRaytracingFromRender" = fn () bool;
+        pub const @"-supportsPrimitiveMotionBlur" = fn () bool;
+        pub const @"-shouldMaximizeConcurrentCompilation" = fn () bool;
+        pub const @"-setShouldMaximizeConcurrentCompilation:" = fn (bool) void;
+        pub const @"-maximumConcurrentCompilationTaskCount" = fn () objc.UInteger;
     };
 };
 
@@ -7463,17 +7463,17 @@ pub const CommandQueue = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const commandBuffer = fn () ?CommandBuffer;
-        pub const @"commandBufferWithDescriptor:" = fn (objc.Object) ?CommandBuffer;
-        pub const commandBufferWithUnretainedReferences = fn () ?CommandBuffer;
-        pub const insertDebugCaptureBoundary = fn () void;
-        pub const @"addResidencySet:" = fn (objc.Object) void;
-        pub const @"addResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
-        pub const @"removeResidencySet:" = fn (objc.Object) void;
-        pub const @"removeResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const device = fn () Device;
+        pub const @"-commandBuffer" = fn () ?CommandBuffer;
+        pub const @"-commandBufferWithDescriptor:" = fn (objc.Object) ?CommandBuffer;
+        pub const @"-commandBufferWithUnretainedReferences" = fn () ?CommandBuffer;
+        pub const @"-insertDebugCaptureBoundary" = fn () void;
+        pub const @"-addResidencySet:" = fn (objc.Object) void;
+        pub const @"-addResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
+        pub const @"-removeResidencySet:" = fn (objc.Object) void;
+        pub const @"-removeResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-device" = fn () Device;
     };
 };
 
@@ -7685,12 +7685,12 @@ pub const CommandBuffer = extern struct {
     }
 
     /// `-[MTLCommandBuffer GPUStartTime]`
-    pub fn GPUStartTime(self: Self) f64 {
+    pub fn gpuStartTime(self: Self) f64 {
         return self.object.msgSend(f64, "GPUStartTime", .{});
     }
 
     /// `-[MTLCommandBuffer GPUEndTime]`
-    pub fn GPUEndTime(self: Self) f64 {
+    pub fn gpuEndTime(self: Self) f64 {
         return self.object.msgSend(f64, "GPUEndTime", .{});
     }
 
@@ -7706,45 +7706,45 @@ pub const CommandBuffer = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const enqueue = fn () void;
-        pub const commit = fn () void;
-        pub const @"addScheduledHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
-        pub const @"presentDrawable:" = fn (Drawable) void;
-        pub const @"presentDrawable:atTime:" = fn (Drawable, f64) void;
-        pub const @"presentDrawable:afterMinimumDuration:" = fn (Drawable, f64) void;
-        pub const waitUntilScheduled = fn () void;
-        pub const @"addCompletedHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
-        pub const waitUntilCompleted = fn () void;
-        pub const blitCommandEncoder = fn () ?BlitCommandEncoder;
-        pub const @"renderCommandEncoderWithDescriptor:" = fn (RenderPassDescriptor) ?RenderCommandEncoder;
-        pub const @"computeCommandEncoderWithDescriptor:" = fn (objc.Object) ?ComputeCommandEncoder;
-        pub const @"blitCommandEncoderWithDescriptor:" = fn (objc.Object) ?BlitCommandEncoder;
-        pub const computeCommandEncoder = fn () ?ComputeCommandEncoder;
-        pub const @"computeCommandEncoderWithDispatchType:" = fn (DispatchType) ?ComputeCommandEncoder;
-        pub const @"encodeWaitForEvent:value:" = fn (objc.Object, u64) void;
-        pub const @"encodeSignalEvent:value:" = fn (objc.Object, u64) void;
-        pub const @"parallelRenderCommandEncoderWithDescriptor:" = fn (RenderPassDescriptor) ?objc.Object;
-        pub const resourceStateCommandEncoder = fn () ?objc.Object;
-        pub const @"resourceStateCommandEncoderWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const accelerationStructureCommandEncoder = fn () ?objc.Object;
-        pub const @"accelerationStructureCommandEncoderWithDescriptor:" = fn (objc.Object) objc.Object;
-        pub const @"pushDebugGroup:" = fn (foundation.String) void;
-        pub const popDebugGroup = fn () void;
-        pub const @"useResidencySet:" = fn (objc.Object) void;
-        pub const @"useResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
-        pub const device = fn () Device;
-        pub const commandQueue = fn () CommandQueue;
-        pub const retainedReferences = fn () bool;
-        pub const errorOptions = fn () CommandBufferErrorOption;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const kernelStartTime = fn () f64;
-        pub const kernelEndTime = fn () f64;
-        pub const logs = fn () objc.Object;
-        pub const GPUStartTime = fn () f64;
-        pub const GPUEndTime = fn () f64;
-        pub const status = fn () CommandBufferStatus;
-        pub const @"error" = fn () ?foundation.ErrorObject;
+        pub const @"-enqueue" = fn () void;
+        pub const @"-commit" = fn () void;
+        pub const @"-addScheduledHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
+        pub const @"-presentDrawable:" = fn (Drawable) void;
+        pub const @"-presentDrawable:atTime:" = fn (Drawable, f64) void;
+        pub const @"-presentDrawable:afterMinimumDuration:" = fn (Drawable, f64) void;
+        pub const @"-waitUntilScheduled" = fn () void;
+        pub const @"-addCompletedHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
+        pub const @"-waitUntilCompleted" = fn () void;
+        pub const @"-blitCommandEncoder" = fn () ?BlitCommandEncoder;
+        pub const @"-renderCommandEncoderWithDescriptor:" = fn (RenderPassDescriptor) ?RenderCommandEncoder;
+        pub const @"-computeCommandEncoderWithDescriptor:" = fn (objc.Object) ?ComputeCommandEncoder;
+        pub const @"-blitCommandEncoderWithDescriptor:" = fn (objc.Object) ?BlitCommandEncoder;
+        pub const @"-computeCommandEncoder" = fn () ?ComputeCommandEncoder;
+        pub const @"-computeCommandEncoderWithDispatchType:" = fn (DispatchType) ?ComputeCommandEncoder;
+        pub const @"-encodeWaitForEvent:value:" = fn (objc.Object, u64) void;
+        pub const @"-encodeSignalEvent:value:" = fn (objc.Object, u64) void;
+        pub const @"-parallelRenderCommandEncoderWithDescriptor:" = fn (RenderPassDescriptor) ?objc.Object;
+        pub const @"-resourceStateCommandEncoder" = fn () ?objc.Object;
+        pub const @"-resourceStateCommandEncoderWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-accelerationStructureCommandEncoder" = fn () ?objc.Object;
+        pub const @"-accelerationStructureCommandEncoderWithDescriptor:" = fn (objc.Object) objc.Object;
+        pub const @"-pushDebugGroup:" = fn (foundation.String) void;
+        pub const @"-popDebugGroup" = fn () void;
+        pub const @"-useResidencySet:" = fn (objc.Object) void;
+        pub const @"-useResidencySets:count:" = fn ([*]const objc.Object, objc.UInteger) void;
+        pub const @"-device" = fn () Device;
+        pub const @"-commandQueue" = fn () CommandQueue;
+        pub const @"-retainedReferences" = fn () bool;
+        pub const @"-errorOptions" = fn () CommandBufferErrorOption;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-kernelStartTime" = fn () f64;
+        pub const @"-kernelEndTime" = fn () f64;
+        pub const @"-logs" = fn () objc.Object;
+        pub const @"-GPUStartTime" = fn () f64;
+        pub const @"-GPUEndTime" = fn () f64;
+        pub const @"-status" = fn () CommandBufferStatus;
+        pub const @"-error" = fn () ?foundation.ErrorObject;
     };
 };
 
@@ -7822,14 +7822,14 @@ pub const CommandEncoder = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const endEncoding = fn () void;
-        pub const @"barrierAfterQueueStages:beforeStages:" = fn (Stages, Stages) void;
-        pub const @"insertDebugSignpost:" = fn (foundation.String) void;
-        pub const @"pushDebugGroup:" = fn (foundation.String) void;
-        pub const popDebugGroup = fn () void;
-        pub const device = fn () Device;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
+        pub const @"-endEncoding" = fn () void;
+        pub const @"-barrierAfterQueueStages:beforeStages:" = fn (Stages, Stages) void;
+        pub const @"-insertDebugSignpost:" = fn (foundation.String) void;
+        pub const @"-pushDebugGroup:" = fn (foundation.String) void;
+        pub const @"-popDebugGroup" = fn () void;
+        pub const @"-device" = fn () Device;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
     };
 };
 
@@ -8562,137 +8562,137 @@ pub const RenderCommandEncoder = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"setRenderPipelineState:" = fn (RenderPipelineState) void;
-        pub const @"setVertexBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setVertexBuffer:offset:attributeStride:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setVertexBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setVertexTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setVertexTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setVertexSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setVertexSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"setVertexVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setVertexVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setVertexIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setVertexIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setVertexAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setViewport:" = fn (Viewport) void;
-        pub const @"setViewports:count:" = fn (?[*]const Viewport, objc.UInteger) void;
-        pub const @"setFrontFacingWinding:" = fn (Winding) void;
-        pub const @"setVertexAmplificationCount:viewMappings:" = fn (objc.UInteger, ?objc.Object) void;
-        pub const @"setCullMode:" = fn (CullMode) void;
-        pub const @"setDepthClipMode:" = fn (DepthClipMode) void;
-        pub const @"setDepthBias:slopeScale:clamp:" = fn (f32, f32, f32) void;
-        pub const @"setDepthTestMinBound:maxBound:" = fn (f32, f32) void;
-        pub const @"setScissorRect:" = fn (ScissorRect) void;
-        pub const @"setScissorRects:count:" = fn (?[*]const ScissorRect, objc.UInteger) void;
-        pub const @"setTriangleFillMode:" = fn (TriangleFillMode) void;
-        pub const @"setFragmentBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setFragmentBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setFragmentBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setFragmentBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setFragmentTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setFragmentTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setFragmentSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setFragmentSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"setFragmentVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setFragmentVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setFragmentIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setFragmentIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setFragmentAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setBlendColorRed:green:blue:alpha:" = fn (f32, f32, f32, f32) void;
-        pub const @"setDepthStencilState:" = fn (?DepthStencilState) void;
-        pub const @"setStencilReferenceValue:" = fn (u32) void;
-        pub const @"setStencilFrontReferenceValue:backReferenceValue:" = fn (u32, u32) void;
-        pub const @"setVisibilityResultMode:offset:" = fn (VisibilityResultMode, objc.UInteger) void;
-        pub const @"setColorStoreAction:atIndex:" = fn (StoreAction, objc.UInteger) void;
-        pub const @"setDepthStoreAction:" = fn (StoreAction) void;
-        pub const @"setStencilStoreAction:" = fn (StoreAction) void;
-        pub const @"setColorStoreActionOptions:atIndex:" = fn (StoreActionOptions, objc.UInteger) void;
-        pub const @"setDepthStoreActionOptions:" = fn (StoreActionOptions) void;
-        pub const @"setStencilStoreActionOptions:" = fn (StoreActionOptions) void;
-        pub const @"setObjectBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setObjectBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setObjectBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setObjectBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setObjectTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setObjectTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setObjectSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setObjectSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"setObjectThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setMeshBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setMeshBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setMeshBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setMeshBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setMeshTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setMeshTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setMeshSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setMeshSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
-        pub const @"drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
-        pub const @"drawMeshThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Buffer, objc.UInteger, Size, Size) void;
-        pub const @"drawPrimitives:vertexStart:vertexCount:instanceCount:" = fn (PrimitiveType, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"drawPrimitives:vertexStart:vertexCount:" = fn (PrimitiveType, objc.UInteger, objc.UInteger) void;
-        pub const @"drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger) void;
-        pub const @"drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:" = fn (PrimitiveType, objc.UInteger, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger, objc.UInteger, objc.Integer, objc.UInteger) void;
-        pub const @"drawPrimitives:indirectBuffer:indirectBufferOffset:" = fn (PrimitiveType, Buffer, objc.UInteger) void;
-        pub const @"drawIndexedPrimitives:indexType:indexBuffer:indexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (PrimitiveType, IndexType, Buffer, objc.UInteger, Buffer, objc.UInteger) void;
-        pub const textureBarrier = fn () void;
-        pub const @"updateFence:afterStages:" = fn (objc.Object, RenderStages) void;
-        pub const @"waitForFence:beforeStages:" = fn (objc.Object, RenderStages) void;
-        pub const @"setTessellationFactorBuffer:offset:instanceStride:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setTessellationFactorScale:" = fn (f32) void;
-        pub const @"drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:" = fn (objc.UInteger, objc.UInteger, objc.UInteger, ?Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"drawPatches:patchIndexBuffer:patchIndexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger) void;
-        pub const @"drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:" = fn (objc.UInteger, objc.UInteger, objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"drawIndexedPatches:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger, Buffer, objc.UInteger) void;
-        pub const @"setTileBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setTileBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setTileBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setTileBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setTileTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setTileTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setTileSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setTileSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"setTileVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setTileVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setTileIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setTileIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setTileAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"dispatchThreadsPerTile:" = fn (Size) void;
-        pub const @"setThreadgroupMemoryLength:offset:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"useResource:usage:" = fn (Resource, ResourceUsage) void;
-        pub const @"useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
-        pub const @"useResource:usage:stages:" = fn (Resource, ResourceUsage, RenderStages) void;
-        pub const @"useResources:count:usage:stages:" = fn ([*]const Resource, objc.UInteger, ResourceUsage, RenderStages) void;
-        pub const @"useHeap:" = fn (objc.Object) void;
-        pub const @"useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
-        pub const @"useHeap:stages:" = fn (objc.Object, RenderStages) void;
-        pub const @"useHeaps:count:stages:" = fn ([*]const objc.Object, objc.UInteger, RenderStages) void;
-        pub const @"executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
-        pub const @"executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
-        pub const @"memoryBarrierWithScope:afterStages:beforeStages:" = fn (BarrierScope, RenderStages, RenderStages) void;
-        pub const @"memoryBarrierWithResources:count:afterStages:beforeStages:" = fn ([*]const Resource, objc.UInteger, RenderStages, RenderStages) void;
-        pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
-        pub const @"setColorAttachmentMap:" = fn (?objc.Object) void;
-        pub const tileWidth = fn () objc.UInteger;
-        pub const tileHeight = fn () objc.UInteger;
+        pub const @"-setRenderPipelineState:" = fn (RenderPipelineState) void;
+        pub const @"-setVertexBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setVertexBuffer:offset:attributeStride:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setVertexBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVertexTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setVertexTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setVertexSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setVertexSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setVertexSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setVertexSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-setVertexVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setVertexVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setVertexIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setVertexIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setVertexAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setViewport:" = fn (Viewport) void;
+        pub const @"-setViewports:count:" = fn (?[*]const Viewport, objc.UInteger) void;
+        pub const @"-setFrontFacingWinding:" = fn (Winding) void;
+        pub const @"-setVertexAmplificationCount:viewMappings:" = fn (objc.UInteger, ?objc.Object) void;
+        pub const @"-setCullMode:" = fn (CullMode) void;
+        pub const @"-setDepthClipMode:" = fn (DepthClipMode) void;
+        pub const @"-setDepthBias:slopeScale:clamp:" = fn (f32, f32, f32) void;
+        pub const @"-setDepthTestMinBound:maxBound:" = fn (f32, f32) void;
+        pub const @"-setScissorRect:" = fn (ScissorRect) void;
+        pub const @"-setScissorRects:count:" = fn (?[*]const ScissorRect, objc.UInteger) void;
+        pub const @"-setTriangleFillMode:" = fn (TriangleFillMode) void;
+        pub const @"-setFragmentBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setFragmentBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setFragmentBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setFragmentBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setFragmentTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setFragmentTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setFragmentSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setFragmentSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setFragmentSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setFragmentSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-setFragmentVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setFragmentVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setFragmentIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setFragmentIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setFragmentAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setBlendColorRed:green:blue:alpha:" = fn (f32, f32, f32, f32) void;
+        pub const @"-setDepthStencilState:" = fn (?DepthStencilState) void;
+        pub const @"-setStencilReferenceValue:" = fn (u32) void;
+        pub const @"-setStencilFrontReferenceValue:backReferenceValue:" = fn (u32, u32) void;
+        pub const @"-setVisibilityResultMode:offset:" = fn (VisibilityResultMode, objc.UInteger) void;
+        pub const @"-setColorStoreAction:atIndex:" = fn (StoreAction, objc.UInteger) void;
+        pub const @"-setDepthStoreAction:" = fn (StoreAction) void;
+        pub const @"-setStencilStoreAction:" = fn (StoreAction) void;
+        pub const @"-setColorStoreActionOptions:atIndex:" = fn (StoreActionOptions, objc.UInteger) void;
+        pub const @"-setDepthStoreActionOptions:" = fn (StoreActionOptions) void;
+        pub const @"-setStencilStoreActionOptions:" = fn (StoreActionOptions) void;
+        pub const @"-setObjectBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setObjectBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setObjectBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setObjectBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setObjectTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setObjectTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setObjectSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setObjectSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setObjectSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setObjectSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-setObjectThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setMeshBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setMeshBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setMeshBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setMeshBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setMeshTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setMeshTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setMeshSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setMeshSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setMeshSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setMeshSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
+        pub const @"-drawMeshThreads:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Size, Size, Size) void;
+        pub const @"-drawMeshThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:" = fn (Buffer, objc.UInteger, Size, Size) void;
+        pub const @"-drawPrimitives:vertexStart:vertexCount:instanceCount:" = fn (PrimitiveType, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawPrimitives:vertexStart:vertexCount:" = fn (PrimitiveType, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger) void;
+        pub const @"-drawPrimitives:vertexStart:vertexCount:instanceCount:baseInstance:" = fn (PrimitiveType, objc.UInteger, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawIndexedPrimitives:indexCount:indexType:indexBuffer:indexBufferOffset:instanceCount:baseVertex:baseInstance:" = fn (PrimitiveType, objc.UInteger, IndexType, Buffer, objc.UInteger, objc.UInteger, objc.Integer, objc.UInteger) void;
+        pub const @"-drawPrimitives:indirectBuffer:indirectBufferOffset:" = fn (PrimitiveType, Buffer, objc.UInteger) void;
+        pub const @"-drawIndexedPrimitives:indexType:indexBuffer:indexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (PrimitiveType, IndexType, Buffer, objc.UInteger, Buffer, objc.UInteger) void;
+        pub const @"-textureBarrier" = fn () void;
+        pub const @"-updateFence:afterStages:" = fn (objc.Object, RenderStages) void;
+        pub const @"-waitForFence:beforeStages:" = fn (objc.Object, RenderStages) void;
+        pub const @"-setTessellationFactorBuffer:offset:instanceStride:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setTessellationFactorScale:" = fn (f32) void;
+        pub const @"-drawPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:instanceCount:baseInstance:" = fn (objc.UInteger, objc.UInteger, objc.UInteger, ?Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawPatches:patchIndexBuffer:patchIndexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger) void;
+        pub const @"-drawIndexedPatches:patchStart:patchCount:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:instanceCount:baseInstance:" = fn (objc.UInteger, objc.UInteger, objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-drawIndexedPatches:patchIndexBuffer:patchIndexBufferOffset:controlPointIndexBuffer:controlPointIndexBufferOffset:indirectBuffer:indirectBufferOffset:" = fn (objc.UInteger, ?Buffer, objc.UInteger, Buffer, objc.UInteger, Buffer, objc.UInteger) void;
+        pub const @"-setTileBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setTileBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setTileBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setTileBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setTileTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setTileTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setTileSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setTileSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setTileSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setTileSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-setTileVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setTileVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setTileIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setTileIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setTileAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-dispatchThreadsPerTile:" = fn (Size) void;
+        pub const @"-setThreadgroupMemoryLength:offset:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-useResource:usage:" = fn (Resource, ResourceUsage) void;
+        pub const @"-useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
+        pub const @"-useResource:usage:stages:" = fn (Resource, ResourceUsage, RenderStages) void;
+        pub const @"-useResources:count:usage:stages:" = fn ([*]const Resource, objc.UInteger, ResourceUsage, RenderStages) void;
+        pub const @"-useHeap:" = fn (objc.Object) void;
+        pub const @"-useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
+        pub const @"-useHeap:stages:" = fn (objc.Object, RenderStages) void;
+        pub const @"-useHeaps:count:stages:" = fn ([*]const objc.Object, objc.UInteger, RenderStages) void;
+        pub const @"-executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
+        pub const @"-memoryBarrierWithScope:afterStages:beforeStages:" = fn (BarrierScope, RenderStages, RenderStages) void;
+        pub const @"-memoryBarrierWithResources:count:afterStages:beforeStages:" = fn ([*]const Resource, objc.UInteger, RenderStages, RenderStages) void;
+        pub const @"-sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
+        pub const @"-setColorAttachmentMap:" = fn (?objc.Object) void;
+        pub const @"-tileWidth" = fn () objc.UInteger;
+        pub const @"-tileHeight" = fn () objc.UInteger;
     };
 };
 
@@ -8965,45 +8965,45 @@ pub const ComputeCommandEncoder = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"setComputePipelineState:" = fn (ComputePipelineState) void;
-        pub const @"setBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"setBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"setBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setBuffer:offset:attributeStride:atIndex:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
-        pub const @"setBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"setVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
-        pub const @"setAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
-        pub const @"setTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
-        pub const @"setTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
-        pub const @"setSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
-        pub const @"setSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
-        pub const @"setSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
-        pub const @"setSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
-        pub const @"setThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setImageblockWidth:height:" = fn (objc.UInteger, objc.UInteger) void;
-        pub const @"setStageInRegion:" = fn (Region) void;
-        pub const @"setStageInRegionWithIndirectBuffer:indirectBufferOffset:" = fn (Buffer, objc.UInteger) void;
-        pub const @"dispatchThreadgroups:threadsPerThreadgroup:" = fn (Size, Size) void;
-        pub const @"dispatchThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerThreadgroup:" = fn (Buffer, objc.UInteger, Size) void;
-        pub const @"dispatchThreads:threadsPerThreadgroup:" = fn (Size, Size) void;
-        pub const @"updateFence:" = fn (objc.Object) void;
-        pub const @"waitForFence:" = fn (objc.Object) void;
-        pub const @"useResource:usage:" = fn (Resource, ResourceUsage) void;
-        pub const @"useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
-        pub const @"useHeap:" = fn (objc.Object) void;
-        pub const @"useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
-        pub const @"executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
-        pub const @"executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
-        pub const @"memoryBarrierWithScope:" = fn (BarrierScope) void;
-        pub const @"memoryBarrierWithResources:count:" = fn ([*]const Resource, objc.UInteger) void;
-        pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
-        pub const dispatchType = fn () DispatchType;
+        pub const @"-setComputePipelineState:" = fn (ComputePipelineState) void;
+        pub const @"-setBytes:length:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-setBuffer:offset:atIndex:" = fn (?Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-setBufferOffset:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setBuffers:offsets:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setBuffer:offset:attributeStride:atIndex:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setBuffers:offsets:attributeStrides:withRange:" = fn ([*]const objc.Nullable(Buffer), ?[*]const objc.UInteger, ?[*]const objc.UInteger, objc.Range) void;
+        pub const @"-setBufferOffset:attributeStride:atIndex:" = fn (objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setBytes:length:attributeStride:atIndex:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-setVisibleFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setVisibleFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setIntersectionFunctionTable:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setIntersectionFunctionTables:withBufferRange:" = fn ([*]const objc.Nullable(objc.Object), objc.Range) void;
+        pub const @"-setAccelerationStructure:atBufferIndex:" = fn (?objc.Object, objc.UInteger) void;
+        pub const @"-setTexture:atIndex:" = fn (?Texture, objc.UInteger) void;
+        pub const @"-setTextures:withRange:" = fn ([*]const objc.Nullable(Texture), objc.Range) void;
+        pub const @"-setSamplerState:atIndex:" = fn (?SamplerState, objc.UInteger) void;
+        pub const @"-setSamplerStates:withRange:" = fn ([*]const objc.Nullable(SamplerState), objc.Range) void;
+        pub const @"-setSamplerState:lodMinClamp:lodMaxClamp:atIndex:" = fn (?SamplerState, f32, f32, objc.UInteger) void;
+        pub const @"-setSamplerStates:lodMinClamps:lodMaxClamps:withRange:" = fn ([*]const objc.Nullable(SamplerState), ?[*]const f32, ?[*]const f32, objc.Range) void;
+        pub const @"-setThreadgroupMemoryLength:atIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setImageblockWidth:height:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-setStageInRegion:" = fn (Region) void;
+        pub const @"-setStageInRegionWithIndirectBuffer:indirectBufferOffset:" = fn (Buffer, objc.UInteger) void;
+        pub const @"-dispatchThreadgroups:threadsPerThreadgroup:" = fn (Size, Size) void;
+        pub const @"-dispatchThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerThreadgroup:" = fn (Buffer, objc.UInteger, Size) void;
+        pub const @"-dispatchThreads:threadsPerThreadgroup:" = fn (Size, Size) void;
+        pub const @"-updateFence:" = fn (objc.Object) void;
+        pub const @"-waitForFence:" = fn (objc.Object) void;
+        pub const @"-useResource:usage:" = fn (Resource, ResourceUsage) void;
+        pub const @"-useResources:count:usage:" = fn ([*]const Resource, objc.UInteger, ResourceUsage) void;
+        pub const @"-useHeap:" = fn (objc.Object) void;
+        pub const @"-useHeaps:count:" = fn ([*]const objc.Object, objc.UInteger) void;
+        pub const @"-executeCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:" = fn (objc.Object, Buffer, objc.UInteger) void;
+        pub const @"-memoryBarrierWithScope:" = fn (BarrierScope) void;
+        pub const @"-memoryBarrierWithResources:count:" = fn ([*]const Resource, objc.UInteger) void;
+        pub const @"-sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
+        pub const @"-dispatchType" = fn () DispatchType;
     };
 };
 
@@ -9216,33 +9216,33 @@ pub const BlitCommandEncoder = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"synchronizeResource:" = fn (Resource) void;
-        pub const @"synchronizeTexture:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
-        pub const @"copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Texture, objc.UInteger, objc.UInteger, Origin) void;
-        pub const @"copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger, Size, Texture, objc.UInteger, objc.UInteger, Origin) void;
-        pub const @"copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:options:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger, Size, Texture, objc.UInteger, objc.UInteger, Origin, BlitOption) void;
-        pub const @"copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:options:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Buffer, objc.UInteger, objc.UInteger, objc.UInteger, BlitOption) void;
-        pub const @"generateMipmapsForTexture:" = fn (Texture) void;
-        pub const @"fillBuffer:range:value:" = fn (Buffer, objc.Range, u8) void;
-        pub const @"copyFromTexture:sourceSlice:sourceLevel:toTexture:destinationSlice:destinationLevel:sliceCount:levelCount:" = fn (Texture, objc.UInteger, objc.UInteger, Texture, objc.UInteger, objc.UInteger, objc.UInteger, objc.UInteger) void;
-        pub const @"copyFromTexture:toTexture:" = fn (Texture, Texture) void;
-        pub const @"copyFromBuffer:sourceOffset:toBuffer:destinationOffset:size:" = fn (Buffer, objc.UInteger, Buffer, objc.UInteger, objc.UInteger) void;
-        pub const @"updateFence:" = fn (objc.Object) void;
-        pub const @"waitForFence:" = fn (objc.Object) void;
-        pub const @"getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:" = fn (Texture, Region, objc.UInteger, objc.UInteger, bool, Buffer, objc.UInteger) void;
-        pub const @"resetTextureAccessCounters:region:mipLevel:slice:" = fn (Texture, Region, objc.UInteger, objc.UInteger) void;
-        pub const @"optimizeContentsForGPUAccess:" = fn (Texture) void;
-        pub const @"optimizeContentsForGPUAccess:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
-        pub const @"optimizeContentsForCPUAccess:" = fn (Texture) void;
-        pub const @"optimizeContentsForCPUAccess:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
-        pub const @"resetCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
-        pub const @"copyIndirectCommandBuffer:sourceRange:destination:destinationIndex:" = fn (objc.Object, objc.Range, objc.Object, objc.UInteger) void;
-        pub const @"optimizeIndirectCommandBuffer:withRange:" = fn (objc.Object, objc.Range) void;
-        pub const @"sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
-        pub const @"resolveCounters:inRange:destinationBuffer:destinationOffset:" = fn (objc.Object, objc.Range, Buffer, objc.UInteger) void;
-        pub const @"copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:" = fn (objc.Object, objc.Object, objc.Object, objc.Object, objc.Object, objc.Object) void;
-        pub const @"copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:" = fn (objc.Object, objc.Object, objc.Object, TensorPlaneType, objc.Object, objc.Object, objc.Object, TensorPlaneType) void;
+        pub const @"-synchronizeResource:" = fn (Resource) void;
+        pub const @"-synchronizeTexture:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
+        pub const @"-copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Texture, objc.UInteger, objc.UInteger, Origin) void;
+        pub const @"-copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger, Size, Texture, objc.UInteger, objc.UInteger, Origin) void;
+        pub const @"-copyFromBuffer:sourceOffset:sourceBytesPerRow:sourceBytesPerImage:sourceSize:toTexture:destinationSlice:destinationLevel:destinationOrigin:options:" = fn (Buffer, objc.UInteger, objc.UInteger, objc.UInteger, Size, Texture, objc.UInteger, objc.UInteger, Origin, BlitOption) void;
+        pub const @"-copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Buffer, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-copyFromTexture:sourceSlice:sourceLevel:sourceOrigin:sourceSize:toBuffer:destinationOffset:destinationBytesPerRow:destinationBytesPerImage:options:" = fn (Texture, objc.UInteger, objc.UInteger, Origin, Size, Buffer, objc.UInteger, objc.UInteger, objc.UInteger, BlitOption) void;
+        pub const @"-generateMipmapsForTexture:" = fn (Texture) void;
+        pub const @"-fillBuffer:range:value:" = fn (Buffer, objc.Range, u8) void;
+        pub const @"-copyFromTexture:sourceSlice:sourceLevel:toTexture:destinationSlice:destinationLevel:sliceCount:levelCount:" = fn (Texture, objc.UInteger, objc.UInteger, Texture, objc.UInteger, objc.UInteger, objc.UInteger, objc.UInteger) void;
+        pub const @"-copyFromTexture:toTexture:" = fn (Texture, Texture) void;
+        pub const @"-copyFromBuffer:sourceOffset:toBuffer:destinationOffset:size:" = fn (Buffer, objc.UInteger, Buffer, objc.UInteger, objc.UInteger) void;
+        pub const @"-updateFence:" = fn (objc.Object) void;
+        pub const @"-waitForFence:" = fn (objc.Object) void;
+        pub const @"-getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:" = fn (Texture, Region, objc.UInteger, objc.UInteger, bool, Buffer, objc.UInteger) void;
+        pub const @"-resetTextureAccessCounters:region:mipLevel:slice:" = fn (Texture, Region, objc.UInteger, objc.UInteger) void;
+        pub const @"-optimizeContentsForGPUAccess:" = fn (Texture) void;
+        pub const @"-optimizeContentsForGPUAccess:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
+        pub const @"-optimizeContentsForCPUAccess:" = fn (Texture) void;
+        pub const @"-optimizeContentsForCPUAccess:slice:level:" = fn (Texture, objc.UInteger, objc.UInteger) void;
+        pub const @"-resetCommandsInBuffer:withRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-copyIndirectCommandBuffer:sourceRange:destination:destinationIndex:" = fn (objc.Object, objc.Range, objc.Object, objc.UInteger) void;
+        pub const @"-optimizeIndirectCommandBuffer:withRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-sampleCountersInBuffer:atSampleIndex:withBarrier:" = fn (objc.Object, objc.UInteger, bool) void;
+        pub const @"-resolveCounters:inRange:destinationBuffer:destinationOffset:" = fn (objc.Object, objc.Range, Buffer, objc.UInteger) void;
+        pub const @"-copyFromTensor:sourceOrigin:sourceDimensions:toTensor:destinationOrigin:destinationDimensions:" = fn (objc.Object, objc.Object, objc.Object, objc.Object, objc.Object, objc.Object) void;
+        pub const @"-copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:" = fn (objc.Object, objc.Object, objc.Object, TensorPlaneType, objc.Object, objc.Object, objc.Object, TensorPlaneType) void;
     };
 };
 
@@ -9350,20 +9350,20 @@ pub const Resource = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"setPurgeableState:" = fn (PurgeableState) PurgeableState;
-        pub const makeAliasable = fn () void;
-        pub const isAliasable = fn () bool;
-        pub const @"setOwnerWithIdentity:" = fn (c_uint) c_int;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const device = fn () Device;
-        pub const cpuCacheMode = fn () CPUCacheMode;
-        pub const storageMode = fn () StorageMode;
-        pub const hazardTrackingMode = fn () HazardTrackingMode;
-        pub const resourceOptions = fn () ResourceOptions;
-        pub const heap = fn () ?objc.Object;
-        pub const heapOffset = fn () objc.UInteger;
-        pub const allocatedSize = fn () objc.UInteger;
+        pub const @"-setPurgeableState:" = fn (PurgeableState) PurgeableState;
+        pub const @"-makeAliasable" = fn () void;
+        pub const @"-isAliasable" = fn () bool;
+        pub const @"-setOwnerWithIdentity:" = fn (c_uint) c_int;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-device" = fn () Device;
+        pub const @"-cpuCacheMode" = fn () CPUCacheMode;
+        pub const @"-storageMode" = fn () StorageMode;
+        pub const @"-hazardTrackingMode" = fn () HazardTrackingMode;
+        pub const @"-resourceOptions" = fn () ResourceOptions;
+        pub const @"-heap" = fn () ?objc.Object;
+        pub const @"-heapOffset" = fn () objc.UInteger;
+        pub const @"-allocatedSize" = fn () objc.UInteger;
     };
 };
 
@@ -9526,17 +9526,17 @@ pub const Buffer = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const contents = fn () ?*anyopaque;
-        pub const @"didModifyRange:" = fn (objc.Range) void;
-        pub const @"newTextureWithDescriptor:offset:bytesPerRow:" = fn (TextureDescriptor, objc.UInteger, objc.UInteger) ?Texture;
-        pub const @"newTensorWithDescriptor:offset:error:" = fn (objc.Object, objc.UInteger, ?*objc.abi.Id) ?objc.Object;
-        pub const @"addDebugMarker:range:" = fn (foundation.String, objc.Range) void;
-        pub const removeAllDebugMarkers = fn () void;
-        pub const @"newRemoteBufferViewForDevice:" = fn (Device) ?Buffer;
-        pub const length = fn () objc.UInteger;
-        pub const remoteStorageBuffer = fn () ?Buffer;
-        pub const gpuAddress = fn () c_ulonglong;
-        pub const sparseBufferTier = fn () BufferSparseTier;
+        pub const @"-contents" = fn () ?*anyopaque;
+        pub const @"-didModifyRange:" = fn (objc.Range) void;
+        pub const @"-newTextureWithDescriptor:offset:bytesPerRow:" = fn (TextureDescriptor, objc.UInteger, objc.UInteger) ?Texture;
+        pub const @"-newTensorWithDescriptor:offset:error:" = fn (objc.Object, objc.UInteger, ?*objc.abi.Id) ?objc.Object;
+        pub const @"-addDebugMarker:range:" = fn (foundation.String, objc.Range) void;
+        pub const @"-removeAllDebugMarkers" = fn () void;
+        pub const @"-newRemoteBufferViewForDevice:" = fn (Device) ?Buffer;
+        pub const @"-length" = fn () objc.UInteger;
+        pub const @"-remoteStorageBuffer" = fn () ?Buffer;
+        pub const @"-gpuAddress" = fn () c_ulonglong;
+        pub const @"-sparseBufferTier" = fn () BufferSparseTier;
     };
 };
 
@@ -9844,46 +9844,46 @@ pub const Texture = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:" = fn (?*anyopaque, objc.UInteger, objc.UInteger, Region, objc.UInteger, objc.UInteger) void;
-        pub const @"replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:" = fn (Region, objc.UInteger, objc.UInteger, ?*const anyopaque, objc.UInteger, objc.UInteger) void;
-        pub const @"getBytes:bytesPerRow:fromRegion:mipmapLevel:" = fn (?*anyopaque, objc.UInteger, Region, objc.UInteger) void;
-        pub const @"replaceRegion:mipmapLevel:withBytes:bytesPerRow:" = fn (Region, objc.UInteger, ?*const anyopaque, objc.UInteger) void;
-        pub const @"newTextureViewWithPixelFormat:" = fn (PixelFormat) ?Texture;
-        pub const @"newTextureViewWithPixelFormat:textureType:levels:slices:" = fn (PixelFormat, TextureType, objc.Range, objc.Range) ?Texture;
-        pub const newSharedTextureHandle = fn () ?objc.Object;
-        pub const @"newTextureViewWithDescriptor:" = fn (objc.Object) ?Texture;
-        pub const @"newRemoteTextureViewForDevice:" = fn (Device) ?Texture;
-        pub const @"newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:" = fn (PixelFormat, TextureType, objc.Range, objc.Range, TextureSwizzleChannels) ?Texture;
-        pub const rootResource = fn () ?Resource;
-        pub const parentTexture = fn () ?Texture;
-        pub const parentRelativeLevel = fn () objc.UInteger;
-        pub const parentRelativeSlice = fn () objc.UInteger;
-        pub const buffer = fn () ?Buffer;
-        pub const bufferOffset = fn () objc.UInteger;
-        pub const bufferBytesPerRow = fn () objc.UInteger;
-        pub const iosurface = fn () ?io_surface.Surface;
-        pub const iosurfacePlane = fn () objc.UInteger;
-        pub const textureType = fn () TextureType;
-        pub const pixelFormat = fn () PixelFormat;
-        pub const width = fn () objc.UInteger;
-        pub const height = fn () objc.UInteger;
-        pub const depth = fn () objc.UInteger;
-        pub const mipmapLevelCount = fn () objc.UInteger;
-        pub const sampleCount = fn () objc.UInteger;
-        pub const arrayLength = fn () objc.UInteger;
-        pub const usage = fn () TextureUsage;
-        pub const isShareable = fn () bool;
-        pub const isFramebufferOnly = fn () bool;
-        pub const firstMipmapInTail = fn () objc.UInteger;
-        pub const tailSizeInBytes = fn () objc.UInteger;
-        pub const isSparse = fn () bool;
-        pub const allowGPUOptimizedContents = fn () bool;
-        pub const compressionType = fn () TextureCompressionType;
-        pub const gpuResourceID = fn () ResourceID;
-        pub const remoteStorageTexture = fn () ?Texture;
-        pub const swizzle = fn () TextureSwizzleChannels;
-        pub const sparseTextureTier = fn () TextureSparseTier;
-        pub const minLOD = fn () f32;
+        pub const @"-getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:" = fn (?*anyopaque, objc.UInteger, objc.UInteger, Region, objc.UInteger, objc.UInteger) void;
+        pub const @"-replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:" = fn (Region, objc.UInteger, objc.UInteger, ?*const anyopaque, objc.UInteger, objc.UInteger) void;
+        pub const @"-getBytes:bytesPerRow:fromRegion:mipmapLevel:" = fn (?*anyopaque, objc.UInteger, Region, objc.UInteger) void;
+        pub const @"-replaceRegion:mipmapLevel:withBytes:bytesPerRow:" = fn (Region, objc.UInteger, ?*const anyopaque, objc.UInteger) void;
+        pub const @"-newTextureViewWithPixelFormat:" = fn (PixelFormat) ?Texture;
+        pub const @"-newTextureViewWithPixelFormat:textureType:levels:slices:" = fn (PixelFormat, TextureType, objc.Range, objc.Range) ?Texture;
+        pub const @"-newSharedTextureHandle" = fn () ?objc.Object;
+        pub const @"-newTextureViewWithDescriptor:" = fn (objc.Object) ?Texture;
+        pub const @"-newRemoteTextureViewForDevice:" = fn (Device) ?Texture;
+        pub const @"-newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:" = fn (PixelFormat, TextureType, objc.Range, objc.Range, TextureSwizzleChannels) ?Texture;
+        pub const @"-rootResource" = fn () ?Resource;
+        pub const @"-parentTexture" = fn () ?Texture;
+        pub const @"-parentRelativeLevel" = fn () objc.UInteger;
+        pub const @"-parentRelativeSlice" = fn () objc.UInteger;
+        pub const @"-buffer" = fn () ?Buffer;
+        pub const @"-bufferOffset" = fn () objc.UInteger;
+        pub const @"-bufferBytesPerRow" = fn () objc.UInteger;
+        pub const @"-iosurface" = fn () ?io_surface.Surface;
+        pub const @"-iosurfacePlane" = fn () objc.UInteger;
+        pub const @"-textureType" = fn () TextureType;
+        pub const @"-pixelFormat" = fn () PixelFormat;
+        pub const @"-width" = fn () objc.UInteger;
+        pub const @"-height" = fn () objc.UInteger;
+        pub const @"-depth" = fn () objc.UInteger;
+        pub const @"-mipmapLevelCount" = fn () objc.UInteger;
+        pub const @"-sampleCount" = fn () objc.UInteger;
+        pub const @"-arrayLength" = fn () objc.UInteger;
+        pub const @"-usage" = fn () TextureUsage;
+        pub const @"-isShareable" = fn () bool;
+        pub const @"-isFramebufferOnly" = fn () bool;
+        pub const @"-firstMipmapInTail" = fn () objc.UInteger;
+        pub const @"-tailSizeInBytes" = fn () objc.UInteger;
+        pub const @"-isSparse" = fn () bool;
+        pub const @"-allowGPUOptimizedContents" = fn () bool;
+        pub const @"-compressionType" = fn () TextureCompressionType;
+        pub const @"-gpuResourceID" = fn () ResourceID;
+        pub const @"-remoteStorageTexture" = fn () ?Texture;
+        pub const @"-swizzle" = fn () TextureSwizzleChannels;
+        pub const @"-sparseTextureTier" = fn () TextureSparseTier;
+        pub const @"-minLOD" = fn () f32;
     };
 };
 
@@ -9991,20 +9991,20 @@ pub const Library = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"newFunctionWithName:" = fn (foundation.String) ?Function;
-        pub const @"newFunctionWithName:constantValues:error:" = fn (foundation.String, objc.Object, ?*objc.abi.Id) ?Function;
-        pub const @"newFunctionWithName:constantValues:completionHandler:" = fn (foundation.String, objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
-        pub const @"reflectionForFunctionWithName:" = fn (foundation.String) ?objc.Object;
-        pub const @"newFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
-        pub const @"newFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
-        pub const @"newIntersectionFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
-        pub const @"newIntersectionFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const device = fn () Device;
-        pub const functionNames = fn () foundation.Array(foundation.String);
-        pub const @"type" = fn () LibraryType;
-        pub const installName = fn () ?foundation.String;
+        pub const @"-newFunctionWithName:" = fn (foundation.String) ?Function;
+        pub const @"-newFunctionWithName:constantValues:error:" = fn (foundation.String, objc.Object, ?*objc.abi.Id) ?Function;
+        pub const @"-newFunctionWithName:constantValues:completionHandler:" = fn (foundation.String, objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
+        pub const @"-reflectionForFunctionWithName:" = fn (foundation.String) ?objc.Object;
+        pub const @"-newFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
+        pub const @"-newFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
+        pub const @"-newIntersectionFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
+        pub const @"-newIntersectionFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-device" = fn () Device;
+        pub const @"-functionNames" = fn () foundation.Array(foundation.String);
+        pub const @"-type" = fn () LibraryType;
+        pub const @"-installName" = fn () ?foundation.String;
     };
 };
 
@@ -10107,19 +10107,19 @@ pub const Function = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"newArgumentEncoderWithBufferIndex:" = fn (objc.UInteger) objc.Object;
-        pub const @"newArgumentEncoderWithBufferIndex:reflection:" = fn (objc.UInteger, ?objc.Object) objc.Object;
-        pub const label = fn () ?foundation.String;
-        pub const @"setLabel:" = fn (?foundation.String) void;
-        pub const device = fn () Device;
-        pub const functionType = fn () FunctionType;
-        pub const patchType = fn () PatchType;
-        pub const patchControlPointCount = fn () objc.Integer;
-        pub const vertexAttributes = fn () ?foundation.Array(objc.Object);
-        pub const stageInputAttributes = fn () ?foundation.Array(objc.Object);
-        pub const name = fn () foundation.String;
-        pub const functionConstantsDictionary = fn () foundation.Dictionary(foundation.String, objc.Object);
-        pub const options = fn () FunctionOptions;
+        pub const @"-newArgumentEncoderWithBufferIndex:" = fn (objc.UInteger) objc.Object;
+        pub const @"-newArgumentEncoderWithBufferIndex:reflection:" = fn (objc.UInteger, ?objc.Object) objc.Object;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-setLabel:" = fn (?foundation.String) void;
+        pub const @"-device" = fn () Device;
+        pub const @"-functionType" = fn () FunctionType;
+        pub const @"-patchType" = fn () PatchType;
+        pub const @"-patchControlPointCount" = fn () objc.Integer;
+        pub const @"-vertexAttributes" = fn () ?foundation.Array(objc.Object);
+        pub const @"-stageInputAttributes" = fn () ?foundation.Array(objc.Object);
+        pub const @"-name" = fn () foundation.String;
+        pub const @"-functionConstantsDictionary" = fn () foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-options" = fn () FunctionOptions;
     };
 };
 
@@ -10287,32 +10287,32 @@ pub const RenderPipelineState = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"functionHandleWithName:stage:" = fn (foundation.String, RenderStages) ?objc.Object;
-        pub const @"functionHandleWithBinaryFunction:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
-        pub const @"newRenderPipelineStateWithBinaryFunctions:error:" = fn (objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const newRenderPipelineDescriptorForSpecialization = fn () objc.Object;
-        pub const @"imageblockMemoryLengthForDimensions:" = fn (Size) objc.UInteger;
-        pub const @"functionHandleWithFunction:stage:" = fn (Function, RenderStages) ?objc.Object;
-        pub const @"newVisibleFunctionTableWithDescriptor:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
-        pub const @"newIntersectionFunctionTableWithDescriptor:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
-        pub const @"newRenderPipelineStateWithAdditionalBinaryFunctions:error:" = fn (objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
-        pub const label = fn () ?foundation.String;
-        pub const device = fn () Device;
-        pub const reflection = fn () ?objc.Object;
-        pub const maxTotalThreadsPerThreadgroup = fn () objc.UInteger;
-        pub const threadgroupSizeMatchesTileSize = fn () bool;
-        pub const imageblockSampleLength = fn () objc.UInteger;
-        pub const supportIndirectCommandBuffers = fn () bool;
-        pub const maxTotalThreadsPerObjectThreadgroup = fn () objc.UInteger;
-        pub const maxTotalThreadsPerMeshThreadgroup = fn () objc.UInteger;
-        pub const objectThreadExecutionWidth = fn () objc.UInteger;
-        pub const meshThreadExecutionWidth = fn () objc.UInteger;
-        pub const maxTotalThreadgroupsPerMeshGrid = fn () objc.UInteger;
-        pub const gpuResourceID = fn () ResourceID;
-        pub const shaderValidation = fn () ShaderValidation;
-        pub const requiredThreadsPerTileThreadgroup = fn () Size;
-        pub const requiredThreadsPerObjectThreadgroup = fn () Size;
-        pub const requiredThreadsPerMeshThreadgroup = fn () Size;
+        pub const @"-functionHandleWithName:stage:" = fn (foundation.String, RenderStages) ?objc.Object;
+        pub const @"-functionHandleWithBinaryFunction:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
+        pub const @"-newRenderPipelineStateWithBinaryFunctions:error:" = fn (objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-newRenderPipelineDescriptorForSpecialization" = fn () objc.Object;
+        pub const @"-imageblockMemoryLengthForDimensions:" = fn (Size) objc.UInteger;
+        pub const @"-functionHandleWithFunction:stage:" = fn (Function, RenderStages) ?objc.Object;
+        pub const @"-newVisibleFunctionTableWithDescriptor:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
+        pub const @"-newIntersectionFunctionTableWithDescriptor:stage:" = fn (objc.Object, RenderStages) ?objc.Object;
+        pub const @"-newRenderPipelineStateWithAdditionalBinaryFunctions:error:" = fn (objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-device" = fn () Device;
+        pub const @"-reflection" = fn () ?objc.Object;
+        pub const @"-maxTotalThreadsPerThreadgroup" = fn () objc.UInteger;
+        pub const @"-threadgroupSizeMatchesTileSize" = fn () bool;
+        pub const @"-imageblockSampleLength" = fn () objc.UInteger;
+        pub const @"-supportIndirectCommandBuffers" = fn () bool;
+        pub const @"-maxTotalThreadsPerObjectThreadgroup" = fn () objc.UInteger;
+        pub const @"-maxTotalThreadsPerMeshThreadgroup" = fn () objc.UInteger;
+        pub const @"-objectThreadExecutionWidth" = fn () objc.UInteger;
+        pub const @"-meshThreadExecutionWidth" = fn () objc.UInteger;
+        pub const @"-maxTotalThreadgroupsPerMeshGrid" = fn () objc.UInteger;
+        pub const @"-gpuResourceID" = fn () ResourceID;
+        pub const @"-shaderValidation" = fn () ShaderValidation;
+        pub const @"-requiredThreadsPerTileThreadgroup" = fn () Size;
+        pub const @"-requiredThreadsPerObjectThreadgroup" = fn () Size;
+        pub const @"-requiredThreadsPerMeshThreadgroup" = fn () Size;
     };
 };
 
@@ -10450,26 +10450,26 @@ pub const ComputePipelineState = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"functionHandleWithName:" = fn (foundation.String) ?objc.Object;
-        pub const @"functionHandleWithBinaryFunction:" = fn (objc.Object) ?objc.Object;
-        pub const @"newComputePipelineStateWithBinaryFunctions:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?ComputePipelineState;
-        pub const @"imageblockMemoryLengthForDimensions:" = fn (Size) objc.UInteger;
-        pub const @"functionHandleWithFunction:" = fn (Function) ?objc.Object;
-        pub const @"newComputePipelineStateWithAdditionalBinaryFunctions:error:" = fn (foundation.Array(Function), ?*objc.abi.Id) ?ComputePipelineState;
-        pub const @"newVisibleFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const @"newIntersectionFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
-        pub const @"recommendedPersistentThreadgroupsPerGridForThreadsPerThreadgroup:" = fn (Size) objc.UInteger;
-        pub const label = fn () ?foundation.String;
-        pub const reflection = fn () ?objc.Object;
-        pub const device = fn () Device;
-        pub const maxTotalThreadsPerThreadgroup = fn () objc.UInteger;
-        pub const threadExecutionWidth = fn () objc.UInteger;
-        pub const staticThreadgroupMemoryLength = fn () objc.UInteger;
-        pub const supportIndirectCommandBuffers = fn () bool;
-        pub const gpuResourceID = fn () ResourceID;
-        pub const shaderValidation = fn () ShaderValidation;
-        pub const requiredThreadsPerThreadgroup = fn () Size;
-        pub const forwardProgressUsage = fn () ForwardProgressUsage;
+        pub const @"-functionHandleWithName:" = fn (foundation.String) ?objc.Object;
+        pub const @"-functionHandleWithBinaryFunction:" = fn (objc.Object) ?objc.Object;
+        pub const @"-newComputePipelineStateWithBinaryFunctions:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"-imageblockMemoryLengthForDimensions:" = fn (Size) objc.UInteger;
+        pub const @"-functionHandleWithFunction:" = fn (Function) ?objc.Object;
+        pub const @"-newComputePipelineStateWithAdditionalBinaryFunctions:error:" = fn (foundation.Array(Function), ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"-newVisibleFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-newIntersectionFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
+        pub const @"-recommendedPersistentThreadgroupsPerGridForThreadsPerThreadgroup:" = fn (Size) objc.UInteger;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-reflection" = fn () ?objc.Object;
+        pub const @"-device" = fn () Device;
+        pub const @"-maxTotalThreadsPerThreadgroup" = fn () objc.UInteger;
+        pub const @"-threadExecutionWidth" = fn () objc.UInteger;
+        pub const @"-staticThreadgroupMemoryLength" = fn () objc.UInteger;
+        pub const @"-supportIndirectCommandBuffers" = fn () bool;
+        pub const @"-gpuResourceID" = fn () ResourceID;
+        pub const @"-shaderValidation" = fn () ShaderValidation;
+        pub const @"-requiredThreadsPerThreadgroup" = fn () Size;
+        pub const @"-forwardProgressUsage" = fn () ForwardProgressUsage;
     };
 };
 
@@ -10522,9 +10522,9 @@ pub const DepthStencilState = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const label = fn () ?foundation.String;
-        pub const device = fn () Device;
-        pub const gpuResourceID = fn () ResourceID;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-device" = fn () Device;
+        pub const @"-gpuResourceID" = fn () ResourceID;
     };
 };
 
@@ -10577,9 +10577,9 @@ pub const SamplerState = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const label = fn () ?foundation.String;
-        pub const device = fn () Device;
-        pub const gpuResourceID = fn () ResourceID;
+        pub const @"-label" = fn () ?foundation.String;
+        pub const @"-device" = fn () Device;
+        pub const @"-gpuResourceID" = fn () ResourceID;
     };
 };
 
@@ -10647,12 +10647,12 @@ pub const Drawable = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const present = fn () void;
-        pub const @"presentAtTime:" = fn (f64) void;
-        pub const @"presentAfterMinimumDuration:" = fn (f64) void;
-        pub const @"addPresentedHandler:" = fn (?objc.BlockRef(fn (Drawable) void)) void;
-        pub const presentedTime = fn () f64;
-        pub const drawableID = fn () objc.UInteger;
+        pub const @"-present" = fn () void;
+        pub const @"-presentAtTime:" = fn (f64) void;
+        pub const @"-presentAfterMinimumDuration:" = fn (f64) void;
+        pub const @"-addPresentedHandler:" = fn (?objc.BlockRef(fn (Drawable) void)) void;
+        pub const @"-presentedTime" = fn () f64;
+        pub const @"-drawableID" = fn () objc.UInteger;
     };
 };
 
@@ -10730,8 +10730,8 @@ pub const MetalDrawable = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const texture = fn () Texture;
-        pub const layer = fn () MetalLayer;
+        pub const @"-texture" = fn () Texture;
+        pub const @"-layer" = fn () MetalLayer;
     };
 };
 
@@ -10893,6 +10893,12 @@ pub fn deviceWasRemovedNotification() foundation.String {
     return objc.abi.fromAbi(foundation.String, symbol.*);
 }
 
+/// `MTLCopyAllDevicesWithObserver`. What it returns is yours to release.
+pub fn copyAllDevicesWithObserver(observer: [*]objc.Nullable(objc.Object), handler: ?objc.BlockRef(fn (Device, foundation.String) void)) foundation.Array(Device) {
+    const function = @extern(?*const fn (objc.abi.Abi([*]objc.Nullable(objc.Object)), objc.abi.Abi(?objc.BlockRef(fn (Device, foundation.String) void))) callconv(.c) objc.abi.Abi(foundation.Array(Device)), .{ .name = "MTLCopyAllDevicesWithObserver", .linkage = .weak }) orelse missing("MTLCopyAllDevicesWithObserver");
+    return objc.abi.fromAbi(foundation.Array(Device), function(objc.abi.toAbi([*]objc.Nullable(objc.Object), observer), objc.abi.toAbi(?objc.BlockRef(fn (Device, foundation.String) void), handler)));
+}
+
 /// `MTLRemoveDeviceObserver`.
 pub fn removeDeviceObserver(observer: objc.Object) void {
     const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(void), .{ .name = "MTLRemoveDeviceObserver", .linkage = .weak }) orelse missing("MTLRemoveDeviceObserver");
@@ -10957,6 +10963,12 @@ pub fn ioErrorDomain() foundation.String {
 pub fn ioCompressionContextDefaultChunkSize() usize {
     const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(usize), .{ .name = "MTLIOCompressionContextDefaultChunkSize", .linkage = .weak }) orelse missing("MTLIOCompressionContextDefaultChunkSize");
     return objc.abi.fromAbi(usize, function());
+}
+
+/// `MTLIOCreateCompressionContext`. What it returns is yours to release.
+pub fn ioCreateCompressionContext(path: [*:0]const u8, @"type": IOCompressionMethod, chunk_size: usize) ?*anyopaque {
+    const function = @extern(?*const fn (objc.abi.Abi([*:0]const u8), objc.abi.Abi(IOCompressionMethod), objc.abi.Abi(usize)) callconv(.c) objc.abi.Abi(?*anyopaque), .{ .name = "MTLIOCreateCompressionContext", .linkage = .weak }) orelse missing("MTLIOCreateCompressionContext");
+    return objc.abi.fromAbi(?*anyopaque, function(objc.abi.toAbi([*:0]const u8, path), objc.abi.toAbi(IOCompressionMethod, @"type"), objc.abi.toAbi(usize, chunk_size)));
 }
 
 /// `MTLIOCompressionContextAppendData`.
@@ -11740,6 +11752,4 @@ pub fn valueFunctionTranslateZ() foundation.String {
 }
 
 // Not generated:
-//   MTLCopyAllDevicesWithObserver()
-//   MTLIOCreateCompressionContext: MTLIOCompressionContext  _Nullable
 //   MTLIOFlushAndDestroyCompressionContext: MTLIOCompressionStatus

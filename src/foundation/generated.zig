@@ -33,6 +33,21 @@ fn missing(comptime name: []const u8) noreturn {
     @panic(name ++ " is not in this version of macOS");
 }
 
+/// `NSOperatingSystemVersion`.
+pub const OperatingSystemVersion = extern struct {
+    major_version: objc.Integer,
+    minor_version: objc.Integer,
+    patch_version: objc.Integer,
+};
+
+/// `NSEdgeInsets`.
+pub const EdgeInsets = extern struct {
+    top: cg.Float,
+    left: cg.Float,
+    bottom: cg.Float,
+    right: cg.Float,
+};
+
 /// `NSComparisonResult`.
 pub const ComparisonResult = enum(objc.Integer) {
     ascending = -1,
@@ -91,6 +106,15020 @@ pub const QualityOfService = enum(objc.Integer) {
     background = 9,
     default = -1,
     _,
+};
+
+/// `NSStringCompareOptions`.
+pub const StringCompareOptions = packed struct(u64) {
+    case_insensitive_search: bool = false,
+    literal_search: bool = false,
+    backwards_search: bool = false,
+    anchored_search: bool = false,
+    _4: u2 = 0,
+    numeric_search: bool = false,
+    diacritic_insensitive_search: bool = false,
+    width_insensitive_search: bool = false,
+    forced_ordering_search: bool = false,
+    regular_expression_search: bool = false,
+    _11: u53 = 0,
+};
+
+/// `NSStringEnumerationOptions`.
+pub const StringEnumerationOptions = packed struct(u64) {
+    by_paragraphs: bool = false,
+    by_composed_character_sequences: bool = false,
+    by_sentences: bool = false,
+    _3: u5 = 0,
+    reverse: bool = false,
+    substring_not_required: bool = false,
+    localized: bool = false,
+    _11: u53 = 0,
+    pub const by_lines: StringEnumerationOptions = @fromBackingInt(0x0);
+    pub const by_words: StringEnumerationOptions = @fromBackingInt(0x3);
+    pub const by_caret_positions: StringEnumerationOptions = @fromBackingInt(0x5);
+    pub const by_deletion_clusters: StringEnumerationOptions = @fromBackingInt(0x6);
+};
+
+/// `NSStringEncodingConversionOptions`.
+pub const StringEncodingConversionOptions = packed struct(u64) {
+    allow_lossy: bool = false,
+    external_representation: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSDataReadingOptions`.
+pub const DataReadingOptions = packed struct(u64) {
+    data_reading_mapped_if_safe: bool = false,
+    data_reading_uncached: bool = false,
+    _2: u1 = 0,
+    data_reading_mapped_always: bool = false,
+    _4: u60 = 0,
+    pub const data_reading_mapped: DataReadingOptions = @fromBackingInt(0x1);
+    pub const mapped_read: DataReadingOptions = @fromBackingInt(0x1);
+    pub const uncached_read: DataReadingOptions = @fromBackingInt(0x2);
+};
+
+/// `NSDataWritingOptions`.
+pub const DataWritingOptions = packed struct(u64) {
+    data_writing_atomic: bool = false,
+    data_writing_without_overwriting: bool = false,
+    _2: u26 = 0,
+    data_writing_file_protection_none: bool = false,
+    data_writing_file_protection_complete: bool = false,
+    data_writing_file_protection_complete_until_first_user_authentication: bool = false,
+    _31: u33 = 0,
+    pub const data_writing_file_protection_complete_unless_open: DataWritingOptions = @fromBackingInt(0x30000000);
+    pub const data_writing_file_protection_complete_when_user_inactive: DataWritingOptions = @fromBackingInt(0x50000000);
+    pub const data_writing_file_protection_mask: DataWritingOptions = @fromBackingInt(0xf0000000);
+    pub const atomic_write: DataWritingOptions = @fromBackingInt(0x1);
+};
+
+/// `NSDataSearchOptions`.
+pub const DataSearchOptions = packed struct(u64) {
+    backwards: bool = false,
+    anchored: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSDataBase64EncodingOptions`.
+pub const DataBase64EncodingOptions = packed struct(u64) {
+    @"64_character_line_length": bool = false,
+    @"76_character_line_length": bool = false,
+    _2: u2 = 0,
+    end_line_with_carriage_return: bool = false,
+    end_line_with_line_feed: bool = false,
+    _6: u58 = 0,
+};
+
+/// `NSDataBase64DecodingOptions`.
+pub const DataBase64DecodingOptions = packed struct(u64) {
+    ignore_unknown_characters: bool = false,
+    _1: u63 = 0,
+};
+
+/// `NSDataCompressionAlgorithm`.
+pub const DataCompressionAlgorithm = enum(objc.Integer) {
+    lzfse = 0,
+    lz4 = 1,
+    lzma = 2,
+    zlib = 3,
+    _,
+};
+
+/// `NSBinarySearchingOptions`.
+pub const BinarySearchingOptions = packed struct(u64) {
+    _0: u8 = 0,
+    first_equal: bool = false,
+    last_equal: bool = false,
+    insertion_index: bool = false,
+    _11: u53 = 0,
+};
+
+/// `NSEnumerationOptions`.
+pub const EnumerationOptions = packed struct(u64) {
+    concurrent: bool = false,
+    reverse: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSSortOptions`.
+pub const SortOptions = packed struct(u64) {
+    concurrent: bool = false,
+    _1: u3 = 0,
+    stable: bool = false,
+    _5: u59 = 0,
+};
+
+/// `NSJSONReadingOptions`.
+pub const JSONReadingOptions = packed struct(u64) {
+    mutable_containers: bool = false,
+    mutable_leaves: bool = false,
+    fragments_allowed: bool = false,
+    json5_allowed: bool = false,
+    top_level_dictionary_assumed: bool = false,
+    _5: u59 = 0,
+    pub const allow_fragments: JSONReadingOptions = @fromBackingInt(0x4);
+};
+
+/// `NSJSONWritingOptions`.
+pub const JSONWritingOptions = packed struct(u64) {
+    pretty_printed: bool = false,
+    sorted_keys: bool = false,
+    fragments_allowed: bool = false,
+    without_escaping_slashes: bool = false,
+    _4: u60 = 0,
+};
+
+/// `NSURLBookmarkCreationOptions`.
+pub const URLBookmarkCreationOptions = packed struct(u64) {
+    _0: u8 = 0,
+    prefer_file_id_resolution: bool = false,
+    minimal_bookmark: bool = false,
+    suitable_for_bookmark_file: bool = false,
+    with_security_scope: bool = false,
+    security_scope_allow_only_read_access: bool = false,
+    _13: u16 = 0,
+    without_implicit_security_scope: bool = false,
+    _30: u34 = 0,
+};
+
+/// `NSURLBookmarkResolutionOptions`.
+pub const URLBookmarkResolutionOptions = packed struct(u64) {
+    _0: u8 = 0,
+    without_ui: bool = false,
+    without_mounting: bool = false,
+    with_security_scope: bool = false,
+    _11: u4 = 0,
+    without_implicit_start_accessing: bool = false,
+    _16: u48 = 0,
+};
+
+/// `NSDirectoryEnumerationOptions`.
+pub const DirectoryEnumerationOptions = packed struct(u64) {
+    skips_subdirectory_descendants: bool = false,
+    skips_package_descendants: bool = false,
+    skips_hidden_files: bool = false,
+    includes_directories_post_order: bool = false,
+    produces_relative_path_ur_ls: bool = false,
+    _5: u59 = 0,
+};
+
+/// `NSFileManagerItemReplacementOptions`.
+pub const FileManagerItemReplacementOptions = packed struct(u64) {
+    using_new_metadata_only: bool = false,
+    without_deleting_backup_item: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSFileManagerUnmountOptions`.
+pub const FileManagerUnmountOptions = packed struct(u64) {
+    all_partitions_and_eject_disk: bool = false,
+    without_ui: bool = false,
+    _2: u62 = 0,
+};
+
+/// `NSVolumeEnumerationOptions`.
+pub const VolumeEnumerationOptions = packed struct(u64) {
+    _0: u1 = 0,
+    skip_hidden_volumes: bool = false,
+    produce_file_reference_ur_ls: bool = false,
+    _3: u61 = 0,
+};
+
+/// `NSURLRelationship`.
+pub const URLRelationship = enum(objc.Integer) {
+    contains = 0,
+    same = 1,
+    other = 2,
+    _,
+};
+
+/// `NSTaskTerminationReason`.
+pub const TaskTerminationReason = enum(objc.Integer) {
+    exit = 1,
+    uncaught_signal = 2,
+    _,
+};
+
+/// `NSProcessInfoThermalState`.
+pub const ProcessInfoThermalState = enum(objc.Integer) {
+    nominal = 0,
+    fair = 1,
+    serious = 2,
+    critical = 3,
+    _,
+};
+
+/// `NSActivityOptions`.
+pub const ActivityOptions = packed struct(u64) {
+    _0: u14 = 0,
+    sudden_termination_disabled: bool = false,
+    automatic_termination_disabled: bool = false,
+    _16: u4 = 0,
+    idle_system_sleep_disabled: bool = false,
+    _21: u19 = 0,
+    idle_display_sleep_disabled: bool = false,
+    _41: u4 = 0,
+    animation_tracking_enabled: bool = false,
+    tracking_enabled: bool = false,
+    _47: u17 = 0,
+    pub const user_initiated: ActivityOptions = @fromBackingInt(0xffffff);
+    pub const user_initiated_allowing_idle_system_sleep: ActivityOptions = @fromBackingInt(0xefffff);
+    pub const background: ActivityOptions = @fromBackingInt(0xff);
+    pub const latency_critical: ActivityOptions = @fromBackingInt(0xff00000000);
+    pub const user_interactive: ActivityOptions = @fromBackingInt(0xff00ffffff);
+};
+
+/// `NSOperationQueuePriority`.
+pub const OperationQueuePriority = enum(objc.Integer) {
+    very_low = -8,
+    low = -4,
+    normal = 0,
+    high = 4,
+    very_high = 8,
+    _,
+};
+
+/// `NSNotificationSuspensionBehavior`.
+pub const NotificationSuspensionBehavior = enum(objc.UInteger) {
+    drop = 1,
+    coalesce = 2,
+    hold = 3,
+    deliver_immediately = 4,
+    _,
+};
+
+/// `NSTimeZoneNameStyle`.
+pub const TimeZoneNameStyle = enum(objc.Integer) {
+    standard = 0,
+    short_standard = 1,
+    daylight_saving = 2,
+    short_daylight_saving = 3,
+    generic = 4,
+    short_generic = 5,
+    _,
+};
+
+/// `NSLocaleLanguageDirection`.
+pub const LocaleLanguageDirection = enum(objc.UInteger) {
+    unknown = 0,
+    left_to_right = 1,
+    right_to_left = 2,
+    top_to_bottom = 3,
+    bottom_to_top = 4,
+    _,
+};
+
+/// `NSURLRequestCachePolicy`.
+pub const URLRequestCachePolicy = enum(objc.UInteger) {
+    use_protocol_cache_policy = 0,
+    reload_ignoring_local_cache_data = 1,
+    reload_ignoring_local_and_remote_cache_data = 4,
+    return_cache_data_else_load = 2,
+    return_cache_data_dont_load = 3,
+    reload_revalidating_cache_data = 5,
+    _,
+    pub const reload_ignoring_cache_data: URLRequestCachePolicy = .reload_ignoring_local_cache_data;
+};
+
+/// `NSURLRequestNetworkServiceType`.
+pub const URLRequestNetworkServiceType = enum(objc.UInteger) {
+    default = 0,
+    vo_ip = 1,
+    video = 2,
+    background = 3,
+    voice = 4,
+    responsive_data = 6,
+    av_streaming = 8,
+    responsive_av = 9,
+    call_signaling = 11,
+    _,
+};
+
+/// `NSURLRequestAttribution`.
+pub const URLRequestAttribution = enum(objc.UInteger) {
+    developer = 0,
+    user = 1,
+    _,
+};
+
+/// `NSURLSessionTaskState`.
+pub const URLSessionTaskState = enum(objc.Integer) {
+    running = 0,
+    suspended = 1,
+    canceling = 2,
+    completed = 3,
+    _,
+};
+
+/// `NSURLSessionDelayedRequestDisposition`.
+pub const URLSessionDelayedRequestDisposition = enum(objc.Integer) {
+    continue_loading = 0,
+    use_new_request = 1,
+    cancel = 2,
+    _,
+};
+
+/// `NSURLSessionAuthChallengeDisposition`.
+pub const URLSessionAuthChallengeDisposition = enum(objc.Integer) {
+    use_credential = 0,
+    perform_default_handling = 1,
+    cancel_authentication_challenge = 2,
+    reject_protection_space = 3,
+    _,
+};
+
+/// `NSURLSessionResponseDisposition`.
+pub const URLSessionResponseDisposition = enum(objc.Integer) {
+    cancel = 0,
+    allow = 1,
+    become_download = 2,
+    become_stream = 3,
+    _,
+};
+
+/// `NSURLSessionMultipathServiceType`.
+pub const URLSessionMultipathServiceType = enum(objc.Integer) {
+    none = 0,
+    handover = 1,
+    interactive = 2,
+    aggregate = 3,
+    _,
+};
+
+/// `NSURLSessionWebSocketMessageType`.
+pub const URLSessionWebSocketMessageType = enum(objc.Integer) {
+    data = 0,
+    string = 1,
+    _,
+};
+
+/// `NSURLSessionWebSocketCloseCode`.
+pub const URLSessionWebSocketCloseCode = enum(objc.Integer) {
+    invalid = 0,
+    normal_closure = 1000,
+    going_away = 1001,
+    protocol_error = 1002,
+    unsupported_data = 1003,
+    no_status_received = 1005,
+    abnormal_closure = 1006,
+    invalid_frame_payload_data = 1007,
+    policy_violation = 1008,
+    message_too_big = 1009,
+    mandatory_extension_missing = 1010,
+    internal_server_error = 1011,
+    tls_handshake_failure = 1015,
+    _,
+};
+
+/// `NSHTTPCookieAcceptPolicy`.
+pub const HTTPCookieAcceptPolicy = enum(objc.UInteger) {
+    always = 0,
+    never = 1,
+    only_from_main_document_domain = 2,
+    _,
+};
+
+/// `NSURLCacheStoragePolicy`.
+pub const URLCacheStoragePolicy = enum(objc.UInteger) {
+    allowed = 0,
+    allowed_in_memory_only = 1,
+    not_allowed = 2,
+    _,
+};
+
+/// `NSKeyValueObservingOptions`.
+pub const KeyValueObservingOptions = packed struct(u64) {
+    new: bool = false,
+    old: bool = false,
+    initial: bool = false,
+    prior: bool = false,
+    _4: u60 = 0,
+};
+
+/// `NSKeyValueChange`.
+pub const KeyValueChange = enum(objc.UInteger) {
+    setting = 1,
+    insertion = 2,
+    removal = 3,
+    replacement = 4,
+    _,
+};
+
+/// `NSKeyValueSetMutationKind`.
+pub const KeyValueSetMutationKind = enum(objc.UInteger) {
+    union_set_mutation = 1,
+    minus_set_mutation = 2,
+    intersect_set_mutation = 3,
+    set_set_mutation = 4,
+    _,
+};
+
+/// `NSOrderedCollectionDifferenceCalculationOptions`.
+pub const OrderedCollectionDifferenceCalculationOptions = packed struct(u64) {
+    omit_inserted_objects: bool = false,
+    omit_removed_objects: bool = false,
+    infer_moves: bool = false,
+    _3: u61 = 0,
+};
+
+/// `NSLinguisticTaggerOptions`.
+pub const LinguisticTaggerOptions = packed struct(u64) {
+    omit_words: bool = false,
+    omit_punctuation: bool = false,
+    omit_whitespace: bool = false,
+    omit_other: bool = false,
+    join_names: bool = false,
+    _5: u59 = 0,
+};
+
+/// `NSFileManagerUploadLocalVersionConflictPolicy`.
+pub const FileManagerUploadLocalVersionConflictPolicy = enum(objc.Integer) {
+    default = 0,
+    fail_on_conflict = 1,
+    _,
+};
+
+/// `NSFileManagerResumeSyncBehavior`.
+pub const FileManagerResumeSyncBehavior = enum(objc.Integer) {
+    preserve_local_changes = 0,
+    after_upload_with_fail_on_conflict = 1,
+    drop_local_changes = 2,
+    _,
+};
+
+/// `NSString`, a subclass of `NSObject`.
+pub const String = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSString";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSString alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSString`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSString characterAtIndex:]`
+    pub fn characterAtIndex(self: Self, index: objc.UInteger) u16 {
+        return self.object.msgSend(u16, "characterAtIndex:", .{index});
+    }
+
+    /// `-[NSString init]`
+    pub fn init(self: Self) String {
+        return self.object.msgSend(String, "init", .{});
+    }
+
+    /// `-[NSString initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?String {
+        return self.object.msgSend(?String, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSString length]`
+    pub fn length(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "length", .{});
+    }
+
+    /// `-[NSString substringFromIndex:]`
+    pub fn substringFromIndex(self: Self, from_: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "substringFromIndex:", .{from_});
+    }
+
+    /// `-[NSString substringToIndex:]`
+    pub fn substringToIndex(self: Self, to: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "substringToIndex:", .{to});
+    }
+
+    /// `-[NSString substringWithRange:]`
+    pub fn substringWithRange(self: Self, range: objc.Range) foundation.String {
+        return self.object.msgSend(foundation.String, "substringWithRange:", .{range});
+    }
+
+    /// `-[NSString getCharacters:range:]`
+    pub fn getCharactersRange(self: Self, buffer: ?*u16, range: objc.Range) void {
+        return self.object.msgSend(void, "getCharacters:range:", .{ buffer, range });
+    }
+
+    /// `-[NSString compare:]`
+    pub fn compare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:", .{string_});
+    }
+
+    /// `-[NSString compare:options:]`
+    pub fn compareOptions(self: Self, string_: foundation.String, mask: StringCompareOptions) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:", .{ string_, mask });
+    }
+
+    /// `-[NSString compare:options:range:]`
+    pub fn compareOptionsRange(self: Self, string_: foundation.String, mask: StringCompareOptions, range_of_receiver_to_compare: objc.Range) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:range:", .{ string_, mask, range_of_receiver_to_compare });
+    }
+
+    /// `-[NSString compare:options:range:locale:]`
+    pub fn compareOptionsRangeLocale(self: Self, string_: foundation.String, mask: StringCompareOptions, range_of_receiver_to_compare: objc.Range, locale: ?objc.Object) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:range:locale:", .{ string_, mask, range_of_receiver_to_compare, locale });
+    }
+
+    /// `-[NSString caseInsensitiveCompare:]`
+    pub fn caseInsensitiveCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "caseInsensitiveCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedCompare:]`
+    pub fn localizedCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedCaseInsensitiveCompare:]`
+    pub fn localizedCaseInsensitiveCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedCaseInsensitiveCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedStandardCompare:]`
+    pub fn localizedStandardCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedStandardCompare:", .{string_});
+    }
+
+    /// `-[NSString isEqualToString:]`
+    pub fn isEqualToString(self: Self, a_string: foundation.String) bool {
+        return self.object.msgSend(bool, "isEqualToString:", .{a_string});
+    }
+
+    /// `-[NSString hasPrefix:]`
+    pub fn hasPrefix(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "hasPrefix:", .{str});
+    }
+
+    /// `-[NSString hasSuffix:]`
+    pub fn hasSuffix(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "hasSuffix:", .{str});
+    }
+
+    /// `-[NSString commonPrefixWithString:options:]`
+    pub fn commonPrefixWithStringOptions(self: Self, str: foundation.String, mask: StringCompareOptions) foundation.String {
+        return self.object.msgSend(foundation.String, "commonPrefixWithString:options:", .{ str, mask });
+    }
+
+    /// `-[NSString containsString:]`
+    pub fn containsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "containsString:", .{str});
+    }
+
+    /// `-[NSString localizedCaseInsensitiveContainsString:]`
+    pub fn localizedCaseInsensitiveContainsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "localizedCaseInsensitiveContainsString:", .{str});
+    }
+
+    /// `-[NSString localizedStandardContainsString:]`
+    pub fn localizedStandardContainsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "localizedStandardContainsString:", .{str});
+    }
+
+    /// `-[NSString localizedStandardRangeOfString:]`
+    pub fn localizedStandardRangeOfString(self: Self, str: foundation.String) objc.Range {
+        return self.object.msgSend(objc.Range, "localizedStandardRangeOfString:", .{str});
+    }
+
+    /// `-[NSString rangeOfString:]`
+    pub fn rangeOfString(self: Self, search_string: foundation.String) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:", .{search_string});
+    }
+
+    /// `-[NSString rangeOfString:options:]`
+    pub fn rangeOfStringOptions(self: Self, search_string: foundation.String, mask: StringCompareOptions) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:", .{ search_string, mask });
+    }
+
+    /// `-[NSString rangeOfString:options:range:]`
+    pub fn rangeOfStringOptionsRange(self: Self, search_string: foundation.String, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:range:", .{ search_string, mask, range_of_receiver_to_search });
+    }
+
+    /// `-[NSString rangeOfString:options:range:locale:]`
+    pub fn rangeOfStringOptionsRangeLocale(self: Self, search_string: foundation.String, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range, locale: ?Locale) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:range:locale:", .{ search_string, mask, range_of_receiver_to_search, locale });
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:]`
+    pub fn rangeOfCharacterFromSet(self: Self, search_set: CharacterSet) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:", .{search_set});
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:options:]`
+    pub fn rangeOfCharacterFromSetOptions(self: Self, search_set: CharacterSet, mask: StringCompareOptions) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:options:", .{ search_set, mask });
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:options:range:]`
+    pub fn rangeOfCharacterFromSetOptionsRange(self: Self, search_set: CharacterSet, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:options:range:", .{ search_set, mask, range_of_receiver_to_search });
+    }
+
+    /// `-[NSString rangeOfComposedCharacterSequenceAtIndex:]`
+    pub fn rangeOfComposedCharacterSequenceAtIndex(self: Self, index: objc.UInteger) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfComposedCharacterSequenceAtIndex:", .{index});
+    }
+
+    /// `-[NSString rangeOfComposedCharacterSequencesForRange:]`
+    pub fn rangeOfComposedCharacterSequencesForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfComposedCharacterSequencesForRange:", .{range});
+    }
+
+    /// `-[NSString stringByAppendingString:]`
+    pub fn stringByAppendingString(self: Self, a_string: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAppendingString:", .{a_string});
+    }
+
+    /// `-[NSString uppercaseStringWithLocale:]`
+    pub fn uppercaseStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "uppercaseStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString lowercaseStringWithLocale:]`
+    pub fn lowercaseStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "lowercaseStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString capitalizedStringWithLocale:]`
+    pub fn capitalizedStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "capitalizedStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString getLineStart:end:contentsEnd:forRange:]`
+    pub fn getLineStartEndContentsEndForRange(self: Self, start_ptr: ?*objc.UInteger, line_end_ptr: ?*objc.UInteger, contents_end_ptr: ?*objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "getLineStart:end:contentsEnd:forRange:", .{ start_ptr, line_end_ptr, contents_end_ptr, range });
+    }
+
+    /// `-[NSString lineRangeForRange:]`
+    pub fn lineRangeForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "lineRangeForRange:", .{range});
+    }
+
+    /// `-[NSString getParagraphStart:end:contentsEnd:forRange:]`
+    pub fn getParagraphStartEndContentsEndForRange(self: Self, start_ptr: ?*objc.UInteger, par_end_ptr: ?*objc.UInteger, contents_end_ptr: ?*objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "getParagraphStart:end:contentsEnd:forRange:", .{ start_ptr, par_end_ptr, contents_end_ptr, range });
+    }
+
+    /// `-[NSString paragraphRangeForRange:]`
+    pub fn paragraphRangeForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "paragraphRangeForRange:", .{range});
+    }
+
+    /// `-[NSString enumerateSubstringsInRange:options:usingBlock:]`
+    pub fn enumerateSubstringsInRangeOptionsUsingBlock(self: Self, range: objc.Range, opts: StringEnumerationOptions, block: objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateSubstringsInRange:options:usingBlock:", .{ range, opts, block });
+    }
+
+    /// `-[NSString enumerateLinesUsingBlock:]`
+    pub fn enumerateLinesUsingBlock(self: Self, block: objc.BlockRef(fn (foundation.String, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateLinesUsingBlock:", .{block});
+    }
+
+    /// `-[NSString dataUsingEncoding:allowLossyConversion:]`
+    pub fn dataUsingEncodingAllowLossyConversion(self: Self, encoding: objc.UInteger, lossy: bool) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "dataUsingEncoding:allowLossyConversion:", .{ encoding, lossy });
+    }
+
+    /// `-[NSString dataUsingEncoding:]`
+    pub fn dataUsingEncoding(self: Self, encoding: objc.UInteger) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "dataUsingEncoding:", .{encoding});
+    }
+
+    /// `-[NSString canBeConvertedToEncoding:]`
+    pub fn canBeConvertedToEncoding(self: Self, encoding: objc.UInteger) bool {
+        return self.object.msgSend(bool, "canBeConvertedToEncoding:", .{encoding});
+    }
+
+    /// `-[NSString cStringUsingEncoding:]`
+    pub fn cStringUsingEncoding(self: Self, encoding: objc.UInteger) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "cStringUsingEncoding:", .{encoding});
+    }
+
+    /// `-[NSString getCString:maxLength:encoding:]`
+    pub fn getCStringMaxLengthEncoding(self: Self, buffer: [*:0]const u8, max_buffer_count: objc.UInteger, encoding: objc.UInteger) bool {
+        return self.object.msgSend(bool, "getCString:maxLength:encoding:", .{ buffer, max_buffer_count, encoding });
+    }
+
+    /// `-[NSString getBytes:maxLength:usedLength:encoding:options:range:remainingRange:]`
+    pub fn getBytesMaxLengthUsedLengthEncodingOptionsRangeRemainingRange(self: Self, buffer: ?*anyopaque, max_buffer_count: objc.UInteger, used_buffer_count: ?*objc.UInteger, encoding: objc.UInteger, options: StringEncodingConversionOptions, range: objc.Range, leftover: ?*objc.Range) bool {
+        return self.object.msgSend(bool, "getBytes:maxLength:usedLength:encoding:options:range:remainingRange:", .{ buffer, max_buffer_count, used_buffer_count, encoding, options, range, leftover });
+    }
+
+    /// `-[NSString maximumLengthOfBytesUsingEncoding:]`
+    pub fn maximumLengthOfBytesUsingEncoding(self: Self, enc: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "maximumLengthOfBytesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString lengthOfBytesUsingEncoding:]`
+    pub fn lengthOfBytesUsingEncoding(self: Self, enc: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "lengthOfBytesUsingEncoding:", .{enc});
+    }
+
+    /// `+[NSString localizedNameOfStringEncoding:]`
+    pub fn localizedNameOfStringEncoding(encoding: objc.UInteger) foundation.String {
+        return class().msgSend(foundation.String, "localizedNameOfStringEncoding:", .{encoding});
+    }
+
+    /// `-[NSString componentsSeparatedByString:]`
+    pub fn componentsSeparatedByString(self: Self, separator: foundation.String) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "componentsSeparatedByString:", .{separator});
+    }
+
+    /// `-[NSString componentsSeparatedByCharactersInSet:]`
+    pub fn componentsSeparatedByCharactersInSet(self: Self, separator: CharacterSet) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "componentsSeparatedByCharactersInSet:", .{separator});
+    }
+
+    /// `-[NSString stringByTrimmingCharactersInSet:]`
+    pub fn stringByTrimmingCharactersInSet(self: Self, set: CharacterSet) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByTrimmingCharactersInSet:", .{set});
+    }
+
+    /// `-[NSString stringByPaddingToLength:withString:startingAtIndex:]`
+    pub fn stringByPaddingToLengthWithStringStartingAtIndex(self: Self, new_length: objc.UInteger, pad_string: foundation.String, pad_index: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByPaddingToLength:withString:startingAtIndex:", .{ new_length, pad_string, pad_index });
+    }
+
+    /// `-[NSString stringByFoldingWithOptions:locale:]`
+    pub fn stringByFoldingWithOptionsLocale(self: Self, options: StringCompareOptions, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByFoldingWithOptions:locale:", .{ options, locale });
+    }
+
+    /// `-[NSString stringByReplacingOccurrencesOfString:withString:options:range:]`
+    pub fn stringByReplacingOccurrencesOfStringWithStringOptionsRange(self: Self, target: foundation.String, replacement: foundation.String, options: StringCompareOptions, search_range: objc.Range) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingOccurrencesOfString:withString:options:range:", .{ target, replacement, options, search_range });
+    }
+
+    /// `-[NSString stringByReplacingOccurrencesOfString:withString:]`
+    pub fn stringByReplacingOccurrencesOfStringWithString(self: Self, target: foundation.String, replacement: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingOccurrencesOfString:withString:", .{ target, replacement });
+    }
+
+    /// `-[NSString stringByReplacingCharactersInRange:withString:]`
+    pub fn stringByReplacingCharactersInRangeWithString(self: Self, range: objc.Range, replacement: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingCharactersInRange:withString:", .{ range, replacement });
+    }
+
+    /// `-[NSString stringByApplyingTransform:reverse:]`
+    pub fn stringByApplyingTransformReverse(self: Self, transform: foundation.String, reverse: bool) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByApplyingTransform:reverse:", .{ transform, reverse });
+    }
+
+    /// `-[NSString writeToURL:atomically:encoding:error:]`
+    pub fn writeToURLAtomicallyEncodingError(self: Self, url: foundation.Url, use_auxiliary_file: bool, enc: objc.UInteger, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:encoding:error:", .{ url, use_auxiliary_file, enc, @"error" });
+    }
+
+    /// `-[NSString writeToFile:atomically:encoding:error:]`
+    pub fn writeToFileAtomicallyEncodingError(self: Self, path: foundation.String, use_auxiliary_file: bool, enc: objc.UInteger, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:encoding:error:", .{ path, use_auxiliary_file, enc, @"error" });
+    }
+
+    /// `-[NSString initWithCharactersNoCopy:length:freeWhenDone:]`
+    pub fn initWithCharactersNoCopyLengthFreeWhenDone(self: Self, characters: ?*u16, length_: objc.UInteger, free_buffer: bool) String {
+        return self.object.msgSend(String, "initWithCharactersNoCopy:length:freeWhenDone:", .{ characters, length_, free_buffer });
+    }
+
+    /// `-[NSString initWithCharactersNoCopy:length:deallocator:]`
+    pub fn initWithCharactersNoCopyLengthDeallocator(self: Self, chars: ?*u16, len: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*u16, objc.UInteger) void)) String {
+        return self.object.msgSend(String, "initWithCharactersNoCopy:length:deallocator:", .{ chars, len, deallocator });
+    }
+
+    /// `-[NSString initWithCharacters:length:]`
+    pub fn initWithCharactersLength(self: Self, characters: ?[*]const u16, length_: objc.UInteger) String {
+        return self.object.msgSend(String, "initWithCharacters:length:", .{ characters, length_ });
+    }
+
+    /// `-[NSString initWithUTF8String:]`
+    pub fn initWithUTF8String(self: Self, null_terminated_c_string: [*:0]const u8) ?String {
+        return self.object.msgSend(?String, "initWithUTF8String:", .{null_terminated_c_string});
+    }
+
+    /// `-[NSString initWithString:]`
+    pub fn initWithString(self: Self, a_string: foundation.String) String {
+        return self.object.msgSend(String, "initWithString:", .{a_string});
+    }
+
+    /// `-[NSString initWithFormat:arguments:]`
+    pub fn initWithFormatArguments(self: Self, format: foundation.String, arg_list: ?[*:0]const u8) String {
+        return self.object.msgSend(String, "initWithFormat:arguments:", .{ format, arg_list });
+    }
+
+    /// `-[NSString initWithFormat:locale:arguments:]`
+    pub fn initWithFormatLocaleArguments(self: Self, format: foundation.String, locale: ?objc.Object, arg_list: ?[*:0]const u8) String {
+        return self.object.msgSend(String, "initWithFormat:locale:arguments:", .{ format, locale, arg_list });
+    }
+
+    /// `-[NSString initWithValidatedFormat:validFormatSpecifiers:arguments:error:]`
+    pub fn initWithValidatedFormatValidFormatSpecifiersArgumentsError(self: Self, format: foundation.String, valid_format_specifiers: foundation.String, arg_list: ?[*:0]const u8, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithValidatedFormat:validFormatSpecifiers:arguments:error:", .{ format, valid_format_specifiers, arg_list, @"error" });
+    }
+
+    /// `-[NSString initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:]`
+    pub fn initWithValidatedFormatValidFormatSpecifiersLocaleArgumentsError(self: Self, format: foundation.String, valid_format_specifiers: foundation.String, locale: ?objc.Object, arg_list: ?[*:0]const u8, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:", .{ format, valid_format_specifiers, locale, arg_list, @"error" });
+    }
+
+    /// `-[NSString initWithData:encoding:]`
+    pub fn initWithDataEncoding(self: Self, data: foundation.Data, encoding: objc.UInteger) ?String {
+        return self.object.msgSend(?String, "initWithData:encoding:", .{ data, encoding });
+    }
+
+    /// `-[NSString initWithBytes:length:encoding:]`
+    pub fn initWithBytesLengthEncoding(self: Self, bytes: ?*const anyopaque, len: objc.UInteger, encoding: objc.UInteger) ?String {
+        return self.object.msgSend(?String, "initWithBytes:length:encoding:", .{ bytes, len, encoding });
+    }
+
+    /// `-[NSString initWithBytesNoCopy:length:encoding:freeWhenDone:]`
+    pub fn initWithBytesNoCopyLengthEncodingFreeWhenDone(self: Self, bytes: ?*anyopaque, len: objc.UInteger, encoding: objc.UInteger, free_buffer: bool) ?String {
+        return self.object.msgSend(?String, "initWithBytesNoCopy:length:encoding:freeWhenDone:", .{ bytes, len, encoding, free_buffer });
+    }
+
+    /// `-[NSString initWithBytesNoCopy:length:encoding:deallocator:]`
+    pub fn initWithBytesNoCopyLengthEncodingDeallocator(self: Self, bytes: ?*anyopaque, len: objc.UInteger, encoding: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?String {
+        return self.object.msgSend(?String, "initWithBytesNoCopy:length:encoding:deallocator:", .{ bytes, len, encoding, deallocator });
+    }
+
+    /// `+[NSString string]`
+    pub fn string() String {
+        return class().msgSend(String, "string", .{});
+    }
+
+    /// `+[NSString stringWithString:]`
+    pub fn stringWithString(string_: foundation.String) String {
+        return class().msgSend(String, "stringWithString:", .{string_});
+    }
+
+    /// `+[NSString stringWithCharacters:length:]`
+    pub fn stringWithCharactersLength(characters: ?[*]const u16, length_: objc.UInteger) String {
+        return class().msgSend(String, "stringWithCharacters:length:", .{ characters, length_ });
+    }
+
+    /// `+[NSString stringWithUTF8String:]`
+    pub fn stringWithUTF8String(null_terminated_c_string: [*:0]const u8) ?String {
+        return class().msgSend(?String, "stringWithUTF8String:", .{null_terminated_c_string});
+    }
+
+    /// `-[NSString initWithCString:encoding:]`
+    pub fn initWithCStringEncoding(self: Self, null_terminated_c_string: [*:0]const u8, encoding: objc.UInteger) ?String {
+        return self.object.msgSend(?String, "initWithCString:encoding:", .{ null_terminated_c_string, encoding });
+    }
+
+    /// `+[NSString stringWithCString:encoding:]`
+    pub fn stringWithCStringEncoding(c_string: [*:0]const u8, enc: objc.UInteger) ?String {
+        return class().msgSend(?String, "stringWithCString:encoding:", .{ c_string, enc });
+    }
+
+    /// `-[NSString initWithContentsOfURL:encoding:error:]`
+    pub fn initWithContentsOfURLEncodingError(self: Self, url: foundation.Url, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithContentsOfURL:encoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfFile:encoding:error:]`
+    pub fn initWithContentsOfFileEncodingError(self: Self, path: foundation.String, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithContentsOfFile:encoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfURL:encoding:error:]`
+    pub fn stringWithContentsOfURLEncodingError(url: foundation.Url, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?String {
+        return class().msgSend(?String, "stringWithContentsOfURL:encoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfFile:encoding:error:]`
+    pub fn stringWithContentsOfFileEncodingError(path: foundation.String, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?String {
+        return class().msgSend(?String, "stringWithContentsOfFile:encoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfURL:usedEncoding:error:]`
+    pub fn initWithContentsOfURLUsedEncodingError(self: Self, url: foundation.Url, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithContentsOfURL:usedEncoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfFile:usedEncoding:error:]`
+    pub fn initWithContentsOfFileUsedEncodingError(self: Self, path: foundation.String, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?String {
+        return self.object.msgSend(?String, "initWithContentsOfFile:usedEncoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfURL:usedEncoding:error:]`
+    pub fn stringWithContentsOfURLUsedEncodingError(url: foundation.Url, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?String {
+        return class().msgSend(?String, "stringWithContentsOfURL:usedEncoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfFile:usedEncoding:error:]`
+    pub fn stringWithContentsOfFileUsedEncodingError(path: foundation.String, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?String {
+        return class().msgSend(?String, "stringWithContentsOfFile:usedEncoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `-[NSString doubleValue]`
+    pub fn doubleValue(self: Self) f64 {
+        return self.object.msgSend(f64, "doubleValue", .{});
+    }
+
+    /// `-[NSString floatValue]`
+    pub fn floatValue(self: Self) f32 {
+        return self.object.msgSend(f32, "floatValue", .{});
+    }
+
+    /// `-[NSString intValue]`
+    pub fn intValue(self: Self) c_int {
+        return self.object.msgSend(c_int, "intValue", .{});
+    }
+
+    /// `-[NSString integerValue]`
+    pub fn integerValue(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "integerValue", .{});
+    }
+
+    /// `-[NSString longLongValue]`
+    pub fn longLongValue(self: Self) c_longlong {
+        return self.object.msgSend(c_longlong, "longLongValue", .{});
+    }
+
+    /// `-[NSString boolValue]`
+    pub fn boolValue(self: Self) bool {
+        return self.object.msgSend(bool, "boolValue", .{});
+    }
+
+    /// `-[NSString uppercaseString]`
+    pub fn uppercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "uppercaseString", .{});
+    }
+
+    /// `-[NSString lowercaseString]`
+    pub fn lowercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "lowercaseString", .{});
+    }
+
+    /// `-[NSString capitalizedString]`
+    pub fn capitalizedString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "capitalizedString", .{});
+    }
+
+    /// `-[NSString localizedUppercaseString]`
+    pub fn localizedUppercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedUppercaseString", .{});
+    }
+
+    /// `-[NSString localizedLowercaseString]`
+    pub fn localizedLowercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedLowercaseString", .{});
+    }
+
+    /// `-[NSString localizedCapitalizedString]`
+    pub fn localizedCapitalizedString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedCapitalizedString", .{});
+    }
+
+    /// `-[NSString UTF8String]`
+    pub fn utf8String(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "UTF8String", .{});
+    }
+
+    /// `-[NSString fastestEncoding]`
+    pub fn fastestEncoding(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "fastestEncoding", .{});
+    }
+
+    /// `-[NSString smallestEncoding]`
+    pub fn smallestEncoding(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "smallestEncoding", .{});
+    }
+
+    /// `+[NSString availableStringEncodings]`
+    pub fn availableStringEncodings() objc.Object {
+        return class().msgSend(objc.Object, "availableStringEncodings", .{});
+    }
+
+    /// `+[NSString defaultCStringEncoding]`
+    pub fn defaultCStringEncoding() objc.UInteger {
+        return class().msgSend(objc.UInteger, "defaultCStringEncoding", .{});
+    }
+
+    /// `-[NSString decomposedStringWithCanonicalMapping]`
+    pub fn decomposedStringWithCanonicalMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "decomposedStringWithCanonicalMapping", .{});
+    }
+
+    /// `-[NSString precomposedStringWithCanonicalMapping]`
+    pub fn precomposedStringWithCanonicalMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "precomposedStringWithCanonicalMapping", .{});
+    }
+
+    /// `-[NSString decomposedStringWithCompatibilityMapping]`
+    pub fn decomposedStringWithCompatibilityMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "decomposedStringWithCompatibilityMapping", .{});
+    }
+
+    /// `-[NSString precomposedStringWithCompatibilityMapping]`
+    pub fn precomposedStringWithCompatibilityMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "precomposedStringWithCompatibilityMapping", .{});
+    }
+
+    /// `-[NSString description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSString hash]`
+    pub fn hash(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "hash", .{});
+    }
+
+    /// `+[NSString stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:]`
+    pub fn stringEncodingForDataEncodingOptionsConvertedStringUsedLossyConversion(data: foundation.Data, opts: ?foundation.Dictionary(objc.Object, objc.Object), string_: ?*objc.abi.Id, used_lossy_conversion: ?*bool) objc.UInteger {
+        return class().msgSend(objc.UInteger, "stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:", .{ data, opts, string_, used_lossy_conversion });
+    }
+
+    /// `-[NSString propertyList]`
+    pub fn propertyList(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "propertyList", .{});
+    }
+
+    /// `-[NSString propertyListFromStringsFileFormat]`
+    pub fn propertyListFromStringsFileFormat(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "propertyListFromStringsFileFormat", .{});
+    }
+
+    /// `-[NSString cString]`
+    pub fn cString(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "cString", .{});
+    }
+
+    /// `-[NSString lossyCString]`
+    pub fn lossyCString(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "lossyCString", .{});
+    }
+
+    /// `-[NSString cStringLength]`
+    pub fn cStringLength(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "cStringLength", .{});
+    }
+
+    /// `-[NSString getCString:]`
+    pub fn getCString(self: Self, bytes: [*:0]const u8) void {
+        return self.object.msgSend(void, "getCString:", .{bytes});
+    }
+
+    /// `-[NSString getCString:maxLength:]`
+    pub fn getCStringMaxLength(self: Self, bytes: [*:0]const u8, max_length: objc.UInteger) void {
+        return self.object.msgSend(void, "getCString:maxLength:", .{ bytes, max_length });
+    }
+
+    /// `-[NSString getCString:maxLength:range:remainingRange:]`
+    pub fn getCStringMaxLengthRangeRemainingRange(self: Self, bytes: [*:0]const u8, max_length: objc.UInteger, a_range: objc.Range, leftover_range: ?*objc.Range) void {
+        return self.object.msgSend(void, "getCString:maxLength:range:remainingRange:", .{ bytes, max_length, a_range, leftover_range });
+    }
+
+    /// `-[NSString writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSString writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSString initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSString initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfURL:", .{url});
+    }
+
+    /// `+[NSString stringWithContentsOfFile:]`
+    pub fn stringWithContentsOfFile(path: foundation.String) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSString stringWithContentsOfURL:]`
+    pub fn stringWithContentsOfURL(url: foundation.Url) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSString initWithCStringNoCopy:length:freeWhenDone:]`
+    pub fn initWithCStringNoCopyLengthFreeWhenDone(self: Self, bytes: [*:0]const u8, length_: objc.UInteger, free_buffer: bool) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCStringNoCopy:length:freeWhenDone:", .{ bytes, length_, free_buffer });
+    }
+
+    /// `-[NSString initWithCString:length:]`
+    pub fn initWithCStringLength(self: Self, bytes: [*:0]const u8, length_: objc.UInteger) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCString:length:", .{ bytes, length_ });
+    }
+
+    /// `-[NSString initWithCString:]`
+    pub fn initWithCString(self: Self, bytes: [*:0]const u8) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCString:", .{bytes});
+    }
+
+    /// `+[NSString stringWithCString:length:]`
+    pub fn stringWithCStringLength(bytes: [*:0]const u8, length_: objc.UInteger) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithCString:length:", .{ bytes, length_ });
+    }
+
+    /// `+[NSString stringWithCString:]`
+    pub fn stringWithCString(bytes: [*:0]const u8) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithCString:", .{bytes});
+    }
+
+    /// `-[NSString getCharacters:]`
+    pub fn getCharacters(self: Self, buffer: ?*u16) void {
+        return self.object.msgSend(void, "getCharacters:", .{buffer});
+    }
+
+    /// `-[NSString variantFittingPresentationWidth:]`
+    pub fn variantFittingPresentationWidth(self: Self, width: objc.Integer) foundation.String {
+        return self.object.msgSend(foundation.String, "variantFittingPresentationWidth:", .{width});
+    }
+
+    /// `+[NSString pathWithComponents:]`
+    pub fn pathWithComponents(components: foundation.Array(foundation.String)) foundation.String {
+        return class().msgSend(foundation.String, "pathWithComponents:", .{components});
+    }
+
+    /// `-[NSString stringByAppendingPathComponent:]`
+    pub fn stringByAppendingPathComponent(self: Self, str: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAppendingPathComponent:", .{str});
+    }
+
+    /// `-[NSString stringByAppendingPathExtension:]`
+    pub fn stringByAppendingPathExtension(self: Self, str: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAppendingPathExtension:", .{str});
+    }
+
+    /// `-[NSString stringsByAppendingPaths:]`
+    pub fn stringsByAppendingPaths(self: Self, paths: foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "stringsByAppendingPaths:", .{paths});
+    }
+
+    /// `-[NSString completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:]`
+    pub fn completePathIntoStringCaseSensitiveMatchesIntoArrayFilterTypes(self: Self, output_name: ?*objc.abi.Id, flag: bool, output_array: ?*objc.abi.Id, filter_types: ?foundation.Array(foundation.String)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:", .{ output_name, flag, output_array, filter_types });
+    }
+
+    /// `-[NSString getFileSystemRepresentation:maxLength:]`
+    pub fn getFileSystemRepresentationMaxLength(self: Self, cname: [*:0]const u8, max: objc.UInteger) bool {
+        return self.object.msgSend(bool, "getFileSystemRepresentation:maxLength:", .{ cname, max });
+    }
+
+    /// `-[NSString pathComponents]`
+    pub fn pathComponents(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathComponents", .{});
+    }
+
+    /// `-[NSString isAbsolutePath]`
+    pub fn isAbsolutePath(self: Self) bool {
+        return self.object.msgSend(bool, "isAbsolutePath", .{});
+    }
+
+    /// `-[NSString lastPathComponent]`
+    pub fn lastPathComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "lastPathComponent", .{});
+    }
+
+    /// `-[NSString stringByDeletingLastPathComponent]`
+    pub fn stringByDeletingLastPathComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByDeletingLastPathComponent", .{});
+    }
+
+    /// `-[NSString pathExtension]`
+    pub fn pathExtension(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "pathExtension", .{});
+    }
+
+    /// `-[NSString stringByDeletingPathExtension]`
+    pub fn stringByDeletingPathExtension(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByDeletingPathExtension", .{});
+    }
+
+    /// `-[NSString stringByAbbreviatingWithTildeInPath]`
+    pub fn stringByAbbreviatingWithTildeInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAbbreviatingWithTildeInPath", .{});
+    }
+
+    /// `-[NSString stringByExpandingTildeInPath]`
+    pub fn stringByExpandingTildeInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByExpandingTildeInPath", .{});
+    }
+
+    /// `-[NSString stringByStandardizingPath]`
+    pub fn stringByStandardizingPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByStandardizingPath", .{});
+    }
+
+    /// `-[NSString stringByResolvingSymlinksInPath]`
+    pub fn stringByResolvingSymlinksInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByResolvingSymlinksInPath", .{});
+    }
+
+    /// `-[NSString fileSystemRepresentation]`
+    pub fn fileSystemRepresentation(self: Self) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "fileSystemRepresentation", .{});
+    }
+
+    /// `-[NSString stringByAddingPercentEncodingWithAllowedCharacters:]`
+    pub fn stringByAddingPercentEncodingWithAllowedCharacters(self: Self, allowed_characters: CharacterSet) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAddingPercentEncodingWithAllowedCharacters:", .{allowed_characters});
+    }
+
+    /// `-[NSString stringByAddingPercentEscapesUsingEncoding:]`
+    pub fn stringByAddingPercentEscapesUsingEncoding(self: Self, enc: objc.UInteger) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAddingPercentEscapesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString stringByReplacingPercentEscapesUsingEncoding:]`
+    pub fn stringByReplacingPercentEscapesUsingEncoding(self: Self, enc: objc.UInteger) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByReplacingPercentEscapesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString stringByRemovingPercentEncoding]`
+    pub fn stringByRemovingPercentEncoding(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByRemovingPercentEncoding", .{});
+    }
+
+    /// `-[NSString linguisticTagsInRange:scheme:options:orthography:tokenRanges:]`
+    pub fn linguisticTagsInRangeSchemeOptionsOrthographyTokenRanges(self: Self, range: objc.Range, scheme: foundation.String, options: LinguisticTaggerOptions, orthography: ?objc.Object, token_ranges: ?*objc.abi.Id) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "linguisticTagsInRange:scheme:options:orthography:tokenRanges:", .{ range, scheme, options, orthography, token_ranges });
+    }
+
+    /// `-[NSString enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:]`
+    pub fn enumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlock(self: Self, range: objc.Range, scheme: foundation.String, options: LinguisticTaggerOptions, orthography: ?objc.Object, block: objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:", .{ range, scheme, options, orthography, block });
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-characterAtIndex:" = fn (objc.UInteger) u16;
+        pub const @"-init" = fn () String;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?String;
+        pub const @"-length" = fn () objc.UInteger;
+        pub const @"-substringFromIndex:" = fn (objc.UInteger) foundation.String;
+        pub const @"-substringToIndex:" = fn (objc.UInteger) foundation.String;
+        pub const @"-substringWithRange:" = fn (objc.Range) foundation.String;
+        pub const @"-getCharacters:range:" = fn (?*u16, objc.Range) void;
+        pub const @"-compare:" = fn (foundation.String) ComparisonResult;
+        pub const @"-compare:options:" = fn (foundation.String, StringCompareOptions) ComparisonResult;
+        pub const @"-compare:options:range:" = fn (foundation.String, StringCompareOptions, objc.Range) ComparisonResult;
+        pub const @"-compare:options:range:locale:" = fn (foundation.String, StringCompareOptions, objc.Range, ?objc.Object) ComparisonResult;
+        pub const @"-caseInsensitiveCompare:" = fn (foundation.String) ComparisonResult;
+        pub const @"-localizedCompare:" = fn (foundation.String) ComparisonResult;
+        pub const @"-localizedCaseInsensitiveCompare:" = fn (foundation.String) ComparisonResult;
+        pub const @"-localizedStandardCompare:" = fn (foundation.String) ComparisonResult;
+        pub const @"-isEqualToString:" = fn (foundation.String) bool;
+        pub const @"-hasPrefix:" = fn (foundation.String) bool;
+        pub const @"-hasSuffix:" = fn (foundation.String) bool;
+        pub const @"-commonPrefixWithString:options:" = fn (foundation.String, StringCompareOptions) foundation.String;
+        pub const @"-containsString:" = fn (foundation.String) bool;
+        pub const @"-localizedCaseInsensitiveContainsString:" = fn (foundation.String) bool;
+        pub const @"-localizedStandardContainsString:" = fn (foundation.String) bool;
+        pub const @"-localizedStandardRangeOfString:" = fn (foundation.String) objc.Range;
+        pub const @"-rangeOfString:" = fn (foundation.String) objc.Range;
+        pub const @"-rangeOfString:options:" = fn (foundation.String, StringCompareOptions) objc.Range;
+        pub const @"-rangeOfString:options:range:" = fn (foundation.String, StringCompareOptions, objc.Range) objc.Range;
+        pub const @"-rangeOfString:options:range:locale:" = fn (foundation.String, StringCompareOptions, objc.Range, ?Locale) objc.Range;
+        pub const @"-rangeOfCharacterFromSet:" = fn (CharacterSet) objc.Range;
+        pub const @"-rangeOfCharacterFromSet:options:" = fn (CharacterSet, StringCompareOptions) objc.Range;
+        pub const @"-rangeOfCharacterFromSet:options:range:" = fn (CharacterSet, StringCompareOptions, objc.Range) objc.Range;
+        pub const @"-rangeOfComposedCharacterSequenceAtIndex:" = fn (objc.UInteger) objc.Range;
+        pub const @"-rangeOfComposedCharacterSequencesForRange:" = fn (objc.Range) objc.Range;
+        pub const @"-stringByAppendingString:" = fn (foundation.String) foundation.String;
+        pub const @"-uppercaseStringWithLocale:" = fn (?Locale) foundation.String;
+        pub const @"-lowercaseStringWithLocale:" = fn (?Locale) foundation.String;
+        pub const @"-capitalizedStringWithLocale:" = fn (?Locale) foundation.String;
+        pub const @"-getLineStart:end:contentsEnd:forRange:" = fn (?*objc.UInteger, ?*objc.UInteger, ?*objc.UInteger, objc.Range) void;
+        pub const @"-lineRangeForRange:" = fn (objc.Range) objc.Range;
+        pub const @"-getParagraphStart:end:contentsEnd:forRange:" = fn (?*objc.UInteger, ?*objc.UInteger, ?*objc.UInteger, objc.Range) void;
+        pub const @"-paragraphRangeForRange:" = fn (objc.Range) objc.Range;
+        pub const @"-enumerateSubstringsInRange:options:usingBlock:" = fn (objc.Range, StringEnumerationOptions, objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void;
+        pub const @"-enumerateLinesUsingBlock:" = fn (objc.BlockRef(fn (foundation.String, ?*bool) void)) void;
+        pub const @"-dataUsingEncoding:allowLossyConversion:" = fn (objc.UInteger, bool) ?foundation.Data;
+        pub const @"-dataUsingEncoding:" = fn (objc.UInteger) ?foundation.Data;
+        pub const @"-canBeConvertedToEncoding:" = fn (objc.UInteger) bool;
+        pub const @"-cStringUsingEncoding:" = fn (objc.UInteger) ?[*:0]const u8;
+        pub const @"-getCString:maxLength:encoding:" = fn ([*:0]const u8, objc.UInteger, objc.UInteger) bool;
+        pub const @"-getBytes:maxLength:usedLength:encoding:options:range:remainingRange:" = fn (?*anyopaque, objc.UInteger, ?*objc.UInteger, objc.UInteger, StringEncodingConversionOptions, objc.Range, ?*objc.Range) bool;
+        pub const @"-maximumLengthOfBytesUsingEncoding:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"-lengthOfBytesUsingEncoding:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"+localizedNameOfStringEncoding:" = fn (objc.UInteger) foundation.String;
+        pub const @"-componentsSeparatedByString:" = fn (foundation.String) foundation.Array(foundation.String);
+        pub const @"-componentsSeparatedByCharactersInSet:" = fn (CharacterSet) foundation.Array(foundation.String);
+        pub const @"-stringByTrimmingCharactersInSet:" = fn (CharacterSet) foundation.String;
+        pub const @"-stringByPaddingToLength:withString:startingAtIndex:" = fn (objc.UInteger, foundation.String, objc.UInteger) foundation.String;
+        pub const @"-stringByFoldingWithOptions:locale:" = fn (StringCompareOptions, ?Locale) foundation.String;
+        pub const @"-stringByReplacingOccurrencesOfString:withString:options:range:" = fn (foundation.String, foundation.String, StringCompareOptions, objc.Range) foundation.String;
+        pub const @"-stringByReplacingOccurrencesOfString:withString:" = fn (foundation.String, foundation.String) foundation.String;
+        pub const @"-stringByReplacingCharactersInRange:withString:" = fn (objc.Range, foundation.String) foundation.String;
+        pub const @"-stringByApplyingTransform:reverse:" = fn (foundation.String, bool) ?foundation.String;
+        pub const @"-writeToURL:atomically:encoding:error:" = fn (foundation.Url, bool, objc.UInteger, ?*objc.abi.Id) bool;
+        pub const @"-writeToFile:atomically:encoding:error:" = fn (foundation.String, bool, objc.UInteger, ?*objc.abi.Id) bool;
+        pub const @"-initWithCharactersNoCopy:length:freeWhenDone:" = fn (?*u16, objc.UInteger, bool) String;
+        pub const @"-initWithCharactersNoCopy:length:deallocator:" = fn (?*u16, objc.UInteger, ?objc.BlockRef(fn (?*u16, objc.UInteger) void)) String;
+        pub const @"-initWithCharacters:length:" = fn (?[*]const u16, objc.UInteger) String;
+        pub const @"-initWithUTF8String:" = fn ([*:0]const u8) ?String;
+        pub const @"-initWithString:" = fn (foundation.String) String;
+        pub const @"-initWithFormat:arguments:" = fn (foundation.String, ?[*:0]const u8) String;
+        pub const @"-initWithFormat:locale:arguments:" = fn (foundation.String, ?objc.Object, ?[*:0]const u8) String;
+        pub const @"-initWithValidatedFormat:validFormatSpecifiers:arguments:error:" = fn (foundation.String, foundation.String, ?[*:0]const u8, ?*objc.abi.Id) ?String;
+        pub const @"-initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:" = fn (foundation.String, foundation.String, ?objc.Object, ?[*:0]const u8, ?*objc.abi.Id) ?String;
+        pub const @"-initWithData:encoding:" = fn (foundation.Data, objc.UInteger) ?String;
+        pub const @"-initWithBytes:length:encoding:" = fn (?*const anyopaque, objc.UInteger, objc.UInteger) ?String;
+        pub const @"-initWithBytesNoCopy:length:encoding:freeWhenDone:" = fn (?*anyopaque, objc.UInteger, objc.UInteger, bool) ?String;
+        pub const @"-initWithBytesNoCopy:length:encoding:deallocator:" = fn (?*anyopaque, objc.UInteger, objc.UInteger, ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?String;
+        pub const @"+string" = fn () String;
+        pub const @"+stringWithString:" = fn (foundation.String) String;
+        pub const @"+stringWithCharacters:length:" = fn (?[*]const u16, objc.UInteger) String;
+        pub const @"+stringWithUTF8String:" = fn ([*:0]const u8) ?String;
+        pub const @"-initWithCString:encoding:" = fn ([*:0]const u8, objc.UInteger) ?String;
+        pub const @"+stringWithCString:encoding:" = fn ([*:0]const u8, objc.UInteger) ?String;
+        pub const @"-initWithContentsOfURL:encoding:error:" = fn (foundation.Url, objc.UInteger, ?*objc.abi.Id) ?String;
+        pub const @"-initWithContentsOfFile:encoding:error:" = fn (foundation.String, objc.UInteger, ?*objc.abi.Id) ?String;
+        pub const @"+stringWithContentsOfURL:encoding:error:" = fn (foundation.Url, objc.UInteger, ?*objc.abi.Id) ?String;
+        pub const @"+stringWithContentsOfFile:encoding:error:" = fn (foundation.String, objc.UInteger, ?*objc.abi.Id) ?String;
+        pub const @"-initWithContentsOfURL:usedEncoding:error:" = fn (foundation.Url, ?objc.Object, ?*objc.abi.Id) ?String;
+        pub const @"-initWithContentsOfFile:usedEncoding:error:" = fn (foundation.String, ?objc.Object, ?*objc.abi.Id) ?String;
+        pub const @"+stringWithContentsOfURL:usedEncoding:error:" = fn (foundation.Url, ?objc.Object, ?*objc.abi.Id) ?String;
+        pub const @"+stringWithContentsOfFile:usedEncoding:error:" = fn (foundation.String, ?objc.Object, ?*objc.abi.Id) ?String;
+        pub const @"-doubleValue" = fn () f64;
+        pub const @"-floatValue" = fn () f32;
+        pub const @"-intValue" = fn () c_int;
+        pub const @"-integerValue" = fn () objc.Integer;
+        pub const @"-longLongValue" = fn () c_longlong;
+        pub const @"-boolValue" = fn () bool;
+        pub const @"-uppercaseString" = fn () foundation.String;
+        pub const @"-lowercaseString" = fn () foundation.String;
+        pub const @"-capitalizedString" = fn () foundation.String;
+        pub const @"-localizedUppercaseString" = fn () foundation.String;
+        pub const @"-localizedLowercaseString" = fn () foundation.String;
+        pub const @"-localizedCapitalizedString" = fn () foundation.String;
+        pub const @"-UTF8String" = fn () ?[*:0]const u8;
+        pub const @"-fastestEncoding" = fn () objc.UInteger;
+        pub const @"-smallestEncoding" = fn () objc.UInteger;
+        pub const @"+availableStringEncodings" = fn () objc.Object;
+        pub const @"+defaultCStringEncoding" = fn () objc.UInteger;
+        pub const @"-decomposedStringWithCanonicalMapping" = fn () foundation.String;
+        pub const @"-precomposedStringWithCanonicalMapping" = fn () foundation.String;
+        pub const @"-decomposedStringWithCompatibilityMapping" = fn () foundation.String;
+        pub const @"-precomposedStringWithCompatibilityMapping" = fn () foundation.String;
+        pub const @"-description" = fn () foundation.String;
+        pub const @"-hash" = fn () objc.UInteger;
+        pub const @"+stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:" = fn (foundation.Data, ?foundation.Dictionary(objc.Object, objc.Object), ?*objc.abi.Id, ?*bool) objc.UInteger;
+        pub const @"-propertyList" = fn () objc.Object;
+        pub const @"-propertyListFromStringsFileFormat" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-cString" = fn () ?[*:0]const u8;
+        pub const @"-lossyCString" = fn () ?[*:0]const u8;
+        pub const @"-cStringLength" = fn () objc.UInteger;
+        pub const @"-getCString:" = fn ([*:0]const u8) void;
+        pub const @"-getCString:maxLength:" = fn ([*:0]const u8, objc.UInteger) void;
+        pub const @"-getCString:maxLength:range:remainingRange:" = fn ([*:0]const u8, objc.UInteger, objc.Range, ?*objc.Range) void;
+        pub const @"-writeToFile:atomically:" = fn (foundation.String, bool) bool;
+        pub const @"-writeToURL:atomically:" = fn (foundation.Url, bool) bool;
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?objc.Object;
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?objc.Object;
+        pub const @"+stringWithContentsOfFile:" = fn (foundation.String) ?objc.Object;
+        pub const @"+stringWithContentsOfURL:" = fn (foundation.Url) ?objc.Object;
+        pub const @"-initWithCStringNoCopy:length:freeWhenDone:" = fn ([*:0]const u8, objc.UInteger, bool) ?objc.Object;
+        pub const @"-initWithCString:length:" = fn ([*:0]const u8, objc.UInteger) ?objc.Object;
+        pub const @"-initWithCString:" = fn ([*:0]const u8) ?objc.Object;
+        pub const @"+stringWithCString:length:" = fn ([*:0]const u8, objc.UInteger) ?objc.Object;
+        pub const @"+stringWithCString:" = fn ([*:0]const u8) ?objc.Object;
+        pub const @"-getCharacters:" = fn (?*u16) void;
+        pub const @"-variantFittingPresentationWidth:" = fn (objc.Integer) foundation.String;
+        pub const @"+pathWithComponents:" = fn (foundation.Array(foundation.String)) foundation.String;
+        pub const @"-stringByAppendingPathComponent:" = fn (foundation.String) foundation.String;
+        pub const @"-stringByAppendingPathExtension:" = fn (foundation.String) ?foundation.String;
+        pub const @"-stringsByAppendingPaths:" = fn (foundation.Array(foundation.String)) foundation.Array(foundation.String);
+        pub const @"-completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:" = fn (?*objc.abi.Id, bool, ?*objc.abi.Id, ?foundation.Array(foundation.String)) objc.UInteger;
+        pub const @"-getFileSystemRepresentation:maxLength:" = fn ([*:0]const u8, objc.UInteger) bool;
+        pub const @"-pathComponents" = fn () foundation.Array(foundation.String);
+        pub const @"-isAbsolutePath" = fn () bool;
+        pub const @"-lastPathComponent" = fn () foundation.String;
+        pub const @"-stringByDeletingLastPathComponent" = fn () foundation.String;
+        pub const @"-pathExtension" = fn () foundation.String;
+        pub const @"-stringByDeletingPathExtension" = fn () foundation.String;
+        pub const @"-stringByAbbreviatingWithTildeInPath" = fn () foundation.String;
+        pub const @"-stringByExpandingTildeInPath" = fn () foundation.String;
+        pub const @"-stringByStandardizingPath" = fn () foundation.String;
+        pub const @"-stringByResolvingSymlinksInPath" = fn () foundation.String;
+        pub const @"-fileSystemRepresentation" = fn () [*:0]const u8;
+        pub const @"-stringByAddingPercentEncodingWithAllowedCharacters:" = fn (CharacterSet) ?foundation.String;
+        pub const @"-stringByAddingPercentEscapesUsingEncoding:" = fn (objc.UInteger) ?foundation.String;
+        pub const @"-stringByReplacingPercentEscapesUsingEncoding:" = fn (objc.UInteger) ?foundation.String;
+        pub const @"-stringByRemovingPercentEncoding" = fn () ?foundation.String;
+        pub const @"-linguisticTagsInRange:scheme:options:orthography:tokenRanges:" = fn (objc.Range, foundation.String, LinguisticTaggerOptions, ?objc.Object, ?*objc.abi.Id) foundation.Array(objc.Object);
+        pub const @"-enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:" = fn (objc.Range, foundation.String, LinguisticTaggerOptions, ?objc.Object, objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void;
+    };
+
+    // Not generated:
+    //   -[NSString stringByAppendingFormat:]: variadic
+    //   -[NSString initWithFormat:]: variadic
+    //   -[NSString initWithFormat:locale:]: variadic
+    //   -[NSString initWithValidatedFormat:validFormatSpecifiers:error:]: variadic
+    //   -[NSString initWithValidatedFormat:validFormatSpecifiers:locale:error:]: variadic
+    //   +[NSString stringWithFormat:]: variadic
+    //   +[NSString localizedStringWithFormat:]: variadic
+    //   +[NSString stringWithValidatedFormat:validFormatSpecifiers:error:]: variadic
+    //   +[NSString localizedStringWithValidatedFormat:validFormatSpecifiers:error:]: variadic
+};
+
+/// `NSMutableString`, a subclass of `NSString`.
+pub const MutableString = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = String;
+    pub const class_name = "NSMutableString";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableString alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableString`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableString replaceCharactersInRange:withString:]`
+    pub fn replaceCharactersInRangeWithString(self: Self, range: objc.Range, a_string: foundation.String) void {
+        return self.object.msgSend(void, "replaceCharactersInRange:withString:", .{ range, a_string });
+    }
+
+    /// `-[NSMutableString insertString:atIndex:]`
+    pub fn insertStringAtIndex(self: Self, a_string: foundation.String, loc: objc.UInteger) void {
+        return self.object.msgSend(void, "insertString:atIndex:", .{ a_string, loc });
+    }
+
+    /// `-[NSMutableString deleteCharactersInRange:]`
+    pub fn deleteCharactersInRange(self: Self, range: objc.Range) void {
+        return self.object.msgSend(void, "deleteCharactersInRange:", .{range});
+    }
+
+    /// `-[NSMutableString appendString:]`
+    pub fn appendString(self: Self, a_string: foundation.String) void {
+        return self.object.msgSend(void, "appendString:", .{a_string});
+    }
+
+    /// `-[NSMutableString setString:]`
+    pub fn setString(self: Self, a_string: foundation.String) void {
+        return self.object.msgSend(void, "setString:", .{a_string});
+    }
+
+    /// `-[NSMutableString replaceOccurrencesOfString:withString:options:range:]`
+    pub fn replaceOccurrencesOfStringWithStringOptionsRange(self: Self, target: foundation.String, replacement: foundation.String, options: StringCompareOptions, search_range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "replaceOccurrencesOfString:withString:options:range:", .{ target, replacement, options, search_range });
+    }
+
+    /// `-[NSMutableString applyTransform:reverse:range:updatedRange:]`
+    pub fn applyTransformReverseRangeUpdatedRange(self: Self, transform: foundation.String, reverse: bool, range: objc.Range, resulting_range: ?*objc.Range) bool {
+        return self.object.msgSend(bool, "applyTransform:reverse:range:updatedRange:", .{ transform, reverse, range, resulting_range });
+    }
+
+    /// `-[NSMutableString initWithCapacity:]`
+    pub fn initWithCapacity(self: Self, capacity: objc.UInteger) MutableString {
+        return self.object.msgSend(MutableString, "initWithCapacity:", .{capacity});
+    }
+
+    /// `+[NSMutableString stringWithCapacity:]`
+    pub fn stringWithCapacity(capacity: objc.UInteger) MutableString {
+        return class().msgSend(MutableString, "stringWithCapacity:", .{capacity});
+    }
+
+    /// `-[NSString characterAtIndex:]`
+    pub fn characterAtIndex(self: Self, index: objc.UInteger) u16 {
+        return self.object.msgSend(u16, "characterAtIndex:", .{index});
+    }
+
+    /// `-[NSString init]`
+    pub fn init(self: Self) MutableString {
+        return self.object.msgSend(MutableString, "init", .{});
+    }
+
+    /// `-[NSString initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSString length]`
+    pub fn length(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "length", .{});
+    }
+
+    /// `-[NSString substringFromIndex:]`
+    pub fn substringFromIndex(self: Self, from_: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "substringFromIndex:", .{from_});
+    }
+
+    /// `-[NSString substringToIndex:]`
+    pub fn substringToIndex(self: Self, to: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "substringToIndex:", .{to});
+    }
+
+    /// `-[NSString substringWithRange:]`
+    pub fn substringWithRange(self: Self, range: objc.Range) foundation.String {
+        return self.object.msgSend(foundation.String, "substringWithRange:", .{range});
+    }
+
+    /// `-[NSString getCharacters:range:]`
+    pub fn getCharactersRange(self: Self, buffer: ?*u16, range: objc.Range) void {
+        return self.object.msgSend(void, "getCharacters:range:", .{ buffer, range });
+    }
+
+    /// `-[NSString compare:]`
+    pub fn compare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:", .{string_});
+    }
+
+    /// `-[NSString compare:options:]`
+    pub fn compareOptions(self: Self, string_: foundation.String, mask: StringCompareOptions) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:", .{ string_, mask });
+    }
+
+    /// `-[NSString compare:options:range:]`
+    pub fn compareOptionsRange(self: Self, string_: foundation.String, mask: StringCompareOptions, range_of_receiver_to_compare: objc.Range) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:range:", .{ string_, mask, range_of_receiver_to_compare });
+    }
+
+    /// `-[NSString compare:options:range:locale:]`
+    pub fn compareOptionsRangeLocale(self: Self, string_: foundation.String, mask: StringCompareOptions, range_of_receiver_to_compare: objc.Range, locale: ?objc.Object) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:options:range:locale:", .{ string_, mask, range_of_receiver_to_compare, locale });
+    }
+
+    /// `-[NSString caseInsensitiveCompare:]`
+    pub fn caseInsensitiveCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "caseInsensitiveCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedCompare:]`
+    pub fn localizedCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedCaseInsensitiveCompare:]`
+    pub fn localizedCaseInsensitiveCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedCaseInsensitiveCompare:", .{string_});
+    }
+
+    /// `-[NSString localizedStandardCompare:]`
+    pub fn localizedStandardCompare(self: Self, string_: foundation.String) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "localizedStandardCompare:", .{string_});
+    }
+
+    /// `-[NSString isEqualToString:]`
+    pub fn isEqualToString(self: Self, a_string: foundation.String) bool {
+        return self.object.msgSend(bool, "isEqualToString:", .{a_string});
+    }
+
+    /// `-[NSString hasPrefix:]`
+    pub fn hasPrefix(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "hasPrefix:", .{str});
+    }
+
+    /// `-[NSString hasSuffix:]`
+    pub fn hasSuffix(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "hasSuffix:", .{str});
+    }
+
+    /// `-[NSString commonPrefixWithString:options:]`
+    pub fn commonPrefixWithStringOptions(self: Self, str: foundation.String, mask: StringCompareOptions) foundation.String {
+        return self.object.msgSend(foundation.String, "commonPrefixWithString:options:", .{ str, mask });
+    }
+
+    /// `-[NSString containsString:]`
+    pub fn containsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "containsString:", .{str});
+    }
+
+    /// `-[NSString localizedCaseInsensitiveContainsString:]`
+    pub fn localizedCaseInsensitiveContainsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "localizedCaseInsensitiveContainsString:", .{str});
+    }
+
+    /// `-[NSString localizedStandardContainsString:]`
+    pub fn localizedStandardContainsString(self: Self, str: foundation.String) bool {
+        return self.object.msgSend(bool, "localizedStandardContainsString:", .{str});
+    }
+
+    /// `-[NSString localizedStandardRangeOfString:]`
+    pub fn localizedStandardRangeOfString(self: Self, str: foundation.String) objc.Range {
+        return self.object.msgSend(objc.Range, "localizedStandardRangeOfString:", .{str});
+    }
+
+    /// `-[NSString rangeOfString:]`
+    pub fn rangeOfString(self: Self, search_string: foundation.String) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:", .{search_string});
+    }
+
+    /// `-[NSString rangeOfString:options:]`
+    pub fn rangeOfStringOptions(self: Self, search_string: foundation.String, mask: StringCompareOptions) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:", .{ search_string, mask });
+    }
+
+    /// `-[NSString rangeOfString:options:range:]`
+    pub fn rangeOfStringOptionsRange(self: Self, search_string: foundation.String, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:range:", .{ search_string, mask, range_of_receiver_to_search });
+    }
+
+    /// `-[NSString rangeOfString:options:range:locale:]`
+    pub fn rangeOfStringOptionsRangeLocale(self: Self, search_string: foundation.String, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range, locale: ?Locale) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfString:options:range:locale:", .{ search_string, mask, range_of_receiver_to_search, locale });
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:]`
+    pub fn rangeOfCharacterFromSet(self: Self, search_set: CharacterSet) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:", .{search_set});
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:options:]`
+    pub fn rangeOfCharacterFromSetOptions(self: Self, search_set: CharacterSet, mask: StringCompareOptions) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:options:", .{ search_set, mask });
+    }
+
+    /// `-[NSString rangeOfCharacterFromSet:options:range:]`
+    pub fn rangeOfCharacterFromSetOptionsRange(self: Self, search_set: CharacterSet, mask: StringCompareOptions, range_of_receiver_to_search: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfCharacterFromSet:options:range:", .{ search_set, mask, range_of_receiver_to_search });
+    }
+
+    /// `-[NSString rangeOfComposedCharacterSequenceAtIndex:]`
+    pub fn rangeOfComposedCharacterSequenceAtIndex(self: Self, index: objc.UInteger) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfComposedCharacterSequenceAtIndex:", .{index});
+    }
+
+    /// `-[NSString rangeOfComposedCharacterSequencesForRange:]`
+    pub fn rangeOfComposedCharacterSequencesForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfComposedCharacterSequencesForRange:", .{range});
+    }
+
+    /// `-[NSString stringByAppendingString:]`
+    pub fn stringByAppendingString(self: Self, a_string: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAppendingString:", .{a_string});
+    }
+
+    /// `-[NSString uppercaseStringWithLocale:]`
+    pub fn uppercaseStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "uppercaseStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString lowercaseStringWithLocale:]`
+    pub fn lowercaseStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "lowercaseStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString capitalizedStringWithLocale:]`
+    pub fn capitalizedStringWithLocale(self: Self, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "capitalizedStringWithLocale:", .{locale});
+    }
+
+    /// `-[NSString getLineStart:end:contentsEnd:forRange:]`
+    pub fn getLineStartEndContentsEndForRange(self: Self, start_ptr: ?*objc.UInteger, line_end_ptr: ?*objc.UInteger, contents_end_ptr: ?*objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "getLineStart:end:contentsEnd:forRange:", .{ start_ptr, line_end_ptr, contents_end_ptr, range });
+    }
+
+    /// `-[NSString lineRangeForRange:]`
+    pub fn lineRangeForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "lineRangeForRange:", .{range});
+    }
+
+    /// `-[NSString getParagraphStart:end:contentsEnd:forRange:]`
+    pub fn getParagraphStartEndContentsEndForRange(self: Self, start_ptr: ?*objc.UInteger, par_end_ptr: ?*objc.UInteger, contents_end_ptr: ?*objc.UInteger, range: objc.Range) void {
+        return self.object.msgSend(void, "getParagraphStart:end:contentsEnd:forRange:", .{ start_ptr, par_end_ptr, contents_end_ptr, range });
+    }
+
+    /// `-[NSString paragraphRangeForRange:]`
+    pub fn paragraphRangeForRange(self: Self, range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "paragraphRangeForRange:", .{range});
+    }
+
+    /// `-[NSString enumerateSubstringsInRange:options:usingBlock:]`
+    pub fn enumerateSubstringsInRangeOptionsUsingBlock(self: Self, range: objc.Range, opts: StringEnumerationOptions, block: objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateSubstringsInRange:options:usingBlock:", .{ range, opts, block });
+    }
+
+    /// `-[NSString enumerateLinesUsingBlock:]`
+    pub fn enumerateLinesUsingBlock(self: Self, block: objc.BlockRef(fn (foundation.String, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateLinesUsingBlock:", .{block});
+    }
+
+    /// `-[NSString dataUsingEncoding:allowLossyConversion:]`
+    pub fn dataUsingEncodingAllowLossyConversion(self: Self, encoding: objc.UInteger, lossy: bool) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "dataUsingEncoding:allowLossyConversion:", .{ encoding, lossy });
+    }
+
+    /// `-[NSString dataUsingEncoding:]`
+    pub fn dataUsingEncoding(self: Self, encoding: objc.UInteger) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "dataUsingEncoding:", .{encoding});
+    }
+
+    /// `-[NSString canBeConvertedToEncoding:]`
+    pub fn canBeConvertedToEncoding(self: Self, encoding: objc.UInteger) bool {
+        return self.object.msgSend(bool, "canBeConvertedToEncoding:", .{encoding});
+    }
+
+    /// `-[NSString cStringUsingEncoding:]`
+    pub fn cStringUsingEncoding(self: Self, encoding: objc.UInteger) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "cStringUsingEncoding:", .{encoding});
+    }
+
+    /// `-[NSString getCString:maxLength:encoding:]`
+    pub fn getCStringMaxLengthEncoding(self: Self, buffer: [*:0]const u8, max_buffer_count: objc.UInteger, encoding: objc.UInteger) bool {
+        return self.object.msgSend(bool, "getCString:maxLength:encoding:", .{ buffer, max_buffer_count, encoding });
+    }
+
+    /// `-[NSString getBytes:maxLength:usedLength:encoding:options:range:remainingRange:]`
+    pub fn getBytesMaxLengthUsedLengthEncodingOptionsRangeRemainingRange(self: Self, buffer: ?*anyopaque, max_buffer_count: objc.UInteger, used_buffer_count: ?*objc.UInteger, encoding: objc.UInteger, options: StringEncodingConversionOptions, range: objc.Range, leftover: ?*objc.Range) bool {
+        return self.object.msgSend(bool, "getBytes:maxLength:usedLength:encoding:options:range:remainingRange:", .{ buffer, max_buffer_count, used_buffer_count, encoding, options, range, leftover });
+    }
+
+    /// `-[NSString maximumLengthOfBytesUsingEncoding:]`
+    pub fn maximumLengthOfBytesUsingEncoding(self: Self, enc: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "maximumLengthOfBytesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString lengthOfBytesUsingEncoding:]`
+    pub fn lengthOfBytesUsingEncoding(self: Self, enc: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "lengthOfBytesUsingEncoding:", .{enc});
+    }
+
+    /// `+[NSString localizedNameOfStringEncoding:]`
+    pub fn localizedNameOfStringEncoding(encoding: objc.UInteger) foundation.String {
+        return class().msgSend(foundation.String, "localizedNameOfStringEncoding:", .{encoding});
+    }
+
+    /// `-[NSString componentsSeparatedByString:]`
+    pub fn componentsSeparatedByString(self: Self, separator: foundation.String) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "componentsSeparatedByString:", .{separator});
+    }
+
+    /// `-[NSString componentsSeparatedByCharactersInSet:]`
+    pub fn componentsSeparatedByCharactersInSet(self: Self, separator: CharacterSet) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "componentsSeparatedByCharactersInSet:", .{separator});
+    }
+
+    /// `-[NSString stringByTrimmingCharactersInSet:]`
+    pub fn stringByTrimmingCharactersInSet(self: Self, set: CharacterSet) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByTrimmingCharactersInSet:", .{set});
+    }
+
+    /// `-[NSString stringByPaddingToLength:withString:startingAtIndex:]`
+    pub fn stringByPaddingToLengthWithStringStartingAtIndex(self: Self, new_length: objc.UInteger, pad_string: foundation.String, pad_index: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByPaddingToLength:withString:startingAtIndex:", .{ new_length, pad_string, pad_index });
+    }
+
+    /// `-[NSString stringByFoldingWithOptions:locale:]`
+    pub fn stringByFoldingWithOptionsLocale(self: Self, options: StringCompareOptions, locale: ?Locale) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByFoldingWithOptions:locale:", .{ options, locale });
+    }
+
+    /// `-[NSString stringByReplacingOccurrencesOfString:withString:options:range:]`
+    pub fn stringByReplacingOccurrencesOfStringWithStringOptionsRange(self: Self, target: foundation.String, replacement: foundation.String, options: StringCompareOptions, search_range: objc.Range) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingOccurrencesOfString:withString:options:range:", .{ target, replacement, options, search_range });
+    }
+
+    /// `-[NSString stringByReplacingOccurrencesOfString:withString:]`
+    pub fn stringByReplacingOccurrencesOfStringWithString(self: Self, target: foundation.String, replacement: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingOccurrencesOfString:withString:", .{ target, replacement });
+    }
+
+    /// `-[NSString stringByReplacingCharactersInRange:withString:]`
+    pub fn stringByReplacingCharactersInRangeWithString(self: Self, range: objc.Range, replacement: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByReplacingCharactersInRange:withString:", .{ range, replacement });
+    }
+
+    /// `-[NSString stringByApplyingTransform:reverse:]`
+    pub fn stringByApplyingTransformReverse(self: Self, transform: foundation.String, reverse: bool) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByApplyingTransform:reverse:", .{ transform, reverse });
+    }
+
+    /// `-[NSString writeToURL:atomically:encoding:error:]`
+    pub fn writeToURLAtomicallyEncodingError(self: Self, url: foundation.Url, use_auxiliary_file: bool, enc: objc.UInteger, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:encoding:error:", .{ url, use_auxiliary_file, enc, @"error" });
+    }
+
+    /// `-[NSString writeToFile:atomically:encoding:error:]`
+    pub fn writeToFileAtomicallyEncodingError(self: Self, path: foundation.String, use_auxiliary_file: bool, enc: objc.UInteger, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:encoding:error:", .{ path, use_auxiliary_file, enc, @"error" });
+    }
+
+    /// `-[NSString initWithCharactersNoCopy:length:freeWhenDone:]`
+    pub fn initWithCharactersNoCopyLengthFreeWhenDone(self: Self, characters: ?*u16, length_: objc.UInteger, free_buffer: bool) MutableString {
+        return self.object.msgSend(MutableString, "initWithCharactersNoCopy:length:freeWhenDone:", .{ characters, length_, free_buffer });
+    }
+
+    /// `-[NSString initWithCharactersNoCopy:length:deallocator:]`
+    pub fn initWithCharactersNoCopyLengthDeallocator(self: Self, chars: ?*u16, len: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*u16, objc.UInteger) void)) MutableString {
+        return self.object.msgSend(MutableString, "initWithCharactersNoCopy:length:deallocator:", .{ chars, len, deallocator });
+    }
+
+    /// `-[NSString initWithCharacters:length:]`
+    pub fn initWithCharactersLength(self: Self, characters: ?[*]const u16, length_: objc.UInteger) MutableString {
+        return self.object.msgSend(MutableString, "initWithCharacters:length:", .{ characters, length_ });
+    }
+
+    /// `-[NSString initWithUTF8String:]`
+    pub fn initWithUTF8String(self: Self, null_terminated_c_string: [*:0]const u8) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithUTF8String:", .{null_terminated_c_string});
+    }
+
+    /// `-[NSString initWithString:]`
+    pub fn initWithString(self: Self, a_string: foundation.String) MutableString {
+        return self.object.msgSend(MutableString, "initWithString:", .{a_string});
+    }
+
+    /// `-[NSString initWithFormat:arguments:]`
+    pub fn initWithFormatArguments(self: Self, format: foundation.String, arg_list: ?[*:0]const u8) MutableString {
+        return self.object.msgSend(MutableString, "initWithFormat:arguments:", .{ format, arg_list });
+    }
+
+    /// `-[NSString initWithFormat:locale:arguments:]`
+    pub fn initWithFormatLocaleArguments(self: Self, format: foundation.String, locale: ?objc.Object, arg_list: ?[*:0]const u8) MutableString {
+        return self.object.msgSend(MutableString, "initWithFormat:locale:arguments:", .{ format, locale, arg_list });
+    }
+
+    /// `-[NSString initWithValidatedFormat:validFormatSpecifiers:arguments:error:]`
+    pub fn initWithValidatedFormatValidFormatSpecifiersArgumentsError(self: Self, format: foundation.String, valid_format_specifiers: foundation.String, arg_list: ?[*:0]const u8, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithValidatedFormat:validFormatSpecifiers:arguments:error:", .{ format, valid_format_specifiers, arg_list, @"error" });
+    }
+
+    /// `-[NSString initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:]`
+    pub fn initWithValidatedFormatValidFormatSpecifiersLocaleArgumentsError(self: Self, format: foundation.String, valid_format_specifiers: foundation.String, locale: ?objc.Object, arg_list: ?[*:0]const u8, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithValidatedFormat:validFormatSpecifiers:locale:arguments:error:", .{ format, valid_format_specifiers, locale, arg_list, @"error" });
+    }
+
+    /// `-[NSString initWithData:encoding:]`
+    pub fn initWithDataEncoding(self: Self, data: foundation.Data, encoding: objc.UInteger) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithData:encoding:", .{ data, encoding });
+    }
+
+    /// `-[NSString initWithBytes:length:encoding:]`
+    pub fn initWithBytesLengthEncoding(self: Self, bytes: ?*const anyopaque, len: objc.UInteger, encoding: objc.UInteger) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithBytes:length:encoding:", .{ bytes, len, encoding });
+    }
+
+    /// `-[NSString initWithBytesNoCopy:length:encoding:freeWhenDone:]`
+    pub fn initWithBytesNoCopyLengthEncodingFreeWhenDone(self: Self, bytes: ?*anyopaque, len: objc.UInteger, encoding: objc.UInteger, free_buffer: bool) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithBytesNoCopy:length:encoding:freeWhenDone:", .{ bytes, len, encoding, free_buffer });
+    }
+
+    /// `-[NSString initWithBytesNoCopy:length:encoding:deallocator:]`
+    pub fn initWithBytesNoCopyLengthEncodingDeallocator(self: Self, bytes: ?*anyopaque, len: objc.UInteger, encoding: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithBytesNoCopy:length:encoding:deallocator:", .{ bytes, len, encoding, deallocator });
+    }
+
+    /// `+[NSString string]`
+    pub fn string() MutableString {
+        return class().msgSend(MutableString, "string", .{});
+    }
+
+    /// `+[NSString stringWithString:]`
+    pub fn stringWithString(string_: foundation.String) MutableString {
+        return class().msgSend(MutableString, "stringWithString:", .{string_});
+    }
+
+    /// `+[NSString stringWithCharacters:length:]`
+    pub fn stringWithCharactersLength(characters: ?[*]const u16, length_: objc.UInteger) MutableString {
+        return class().msgSend(MutableString, "stringWithCharacters:length:", .{ characters, length_ });
+    }
+
+    /// `+[NSString stringWithUTF8String:]`
+    pub fn stringWithUTF8String(null_terminated_c_string: [*:0]const u8) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithUTF8String:", .{null_terminated_c_string});
+    }
+
+    /// `-[NSString initWithCString:encoding:]`
+    pub fn initWithCStringEncoding(self: Self, null_terminated_c_string: [*:0]const u8, encoding: objc.UInteger) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithCString:encoding:", .{ null_terminated_c_string, encoding });
+    }
+
+    /// `+[NSString stringWithCString:encoding:]`
+    pub fn stringWithCStringEncoding(c_string: [*:0]const u8, enc: objc.UInteger) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithCString:encoding:", .{ c_string, enc });
+    }
+
+    /// `-[NSString initWithContentsOfURL:encoding:error:]`
+    pub fn initWithContentsOfURLEncodingError(self: Self, url: foundation.Url, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithContentsOfURL:encoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfFile:encoding:error:]`
+    pub fn initWithContentsOfFileEncodingError(self: Self, path: foundation.String, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithContentsOfFile:encoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfURL:encoding:error:]`
+    pub fn stringWithContentsOfURLEncodingError(url: foundation.Url, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithContentsOfURL:encoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfFile:encoding:error:]`
+    pub fn stringWithContentsOfFileEncodingError(path: foundation.String, enc: objc.UInteger, @"error": ?*objc.abi.Id) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithContentsOfFile:encoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfURL:usedEncoding:error:]`
+    pub fn initWithContentsOfURLUsedEncodingError(self: Self, url: foundation.Url, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithContentsOfURL:usedEncoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `-[NSString initWithContentsOfFile:usedEncoding:error:]`
+    pub fn initWithContentsOfFileUsedEncodingError(self: Self, path: foundation.String, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?MutableString {
+        return self.object.msgSend(?MutableString, "initWithContentsOfFile:usedEncoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfURL:usedEncoding:error:]`
+    pub fn stringWithContentsOfURLUsedEncodingError(url: foundation.Url, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithContentsOfURL:usedEncoding:error:", .{ url, enc, @"error" });
+    }
+
+    /// `+[NSString stringWithContentsOfFile:usedEncoding:error:]`
+    pub fn stringWithContentsOfFileUsedEncodingError(path: foundation.String, enc: ?objc.Object, @"error": ?*objc.abi.Id) ?MutableString {
+        return class().msgSend(?MutableString, "stringWithContentsOfFile:usedEncoding:error:", .{ path, enc, @"error" });
+    }
+
+    /// `-[NSString doubleValue]`
+    pub fn doubleValue(self: Self) f64 {
+        return self.object.msgSend(f64, "doubleValue", .{});
+    }
+
+    /// `-[NSString floatValue]`
+    pub fn floatValue(self: Self) f32 {
+        return self.object.msgSend(f32, "floatValue", .{});
+    }
+
+    /// `-[NSString intValue]`
+    pub fn intValue(self: Self) c_int {
+        return self.object.msgSend(c_int, "intValue", .{});
+    }
+
+    /// `-[NSString integerValue]`
+    pub fn integerValue(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "integerValue", .{});
+    }
+
+    /// `-[NSString longLongValue]`
+    pub fn longLongValue(self: Self) c_longlong {
+        return self.object.msgSend(c_longlong, "longLongValue", .{});
+    }
+
+    /// `-[NSString boolValue]`
+    pub fn boolValue(self: Self) bool {
+        return self.object.msgSend(bool, "boolValue", .{});
+    }
+
+    /// `-[NSString uppercaseString]`
+    pub fn uppercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "uppercaseString", .{});
+    }
+
+    /// `-[NSString lowercaseString]`
+    pub fn lowercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "lowercaseString", .{});
+    }
+
+    /// `-[NSString capitalizedString]`
+    pub fn capitalizedString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "capitalizedString", .{});
+    }
+
+    /// `-[NSString localizedUppercaseString]`
+    pub fn localizedUppercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedUppercaseString", .{});
+    }
+
+    /// `-[NSString localizedLowercaseString]`
+    pub fn localizedLowercaseString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedLowercaseString", .{});
+    }
+
+    /// `-[NSString localizedCapitalizedString]`
+    pub fn localizedCapitalizedString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedCapitalizedString", .{});
+    }
+
+    /// `-[NSString UTF8String]`
+    pub fn utf8String(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "UTF8String", .{});
+    }
+
+    /// `-[NSString fastestEncoding]`
+    pub fn fastestEncoding(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "fastestEncoding", .{});
+    }
+
+    /// `-[NSString smallestEncoding]`
+    pub fn smallestEncoding(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "smallestEncoding", .{});
+    }
+
+    /// `+[NSString availableStringEncodings]`
+    pub fn availableStringEncodings() objc.Object {
+        return class().msgSend(objc.Object, "availableStringEncodings", .{});
+    }
+
+    /// `+[NSString defaultCStringEncoding]`
+    pub fn defaultCStringEncoding() objc.UInteger {
+        return class().msgSend(objc.UInteger, "defaultCStringEncoding", .{});
+    }
+
+    /// `-[NSString decomposedStringWithCanonicalMapping]`
+    pub fn decomposedStringWithCanonicalMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "decomposedStringWithCanonicalMapping", .{});
+    }
+
+    /// `-[NSString precomposedStringWithCanonicalMapping]`
+    pub fn precomposedStringWithCanonicalMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "precomposedStringWithCanonicalMapping", .{});
+    }
+
+    /// `-[NSString decomposedStringWithCompatibilityMapping]`
+    pub fn decomposedStringWithCompatibilityMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "decomposedStringWithCompatibilityMapping", .{});
+    }
+
+    /// `-[NSString precomposedStringWithCompatibilityMapping]`
+    pub fn precomposedStringWithCompatibilityMapping(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "precomposedStringWithCompatibilityMapping", .{});
+    }
+
+    /// `-[NSString description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSString hash]`
+    pub fn hash(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "hash", .{});
+    }
+
+    /// `+[NSString stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:]`
+    pub fn stringEncodingForDataEncodingOptionsConvertedStringUsedLossyConversion(data: foundation.Data, opts: ?foundation.Dictionary(objc.Object, objc.Object), string_: ?*objc.abi.Id, used_lossy_conversion: ?*bool) objc.UInteger {
+        return class().msgSend(objc.UInteger, "stringEncodingForData:encodingOptions:convertedString:usedLossyConversion:", .{ data, opts, string_, used_lossy_conversion });
+    }
+
+    /// `-[NSString propertyList]`
+    pub fn propertyList(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "propertyList", .{});
+    }
+
+    /// `-[NSString propertyListFromStringsFileFormat]`
+    pub fn propertyListFromStringsFileFormat(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "propertyListFromStringsFileFormat", .{});
+    }
+
+    /// `-[NSString cString]`
+    pub fn cString(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "cString", .{});
+    }
+
+    /// `-[NSString lossyCString]`
+    pub fn lossyCString(self: Self) ?[*:0]const u8 {
+        return self.object.msgSend(?[*:0]const u8, "lossyCString", .{});
+    }
+
+    /// `-[NSString cStringLength]`
+    pub fn cStringLength(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "cStringLength", .{});
+    }
+
+    /// `-[NSString getCString:]`
+    pub fn getCString(self: Self, bytes: [*:0]const u8) void {
+        return self.object.msgSend(void, "getCString:", .{bytes});
+    }
+
+    /// `-[NSString getCString:maxLength:]`
+    pub fn getCStringMaxLength(self: Self, bytes: [*:0]const u8, max_length: objc.UInteger) void {
+        return self.object.msgSend(void, "getCString:maxLength:", .{ bytes, max_length });
+    }
+
+    /// `-[NSString getCString:maxLength:range:remainingRange:]`
+    pub fn getCStringMaxLengthRangeRemainingRange(self: Self, bytes: [*:0]const u8, max_length: objc.UInteger, a_range: objc.Range, leftover_range: ?*objc.Range) void {
+        return self.object.msgSend(void, "getCString:maxLength:range:remainingRange:", .{ bytes, max_length, a_range, leftover_range });
+    }
+
+    /// `-[NSString writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSString writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSString initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSString initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfURL:", .{url});
+    }
+
+    /// `+[NSString stringWithContentsOfFile:]`
+    pub fn stringWithContentsOfFile(path: foundation.String) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSString stringWithContentsOfURL:]`
+    pub fn stringWithContentsOfURL(url: foundation.Url) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSString initWithCStringNoCopy:length:freeWhenDone:]`
+    pub fn initWithCStringNoCopyLengthFreeWhenDone(self: Self, bytes: [*:0]const u8, length_: objc.UInteger, free_buffer: bool) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCStringNoCopy:length:freeWhenDone:", .{ bytes, length_, free_buffer });
+    }
+
+    /// `-[NSString initWithCString:length:]`
+    pub fn initWithCStringLength(self: Self, bytes: [*:0]const u8, length_: objc.UInteger) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCString:length:", .{ bytes, length_ });
+    }
+
+    /// `-[NSString initWithCString:]`
+    pub fn initWithCString(self: Self, bytes: [*:0]const u8) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithCString:", .{bytes});
+    }
+
+    /// `+[NSString stringWithCString:length:]`
+    pub fn stringWithCStringLength(bytes: [*:0]const u8, length_: objc.UInteger) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithCString:length:", .{ bytes, length_ });
+    }
+
+    /// `+[NSString stringWithCString:]`
+    pub fn stringWithCString(bytes: [*:0]const u8) ?objc.Object {
+        return class().msgSend(?objc.Object, "stringWithCString:", .{bytes});
+    }
+
+    /// `-[NSString getCharacters:]`
+    pub fn getCharacters(self: Self, buffer: ?*u16) void {
+        return self.object.msgSend(void, "getCharacters:", .{buffer});
+    }
+
+    /// `-[NSString variantFittingPresentationWidth:]`
+    pub fn variantFittingPresentationWidth(self: Self, width: objc.Integer) foundation.String {
+        return self.object.msgSend(foundation.String, "variantFittingPresentationWidth:", .{width});
+    }
+
+    /// `+[NSString pathWithComponents:]`
+    pub fn pathWithComponents(components: foundation.Array(foundation.String)) foundation.String {
+        return class().msgSend(foundation.String, "pathWithComponents:", .{components});
+    }
+
+    /// `-[NSString stringByAppendingPathComponent:]`
+    pub fn stringByAppendingPathComponent(self: Self, str: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAppendingPathComponent:", .{str});
+    }
+
+    /// `-[NSString stringByAppendingPathExtension:]`
+    pub fn stringByAppendingPathExtension(self: Self, str: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAppendingPathExtension:", .{str});
+    }
+
+    /// `-[NSString stringsByAppendingPaths:]`
+    pub fn stringsByAppendingPaths(self: Self, paths: foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "stringsByAppendingPaths:", .{paths});
+    }
+
+    /// `-[NSString completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:]`
+    pub fn completePathIntoStringCaseSensitiveMatchesIntoArrayFilterTypes(self: Self, output_name: ?*objc.abi.Id, flag: bool, output_array: ?*objc.abi.Id, filter_types: ?foundation.Array(foundation.String)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "completePathIntoString:caseSensitive:matchesIntoArray:filterTypes:", .{ output_name, flag, output_array, filter_types });
+    }
+
+    /// `-[NSString getFileSystemRepresentation:maxLength:]`
+    pub fn getFileSystemRepresentationMaxLength(self: Self, cname: [*:0]const u8, max: objc.UInteger) bool {
+        return self.object.msgSend(bool, "getFileSystemRepresentation:maxLength:", .{ cname, max });
+    }
+
+    /// `-[NSString pathComponents]`
+    pub fn pathComponents(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathComponents", .{});
+    }
+
+    /// `-[NSString isAbsolutePath]`
+    pub fn isAbsolutePath(self: Self) bool {
+        return self.object.msgSend(bool, "isAbsolutePath", .{});
+    }
+
+    /// `-[NSString lastPathComponent]`
+    pub fn lastPathComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "lastPathComponent", .{});
+    }
+
+    /// `-[NSString stringByDeletingLastPathComponent]`
+    pub fn stringByDeletingLastPathComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByDeletingLastPathComponent", .{});
+    }
+
+    /// `-[NSString pathExtension]`
+    pub fn pathExtension(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "pathExtension", .{});
+    }
+
+    /// `-[NSString stringByDeletingPathExtension]`
+    pub fn stringByDeletingPathExtension(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByDeletingPathExtension", .{});
+    }
+
+    /// `-[NSString stringByAbbreviatingWithTildeInPath]`
+    pub fn stringByAbbreviatingWithTildeInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByAbbreviatingWithTildeInPath", .{});
+    }
+
+    /// `-[NSString stringByExpandingTildeInPath]`
+    pub fn stringByExpandingTildeInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByExpandingTildeInPath", .{});
+    }
+
+    /// `-[NSString stringByStandardizingPath]`
+    pub fn stringByStandardizingPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByStandardizingPath", .{});
+    }
+
+    /// `-[NSString stringByResolvingSymlinksInPath]`
+    pub fn stringByResolvingSymlinksInPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringByResolvingSymlinksInPath", .{});
+    }
+
+    /// `-[NSString fileSystemRepresentation]`
+    pub fn fileSystemRepresentation(self: Self) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "fileSystemRepresentation", .{});
+    }
+
+    /// `-[NSString stringByAddingPercentEncodingWithAllowedCharacters:]`
+    pub fn stringByAddingPercentEncodingWithAllowedCharacters(self: Self, allowed_characters: CharacterSet) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAddingPercentEncodingWithAllowedCharacters:", .{allowed_characters});
+    }
+
+    /// `-[NSString stringByAddingPercentEscapesUsingEncoding:]`
+    pub fn stringByAddingPercentEscapesUsingEncoding(self: Self, enc: objc.UInteger) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByAddingPercentEscapesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString stringByReplacingPercentEscapesUsingEncoding:]`
+    pub fn stringByReplacingPercentEscapesUsingEncoding(self: Self, enc: objc.UInteger) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByReplacingPercentEscapesUsingEncoding:", .{enc});
+    }
+
+    /// `-[NSString stringByRemovingPercentEncoding]`
+    pub fn stringByRemovingPercentEncoding(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringByRemovingPercentEncoding", .{});
+    }
+
+    /// `-[NSString linguisticTagsInRange:scheme:options:orthography:tokenRanges:]`
+    pub fn linguisticTagsInRangeSchemeOptionsOrthographyTokenRanges(self: Self, range: objc.Range, scheme: foundation.String, options: LinguisticTaggerOptions, orthography: ?objc.Object, token_ranges: ?*objc.abi.Id) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "linguisticTagsInRange:scheme:options:orthography:tokenRanges:", .{ range, scheme, options, orthography, token_ranges });
+    }
+
+    /// `-[NSString enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:]`
+    pub fn enumerateLinguisticTagsInRangeSchemeOptionsOrthographyUsingBlock(self: Self, range: objc.Range, scheme: foundation.String, options: LinguisticTaggerOptions, orthography: ?objc.Object, block: objc.BlockRef(fn (?foundation.String, objc.Range, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateLinguisticTagsInRange:scheme:options:orthography:usingBlock:", .{ range, scheme, options, orthography, block });
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-replaceCharactersInRange:withString:" = fn (objc.Range, foundation.String) void;
+        pub const @"-insertString:atIndex:" = fn (foundation.String, objc.UInteger) void;
+        pub const @"-deleteCharactersInRange:" = fn (objc.Range) void;
+        pub const @"-appendString:" = fn (foundation.String) void;
+        pub const @"-setString:" = fn (foundation.String) void;
+        pub const @"-replaceOccurrencesOfString:withString:options:range:" = fn (foundation.String, foundation.String, StringCompareOptions, objc.Range) objc.UInteger;
+        pub const @"-applyTransform:reverse:range:updatedRange:" = fn (foundation.String, bool, objc.Range, ?*objc.Range) bool;
+        pub const @"-initWithCapacity:" = fn (objc.UInteger) MutableString;
+        pub const @"+stringWithCapacity:" = fn (objc.UInteger) MutableString;
+    };
+
+    // Not generated:
+    //   -[NSMutableString appendFormat:]: variadic
+};
+
+/// `NSNumber`, a subclass of `NSValue`.
+pub const Number = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Value;
+    pub const class_name = "NSNumber";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSNumber alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSNumber`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSNumber initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Number {
+        return self.object.msgSend(?Number, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSNumber initWithChar:]`
+    pub fn initWithChar(self: Self, value: u8) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithChar:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedChar:]`
+    pub fn initWithUnsignedChar(self: Self, value: u8) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedChar:", .{value});
+    }
+
+    /// `-[NSNumber initWithShort:]`
+    pub fn initWithShort(self: Self, value: c_short) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithShort:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedShort:]`
+    pub fn initWithUnsignedShort(self: Self, value: c_ushort) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedShort:", .{value});
+    }
+
+    /// `-[NSNumber initWithInt:]`
+    pub fn initWithInt(self: Self, value: c_int) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithInt:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedInt:]`
+    pub fn initWithUnsignedInt(self: Self, value: c_uint) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedInt:", .{value});
+    }
+
+    /// `-[NSNumber initWithLong:]`
+    pub fn initWithLong(self: Self, value: objc.Integer) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithLong:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedLong:]`
+    pub fn initWithUnsignedLong(self: Self, value: objc.UInteger) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedLong:", .{value});
+    }
+
+    /// `-[NSNumber initWithLongLong:]`
+    pub fn initWithLongLong(self: Self, value: c_longlong) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithLongLong:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedLongLong:]`
+    pub fn initWithUnsignedLongLong(self: Self, value: c_ulonglong) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedLongLong:", .{value});
+    }
+
+    /// `-[NSNumber initWithFloat:]`
+    pub fn initWithFloat(self: Self, value: f32) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithFloat:", .{value});
+    }
+
+    /// `-[NSNumber initWithDouble:]`
+    pub fn initWithDouble(self: Self, value: f64) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithDouble:", .{value});
+    }
+
+    /// `-[NSNumber initWithBool:]`
+    pub fn initWithBool(self: Self, value: bool) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithBool:", .{value});
+    }
+
+    /// `-[NSNumber initWithInteger:]`
+    pub fn initWithInteger(self: Self, value: objc.Integer) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithInteger:", .{value});
+    }
+
+    /// `-[NSNumber initWithUnsignedInteger:]`
+    pub fn initWithUnsignedInteger(self: Self, value: objc.UInteger) foundation.Number {
+        return self.object.msgSend(foundation.Number, "initWithUnsignedInteger:", .{value});
+    }
+
+    /// `-[NSNumber compare:]`
+    pub fn compare(self: Self, other_number: foundation.Number) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:", .{other_number});
+    }
+
+    /// `-[NSNumber isEqualToNumber:]`
+    pub fn isEqualToNumber(self: Self, number: foundation.Number) bool {
+        return self.object.msgSend(bool, "isEqualToNumber:", .{number});
+    }
+
+    /// `-[NSNumber descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSNumber charValue]`
+    pub fn charValue(self: Self) u8 {
+        return self.object.msgSend(u8, "charValue", .{});
+    }
+
+    /// `-[NSNumber unsignedCharValue]`
+    pub fn unsignedCharValue(self: Self) u8 {
+        return self.object.msgSend(u8, "unsignedCharValue", .{});
+    }
+
+    /// `-[NSNumber shortValue]`
+    pub fn shortValue(self: Self) c_short {
+        return self.object.msgSend(c_short, "shortValue", .{});
+    }
+
+    /// `-[NSNumber unsignedShortValue]`
+    pub fn unsignedShortValue(self: Self) c_ushort {
+        return self.object.msgSend(c_ushort, "unsignedShortValue", .{});
+    }
+
+    /// `-[NSNumber intValue]`
+    pub fn intValue(self: Self) c_int {
+        return self.object.msgSend(c_int, "intValue", .{});
+    }
+
+    /// `-[NSNumber unsignedIntValue]`
+    pub fn unsignedIntValue(self: Self) c_uint {
+        return self.object.msgSend(c_uint, "unsignedIntValue", .{});
+    }
+
+    /// `-[NSNumber longValue]`
+    pub fn longValue(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "longValue", .{});
+    }
+
+    /// `-[NSNumber unsignedLongValue]`
+    pub fn unsignedLongValue(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "unsignedLongValue", .{});
+    }
+
+    /// `-[NSNumber longLongValue]`
+    pub fn longLongValue(self: Self) c_longlong {
+        return self.object.msgSend(c_longlong, "longLongValue", .{});
+    }
+
+    /// `-[NSNumber unsignedLongLongValue]`
+    pub fn unsignedLongLongValue(self: Self) c_ulonglong {
+        return self.object.msgSend(c_ulonglong, "unsignedLongLongValue", .{});
+    }
+
+    /// `-[NSNumber floatValue]`
+    pub fn floatValue(self: Self) f32 {
+        return self.object.msgSend(f32, "floatValue", .{});
+    }
+
+    /// `-[NSNumber doubleValue]`
+    pub fn doubleValue(self: Self) f64 {
+        return self.object.msgSend(f64, "doubleValue", .{});
+    }
+
+    /// `-[NSNumber boolValue]`
+    pub fn boolValue(self: Self) bool {
+        return self.object.msgSend(bool, "boolValue", .{});
+    }
+
+    /// `-[NSNumber integerValue]`
+    pub fn integerValue(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "integerValue", .{});
+    }
+
+    /// `-[NSNumber unsignedIntegerValue]`
+    pub fn unsignedIntegerValue(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "unsignedIntegerValue", .{});
+    }
+
+    /// `-[NSNumber stringValue]`
+    pub fn stringValue(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringValue", .{});
+    }
+
+    /// `+[NSNumber numberWithChar:]`
+    pub fn numberWithChar(value: u8) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithChar:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedChar:]`
+    pub fn numberWithUnsignedChar(value: u8) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedChar:", .{value});
+    }
+
+    /// `+[NSNumber numberWithShort:]`
+    pub fn numberWithShort(value: c_short) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithShort:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedShort:]`
+    pub fn numberWithUnsignedShort(value: c_ushort) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedShort:", .{value});
+    }
+
+    /// `+[NSNumber numberWithInt:]`
+    pub fn numberWithInt(value: c_int) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithInt:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedInt:]`
+    pub fn numberWithUnsignedInt(value: c_uint) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedInt:", .{value});
+    }
+
+    /// `+[NSNumber numberWithLong:]`
+    pub fn numberWithLong(value: objc.Integer) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithLong:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedLong:]`
+    pub fn numberWithUnsignedLong(value: objc.UInteger) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedLong:", .{value});
+    }
+
+    /// `+[NSNumber numberWithLongLong:]`
+    pub fn numberWithLongLong(value: c_longlong) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithLongLong:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedLongLong:]`
+    pub fn numberWithUnsignedLongLong(value: c_ulonglong) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedLongLong:", .{value});
+    }
+
+    /// `+[NSNumber numberWithFloat:]`
+    pub fn numberWithFloat(value: f32) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithFloat:", .{value});
+    }
+
+    /// `+[NSNumber numberWithDouble:]`
+    pub fn numberWithDouble(value: f64) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithDouble:", .{value});
+    }
+
+    /// `+[NSNumber numberWithBool:]`
+    pub fn numberWithBool(value: bool) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithBool:", .{value});
+    }
+
+    /// `+[NSNumber numberWithInteger:]`
+    pub fn numberWithInteger(value: objc.Integer) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithInteger:", .{value});
+    }
+
+    /// `+[NSNumber numberWithUnsignedInteger:]`
+    pub fn numberWithUnsignedInteger(value: objc.UInteger) foundation.Number {
+        return class().msgSend(foundation.Number, "numberWithUnsignedInteger:", .{value});
+    }
+
+    /// `-[NSValue getValue:size:]`
+    pub fn getValueSize(self: Self, value: ?*anyopaque, size: objc.UInteger) void {
+        return self.object.msgSend(void, "getValue:size:", .{ value, size });
+    }
+
+    /// `-[NSValue initWithBytes:objCType:]`
+    pub fn initWithBytesObjCType(self: Self, value: ?*const anyopaque, @"type": [*:0]const u8) Number {
+        return self.object.msgSend(Number, "initWithBytes:objCType:", .{ value, @"type" });
+    }
+
+    /// `-[NSValue objCType]`
+    pub fn objCType(self: Self) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "objCType", .{});
+    }
+
+    /// `+[NSValue valueWithBytes:objCType:]`
+    pub fn valueWithBytesObjCType(value: ?*const anyopaque, @"type": [*:0]const u8) Value {
+        return class().msgSend(Value, "valueWithBytes:objCType:", .{ value, @"type" });
+    }
+
+    /// `+[NSValue value:withObjCType:]`
+    pub fn valueWithObjCType(value: ?*const anyopaque, @"type": [*:0]const u8) Value {
+        return class().msgSend(Value, "value:withObjCType:", .{ value, @"type" });
+    }
+
+    /// `+[NSValue valueWithNonretainedObject:]`
+    pub fn valueWithNonretainedObject(an_object: ?objc.Object) Value {
+        return class().msgSend(Value, "valueWithNonretainedObject:", .{an_object});
+    }
+
+    /// `+[NSValue valueWithPointer:]`
+    pub fn valueWithPointer(pointer: ?*const anyopaque) Value {
+        return class().msgSend(Value, "valueWithPointer:", .{pointer});
+    }
+
+    /// `-[NSValue isEqualToValue:]`
+    pub fn isEqualToValue(self: Self, value: Value) bool {
+        return self.object.msgSend(bool, "isEqualToValue:", .{value});
+    }
+
+    /// `-[NSValue nonretainedObjectValue]`
+    pub fn nonretainedObjectValue(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "nonretainedObjectValue", .{});
+    }
+
+    /// `-[NSValue pointerValue]`
+    pub fn pointerValue(self: Self) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "pointerValue", .{});
+    }
+
+    /// `-[NSValue getValue:]`
+    pub fn getValue(self: Self, value: ?*anyopaque) void {
+        return self.object.msgSend(void, "getValue:", .{value});
+    }
+
+    /// `+[NSValue valueWithRange:]`
+    pub fn valueWithRange(range: objc.Range) Value {
+        return class().msgSend(Value, "valueWithRange:", .{range});
+    }
+
+    /// `-[NSValue rangeValue]`
+    pub fn rangeValue(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeValue", .{});
+    }
+
+    /// `+[NSValue valueWithPoint:]`
+    pub fn valueWithPoint(point: cg.Point) Value {
+        return class().msgSend(Value, "valueWithPoint:", .{point});
+    }
+
+    /// `+[NSValue valueWithSize:]`
+    pub fn valueWithSize(size: cg.Size) Value {
+        return class().msgSend(Value, "valueWithSize:", .{size});
+    }
+
+    /// `+[NSValue valueWithRect:]`
+    pub fn valueWithRect(rect: cg.Rect) Value {
+        return class().msgSend(Value, "valueWithRect:", .{rect});
+    }
+
+    /// `+[NSValue valueWithEdgeInsets:]`
+    pub fn valueWithEdgeInsets(insets: EdgeInsets) Value {
+        return class().msgSend(Value, "valueWithEdgeInsets:", .{insets});
+    }
+
+    /// `-[NSValue pointValue]`
+    pub fn pointValue(self: Self) cg.Point {
+        return self.object.msgSend(cg.Point, "pointValue", .{});
+    }
+
+    /// `-[NSValue sizeValue]`
+    pub fn sizeValue(self: Self) cg.Size {
+        return self.object.msgSend(cg.Size, "sizeValue", .{});
+    }
+
+    /// `-[NSValue rectValue]`
+    pub fn rectValue(self: Self) cg.Rect {
+        return self.object.msgSend(cg.Rect, "rectValue", .{});
+    }
+
+    /// `-[NSValue edgeInsetsValue]`
+    pub fn edgeInsetsValue(self: Self) EdgeInsets {
+        return self.object.msgSend(EdgeInsets, "edgeInsetsValue", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Number;
+        pub const @"-initWithChar:" = fn (u8) foundation.Number;
+        pub const @"-initWithUnsignedChar:" = fn (u8) foundation.Number;
+        pub const @"-initWithShort:" = fn (c_short) foundation.Number;
+        pub const @"-initWithUnsignedShort:" = fn (c_ushort) foundation.Number;
+        pub const @"-initWithInt:" = fn (c_int) foundation.Number;
+        pub const @"-initWithUnsignedInt:" = fn (c_uint) foundation.Number;
+        pub const @"-initWithLong:" = fn (objc.Integer) foundation.Number;
+        pub const @"-initWithUnsignedLong:" = fn (objc.UInteger) foundation.Number;
+        pub const @"-initWithLongLong:" = fn (c_longlong) foundation.Number;
+        pub const @"-initWithUnsignedLongLong:" = fn (c_ulonglong) foundation.Number;
+        pub const @"-initWithFloat:" = fn (f32) foundation.Number;
+        pub const @"-initWithDouble:" = fn (f64) foundation.Number;
+        pub const @"-initWithBool:" = fn (bool) foundation.Number;
+        pub const @"-initWithInteger:" = fn (objc.Integer) foundation.Number;
+        pub const @"-initWithUnsignedInteger:" = fn (objc.UInteger) foundation.Number;
+        pub const @"-compare:" = fn (foundation.Number) ComparisonResult;
+        pub const @"-isEqualToNumber:" = fn (foundation.Number) bool;
+        pub const @"-descriptionWithLocale:" = fn (?objc.Object) foundation.String;
+        pub const @"-charValue" = fn () u8;
+        pub const @"-unsignedCharValue" = fn () u8;
+        pub const @"-shortValue" = fn () c_short;
+        pub const @"-unsignedShortValue" = fn () c_ushort;
+        pub const @"-intValue" = fn () c_int;
+        pub const @"-unsignedIntValue" = fn () c_uint;
+        pub const @"-longValue" = fn () objc.Integer;
+        pub const @"-unsignedLongValue" = fn () objc.UInteger;
+        pub const @"-longLongValue" = fn () c_longlong;
+        pub const @"-unsignedLongLongValue" = fn () c_ulonglong;
+        pub const @"-floatValue" = fn () f32;
+        pub const @"-doubleValue" = fn () f64;
+        pub const @"-boolValue" = fn () bool;
+        pub const @"-integerValue" = fn () objc.Integer;
+        pub const @"-unsignedIntegerValue" = fn () objc.UInteger;
+        pub const @"-stringValue" = fn () foundation.String;
+        pub const @"+numberWithChar:" = fn (u8) foundation.Number;
+        pub const @"+numberWithUnsignedChar:" = fn (u8) foundation.Number;
+        pub const @"+numberWithShort:" = fn (c_short) foundation.Number;
+        pub const @"+numberWithUnsignedShort:" = fn (c_ushort) foundation.Number;
+        pub const @"+numberWithInt:" = fn (c_int) foundation.Number;
+        pub const @"+numberWithUnsignedInt:" = fn (c_uint) foundation.Number;
+        pub const @"+numberWithLong:" = fn (objc.Integer) foundation.Number;
+        pub const @"+numberWithUnsignedLong:" = fn (objc.UInteger) foundation.Number;
+        pub const @"+numberWithLongLong:" = fn (c_longlong) foundation.Number;
+        pub const @"+numberWithUnsignedLongLong:" = fn (c_ulonglong) foundation.Number;
+        pub const @"+numberWithFloat:" = fn (f32) foundation.Number;
+        pub const @"+numberWithDouble:" = fn (f64) foundation.Number;
+        pub const @"+numberWithBool:" = fn (bool) foundation.Number;
+        pub const @"+numberWithInteger:" = fn (objc.Integer) foundation.Number;
+        pub const @"+numberWithUnsignedInteger:" = fn (objc.UInteger) foundation.Number;
+    };
+
+    // Not generated:
+    //   -[NSNumber decimalValue]: NSDecimal
+};
+
+/// `NSValue`, a subclass of `NSObject`.
+pub const Value = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSValue";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSValue alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSValue`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSValue getValue:size:]`
+    pub fn getValueSize(self: Self, value: ?*anyopaque, size: objc.UInteger) void {
+        return self.object.msgSend(void, "getValue:size:", .{ value, size });
+    }
+
+    /// `-[NSValue initWithBytes:objCType:]`
+    pub fn initWithBytesObjCType(self: Self, value: ?*const anyopaque, @"type": [*:0]const u8) Value {
+        return self.object.msgSend(Value, "initWithBytes:objCType:", .{ value, @"type" });
+    }
+
+    /// `-[NSValue initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Value {
+        return self.object.msgSend(?Value, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSValue objCType]`
+    pub fn objCType(self: Self) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "objCType", .{});
+    }
+
+    /// `+[NSValue valueWithBytes:objCType:]`
+    pub fn valueWithBytesObjCType(value: ?*const anyopaque, @"type": [*:0]const u8) Value {
+        return class().msgSend(Value, "valueWithBytes:objCType:", .{ value, @"type" });
+    }
+
+    /// `+[NSValue value:withObjCType:]`
+    pub fn valueWithObjCType(value: ?*const anyopaque, @"type": [*:0]const u8) Value {
+        return class().msgSend(Value, "value:withObjCType:", .{ value, @"type" });
+    }
+
+    /// `+[NSValue valueWithNonretainedObject:]`
+    pub fn valueWithNonretainedObject(an_object: ?objc.Object) Value {
+        return class().msgSend(Value, "valueWithNonretainedObject:", .{an_object});
+    }
+
+    /// `+[NSValue valueWithPointer:]`
+    pub fn valueWithPointer(pointer: ?*const anyopaque) Value {
+        return class().msgSend(Value, "valueWithPointer:", .{pointer});
+    }
+
+    /// `-[NSValue isEqualToValue:]`
+    pub fn isEqualToValue(self: Self, value: Value) bool {
+        return self.object.msgSend(bool, "isEqualToValue:", .{value});
+    }
+
+    /// `-[NSValue nonretainedObjectValue]`
+    pub fn nonretainedObjectValue(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "nonretainedObjectValue", .{});
+    }
+
+    /// `-[NSValue pointerValue]`
+    pub fn pointerValue(self: Self) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "pointerValue", .{});
+    }
+
+    /// `-[NSValue getValue:]`
+    pub fn getValue(self: Self, value: ?*anyopaque) void {
+        return self.object.msgSend(void, "getValue:", .{value});
+    }
+
+    /// `+[NSValue valueWithRange:]`
+    pub fn valueWithRange(range: objc.Range) Value {
+        return class().msgSend(Value, "valueWithRange:", .{range});
+    }
+
+    /// `-[NSValue rangeValue]`
+    pub fn rangeValue(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeValue", .{});
+    }
+
+    /// `+[NSValue valueWithPoint:]`
+    pub fn valueWithPoint(point: cg.Point) Value {
+        return class().msgSend(Value, "valueWithPoint:", .{point});
+    }
+
+    /// `+[NSValue valueWithSize:]`
+    pub fn valueWithSize(size: cg.Size) Value {
+        return class().msgSend(Value, "valueWithSize:", .{size});
+    }
+
+    /// `+[NSValue valueWithRect:]`
+    pub fn valueWithRect(rect: cg.Rect) Value {
+        return class().msgSend(Value, "valueWithRect:", .{rect});
+    }
+
+    /// `+[NSValue valueWithEdgeInsets:]`
+    pub fn valueWithEdgeInsets(insets: EdgeInsets) Value {
+        return class().msgSend(Value, "valueWithEdgeInsets:", .{insets});
+    }
+
+    /// `-[NSValue pointValue]`
+    pub fn pointValue(self: Self) cg.Point {
+        return self.object.msgSend(cg.Point, "pointValue", .{});
+    }
+
+    /// `-[NSValue sizeValue]`
+    pub fn sizeValue(self: Self) cg.Size {
+        return self.object.msgSend(cg.Size, "sizeValue", .{});
+    }
+
+    /// `-[NSValue rectValue]`
+    pub fn rectValue(self: Self) cg.Rect {
+        return self.object.msgSend(cg.Rect, "rectValue", .{});
+    }
+
+    /// `-[NSValue edgeInsetsValue]`
+    pub fn edgeInsetsValue(self: Self) EdgeInsets {
+        return self.object.msgSend(EdgeInsets, "edgeInsetsValue", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-getValue:size:" = fn (?*anyopaque, objc.UInteger) void;
+        pub const @"-initWithBytes:objCType:" = fn (?*const anyopaque, [*:0]const u8) Value;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Value;
+        pub const @"-objCType" = fn () [*:0]const u8;
+        pub const @"+valueWithBytes:objCType:" = fn (?*const anyopaque, [*:0]const u8) Value;
+        pub const @"+value:withObjCType:" = fn (?*const anyopaque, [*:0]const u8) Value;
+        pub const @"+valueWithNonretainedObject:" = fn (?objc.Object) Value;
+        pub const @"+valueWithPointer:" = fn (?*const anyopaque) Value;
+        pub const @"-isEqualToValue:" = fn (Value) bool;
+        pub const @"-nonretainedObjectValue" = fn () ?objc.Object;
+        pub const @"-pointerValue" = fn () ?*anyopaque;
+        pub const @"-getValue:" = fn (?*anyopaque) void;
+        pub const @"+valueWithRange:" = fn (objc.Range) Value;
+        pub const @"-rangeValue" = fn () objc.Range;
+        pub const @"+valueWithPoint:" = fn (cg.Point) Value;
+        pub const @"+valueWithSize:" = fn (cg.Size) Value;
+        pub const @"+valueWithRect:" = fn (cg.Rect) Value;
+        pub const @"+valueWithEdgeInsets:" = fn (EdgeInsets) Value;
+        pub const @"-pointValue" = fn () cg.Point;
+        pub const @"-sizeValue" = fn () cg.Size;
+        pub const @"-rectValue" = fn () cg.Rect;
+        pub const @"-edgeInsetsValue" = fn () EdgeInsets;
+    };
+};
+
+/// `NSData`, a subclass of `NSObject`.
+pub const Data = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSData";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSData alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSData`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSData length]`
+    pub fn length(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "length", .{});
+    }
+
+    /// `-[NSData bytes]`
+    pub fn bytes(self: Self) ?*const anyopaque {
+        return self.object.msgSend(?*const anyopaque, "bytes", .{});
+    }
+
+    /// `-[NSData getBytes:length:]`
+    pub fn getBytesLength(self: Self, buffer: ?*anyopaque, length_: objc.UInteger) void {
+        return self.object.msgSend(void, "getBytes:length:", .{ buffer, length_ });
+    }
+
+    /// `-[NSData getBytes:range:]`
+    pub fn getBytesRange(self: Self, buffer: ?*anyopaque, range: objc.Range) void {
+        return self.object.msgSend(void, "getBytes:range:", .{ buffer, range });
+    }
+
+    /// `-[NSData isEqualToData:]`
+    pub fn isEqualToData(self: Self, other: foundation.Data) bool {
+        return self.object.msgSend(bool, "isEqualToData:", .{other});
+    }
+
+    /// `-[NSData subdataWithRange:]`
+    pub fn subdataWithRange(self: Self, range: objc.Range) foundation.Data {
+        return self.object.msgSend(foundation.Data, "subdataWithRange:", .{range});
+    }
+
+    /// `-[NSData writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSData writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSData writeToFile:options:error:]`
+    pub fn writeToFileOptionsError(self: Self, path: foundation.String, write_options_mask: DataWritingOptions, error_ptr: ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToFile:options:error:", .{ path, write_options_mask, error_ptr });
+    }
+
+    /// `-[NSData writeToURL:options:error:]`
+    pub fn writeToURLOptionsError(self: Self, url: foundation.Url, write_options_mask: DataWritingOptions, error_ptr: ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:options:error:", .{ url, write_options_mask, error_ptr });
+    }
+
+    /// `-[NSData rangeOfData:options:range:]`
+    pub fn rangeOfDataOptionsRange(self: Self, data_to_find: foundation.Data, mask: DataSearchOptions, search_range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfData:options:range:", .{ data_to_find, mask, search_range });
+    }
+
+    /// `-[NSData enumerateByteRangesUsingBlock:]`
+    pub fn enumerateByteRangesUsingBlock(self: Self, block: objc.BlockRef(fn (?*const anyopaque, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateByteRangesUsingBlock:", .{block});
+    }
+
+    /// `-[NSData description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSData data]`
+    pub fn data() Data {
+        return class().msgSend(Data, "data", .{});
+    }
+
+    /// `+[NSData dataWithBytes:length:]`
+    pub fn dataWithBytesLength(bytes_: ?*const anyopaque, length_: objc.UInteger) Data {
+        return class().msgSend(Data, "dataWithBytes:length:", .{ bytes_, length_ });
+    }
+
+    /// `+[NSData dataWithBytesNoCopy:length:]`
+    pub fn dataWithBytesNoCopyLength(bytes_: ?*anyopaque, length_: objc.UInteger) Data {
+        return class().msgSend(Data, "dataWithBytesNoCopy:length:", .{ bytes_, length_ });
+    }
+
+    /// `+[NSData dataWithBytesNoCopy:length:freeWhenDone:]`
+    pub fn dataWithBytesNoCopyLengthFreeWhenDone(bytes_: ?*anyopaque, length_: objc.UInteger, b: bool) Data {
+        return class().msgSend(Data, "dataWithBytesNoCopy:length:freeWhenDone:", .{ bytes_, length_, b });
+    }
+
+    /// `+[NSData dataWithContentsOfFile:options:error:]`
+    pub fn dataWithContentsOfFileOptionsError(path: foundation.String, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?Data {
+        return class().msgSend(?Data, "dataWithContentsOfFile:options:error:", .{ path, read_options_mask, error_ptr });
+    }
+
+    /// `+[NSData dataWithContentsOfURL:options:error:]`
+    pub fn dataWithContentsOfURLOptionsError(url: foundation.Url, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?Data {
+        return class().msgSend(?Data, "dataWithContentsOfURL:options:error:", .{ url, read_options_mask, error_ptr });
+    }
+
+    /// `+[NSData dataWithContentsOfFile:]`
+    pub fn dataWithContentsOfFile(path: foundation.String) ?Data {
+        return class().msgSend(?Data, "dataWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSData dataWithContentsOfURL:]`
+    pub fn dataWithContentsOfURL(url: foundation.Url) ?Data {
+        return class().msgSend(?Data, "dataWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSData initWithBytes:length:]`
+    pub fn initWithBytesLength(self: Self, bytes_: ?*const anyopaque, length_: objc.UInteger) Data {
+        return self.object.msgSend(Data, "initWithBytes:length:", .{ bytes_, length_ });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:]`
+    pub fn initWithBytesNoCopyLength(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger) Data {
+        return self.object.msgSend(Data, "initWithBytesNoCopy:length:", .{ bytes_, length_ });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:freeWhenDone:]`
+    pub fn initWithBytesNoCopyLengthFreeWhenDone(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger, b: bool) Data {
+        return self.object.msgSend(Data, "initWithBytesNoCopy:length:freeWhenDone:", .{ bytes_, length_, b });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:deallocator:]`
+    pub fn initWithBytesNoCopyLengthDeallocator(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) Data {
+        return self.object.msgSend(Data, "initWithBytesNoCopy:length:deallocator:", .{ bytes_, length_, deallocator });
+    }
+
+    /// `-[NSData initWithContentsOfFile:options:error:]`
+    pub fn initWithContentsOfFileOptionsError(self: Self, path: foundation.String, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?Data {
+        return self.object.msgSend(?Data, "initWithContentsOfFile:options:error:", .{ path, read_options_mask, error_ptr });
+    }
+
+    /// `-[NSData initWithContentsOfURL:options:error:]`
+    pub fn initWithContentsOfURLOptionsError(self: Self, url: foundation.Url, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?Data {
+        return self.object.msgSend(?Data, "initWithContentsOfURL:options:error:", .{ url, read_options_mask, error_ptr });
+    }
+
+    /// `-[NSData initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?Data {
+        return self.object.msgSend(?Data, "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSData initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?Data {
+        return self.object.msgSend(?Data, "initWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSData initWithData:]`
+    pub fn initWithData(self: Self, data_: foundation.Data) Data {
+        return self.object.msgSend(Data, "initWithData:", .{data_});
+    }
+
+    /// `+[NSData dataWithData:]`
+    pub fn dataWithData(data_: foundation.Data) Data {
+        return class().msgSend(Data, "dataWithData:", .{data_});
+    }
+
+    /// `-[NSData initWithBase64EncodedString:options:]`
+    pub fn initWithBase64EncodedStringOptions(self: Self, base64_string: foundation.String, options: DataBase64DecodingOptions) ?Data {
+        return self.object.msgSend(?Data, "initWithBase64EncodedString:options:", .{ base64_string, options });
+    }
+
+    /// `-[NSData base64EncodedStringWithOptions:]`
+    pub fn base64EncodedStringWithOptions(self: Self, options: DataBase64EncodingOptions) foundation.String {
+        return self.object.msgSend(foundation.String, "base64EncodedStringWithOptions:", .{options});
+    }
+
+    /// `-[NSData initWithBase64EncodedData:options:]`
+    pub fn initWithBase64EncodedDataOptions(self: Self, base64_data: foundation.Data, options: DataBase64DecodingOptions) ?Data {
+        return self.object.msgSend(?Data, "initWithBase64EncodedData:options:", .{ base64_data, options });
+    }
+
+    /// `-[NSData base64EncodedDataWithOptions:]`
+    pub fn base64EncodedDataWithOptions(self: Self, options: DataBase64EncodingOptions) foundation.Data {
+        return self.object.msgSend(foundation.Data, "base64EncodedDataWithOptions:", .{options});
+    }
+
+    /// `-[NSData decompressedDataUsingAlgorithm:error:]`
+    pub fn decompressedDataUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) ?Data {
+        return self.object.msgSend(?Data, "decompressedDataUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSData compressedDataUsingAlgorithm:error:]`
+    pub fn compressedDataUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) ?Data {
+        return self.object.msgSend(?Data, "compressedDataUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSData getBytes:]`
+    pub fn getBytes(self: Self, buffer: ?*anyopaque) void {
+        return self.object.msgSend(void, "getBytes:", .{buffer});
+    }
+
+    /// `+[NSData dataWithContentsOfMappedFile:]`
+    pub fn dataWithContentsOfMappedFile(path: foundation.String) ?objc.Object {
+        return class().msgSend(?objc.Object, "dataWithContentsOfMappedFile:", .{path});
+    }
+
+    /// `-[NSData initWithContentsOfMappedFile:]`
+    pub fn initWithContentsOfMappedFile(self: Self, path: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfMappedFile:", .{path});
+    }
+
+    /// `-[NSData initWithBase64Encoding:]`
+    pub fn initWithBase64Encoding(self: Self, base64_string: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithBase64Encoding:", .{base64_string});
+    }
+
+    /// `-[NSData base64Encoding]`
+    pub fn base64Encoding(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "base64Encoding", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-length" = fn () objc.UInteger;
+        pub const @"-bytes" = fn () ?*const anyopaque;
+        pub const @"-getBytes:length:" = fn (?*anyopaque, objc.UInteger) void;
+        pub const @"-getBytes:range:" = fn (?*anyopaque, objc.Range) void;
+        pub const @"-isEqualToData:" = fn (foundation.Data) bool;
+        pub const @"-subdataWithRange:" = fn (objc.Range) foundation.Data;
+        pub const @"-writeToFile:atomically:" = fn (foundation.String, bool) bool;
+        pub const @"-writeToURL:atomically:" = fn (foundation.Url, bool) bool;
+        pub const @"-writeToFile:options:error:" = fn (foundation.String, DataWritingOptions, ?*objc.abi.Id) bool;
+        pub const @"-writeToURL:options:error:" = fn (foundation.Url, DataWritingOptions, ?*objc.abi.Id) bool;
+        pub const @"-rangeOfData:options:range:" = fn (foundation.Data, DataSearchOptions, objc.Range) objc.Range;
+        pub const @"-enumerateByteRangesUsingBlock:" = fn (objc.BlockRef(fn (?*const anyopaque, objc.Range, ?*bool) void)) void;
+        pub const @"-description" = fn () foundation.String;
+        pub const @"+data" = fn () Data;
+        pub const @"+dataWithBytes:length:" = fn (?*const anyopaque, objc.UInteger) Data;
+        pub const @"+dataWithBytesNoCopy:length:" = fn (?*anyopaque, objc.UInteger) Data;
+        pub const @"+dataWithBytesNoCopy:length:freeWhenDone:" = fn (?*anyopaque, objc.UInteger, bool) Data;
+        pub const @"+dataWithContentsOfFile:options:error:" = fn (foundation.String, DataReadingOptions, ?*objc.abi.Id) ?Data;
+        pub const @"+dataWithContentsOfURL:options:error:" = fn (foundation.Url, DataReadingOptions, ?*objc.abi.Id) ?Data;
+        pub const @"+dataWithContentsOfFile:" = fn (foundation.String) ?Data;
+        pub const @"+dataWithContentsOfURL:" = fn (foundation.Url) ?Data;
+        pub const @"-initWithBytes:length:" = fn (?*const anyopaque, objc.UInteger) Data;
+        pub const @"-initWithBytesNoCopy:length:" = fn (?*anyopaque, objc.UInteger) Data;
+        pub const @"-initWithBytesNoCopy:length:freeWhenDone:" = fn (?*anyopaque, objc.UInteger, bool) Data;
+        pub const @"-initWithBytesNoCopy:length:deallocator:" = fn (?*anyopaque, objc.UInteger, ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) Data;
+        pub const @"-initWithContentsOfFile:options:error:" = fn (foundation.String, DataReadingOptions, ?*objc.abi.Id) ?Data;
+        pub const @"-initWithContentsOfURL:options:error:" = fn (foundation.Url, DataReadingOptions, ?*objc.abi.Id) ?Data;
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?Data;
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?Data;
+        pub const @"-initWithData:" = fn (foundation.Data) Data;
+        pub const @"+dataWithData:" = fn (foundation.Data) Data;
+        pub const @"-initWithBase64EncodedString:options:" = fn (foundation.String, DataBase64DecodingOptions) ?Data;
+        pub const @"-base64EncodedStringWithOptions:" = fn (DataBase64EncodingOptions) foundation.String;
+        pub const @"-initWithBase64EncodedData:options:" = fn (foundation.Data, DataBase64DecodingOptions) ?Data;
+        pub const @"-base64EncodedDataWithOptions:" = fn (DataBase64EncodingOptions) foundation.Data;
+        pub const @"-decompressedDataUsingAlgorithm:error:" = fn (DataCompressionAlgorithm, ?*objc.abi.Id) ?Data;
+        pub const @"-compressedDataUsingAlgorithm:error:" = fn (DataCompressionAlgorithm, ?*objc.abi.Id) ?Data;
+        pub const @"-getBytes:" = fn (?*anyopaque) void;
+        pub const @"+dataWithContentsOfMappedFile:" = fn (foundation.String) ?objc.Object;
+        pub const @"-initWithContentsOfMappedFile:" = fn (foundation.String) ?objc.Object;
+        pub const @"-initWithBase64Encoding:" = fn (foundation.String) ?objc.Object;
+        pub const @"-base64Encoding" = fn () foundation.String;
+    };
+};
+
+/// `NSMutableData`, a subclass of `NSData`.
+pub const MutableData = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Data;
+    pub const class_name = "NSMutableData";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableData alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableData`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableData mutableBytes]`
+    pub fn mutableBytes(self: Self) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "mutableBytes", .{});
+    }
+
+    /// `-[NSMutableData length]`
+    pub fn length(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "length", .{});
+    }
+
+    /// `-[NSMutableData setLength:]`
+    pub fn setLength(self: Self, length_: objc.UInteger) void {
+        return self.object.msgSend(void, "setLength:", .{length_});
+    }
+
+    /// `-[NSMutableData appendBytes:length:]`
+    pub fn appendBytesLength(self: Self, bytes_: ?*const anyopaque, length_: objc.UInteger) void {
+        return self.object.msgSend(void, "appendBytes:length:", .{ bytes_, length_ });
+    }
+
+    /// `-[NSMutableData appendData:]`
+    pub fn appendData(self: Self, other: foundation.Data) void {
+        return self.object.msgSend(void, "appendData:", .{other});
+    }
+
+    /// `-[NSMutableData increaseLengthBy:]`
+    pub fn increaseLengthBy(self: Self, extra_length: objc.UInteger) void {
+        return self.object.msgSend(void, "increaseLengthBy:", .{extra_length});
+    }
+
+    /// `-[NSMutableData replaceBytesInRange:withBytes:]`
+    pub fn replaceBytesInRangeWithBytes(self: Self, range: objc.Range, bytes_: ?*const anyopaque) void {
+        return self.object.msgSend(void, "replaceBytesInRange:withBytes:", .{ range, bytes_ });
+    }
+
+    /// `-[NSMutableData resetBytesInRange:]`
+    pub fn resetBytesInRange(self: Self, range: objc.Range) void {
+        return self.object.msgSend(void, "resetBytesInRange:", .{range});
+    }
+
+    /// `-[NSMutableData setData:]`
+    pub fn setData(self: Self, data_: foundation.Data) void {
+        return self.object.msgSend(void, "setData:", .{data_});
+    }
+
+    /// `-[NSMutableData replaceBytesInRange:withBytes:length:]`
+    pub fn replaceBytesInRangeWithBytesLength(self: Self, range: objc.Range, replacement_bytes: ?*const anyopaque, replacement_length: objc.UInteger) void {
+        return self.object.msgSend(void, "replaceBytesInRange:withBytes:length:", .{ range, replacement_bytes, replacement_length });
+    }
+
+    /// `+[NSMutableData dataWithCapacity:]`
+    pub fn dataWithCapacity(a_num_items: objc.UInteger) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithCapacity:", .{a_num_items});
+    }
+
+    /// `+[NSMutableData dataWithLength:]`
+    pub fn dataWithLength(length_: objc.UInteger) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithLength:", .{length_});
+    }
+
+    /// `-[NSMutableData initWithCapacity:]`
+    pub fn initWithCapacity(self: Self, capacity: objc.UInteger) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithCapacity:", .{capacity});
+    }
+
+    /// `-[NSMutableData initWithLength:]`
+    pub fn initWithLength(self: Self, length_: objc.UInteger) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithLength:", .{length_});
+    }
+
+    /// `-[NSMutableData decompressUsingAlgorithm:error:]`
+    pub fn decompressUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "decompressUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSMutableData compressUsingAlgorithm:error:]`
+    pub fn compressUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "compressUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSData bytes]`
+    pub fn bytes(self: Self) ?*const anyopaque {
+        return self.object.msgSend(?*const anyopaque, "bytes", .{});
+    }
+
+    /// `-[NSData getBytes:length:]`
+    pub fn getBytesLength(self: Self, buffer: ?*anyopaque, length_: objc.UInteger) void {
+        return self.object.msgSend(void, "getBytes:length:", .{ buffer, length_ });
+    }
+
+    /// `-[NSData getBytes:range:]`
+    pub fn getBytesRange(self: Self, buffer: ?*anyopaque, range: objc.Range) void {
+        return self.object.msgSend(void, "getBytes:range:", .{ buffer, range });
+    }
+
+    /// `-[NSData isEqualToData:]`
+    pub fn isEqualToData(self: Self, other: foundation.Data) bool {
+        return self.object.msgSend(bool, "isEqualToData:", .{other});
+    }
+
+    /// `-[NSData subdataWithRange:]`
+    pub fn subdataWithRange(self: Self, range: objc.Range) foundation.Data {
+        return self.object.msgSend(foundation.Data, "subdataWithRange:", .{range});
+    }
+
+    /// `-[NSData writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSData writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSData writeToFile:options:error:]`
+    pub fn writeToFileOptionsError(self: Self, path: foundation.String, write_options_mask: DataWritingOptions, error_ptr: ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToFile:options:error:", .{ path, write_options_mask, error_ptr });
+    }
+
+    /// `-[NSData writeToURL:options:error:]`
+    pub fn writeToURLOptionsError(self: Self, url: foundation.Url, write_options_mask: DataWritingOptions, error_ptr: ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:options:error:", .{ url, write_options_mask, error_ptr });
+    }
+
+    /// `-[NSData rangeOfData:options:range:]`
+    pub fn rangeOfDataOptionsRange(self: Self, data_to_find: foundation.Data, mask: DataSearchOptions, search_range: objc.Range) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfData:options:range:", .{ data_to_find, mask, search_range });
+    }
+
+    /// `-[NSData enumerateByteRangesUsingBlock:]`
+    pub fn enumerateByteRangesUsingBlock(self: Self, block: objc.BlockRef(fn (?*const anyopaque, objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateByteRangesUsingBlock:", .{block});
+    }
+
+    /// `-[NSData description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSData data]`
+    pub fn data() MutableData {
+        return class().msgSend(MutableData, "data", .{});
+    }
+
+    /// `+[NSData dataWithBytes:length:]`
+    pub fn dataWithBytesLength(bytes_: ?*const anyopaque, length_: objc.UInteger) MutableData {
+        return class().msgSend(MutableData, "dataWithBytes:length:", .{ bytes_, length_ });
+    }
+
+    /// `+[NSData dataWithBytesNoCopy:length:]`
+    pub fn dataWithBytesNoCopyLength(bytes_: ?*anyopaque, length_: objc.UInteger) MutableData {
+        return class().msgSend(MutableData, "dataWithBytesNoCopy:length:", .{ bytes_, length_ });
+    }
+
+    /// `+[NSData dataWithBytesNoCopy:length:freeWhenDone:]`
+    pub fn dataWithBytesNoCopyLengthFreeWhenDone(bytes_: ?*anyopaque, length_: objc.UInteger, b: bool) MutableData {
+        return class().msgSend(MutableData, "dataWithBytesNoCopy:length:freeWhenDone:", .{ bytes_, length_, b });
+    }
+
+    /// `+[NSData dataWithContentsOfFile:options:error:]`
+    pub fn dataWithContentsOfFileOptionsError(path: foundation.String, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithContentsOfFile:options:error:", .{ path, read_options_mask, error_ptr });
+    }
+
+    /// `+[NSData dataWithContentsOfURL:options:error:]`
+    pub fn dataWithContentsOfURLOptionsError(url: foundation.Url, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithContentsOfURL:options:error:", .{ url, read_options_mask, error_ptr });
+    }
+
+    /// `+[NSData dataWithContentsOfFile:]`
+    pub fn dataWithContentsOfFile(path: foundation.String) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSData dataWithContentsOfURL:]`
+    pub fn dataWithContentsOfURL(url: foundation.Url) ?MutableData {
+        return class().msgSend(?MutableData, "dataWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSData initWithBytes:length:]`
+    pub fn initWithBytesLength(self: Self, bytes_: ?*const anyopaque, length_: objc.UInteger) MutableData {
+        return self.object.msgSend(MutableData, "initWithBytes:length:", .{ bytes_, length_ });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:]`
+    pub fn initWithBytesNoCopyLength(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger) MutableData {
+        return self.object.msgSend(MutableData, "initWithBytesNoCopy:length:", .{ bytes_, length_ });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:freeWhenDone:]`
+    pub fn initWithBytesNoCopyLengthFreeWhenDone(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger, b: bool) MutableData {
+        return self.object.msgSend(MutableData, "initWithBytesNoCopy:length:freeWhenDone:", .{ bytes_, length_, b });
+    }
+
+    /// `-[NSData initWithBytesNoCopy:length:deallocator:]`
+    pub fn initWithBytesNoCopyLengthDeallocator(self: Self, bytes_: ?*anyopaque, length_: objc.UInteger, deallocator: ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) MutableData {
+        return self.object.msgSend(MutableData, "initWithBytesNoCopy:length:deallocator:", .{ bytes_, length_, deallocator });
+    }
+
+    /// `-[NSData initWithContentsOfFile:options:error:]`
+    pub fn initWithContentsOfFileOptionsError(self: Self, path: foundation.String, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithContentsOfFile:options:error:", .{ path, read_options_mask, error_ptr });
+    }
+
+    /// `-[NSData initWithContentsOfURL:options:error:]`
+    pub fn initWithContentsOfURLOptionsError(self: Self, url: foundation.Url, read_options_mask: DataReadingOptions, error_ptr: ?*objc.abi.Id) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithContentsOfURL:options:error:", .{ url, read_options_mask, error_ptr });
+    }
+
+    /// `-[NSData initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSData initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSData initWithData:]`
+    pub fn initWithData(self: Self, data_: foundation.Data) MutableData {
+        return self.object.msgSend(MutableData, "initWithData:", .{data_});
+    }
+
+    /// `+[NSData dataWithData:]`
+    pub fn dataWithData(data_: foundation.Data) MutableData {
+        return class().msgSend(MutableData, "dataWithData:", .{data_});
+    }
+
+    /// `-[NSData initWithBase64EncodedString:options:]`
+    pub fn initWithBase64EncodedStringOptions(self: Self, base64_string: foundation.String, options: DataBase64DecodingOptions) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithBase64EncodedString:options:", .{ base64_string, options });
+    }
+
+    /// `-[NSData base64EncodedStringWithOptions:]`
+    pub fn base64EncodedStringWithOptions(self: Self, options: DataBase64EncodingOptions) foundation.String {
+        return self.object.msgSend(foundation.String, "base64EncodedStringWithOptions:", .{options});
+    }
+
+    /// `-[NSData initWithBase64EncodedData:options:]`
+    pub fn initWithBase64EncodedDataOptions(self: Self, base64_data: foundation.Data, options: DataBase64DecodingOptions) ?MutableData {
+        return self.object.msgSend(?MutableData, "initWithBase64EncodedData:options:", .{ base64_data, options });
+    }
+
+    /// `-[NSData base64EncodedDataWithOptions:]`
+    pub fn base64EncodedDataWithOptions(self: Self, options: DataBase64EncodingOptions) foundation.Data {
+        return self.object.msgSend(foundation.Data, "base64EncodedDataWithOptions:", .{options});
+    }
+
+    /// `-[NSData decompressedDataUsingAlgorithm:error:]`
+    pub fn decompressedDataUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) ?MutableData {
+        return self.object.msgSend(?MutableData, "decompressedDataUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSData compressedDataUsingAlgorithm:error:]`
+    pub fn compressedDataUsingAlgorithmError(self: Self, algorithm: DataCompressionAlgorithm, @"error": ?*objc.abi.Id) ?MutableData {
+        return self.object.msgSend(?MutableData, "compressedDataUsingAlgorithm:error:", .{ algorithm, @"error" });
+    }
+
+    /// `-[NSData getBytes:]`
+    pub fn getBytes(self: Self, buffer: ?*anyopaque) void {
+        return self.object.msgSend(void, "getBytes:", .{buffer});
+    }
+
+    /// `+[NSData dataWithContentsOfMappedFile:]`
+    pub fn dataWithContentsOfMappedFile(path: foundation.String) ?objc.Object {
+        return class().msgSend(?objc.Object, "dataWithContentsOfMappedFile:", .{path});
+    }
+
+    /// `-[NSData initWithContentsOfMappedFile:]`
+    pub fn initWithContentsOfMappedFile(self: Self, path: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithContentsOfMappedFile:", .{path});
+    }
+
+    /// `-[NSData initWithBase64Encoding:]`
+    pub fn initWithBase64Encoding(self: Self, base64_string: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithBase64Encoding:", .{base64_string});
+    }
+
+    /// `-[NSData base64Encoding]`
+    pub fn base64Encoding(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "base64Encoding", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-mutableBytes" = fn () ?*anyopaque;
+        pub const @"-length" = fn () objc.UInteger;
+        pub const @"-setLength:" = fn (objc.UInteger) void;
+        pub const @"-appendBytes:length:" = fn (?*const anyopaque, objc.UInteger) void;
+        pub const @"-appendData:" = fn (foundation.Data) void;
+        pub const @"-increaseLengthBy:" = fn (objc.UInteger) void;
+        pub const @"-replaceBytesInRange:withBytes:" = fn (objc.Range, ?*const anyopaque) void;
+        pub const @"-resetBytesInRange:" = fn (objc.Range) void;
+        pub const @"-setData:" = fn (foundation.Data) void;
+        pub const @"-replaceBytesInRange:withBytes:length:" = fn (objc.Range, ?*const anyopaque, objc.UInteger) void;
+        pub const @"+dataWithCapacity:" = fn (objc.UInteger) ?MutableData;
+        pub const @"+dataWithLength:" = fn (objc.UInteger) ?MutableData;
+        pub const @"-initWithCapacity:" = fn (objc.UInteger) ?MutableData;
+        pub const @"-initWithLength:" = fn (objc.UInteger) ?MutableData;
+        pub const @"-decompressUsingAlgorithm:error:" = fn (DataCompressionAlgorithm, ?*objc.abi.Id) bool;
+        pub const @"-compressUsingAlgorithm:error:" = fn (DataCompressionAlgorithm, ?*objc.abi.Id) bool;
+    };
+};
+
+/// `NSURL`, a subclass of `NSObject`.
+pub const URL = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURL";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURL alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURL`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURL initWithScheme:host:path:]`
+    pub fn initWithSchemeHostPath(self: Self, scheme_: foundation.String, host_: ?foundation.String, path_: foundation.String) ?URL {
+        return self.object.msgSend(?URL, "initWithScheme:host:path:", .{ scheme_, host_, path_ });
+    }
+
+    /// `-[NSURL initFileURLWithPath:isDirectory:relativeToURL:]`
+    pub fn initFileURLWithPathIsDirectoryRelativeToURL(self: Self, path_: foundation.String, is_dir: bool, base_url: ?foundation.Url) URL {
+        return self.object.msgSend(URL, "initFileURLWithPath:isDirectory:relativeToURL:", .{ path_, is_dir, base_url });
+    }
+
+    /// `-[NSURL initFileURLWithPath:relativeToURL:]`
+    pub fn initFileURLWithPathRelativeToURL(self: Self, path_: foundation.String, base_url: ?foundation.Url) URL {
+        return self.object.msgSend(URL, "initFileURLWithPath:relativeToURL:", .{ path_, base_url });
+    }
+
+    /// `-[NSURL initFileURLWithPath:isDirectory:]`
+    pub fn initFileURLWithPathIsDirectory(self: Self, path_: foundation.String, is_dir: bool) URL {
+        return self.object.msgSend(URL, "initFileURLWithPath:isDirectory:", .{ path_, is_dir });
+    }
+
+    /// `-[NSURL initFileURLWithPath:]`
+    pub fn initFileURLWithPath(self: Self, path_: foundation.String) URL {
+        return self.object.msgSend(URL, "initFileURLWithPath:", .{path_});
+    }
+
+    /// `+[NSURL fileURLWithPath:isDirectory:relativeToURL:]`
+    pub fn fileURLWithPathIsDirectoryRelativeToURL(path_: foundation.String, is_dir: bool, base_url: ?foundation.Url) foundation.Url {
+        return class().msgSend(foundation.Url, "fileURLWithPath:isDirectory:relativeToURL:", .{ path_, is_dir, base_url });
+    }
+
+    /// `+[NSURL fileURLWithPath:relativeToURL:]`
+    pub fn fileURLWithPathRelativeToURL(path_: foundation.String, base_url: ?foundation.Url) foundation.Url {
+        return class().msgSend(foundation.Url, "fileURLWithPath:relativeToURL:", .{ path_, base_url });
+    }
+
+    /// `+[NSURL fileURLWithPath:isDirectory:]`
+    pub fn fileURLWithPathIsDirectory(path_: foundation.String, is_dir: bool) foundation.Url {
+        return class().msgSend(foundation.Url, "fileURLWithPath:isDirectory:", .{ path_, is_dir });
+    }
+
+    /// `+[NSURL fileURLWithPath:]`
+    pub fn fileURLWithPath(path_: foundation.String) foundation.Url {
+        return class().msgSend(foundation.Url, "fileURLWithPath:", .{path_});
+    }
+
+    /// `-[NSURL initFileURLWithFileSystemRepresentation:isDirectory:relativeToURL:]`
+    pub fn initFileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(self: Self, path_: [*:0]const u8, is_dir: bool, base_url: ?foundation.Url) URL {
+        return self.object.msgSend(URL, "initFileURLWithFileSystemRepresentation:isDirectory:relativeToURL:", .{ path_, is_dir, base_url });
+    }
+
+    /// `+[NSURL fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:]`
+    pub fn fileURLWithFileSystemRepresentationIsDirectoryRelativeToURL(path_: [*:0]const u8, is_dir: bool, base_url: ?foundation.Url) foundation.Url {
+        return class().msgSend(foundation.Url, "fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:", .{ path_, is_dir, base_url });
+    }
+
+    /// `-[NSURL initWithString:]`
+    pub fn initWithString(self: Self, url_string: foundation.String) ?URL {
+        return self.object.msgSend(?URL, "initWithString:", .{url_string});
+    }
+
+    /// `-[NSURL initWithString:relativeToURL:]`
+    pub fn initWithStringRelativeToURL(self: Self, url_string: foundation.String, base_url: ?foundation.Url) ?URL {
+        return self.object.msgSend(?URL, "initWithString:relativeToURL:", .{ url_string, base_url });
+    }
+
+    /// `+[NSURL URLWithString:]`
+    pub fn urlWithString(url_string: foundation.String) ?URL {
+        return class().msgSend(?URL, "URLWithString:", .{url_string});
+    }
+
+    /// `+[NSURL URLWithString:relativeToURL:]`
+    pub fn urlWithStringRelativeToURL(url_string: foundation.String, base_url: ?foundation.Url) ?URL {
+        return class().msgSend(?URL, "URLWithString:relativeToURL:", .{ url_string, base_url });
+    }
+
+    /// `-[NSURL initWithString:encodingInvalidCharacters:]`
+    pub fn initWithStringEncodingInvalidCharacters(self: Self, url_string: foundation.String, encoding_invalid_characters: bool) ?URL {
+        return self.object.msgSend(?URL, "initWithString:encodingInvalidCharacters:", .{ url_string, encoding_invalid_characters });
+    }
+
+    /// `+[NSURL URLWithString:encodingInvalidCharacters:]`
+    pub fn urlWithStringEncodingInvalidCharacters(url_string: foundation.String, encoding_invalid_characters: bool) ?URL {
+        return class().msgSend(?URL, "URLWithString:encodingInvalidCharacters:", .{ url_string, encoding_invalid_characters });
+    }
+
+    /// `-[NSURL initWithDataRepresentation:relativeToURL:]`
+    pub fn initWithDataRepresentationRelativeToURL(self: Self, data: foundation.Data, base_url: ?foundation.Url) URL {
+        return self.object.msgSend(URL, "initWithDataRepresentation:relativeToURL:", .{ data, base_url });
+    }
+
+    /// `+[NSURL URLWithDataRepresentation:relativeToURL:]`
+    pub fn urlWithDataRepresentationRelativeToURL(data: foundation.Data, base_url: ?foundation.Url) foundation.Url {
+        return class().msgSend(foundation.Url, "URLWithDataRepresentation:relativeToURL:", .{ data, base_url });
+    }
+
+    /// `-[NSURL initAbsoluteURLWithDataRepresentation:relativeToURL:]`
+    pub fn initAbsoluteURLWithDataRepresentationRelativeToURL(self: Self, data: foundation.Data, base_url: ?foundation.Url) URL {
+        return self.object.msgSend(URL, "initAbsoluteURLWithDataRepresentation:relativeToURL:", .{ data, base_url });
+    }
+
+    /// `+[NSURL absoluteURLWithDataRepresentation:relativeToURL:]`
+    pub fn absoluteURLWithDataRepresentationRelativeToURL(data: foundation.Data, base_url: ?foundation.Url) foundation.Url {
+        return class().msgSend(foundation.Url, "absoluteURLWithDataRepresentation:relativeToURL:", .{ data, base_url });
+    }
+
+    /// `-[NSURL getFileSystemRepresentation:maxLength:]`
+    pub fn getFileSystemRepresentationMaxLength(self: Self, buffer: [*:0]const u8, max_buffer_length: objc.UInteger) bool {
+        return self.object.msgSend(bool, "getFileSystemRepresentation:maxLength:", .{ buffer, max_buffer_length });
+    }
+
+    /// `-[NSURL isFileReferenceURL]`
+    pub fn isFileReferenceURL(self: Self) bool {
+        return self.object.msgSend(bool, "isFileReferenceURL", .{});
+    }
+
+    /// `-[NSURL fileReferenceURL]`
+    pub fn fileReferenceURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "fileReferenceURL", .{});
+    }
+
+    /// `-[NSURL getResourceValue:forKey:error:]`
+    pub fn getResourceValueForKeyError(self: Self, value: [*]objc.Nullable(objc.Object), key: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "getResourceValue:forKey:error:", .{ value, key, @"error" });
+    }
+
+    /// `-[NSURL resourceValuesForKeys:error:]`
+    pub fn resourceValuesForKeysError(self: Self, keys: foundation.Array(objc.Object), @"error": ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "resourceValuesForKeys:error:", .{ keys, @"error" });
+    }
+
+    /// `-[NSURL setResourceValue:forKey:error:]`
+    pub fn setResourceValueForKeyError(self: Self, value: ?objc.Object, key: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "setResourceValue:forKey:error:", .{ value, key, @"error" });
+    }
+
+    /// `-[NSURL setResourceValues:error:]`
+    pub fn setResourceValuesError(self: Self, keyed_values: foundation.Dictionary(objc.Object, objc.Object), @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "setResourceValues:error:", .{ keyed_values, @"error" });
+    }
+
+    /// `-[NSURL removeCachedResourceValueForKey:]`
+    pub fn removeCachedResourceValueForKey(self: Self, key: foundation.String) void {
+        return self.object.msgSend(void, "removeCachedResourceValueForKey:", .{key});
+    }
+
+    /// `-[NSURL removeAllCachedResourceValues]`
+    pub fn removeAllCachedResourceValues(self: Self) void {
+        return self.object.msgSend(void, "removeAllCachedResourceValues", .{});
+    }
+
+    /// `-[NSURL setTemporaryResourceValue:forKey:]`
+    pub fn setTemporaryResourceValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setTemporaryResourceValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSURL bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:]`
+    pub fn bookmarkDataWithOptionsIncludingResourceValuesForKeysRelativeToURLError(self: Self, options: URLBookmarkCreationOptions, keys: ?foundation.Array(objc.Object), relative_url: ?foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:", .{ options, keys, relative_url, @"error" });
+    }
+
+    /// `-[NSURL initByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:]`
+    pub fn initByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(self: Self, bookmark_data: foundation.Data, options: URLBookmarkResolutionOptions, relative_url: ?foundation.Url, is_stale: ?*bool, @"error": ?*objc.abi.Id) ?URL {
+        return self.object.msgSend(?URL, "initByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:", .{ bookmark_data, options, relative_url, is_stale, @"error" });
+    }
+
+    /// `+[NSURL URLByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:]`
+    pub fn urlByResolvingBookmarkDataOptionsRelativeToURLBookmarkDataIsStaleError(bookmark_data: foundation.Data, options: URLBookmarkResolutionOptions, relative_url: ?foundation.Url, is_stale: ?*bool, @"error": ?*objc.abi.Id) ?URL {
+        return class().msgSend(?URL, "URLByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:", .{ bookmark_data, options, relative_url, is_stale, @"error" });
+    }
+
+    /// `+[NSURL resourceValuesForKeys:fromBookmarkData:]`
+    pub fn resourceValuesForKeysFromBookmarkData(keys: foundation.Array(objc.Object), bookmark_data: foundation.Data) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return class().msgSend(?foundation.Dictionary(objc.Object, objc.Object), "resourceValuesForKeys:fromBookmarkData:", .{ keys, bookmark_data });
+    }
+
+    /// `+[NSURL writeBookmarkData:toURL:options:error:]`
+    pub fn writeBookmarkDataToURLOptionsError(bookmark_data: foundation.Data, bookmark_file_url: foundation.Url, options: objc.UInteger, @"error": ?*objc.abi.Id) bool {
+        return class().msgSend(bool, "writeBookmarkData:toURL:options:error:", .{ bookmark_data, bookmark_file_url, options, @"error" });
+    }
+
+    /// `+[NSURL bookmarkDataWithContentsOfURL:error:]`
+    pub fn bookmarkDataWithContentsOfURLError(bookmark_file_url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Data {
+        return class().msgSend(?foundation.Data, "bookmarkDataWithContentsOfURL:error:", .{ bookmark_file_url, @"error" });
+    }
+
+    /// `+[NSURL URLByResolvingAliasFileAtURL:options:error:]`
+    pub fn urlByResolvingAliasFileAtURLOptionsError(url: foundation.Url, options: URLBookmarkResolutionOptions, @"error": ?*objc.abi.Id) ?URL {
+        return class().msgSend(?URL, "URLByResolvingAliasFileAtURL:options:error:", .{ url, options, @"error" });
+    }
+
+    /// `-[NSURL startAccessingSecurityScopedResource]`
+    pub fn startAccessingSecurityScopedResource(self: Self) bool {
+        return self.object.msgSend(bool, "startAccessingSecurityScopedResource", .{});
+    }
+
+    /// `-[NSURL stopAccessingSecurityScopedResource]`
+    pub fn stopAccessingSecurityScopedResource(self: Self) void {
+        return self.object.msgSend(void, "stopAccessingSecurityScopedResource", .{});
+    }
+
+    /// `-[NSURL dataRepresentation]`
+    pub fn dataRepresentation(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "dataRepresentation", .{});
+    }
+
+    /// `-[NSURL absoluteString]`
+    pub fn absoluteString(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "absoluteString", .{});
+    }
+
+    /// `-[NSURL relativeString]`
+    pub fn relativeString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "relativeString", .{});
+    }
+
+    /// `-[NSURL baseURL]`
+    pub fn baseURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "baseURL", .{});
+    }
+
+    /// `-[NSURL absoluteURL]`
+    pub fn absoluteURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "absoluteURL", .{});
+    }
+
+    /// `-[NSURL scheme]`
+    pub fn scheme(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "scheme", .{});
+    }
+
+    /// `-[NSURL resourceSpecifier]`
+    pub fn resourceSpecifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "resourceSpecifier", .{});
+    }
+
+    /// `-[NSURL host]`
+    pub fn host(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "host", .{});
+    }
+
+    /// `-[NSURL port]`
+    pub fn port(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "port", .{});
+    }
+
+    /// `-[NSURL user]`
+    pub fn user(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "user", .{});
+    }
+
+    /// `-[NSURL password]`
+    pub fn password(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "password", .{});
+    }
+
+    /// `-[NSURL path]`
+    pub fn path(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "path", .{});
+    }
+
+    /// `-[NSURL fragment]`
+    pub fn fragment(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fragment", .{});
+    }
+
+    /// `-[NSURL parameterString]`
+    pub fn parameterString(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "parameterString", .{});
+    }
+
+    /// `-[NSURL query]`
+    pub fn query(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "query", .{});
+    }
+
+    /// `-[NSURL relativePath]`
+    pub fn relativePath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "relativePath", .{});
+    }
+
+    /// `-[NSURL hasDirectoryPath]`
+    pub fn hasDirectoryPath(self: Self) bool {
+        return self.object.msgSend(bool, "hasDirectoryPath", .{});
+    }
+
+    /// `-[NSURL fileSystemRepresentation]`
+    pub fn fileSystemRepresentation(self: Self) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "fileSystemRepresentation", .{});
+    }
+
+    /// `-[NSURL isFileURL]`
+    pub fn isFileURL(self: Self) bool {
+        return self.object.msgSend(bool, "isFileURL", .{});
+    }
+
+    /// `-[NSURL standardizedURL]`
+    pub fn standardizedURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "standardizedURL", .{});
+    }
+
+    /// `-[NSURL filePathURL]`
+    pub fn filePathURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "filePathURL", .{});
+    }
+
+    /// `-[NSURL getPromisedItemResourceValue:forKey:error:]`
+    pub fn getPromisedItemResourceValueForKeyError(self: Self, value: [*]objc.Nullable(objc.Object), key: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "getPromisedItemResourceValue:forKey:error:", .{ value, key, @"error" });
+    }
+
+    /// `-[NSURL promisedItemResourceValuesForKeys:error:]`
+    pub fn promisedItemResourceValuesForKeysError(self: Self, keys: foundation.Array(objc.Object), @"error": ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "promisedItemResourceValuesForKeys:error:", .{ keys, @"error" });
+    }
+
+    /// `-[NSURL checkPromisedItemIsReachableAndReturnError:]`
+    pub fn checkPromisedItemIsReachableAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "checkPromisedItemIsReachableAndReturnError:", .{@"error"});
+    }
+
+    /// `+[NSURL fileURLWithPathComponents:]`
+    pub fn fileURLWithPathComponents(components: foundation.Array(foundation.String)) ?foundation.Url {
+        return class().msgSend(?foundation.Url, "fileURLWithPathComponents:", .{components});
+    }
+
+    /// `-[NSURL URLByAppendingPathComponent:]`
+    pub fn urlByAppendingPathComponent(self: Self, path_component: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByAppendingPathComponent:", .{path_component});
+    }
+
+    /// `-[NSURL URLByAppendingPathComponent:isDirectory:]`
+    pub fn urlByAppendingPathComponentIsDirectory(self: Self, path_component: foundation.String, is_directory: bool) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByAppendingPathComponent:isDirectory:", .{ path_component, is_directory });
+    }
+
+    /// `-[NSURL URLByAppendingPathExtension:]`
+    pub fn urlByAppendingPathExtension(self: Self, path_extension: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByAppendingPathExtension:", .{path_extension});
+    }
+
+    /// `-[NSURL checkResourceIsReachableAndReturnError:]`
+    pub fn checkResourceIsReachableAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "checkResourceIsReachableAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSURL pathComponents]`
+    pub fn pathComponents(self: Self) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "pathComponents", .{});
+    }
+
+    /// `-[NSURL lastPathComponent]`
+    pub fn lastPathComponent(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "lastPathComponent", .{});
+    }
+
+    /// `-[NSURL pathExtension]`
+    pub fn pathExtension(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathExtension", .{});
+    }
+
+    /// `-[NSURL URLByDeletingLastPathComponent]`
+    pub fn urlByDeletingLastPathComponent(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByDeletingLastPathComponent", .{});
+    }
+
+    /// `-[NSURL URLByDeletingPathExtension]`
+    pub fn urlByDeletingPathExtension(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByDeletingPathExtension", .{});
+    }
+
+    /// `-[NSURL URLByStandardizingPath]`
+    pub fn urlByStandardizingPath(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByStandardizingPath", .{});
+    }
+
+    /// `-[NSURL URLByResolvingSymlinksInPath]`
+    pub fn urlByResolvingSymlinksInPath(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLByResolvingSymlinksInPath", .{});
+    }
+
+    /// `-[NSURL resourceDataUsingCache:]`
+    pub fn resourceDataUsingCache(self: Self, should_use_cache: bool) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "resourceDataUsingCache:", .{should_use_cache});
+    }
+
+    /// `-[NSURL loadResourceDataNotifyingClient:usingCache:]`
+    pub fn loadResourceDataNotifyingClientUsingCache(self: Self, client: objc.Object, should_use_cache: bool) void {
+        return self.object.msgSend(void, "loadResourceDataNotifyingClient:usingCache:", .{ client, should_use_cache });
+    }
+
+    /// `-[NSURL propertyForKey:]`
+    pub fn propertyForKey(self: Self, property_key: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "propertyForKey:", .{property_key});
+    }
+
+    /// `-[NSURL setResourceData:]`
+    pub fn setResourceData(self: Self, data: foundation.Data) bool {
+        return self.object.msgSend(bool, "setResourceData:", .{data});
+    }
+
+    /// `-[NSURL setProperty:forKey:]`
+    pub fn setPropertyForKey(self: Self, property: objc.Object, property_key: foundation.String) bool {
+        return self.object.msgSend(bool, "setProperty:forKey:", .{ property, property_key });
+    }
+
+    /// `-[NSURL URLHandleUsingCache:]`
+    pub fn urlHandleUsingCache(self: Self, should_use_cache: bool) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "URLHandleUsingCache:", .{should_use_cache});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithScheme:host:path:" = fn (foundation.String, ?foundation.String, foundation.String) ?URL;
+        pub const @"-initFileURLWithPath:isDirectory:relativeToURL:" = fn (foundation.String, bool, ?foundation.Url) URL;
+        pub const @"-initFileURLWithPath:relativeToURL:" = fn (foundation.String, ?foundation.Url) URL;
+        pub const @"-initFileURLWithPath:isDirectory:" = fn (foundation.String, bool) URL;
+        pub const @"-initFileURLWithPath:" = fn (foundation.String) URL;
+        pub const @"+fileURLWithPath:isDirectory:relativeToURL:" = fn (foundation.String, bool, ?foundation.Url) foundation.Url;
+        pub const @"+fileURLWithPath:relativeToURL:" = fn (foundation.String, ?foundation.Url) foundation.Url;
+        pub const @"+fileURLWithPath:isDirectory:" = fn (foundation.String, bool) foundation.Url;
+        pub const @"+fileURLWithPath:" = fn (foundation.String) foundation.Url;
+        pub const @"-initFileURLWithFileSystemRepresentation:isDirectory:relativeToURL:" = fn ([*:0]const u8, bool, ?foundation.Url) URL;
+        pub const @"+fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:" = fn ([*:0]const u8, bool, ?foundation.Url) foundation.Url;
+        pub const @"-initWithString:" = fn (foundation.String) ?URL;
+        pub const @"-initWithString:relativeToURL:" = fn (foundation.String, ?foundation.Url) ?URL;
+        pub const @"+URLWithString:" = fn (foundation.String) ?URL;
+        pub const @"+URLWithString:relativeToURL:" = fn (foundation.String, ?foundation.Url) ?URL;
+        pub const @"-initWithString:encodingInvalidCharacters:" = fn (foundation.String, bool) ?URL;
+        pub const @"+URLWithString:encodingInvalidCharacters:" = fn (foundation.String, bool) ?URL;
+        pub const @"-initWithDataRepresentation:relativeToURL:" = fn (foundation.Data, ?foundation.Url) URL;
+        pub const @"+URLWithDataRepresentation:relativeToURL:" = fn (foundation.Data, ?foundation.Url) foundation.Url;
+        pub const @"-initAbsoluteURLWithDataRepresentation:relativeToURL:" = fn (foundation.Data, ?foundation.Url) URL;
+        pub const @"+absoluteURLWithDataRepresentation:relativeToURL:" = fn (foundation.Data, ?foundation.Url) foundation.Url;
+        pub const @"-getFileSystemRepresentation:maxLength:" = fn ([*:0]const u8, objc.UInteger) bool;
+        pub const @"-isFileReferenceURL" = fn () bool;
+        pub const @"-fileReferenceURL" = fn () ?foundation.Url;
+        pub const @"-getResourceValue:forKey:error:" = fn ([*]objc.Nullable(objc.Object), foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-resourceValuesForKeys:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-setResourceValue:forKey:error:" = fn (?objc.Object, foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-setResourceValues:error:" = fn (foundation.Dictionary(objc.Object, objc.Object), ?*objc.abi.Id) bool;
+        pub const @"-removeCachedResourceValueForKey:" = fn (foundation.String) void;
+        pub const @"-removeAllCachedResourceValues" = fn () void;
+        pub const @"-setTemporaryResourceValue:forKey:" = fn (?objc.Object, foundation.String) void;
+        pub const @"-bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:" = fn (URLBookmarkCreationOptions, ?foundation.Array(objc.Object), ?foundation.Url, ?*objc.abi.Id) ?foundation.Data;
+        pub const @"-initByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:" = fn (foundation.Data, URLBookmarkResolutionOptions, ?foundation.Url, ?*bool, ?*objc.abi.Id) ?URL;
+        pub const @"+URLByResolvingBookmarkData:options:relativeToURL:bookmarkDataIsStale:error:" = fn (foundation.Data, URLBookmarkResolutionOptions, ?foundation.Url, ?*bool, ?*objc.abi.Id) ?URL;
+        pub const @"+resourceValuesForKeys:fromBookmarkData:" = fn (foundation.Array(objc.Object), foundation.Data) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"+writeBookmarkData:toURL:options:error:" = fn (foundation.Data, foundation.Url, objc.UInteger, ?*objc.abi.Id) bool;
+        pub const @"+bookmarkDataWithContentsOfURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?foundation.Data;
+        pub const @"+URLByResolvingAliasFileAtURL:options:error:" = fn (foundation.Url, URLBookmarkResolutionOptions, ?*objc.abi.Id) ?URL;
+        pub const @"-startAccessingSecurityScopedResource" = fn () bool;
+        pub const @"-stopAccessingSecurityScopedResource" = fn () void;
+        pub const @"-dataRepresentation" = fn () foundation.Data;
+        pub const @"-absoluteString" = fn () ?foundation.String;
+        pub const @"-relativeString" = fn () foundation.String;
+        pub const @"-baseURL" = fn () ?foundation.Url;
+        pub const @"-absoluteURL" = fn () ?foundation.Url;
+        pub const @"-scheme" = fn () ?foundation.String;
+        pub const @"-resourceSpecifier" = fn () ?foundation.String;
+        pub const @"-host" = fn () ?foundation.String;
+        pub const @"-port" = fn () ?foundation.Number;
+        pub const @"-user" = fn () ?foundation.String;
+        pub const @"-password" = fn () ?foundation.String;
+        pub const @"-path" = fn () ?foundation.String;
+        pub const @"-fragment" = fn () ?foundation.String;
+        pub const @"-parameterString" = fn () ?foundation.String;
+        pub const @"-query" = fn () ?foundation.String;
+        pub const @"-relativePath" = fn () ?foundation.String;
+        pub const @"-hasDirectoryPath" = fn () bool;
+        pub const @"-fileSystemRepresentation" = fn () [*:0]const u8;
+        pub const @"-isFileURL" = fn () bool;
+        pub const @"-standardizedURL" = fn () ?foundation.Url;
+        pub const @"-filePathURL" = fn () ?foundation.Url;
+        pub const @"-getPromisedItemResourceValue:forKey:error:" = fn ([*]objc.Nullable(objc.Object), foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-promisedItemResourceValuesForKeys:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-checkPromisedItemIsReachableAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"+fileURLWithPathComponents:" = fn (foundation.Array(foundation.String)) ?foundation.Url;
+        pub const @"-URLByAppendingPathComponent:" = fn (foundation.String) ?foundation.Url;
+        pub const @"-URLByAppendingPathComponent:isDirectory:" = fn (foundation.String, bool) ?foundation.Url;
+        pub const @"-URLByAppendingPathExtension:" = fn (foundation.String) ?foundation.Url;
+        pub const @"-checkResourceIsReachableAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-pathComponents" = fn () ?foundation.Array(foundation.String);
+        pub const @"-lastPathComponent" = fn () ?foundation.String;
+        pub const @"-pathExtension" = fn () ?foundation.String;
+        pub const @"-URLByDeletingLastPathComponent" = fn () ?foundation.Url;
+        pub const @"-URLByDeletingPathExtension" = fn () ?foundation.Url;
+        pub const @"-URLByStandardizingPath" = fn () ?foundation.Url;
+        pub const @"-URLByResolvingSymlinksInPath" = fn () ?foundation.Url;
+        pub const @"-resourceDataUsingCache:" = fn (bool) ?foundation.Data;
+        pub const @"-loadResourceDataNotifyingClient:usingCache:" = fn (objc.Object, bool) void;
+        pub const @"-propertyForKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-setResourceData:" = fn (foundation.Data) bool;
+        pub const @"-setProperty:forKey:" = fn (objc.Object, foundation.String) bool;
+        pub const @"-URLHandleUsingCache:" = fn (bool) ?objc.Object;
+    };
+};
+
+/// `NSError`, a subclass of `NSObject`.
+pub const Error = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSError";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSError alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSError`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSError new]`
+    pub fn classNew() Error {
+        return class().msgSend(Error, "new", .{});
+    }
+
+    /// `-[NSError init]`
+    pub fn init(self: Self) Error {
+        return self.object.msgSend(Error, "init", .{});
+    }
+
+    /// `-[NSError initWithDomain:code:userInfo:]`
+    pub fn initWithDomainCodeUserInfo(self: Self, domain_: foundation.String, code_: objc.Integer, dict: ?foundation.Dictionary(objc.Object, objc.Object)) Error {
+        return self.object.msgSend(Error, "initWithDomain:code:userInfo:", .{ domain_, code_, dict });
+    }
+
+    /// `+[NSError errorWithDomain:code:userInfo:]`
+    pub fn errorWithDomainCodeUserInfo(domain_: foundation.String, code_: objc.Integer, dict: ?foundation.Dictionary(objc.Object, objc.Object)) Error {
+        return class().msgSend(Error, "errorWithDomain:code:userInfo:", .{ domain_, code_, dict });
+    }
+
+    /// `+[NSError setUserInfoValueProviderForDomain:provider:]`
+    pub fn setUserInfoValueProviderForDomainProvider(error_domain: foundation.String, provider: ?objc.BlockRef(fn (foundation.ErrorObject, foundation.String) ?objc.Object)) void {
+        return class().msgSend(void, "setUserInfoValueProviderForDomain:provider:", .{ error_domain, provider });
+    }
+
+    /// `+[NSError userInfoValueProviderForDomain:]`
+    pub fn userInfoValueProviderForDomain(error_domain: foundation.String) ?objc.BlockRef(fn (foundation.ErrorObject, foundation.String) ?objc.Object) {
+        return class().msgSend(?objc.BlockRef(fn (foundation.ErrorObject, foundation.String) ?objc.Object), "userInfoValueProviderForDomain:", .{error_domain});
+    }
+
+    /// `-[NSError domain]`
+    pub fn domain(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "domain", .{});
+    }
+
+    /// `-[NSError code]`
+    pub fn code(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "code", .{});
+    }
+
+    /// `-[NSError userInfo]`
+    pub fn userInfo(self: Self) foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(foundation.Dictionary(objc.Object, objc.Object), "userInfo", .{});
+    }
+
+    /// `-[NSError localizedDescription]`
+    pub fn localizedDescription(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedDescription", .{});
+    }
+
+    /// `-[NSError localizedFailureReason]`
+    pub fn localizedFailureReason(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedFailureReason", .{});
+    }
+
+    /// `-[NSError localizedRecoverySuggestion]`
+    pub fn localizedRecoverySuggestion(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedRecoverySuggestion", .{});
+    }
+
+    /// `-[NSError localizedRecoveryOptions]`
+    pub fn localizedRecoveryOptions(self: Self) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "localizedRecoveryOptions", .{});
+    }
+
+    /// `-[NSError recoveryAttempter]`
+    pub fn recoveryAttempter(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "recoveryAttempter", .{});
+    }
+
+    /// `-[NSError helpAnchor]`
+    pub fn helpAnchor(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "helpAnchor", .{});
+    }
+
+    /// `-[NSError underlyingErrors]`
+    pub fn underlyingErrors(self: Self) foundation.Array(foundation.ErrorObject) {
+        return self.object.msgSend(foundation.Array(foundation.ErrorObject), "underlyingErrors", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+new" = fn () Error;
+        pub const @"-init" = fn () Error;
+        pub const @"-initWithDomain:code:userInfo:" = fn (foundation.String, objc.Integer, ?foundation.Dictionary(objc.Object, objc.Object)) Error;
+        pub const @"+errorWithDomain:code:userInfo:" = fn (foundation.String, objc.Integer, ?foundation.Dictionary(objc.Object, objc.Object)) Error;
+        pub const @"+setUserInfoValueProviderForDomain:provider:" = fn (foundation.String, ?objc.BlockRef(fn (foundation.ErrorObject, foundation.String) ?objc.Object)) void;
+        pub const @"+userInfoValueProviderForDomain:" = fn (foundation.String) ?objc.BlockRef(fn (foundation.ErrorObject, foundation.String) ?objc.Object);
+        pub const @"-domain" = fn () foundation.String;
+        pub const @"-code" = fn () objc.Integer;
+        pub const @"-userInfo" = fn () foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-localizedDescription" = fn () foundation.String;
+        pub const @"-localizedFailureReason" = fn () ?foundation.String;
+        pub const @"-localizedRecoverySuggestion" = fn () ?foundation.String;
+        pub const @"-localizedRecoveryOptions" = fn () ?foundation.Array(foundation.String);
+        pub const @"-recoveryAttempter" = fn () ?objc.Object;
+        pub const @"-helpAnchor" = fn () ?foundation.String;
+        pub const @"-underlyingErrors" = fn () foundation.Array(foundation.ErrorObject);
+    };
+};
+
+/// `NSArray`, a subclass of `NSObject`.
+pub const Array = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSArray";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSArray alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSArray`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSArray objectAtIndex:]`
+    pub fn objectAtIndex(self: Self, index: objc.UInteger) objc.Object {
+        return self.object.msgSend(objc.Object, "objectAtIndex:", .{index});
+    }
+
+    /// `-[NSArray init]`
+    pub fn init(self: Self) Array {
+        return self.object.msgSend(Array, "init", .{});
+    }
+
+    /// `-[NSArray initWithObjects:count:]`
+    pub fn initWithObjectsCount(self: Self, objects: ?[*]const objc.Object, cnt: objc.UInteger) Array {
+        return self.object.msgSend(Array, "initWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `-[NSArray initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Array {
+        return self.object.msgSend(?Array, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSArray count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSArray arrayByAddingObject:]`
+    pub fn arrayByAddingObject(self: Self, an_object: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "arrayByAddingObject:", .{an_object});
+    }
+
+    /// `-[NSArray arrayByAddingObjectsFromArray:]`
+    pub fn arrayByAddingObjectsFromArray(self: Self, other_array: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "arrayByAddingObjectsFromArray:", .{other_array});
+    }
+
+    /// `-[NSArray componentsJoinedByString:]`
+    pub fn componentsJoinedByString(self: Self, separator: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "componentsJoinedByString:", .{separator});
+    }
+
+    /// `-[NSArray containsObject:]`
+    pub fn containsObject(self: Self, an_object: objc.Object) bool {
+        return self.object.msgSend(bool, "containsObject:", .{an_object});
+    }
+
+    /// `-[NSArray descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSArray descriptionWithLocale:indent:]`
+    pub fn descriptionWithLocaleIndent(self: Self, locale: ?objc.Object, level: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:indent:", .{ locale, level });
+    }
+
+    /// `-[NSArray firstObjectCommonWithArray:]`
+    pub fn firstObjectCommonWithArray(self: Self, other_array: foundation.Array(objc.Object)) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "firstObjectCommonWithArray:", .{other_array});
+    }
+
+    /// `-[NSArray getObjects:range:]`
+    pub fn getObjectsRange(self: Self, objects: [*]objc.Object, range: objc.Range) void {
+        return self.object.msgSend(void, "getObjects:range:", .{ objects, range });
+    }
+
+    /// `-[NSArray indexOfObject:]`
+    pub fn indexOfObject(self: Self, an_object: objc.Object) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:", .{an_object});
+    }
+
+    /// `-[NSArray indexOfObject:inRange:]`
+    pub fn indexOfObjectInRange(self: Self, an_object: objc.Object, range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSArray indexOfObjectIdenticalTo:]`
+    pub fn indexOfObjectIdenticalTo(self: Self, an_object: objc.Object) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectIdenticalTo:", .{an_object});
+    }
+
+    /// `-[NSArray indexOfObjectIdenticalTo:inRange:]`
+    pub fn indexOfObjectIdenticalToInRange(self: Self, an_object: objc.Object, range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectIdenticalTo:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSArray isEqualToArray:]`
+    pub fn isEqualToArray(self: Self, other_array: foundation.Array(objc.Object)) bool {
+        return self.object.msgSend(bool, "isEqualToArray:", .{other_array});
+    }
+
+    /// `-[NSArray objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSArray reverseObjectEnumerator]`
+    pub fn reverseObjectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "reverseObjectEnumerator", .{});
+    }
+
+    /// `-[NSArray sortedArrayUsingFunction:context:]`
+    pub fn sortedArrayUsingFunctionContext(self: Self, comparator: *const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, context: ?*anyopaque) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingFunction:context:", .{ comparator, context });
+    }
+
+    /// `-[NSArray sortedArrayUsingFunction:context:hint:]`
+    pub fn sortedArrayUsingFunctionContextHint(self: Self, comparator: *const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, context: ?*anyopaque, hint: ?foundation.Data) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingFunction:context:hint:", .{ comparator, context, hint });
+    }
+
+    /// `-[NSArray sortedArrayUsingSelector:]`
+    pub fn sortedArrayUsingSelector(self: Self, comparator: objc.Sel) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingSelector:", .{comparator});
+    }
+
+    /// `-[NSArray subarrayWithRange:]`
+    pub fn subarrayWithRange(self: Self, range: objc.Range) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "subarrayWithRange:", .{range});
+    }
+
+    /// `-[NSArray writeToURL:error:]`
+    pub fn writeToURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSArray makeObjectsPerformSelector:]`
+    pub fn makeObjectsPerformSelector(self: Self, a_selector: objc.Sel) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:", .{a_selector});
+    }
+
+    /// `-[NSArray makeObjectsPerformSelector:withObject:]`
+    pub fn makeObjectsPerformSelectorWithObject(self: Self, a_selector: objc.Sel, argument: ?objc.Object) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:withObject:", .{ a_selector, argument });
+    }
+
+    /// `-[NSArray objectsAtIndexes:]`
+    pub fn objectsAtIndexes(self: Self, indexes: IndexSet) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "objectsAtIndexes:", .{indexes});
+    }
+
+    /// `-[NSArray objectAtIndexedSubscript:]`
+    pub fn objectAtIndexedSubscript(self: Self, idx: objc.UInteger) objc.Object {
+        return self.object.msgSend(objc.Object, "objectAtIndexedSubscript:", .{idx});
+    }
+
+    /// `-[NSArray enumerateObjectsUsingBlock:]`
+    pub fn enumerateObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSArray enumerateObjectsWithOptions:usingBlock:]`
+    pub fn enumerateObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSArray enumerateObjectsAtIndexes:options:usingBlock:]`
+    pub fn enumerateObjectsAtIndexesOptionsUsingBlock(self: Self, s: IndexSet, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsAtIndexes:options:usingBlock:", .{ s, opts, block });
+    }
+
+    /// `-[NSArray indexOfObjectPassingTest:]`
+    pub fn indexOfObjectPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectPassingTest:", .{predicate});
+    }
+
+    /// `-[NSArray indexOfObjectWithOptions:passingTest:]`
+    pub fn indexOfObjectWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSArray indexOfObjectAtIndexes:options:passingTest:]`
+    pub fn indexOfObjectAtIndexesOptionsPassingTest(self: Self, s: IndexSet, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectAtIndexes:options:passingTest:", .{ s, opts, predicate });
+    }
+
+    /// `-[NSArray indexesOfObjectsPassingTest:]`
+    pub fn indexesOfObjectsPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsPassingTest:", .{predicate});
+    }
+
+    /// `-[NSArray indexesOfObjectsWithOptions:passingTest:]`
+    pub fn indexesOfObjectsWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSArray indexesOfObjectsAtIndexes:options:passingTest:]`
+    pub fn indexesOfObjectsAtIndexesOptionsPassingTest(self: Self, s: IndexSet, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsAtIndexes:options:passingTest:", .{ s, opts, predicate });
+    }
+
+    /// `-[NSArray sortedArrayUsingComparator:]`
+    pub fn sortedArrayUsingComparator(self: Self, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingComparator:", .{cmptr});
+    }
+
+    /// `-[NSArray sortedArrayWithOptions:usingComparator:]`
+    pub fn sortedArrayWithOptionsUsingComparator(self: Self, opts: SortOptions, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayWithOptions:usingComparator:", .{ opts, cmptr });
+    }
+
+    /// `-[NSArray indexOfObject:inSortedRange:options:usingComparator:]`
+    pub fn indexOfObjectInSortedRangeOptionsUsingComparator(self: Self, obj: objc.Object, r: objc.Range, opts: BinarySearchingOptions, cmp: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:inSortedRange:options:usingComparator:", .{ obj, r, opts, cmp });
+    }
+
+    /// `-[NSArray description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSArray firstObject]`
+    pub fn firstObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "firstObject", .{});
+    }
+
+    /// `-[NSArray lastObject]`
+    pub fn lastObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "lastObject", .{});
+    }
+
+    /// `-[NSArray sortedArrayHint]`
+    pub fn sortedArrayHint(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "sortedArrayHint", .{});
+    }
+
+    /// `+[NSArray array]`
+    pub fn array() Array {
+        return class().msgSend(Array, "array", .{});
+    }
+
+    /// `+[NSArray arrayWithObject:]`
+    pub fn arrayWithObject(an_object: objc.Object) Array {
+        return class().msgSend(Array, "arrayWithObject:", .{an_object});
+    }
+
+    /// `+[NSArray arrayWithObjects:count:]`
+    pub fn arrayWithObjectsCount(objects: [*]const objc.Object, cnt: objc.UInteger) Array {
+        return class().msgSend(Array, "arrayWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `+[NSArray arrayWithArray:]`
+    pub fn arrayWithArray(array_: foundation.Array(objc.Object)) Array {
+        return class().msgSend(Array, "arrayWithArray:", .{array_});
+    }
+
+    /// `-[NSArray initWithArray:]`
+    pub fn initWithArray(self: Self, array_: foundation.Array(objc.Object)) Array {
+        return self.object.msgSend(Array, "initWithArray:", .{array_});
+    }
+
+    /// `-[NSArray initWithArray:copyItems:]`
+    pub fn initWithArrayCopyItems(self: Self, array_: foundation.Array(objc.Object), flag: bool) Array {
+        return self.object.msgSend(Array, "initWithArray:copyItems:", .{ array_, flag });
+    }
+
+    /// `-[NSArray initWithContentsOfURL:error:]`
+    pub fn initWithContentsOfURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "initWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSArray arrayWithContentsOfURL:error:]`
+    pub fn arrayWithContentsOfURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Array(objc.Object) {
+        return class().msgSend(?foundation.Array(objc.Object), "arrayWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSArray differenceFromArray:withOptions:usingEquivalenceTest:]`
+    pub fn differenceFromArrayWithOptionsUsingEquivalenceTest(self: Self, other: foundation.Array(objc.Object), options: OrderedCollectionDifferenceCalculationOptions, block: objc.BlockRef(fn (objc.Object, objc.Object) bool)) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:withOptions:usingEquivalenceTest:", .{ other, options, block });
+    }
+
+    /// `-[NSArray differenceFromArray:withOptions:]`
+    pub fn differenceFromArrayWithOptions(self: Self, other: foundation.Array(objc.Object), options: OrderedCollectionDifferenceCalculationOptions) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:withOptions:", .{ other, options });
+    }
+
+    /// `-[NSArray differenceFromArray:]`
+    pub fn differenceFromArray(self: Self, other: foundation.Array(objc.Object)) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:", .{other});
+    }
+
+    /// `-[NSArray arrayByApplyingDifference:]`
+    pub fn arrayByApplyingDifference(self: Self, difference: objc.Object) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "arrayByApplyingDifference:", .{difference});
+    }
+
+    /// `-[NSArray getObjects:]`
+    pub fn getObjects(self: Self, objects: [*]objc.Object) void {
+        return self.object.msgSend(void, "getObjects:", .{objects});
+    }
+
+    /// `+[NSArray arrayWithContentsOfFile:]`
+    pub fn arrayWithContentsOfFile(path: foundation.String) ?foundation.Array(objc.Object) {
+        return class().msgSend(?foundation.Array(objc.Object), "arrayWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSArray arrayWithContentsOfURL:]`
+    pub fn arrayWithContentsOfURL(url: foundation.Url) ?foundation.Array(objc.Object) {
+        return class().msgSend(?foundation.Array(objc.Object), "arrayWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSArray initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSArray initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "initWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSArray writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSArray writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSArray pathsMatchingExtensions:]`
+    pub fn pathsMatchingExtensions(self: Self, filter_types: foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathsMatchingExtensions:", .{filter_types});
+    }
+
+    /// `-[NSArray valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "valueForKey:", .{key});
+    }
+
+    /// `-[NSArray setValue:forKey:]`
+    pub fn setValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSArray addObserver:toObjectsAtIndexes:forKeyPath:options:context:]`
+    pub fn addObserverToObjectsAtIndexesForKeyPathOptionsContext(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:toObjectsAtIndexes:forKeyPath:options:context:", .{ observer, indexes, key_path, options, context });
+    }
+
+    /// `-[NSArray removeObserver:fromObjectsAtIndexes:forKeyPath:context:]`
+    pub fn removeObserverFromObjectsAtIndexesForKeyPathContext(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:fromObjectsAtIndexes:forKeyPath:context:", .{ observer, indexes, key_path, context });
+    }
+
+    /// `-[NSArray removeObserver:fromObjectsAtIndexes:forKeyPath:]`
+    pub fn removeObserverFromObjectsAtIndexesForKeyPath(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:fromObjectsAtIndexes:forKeyPath:", .{ observer, indexes, key_path });
+    }
+
+    /// `-[NSArray addObserver:forKeyPath:options:context:]`
+    pub fn addObserverForKeyPathOptionsContext(self: Self, observer: objc.Object, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:forKeyPath:options:context:", .{ observer, key_path, options, context });
+    }
+
+    /// `-[NSArray removeObserver:forKeyPath:context:]`
+    pub fn removeObserverForKeyPathContext(self: Self, observer: objc.Object, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:context:", .{ observer, key_path, context });
+    }
+
+    /// `-[NSArray removeObserver:forKeyPath:]`
+    pub fn removeObserverForKeyPath(self: Self, observer: objc.Object, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:", .{ observer, key_path });
+    }
+
+    /// `-[NSArray sortedArrayUsingDescriptors:]`
+    pub fn sortedArrayUsingDescriptors(self: Self, sort_descriptors: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingDescriptors:", .{sort_descriptors});
+    }
+
+    /// `-[NSArray filteredArrayUsingPredicate:]`
+    pub fn filteredArrayUsingPredicate(self: Self, predicate: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "filteredArrayUsingPredicate:", .{predicate});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-objectAtIndex:" = fn (objc.UInteger) objc.Object;
+        pub const @"-init" = fn () Array;
+        pub const @"-initWithObjects:count:" = fn (?[*]const objc.Object, objc.UInteger) Array;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Array;
+        pub const @"-count" = fn () objc.UInteger;
+        pub const @"-arrayByAddingObject:" = fn (objc.Object) foundation.Array(objc.Object);
+        pub const @"-arrayByAddingObjectsFromArray:" = fn (foundation.Array(objc.Object)) foundation.Array(objc.Object);
+        pub const @"-componentsJoinedByString:" = fn (foundation.String) foundation.String;
+        pub const @"-containsObject:" = fn (objc.Object) bool;
+        pub const @"-descriptionWithLocale:" = fn (?objc.Object) foundation.String;
+        pub const @"-descriptionWithLocale:indent:" = fn (?objc.Object, objc.UInteger) foundation.String;
+        pub const @"-firstObjectCommonWithArray:" = fn (foundation.Array(objc.Object)) ?objc.Object;
+        pub const @"-getObjects:range:" = fn ([*]objc.Object, objc.Range) void;
+        pub const @"-indexOfObject:" = fn (objc.Object) objc.UInteger;
+        pub const @"-indexOfObject:inRange:" = fn (objc.Object, objc.Range) objc.UInteger;
+        pub const @"-indexOfObjectIdenticalTo:" = fn (objc.Object) objc.UInteger;
+        pub const @"-indexOfObjectIdenticalTo:inRange:" = fn (objc.Object, objc.Range) objc.UInteger;
+        pub const @"-isEqualToArray:" = fn (foundation.Array(objc.Object)) bool;
+        pub const @"-objectEnumerator" = fn () objc.Object;
+        pub const @"-reverseObjectEnumerator" = fn () objc.Object;
+        pub const @"-sortedArrayUsingFunction:context:" = fn (*const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, ?*anyopaque) foundation.Array(objc.Object);
+        pub const @"-sortedArrayUsingFunction:context:hint:" = fn (*const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, ?*anyopaque, ?foundation.Data) foundation.Array(objc.Object);
+        pub const @"-sortedArrayUsingSelector:" = fn (objc.Sel) foundation.Array(objc.Object);
+        pub const @"-subarrayWithRange:" = fn (objc.Range) foundation.Array(objc.Object);
+        pub const @"-writeToURL:error:" = fn (foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-makeObjectsPerformSelector:" = fn (objc.Sel) void;
+        pub const @"-makeObjectsPerformSelector:withObject:" = fn (objc.Sel, ?objc.Object) void;
+        pub const @"-objectsAtIndexes:" = fn (IndexSet) foundation.Array(objc.Object);
+        pub const @"-objectAtIndexedSubscript:" = fn (objc.UInteger) objc.Object;
+        pub const @"-enumerateObjectsUsingBlock:" = fn (objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void;
+        pub const @"-enumerateObjectsWithOptions:usingBlock:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void;
+        pub const @"-enumerateObjectsAtIndexes:options:usingBlock:" = fn (IndexSet, EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void;
+        pub const @"-indexOfObjectPassingTest:" = fn (objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexOfObjectWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexOfObjectAtIndexes:options:passingTest:" = fn (IndexSet, EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexesOfObjectsPassingTest:" = fn (objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-indexesOfObjectsWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-indexesOfObjectsAtIndexes:options:passingTest:" = fn (IndexSet, EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-sortedArrayUsingComparator:" = fn (?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object);
+        pub const @"-sortedArrayWithOptions:usingComparator:" = fn (SortOptions, ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object);
+        pub const @"-indexOfObject:inSortedRange:options:usingComparator:" = fn (objc.Object, objc.Range, BinarySearchingOptions, ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) objc.UInteger;
+        pub const @"-description" = fn () foundation.String;
+        pub const @"-firstObject" = fn () ?objc.Object;
+        pub const @"-lastObject" = fn () ?objc.Object;
+        pub const @"-sortedArrayHint" = fn () foundation.Data;
+        pub const @"+array" = fn () Array;
+        pub const @"+arrayWithObject:" = fn (objc.Object) Array;
+        pub const @"+arrayWithObjects:count:" = fn ([*]const objc.Object, objc.UInteger) Array;
+        pub const @"+arrayWithArray:" = fn (foundation.Array(objc.Object)) Array;
+        pub const @"-initWithArray:" = fn (foundation.Array(objc.Object)) Array;
+        pub const @"-initWithArray:copyItems:" = fn (foundation.Array(objc.Object), bool) Array;
+        pub const @"-initWithContentsOfURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?foundation.Array(objc.Object);
+        pub const @"+arrayWithContentsOfURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?foundation.Array(objc.Object);
+        pub const @"-differenceFromArray:withOptions:usingEquivalenceTest:" = fn (foundation.Array(objc.Object), OrderedCollectionDifferenceCalculationOptions, objc.BlockRef(fn (objc.Object, objc.Object) bool)) objc.Object;
+        pub const @"-differenceFromArray:withOptions:" = fn (foundation.Array(objc.Object), OrderedCollectionDifferenceCalculationOptions) objc.Object;
+        pub const @"-differenceFromArray:" = fn (foundation.Array(objc.Object)) objc.Object;
+        pub const @"-arrayByApplyingDifference:" = fn (objc.Object) ?foundation.Array(objc.Object);
+        pub const @"-getObjects:" = fn ([*]objc.Object) void;
+        pub const @"+arrayWithContentsOfFile:" = fn (foundation.String) ?foundation.Array(objc.Object);
+        pub const @"+arrayWithContentsOfURL:" = fn (foundation.Url) ?foundation.Array(objc.Object);
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?foundation.Array(objc.Object);
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?foundation.Array(objc.Object);
+        pub const @"-writeToFile:atomically:" = fn (foundation.String, bool) bool;
+        pub const @"-writeToURL:atomically:" = fn (foundation.Url, bool) bool;
+        pub const @"-pathsMatchingExtensions:" = fn (foundation.Array(foundation.String)) foundation.Array(foundation.String);
+        pub const @"-valueForKey:" = fn (foundation.String) objc.Object;
+        pub const @"-setValue:forKey:" = fn (?objc.Object, foundation.String) void;
+        pub const @"-addObserver:toObjectsAtIndexes:forKeyPath:options:context:" = fn (objc.Object, IndexSet, foundation.String, KeyValueObservingOptions, ?*anyopaque) void;
+        pub const @"-removeObserver:fromObjectsAtIndexes:forKeyPath:context:" = fn (objc.Object, IndexSet, foundation.String, ?*anyopaque) void;
+        pub const @"-removeObserver:fromObjectsAtIndexes:forKeyPath:" = fn (objc.Object, IndexSet, foundation.String) void;
+        pub const @"-addObserver:forKeyPath:options:context:" = fn (objc.Object, foundation.String, KeyValueObservingOptions, ?*anyopaque) void;
+        pub const @"-removeObserver:forKeyPath:context:" = fn (objc.Object, foundation.String, ?*anyopaque) void;
+        pub const @"-removeObserver:forKeyPath:" = fn (objc.Object, foundation.String) void;
+        pub const @"-sortedArrayUsingDescriptors:" = fn (foundation.Array(objc.Object)) foundation.Array(objc.Object);
+        pub const @"-filteredArrayUsingPredicate:" = fn (objc.Object) foundation.Array(objc.Object);
+    };
+
+    // Not generated:
+    //   +[NSArray arrayWithObjects:]: variadic
+    //   -[NSArray initWithObjects:]: variadic
+};
+
+/// `NSMutableArray`, a subclass of `NSArray`.
+pub const MutableArray = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Array;
+    pub const class_name = "NSMutableArray";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableArray alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableArray`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableArray addObject:]`
+    pub fn addObject(self: Self, an_object: objc.Object) void {
+        return self.object.msgSend(void, "addObject:", .{an_object});
+    }
+
+    /// `-[NSMutableArray insertObject:atIndex:]`
+    pub fn insertObjectAtIndex(self: Self, an_object: objc.Object, index: objc.UInteger) void {
+        return self.object.msgSend(void, "insertObject:atIndex:", .{ an_object, index });
+    }
+
+    /// `-[NSMutableArray removeLastObject]`
+    pub fn removeLastObject(self: Self) void {
+        return self.object.msgSend(void, "removeLastObject", .{});
+    }
+
+    /// `-[NSMutableArray removeObjectAtIndex:]`
+    pub fn removeObjectAtIndex(self: Self, index: objc.UInteger) void {
+        return self.object.msgSend(void, "removeObjectAtIndex:", .{index});
+    }
+
+    /// `-[NSMutableArray replaceObjectAtIndex:withObject:]`
+    pub fn replaceObjectAtIndexWithObject(self: Self, index: objc.UInteger, an_object: objc.Object) void {
+        return self.object.msgSend(void, "replaceObjectAtIndex:withObject:", .{ index, an_object });
+    }
+
+    /// `-[NSMutableArray init]`
+    pub fn init(self: Self) MutableArray {
+        return self.object.msgSend(MutableArray, "init", .{});
+    }
+
+    /// `-[NSMutableArray initWithCapacity:]`
+    pub fn initWithCapacity(self: Self, num_items: objc.UInteger) MutableArray {
+        return self.object.msgSend(MutableArray, "initWithCapacity:", .{num_items});
+    }
+
+    /// `-[NSMutableArray initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?MutableArray {
+        return self.object.msgSend(?MutableArray, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSMutableArray addObjectsFromArray:]`
+    pub fn addObjectsFromArray(self: Self, other_array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "addObjectsFromArray:", .{other_array});
+    }
+
+    /// `-[NSMutableArray exchangeObjectAtIndex:withObjectAtIndex:]`
+    pub fn exchangeObjectAtIndexWithObjectAtIndex(self: Self, idx1: objc.UInteger, idx2: objc.UInteger) void {
+        return self.object.msgSend(void, "exchangeObjectAtIndex:withObjectAtIndex:", .{ idx1, idx2 });
+    }
+
+    /// `-[NSMutableArray removeAllObjects]`
+    pub fn removeAllObjects(self: Self) void {
+        return self.object.msgSend(void, "removeAllObjects", .{});
+    }
+
+    /// `-[NSMutableArray removeObject:inRange:]`
+    pub fn removeObjectInRange(self: Self, an_object: objc.Object, range: objc.Range) void {
+        return self.object.msgSend(void, "removeObject:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSMutableArray removeObject:]`
+    pub fn removeObject(self: Self, an_object: objc.Object) void {
+        return self.object.msgSend(void, "removeObject:", .{an_object});
+    }
+
+    /// `-[NSMutableArray removeObjectIdenticalTo:inRange:]`
+    pub fn removeObjectIdenticalToInRange(self: Self, an_object: objc.Object, range: objc.Range) void {
+        return self.object.msgSend(void, "removeObjectIdenticalTo:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSMutableArray removeObjectIdenticalTo:]`
+    pub fn removeObjectIdenticalTo(self: Self, an_object: objc.Object) void {
+        return self.object.msgSend(void, "removeObjectIdenticalTo:", .{an_object});
+    }
+
+    /// `-[NSMutableArray removeObjectsFromIndices:numIndices:]`
+    pub fn removeObjectsFromIndicesNumIndices(self: Self, indices: ?*objc.UInteger, cnt: objc.UInteger) void {
+        return self.object.msgSend(void, "removeObjectsFromIndices:numIndices:", .{ indices, cnt });
+    }
+
+    /// `-[NSMutableArray removeObjectsInArray:]`
+    pub fn removeObjectsInArray(self: Self, other_array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "removeObjectsInArray:", .{other_array});
+    }
+
+    /// `-[NSMutableArray removeObjectsInRange:]`
+    pub fn removeObjectsInRange(self: Self, range: objc.Range) void {
+        return self.object.msgSend(void, "removeObjectsInRange:", .{range});
+    }
+
+    /// `-[NSMutableArray replaceObjectsInRange:withObjectsFromArray:range:]`
+    pub fn replaceObjectsInRangeWithObjectsFromArrayRange(self: Self, range: objc.Range, other_array: foundation.Array(objc.Object), other_range: objc.Range) void {
+        return self.object.msgSend(void, "replaceObjectsInRange:withObjectsFromArray:range:", .{ range, other_array, other_range });
+    }
+
+    /// `-[NSMutableArray replaceObjectsInRange:withObjectsFromArray:]`
+    pub fn replaceObjectsInRangeWithObjectsFromArray(self: Self, range: objc.Range, other_array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "replaceObjectsInRange:withObjectsFromArray:", .{ range, other_array });
+    }
+
+    /// `-[NSMutableArray setArray:]`
+    pub fn setArray(self: Self, other_array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "setArray:", .{other_array});
+    }
+
+    /// `-[NSMutableArray sortUsingFunction:context:]`
+    pub fn sortUsingFunctionContext(self: Self, compare: *const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "sortUsingFunction:context:", .{ compare, context });
+    }
+
+    /// `-[NSMutableArray sortUsingSelector:]`
+    pub fn sortUsingSelector(self: Self, comparator: objc.Sel) void {
+        return self.object.msgSend(void, "sortUsingSelector:", .{comparator});
+    }
+
+    /// `-[NSMutableArray insertObjects:atIndexes:]`
+    pub fn insertObjectsAtIndexes(self: Self, objects: foundation.Array(objc.Object), indexes: IndexSet) void {
+        return self.object.msgSend(void, "insertObjects:atIndexes:", .{ objects, indexes });
+    }
+
+    /// `-[NSMutableArray removeObjectsAtIndexes:]`
+    pub fn removeObjectsAtIndexes(self: Self, indexes: IndexSet) void {
+        return self.object.msgSend(void, "removeObjectsAtIndexes:", .{indexes});
+    }
+
+    /// `-[NSMutableArray replaceObjectsAtIndexes:withObjects:]`
+    pub fn replaceObjectsAtIndexesWithObjects(self: Self, indexes: IndexSet, objects: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "replaceObjectsAtIndexes:withObjects:", .{ indexes, objects });
+    }
+
+    /// `-[NSMutableArray setObject:atIndexedSubscript:]`
+    pub fn setObjectAtIndexedSubscript(self: Self, obj: objc.Object, idx: objc.UInteger) void {
+        return self.object.msgSend(void, "setObject:atIndexedSubscript:", .{ obj, idx });
+    }
+
+    /// `-[NSMutableArray sortUsingComparator:]`
+    pub fn sortUsingComparator(self: Self, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) void {
+        return self.object.msgSend(void, "sortUsingComparator:", .{cmptr});
+    }
+
+    /// `-[NSMutableArray sortWithOptions:usingComparator:]`
+    pub fn sortWithOptionsUsingComparator(self: Self, opts: SortOptions, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) void {
+        return self.object.msgSend(void, "sortWithOptions:usingComparator:", .{ opts, cmptr });
+    }
+
+    /// `+[NSMutableArray arrayWithCapacity:]`
+    pub fn arrayWithCapacity(num_items: objc.UInteger) MutableArray {
+        return class().msgSend(MutableArray, "arrayWithCapacity:", .{num_items});
+    }
+
+    /// `+[NSMutableArray arrayWithContentsOfFile:]`
+    pub fn arrayWithContentsOfFile(path: foundation.String) ?foundation.MutableArray(objc.Object) {
+        return class().msgSend(?foundation.MutableArray(objc.Object), "arrayWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSMutableArray arrayWithContentsOfURL:]`
+    pub fn arrayWithContentsOfURL(url: foundation.Url) ?foundation.MutableArray(objc.Object) {
+        return class().msgSend(?foundation.MutableArray(objc.Object), "arrayWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSMutableArray initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?foundation.MutableArray(objc.Object) {
+        return self.object.msgSend(?foundation.MutableArray(objc.Object), "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSMutableArray initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?foundation.MutableArray(objc.Object) {
+        return self.object.msgSend(?foundation.MutableArray(objc.Object), "initWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSMutableArray applyDifference:]`
+    pub fn applyDifference(self: Self, difference: objc.Object) void {
+        return self.object.msgSend(void, "applyDifference:", .{difference});
+    }
+
+    /// `-[NSMutableArray sortUsingDescriptors:]`
+    pub fn sortUsingDescriptors(self: Self, sort_descriptors: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "sortUsingDescriptors:", .{sort_descriptors});
+    }
+
+    /// `-[NSMutableArray filterUsingPredicate:]`
+    pub fn filterUsingPredicate(self: Self, predicate: objc.Object) void {
+        return self.object.msgSend(void, "filterUsingPredicate:", .{predicate});
+    }
+
+    /// `-[NSArray objectAtIndex:]`
+    pub fn objectAtIndex(self: Self, index: objc.UInteger) objc.Object {
+        return self.object.msgSend(objc.Object, "objectAtIndex:", .{index});
+    }
+
+    /// `-[NSArray initWithObjects:count:]`
+    pub fn initWithObjectsCount(self: Self, objects: ?[*]const objc.Object, cnt: objc.UInteger) MutableArray {
+        return self.object.msgSend(MutableArray, "initWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `-[NSArray count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSArray arrayByAddingObject:]`
+    pub fn arrayByAddingObject(self: Self, an_object: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "arrayByAddingObject:", .{an_object});
+    }
+
+    /// `-[NSArray arrayByAddingObjectsFromArray:]`
+    pub fn arrayByAddingObjectsFromArray(self: Self, other_array: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "arrayByAddingObjectsFromArray:", .{other_array});
+    }
+
+    /// `-[NSArray componentsJoinedByString:]`
+    pub fn componentsJoinedByString(self: Self, separator: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "componentsJoinedByString:", .{separator});
+    }
+
+    /// `-[NSArray containsObject:]`
+    pub fn containsObject(self: Self, an_object: objc.Object) bool {
+        return self.object.msgSend(bool, "containsObject:", .{an_object});
+    }
+
+    /// `-[NSArray descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSArray descriptionWithLocale:indent:]`
+    pub fn descriptionWithLocaleIndent(self: Self, locale: ?objc.Object, level: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:indent:", .{ locale, level });
+    }
+
+    /// `-[NSArray firstObjectCommonWithArray:]`
+    pub fn firstObjectCommonWithArray(self: Self, other_array: foundation.Array(objc.Object)) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "firstObjectCommonWithArray:", .{other_array});
+    }
+
+    /// `-[NSArray getObjects:range:]`
+    pub fn getObjectsRange(self: Self, objects: [*]objc.Object, range: objc.Range) void {
+        return self.object.msgSend(void, "getObjects:range:", .{ objects, range });
+    }
+
+    /// `-[NSArray indexOfObject:]`
+    pub fn indexOfObject(self: Self, an_object: objc.Object) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:", .{an_object});
+    }
+
+    /// `-[NSArray indexOfObject:inRange:]`
+    pub fn indexOfObjectInRange(self: Self, an_object: objc.Object, range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSArray indexOfObjectIdenticalTo:]`
+    pub fn indexOfObjectIdenticalTo(self: Self, an_object: objc.Object) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectIdenticalTo:", .{an_object});
+    }
+
+    /// `-[NSArray indexOfObjectIdenticalTo:inRange:]`
+    pub fn indexOfObjectIdenticalToInRange(self: Self, an_object: objc.Object, range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectIdenticalTo:inRange:", .{ an_object, range });
+    }
+
+    /// `-[NSArray isEqualToArray:]`
+    pub fn isEqualToArray(self: Self, other_array: foundation.Array(objc.Object)) bool {
+        return self.object.msgSend(bool, "isEqualToArray:", .{other_array});
+    }
+
+    /// `-[NSArray objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSArray reverseObjectEnumerator]`
+    pub fn reverseObjectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "reverseObjectEnumerator", .{});
+    }
+
+    /// `-[NSArray sortedArrayUsingFunction:context:]`
+    pub fn sortedArrayUsingFunctionContext(self: Self, comparator: *const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, context: ?*anyopaque) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingFunction:context:", .{ comparator, context });
+    }
+
+    /// `-[NSArray sortedArrayUsingFunction:context:hint:]`
+    pub fn sortedArrayUsingFunctionContextHint(self: Self, comparator: *const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, context: ?*anyopaque, hint: ?foundation.Data) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingFunction:context:hint:", .{ comparator, context, hint });
+    }
+
+    /// `-[NSArray sortedArrayUsingSelector:]`
+    pub fn sortedArrayUsingSelector(self: Self, comparator: objc.Sel) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingSelector:", .{comparator});
+    }
+
+    /// `-[NSArray subarrayWithRange:]`
+    pub fn subarrayWithRange(self: Self, range: objc.Range) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "subarrayWithRange:", .{range});
+    }
+
+    /// `-[NSArray writeToURL:error:]`
+    pub fn writeToURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSArray makeObjectsPerformSelector:]`
+    pub fn makeObjectsPerformSelector(self: Self, a_selector: objc.Sel) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:", .{a_selector});
+    }
+
+    /// `-[NSArray makeObjectsPerformSelector:withObject:]`
+    pub fn makeObjectsPerformSelectorWithObject(self: Self, a_selector: objc.Sel, argument: ?objc.Object) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:withObject:", .{ a_selector, argument });
+    }
+
+    /// `-[NSArray objectsAtIndexes:]`
+    pub fn objectsAtIndexes(self: Self, indexes: IndexSet) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "objectsAtIndexes:", .{indexes});
+    }
+
+    /// `-[NSArray objectAtIndexedSubscript:]`
+    pub fn objectAtIndexedSubscript(self: Self, idx: objc.UInteger) objc.Object {
+        return self.object.msgSend(objc.Object, "objectAtIndexedSubscript:", .{idx});
+    }
+
+    /// `-[NSArray enumerateObjectsUsingBlock:]`
+    pub fn enumerateObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSArray enumerateObjectsWithOptions:usingBlock:]`
+    pub fn enumerateObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSArray enumerateObjectsAtIndexes:options:usingBlock:]`
+    pub fn enumerateObjectsAtIndexesOptionsUsingBlock(self: Self, s: IndexSet, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsAtIndexes:options:usingBlock:", .{ s, opts, block });
+    }
+
+    /// `-[NSArray indexOfObjectPassingTest:]`
+    pub fn indexOfObjectPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectPassingTest:", .{predicate});
+    }
+
+    /// `-[NSArray indexOfObjectWithOptions:passingTest:]`
+    pub fn indexOfObjectWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSArray indexOfObjectAtIndexes:options:passingTest:]`
+    pub fn indexOfObjectAtIndexesOptionsPassingTest(self: Self, s: IndexSet, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObjectAtIndexes:options:passingTest:", .{ s, opts, predicate });
+    }
+
+    /// `-[NSArray indexesOfObjectsPassingTest:]`
+    pub fn indexesOfObjectsPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsPassingTest:", .{predicate});
+    }
+
+    /// `-[NSArray indexesOfObjectsWithOptions:passingTest:]`
+    pub fn indexesOfObjectsWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSArray indexesOfObjectsAtIndexes:options:passingTest:]`
+    pub fn indexesOfObjectsAtIndexesOptionsPassingTest(self: Self, s: IndexSet, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesOfObjectsAtIndexes:options:passingTest:", .{ s, opts, predicate });
+    }
+
+    /// `-[NSArray sortedArrayUsingComparator:]`
+    pub fn sortedArrayUsingComparator(self: Self, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingComparator:", .{cmptr});
+    }
+
+    /// `-[NSArray sortedArrayWithOptions:usingComparator:]`
+    pub fn sortedArrayWithOptionsUsingComparator(self: Self, opts: SortOptions, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayWithOptions:usingComparator:", .{ opts, cmptr });
+    }
+
+    /// `-[NSArray indexOfObject:inSortedRange:options:usingComparator:]`
+    pub fn indexOfObjectInSortedRangeOptionsUsingComparator(self: Self, obj: objc.Object, r: objc.Range, opts: BinarySearchingOptions, cmp: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexOfObject:inSortedRange:options:usingComparator:", .{ obj, r, opts, cmp });
+    }
+
+    /// `-[NSArray description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSArray firstObject]`
+    pub fn firstObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "firstObject", .{});
+    }
+
+    /// `-[NSArray lastObject]`
+    pub fn lastObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "lastObject", .{});
+    }
+
+    /// `-[NSArray sortedArrayHint]`
+    pub fn sortedArrayHint(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "sortedArrayHint", .{});
+    }
+
+    /// `+[NSArray array]`
+    pub fn array() MutableArray {
+        return class().msgSend(MutableArray, "array", .{});
+    }
+
+    /// `+[NSArray arrayWithObject:]`
+    pub fn arrayWithObject(an_object: objc.Object) MutableArray {
+        return class().msgSend(MutableArray, "arrayWithObject:", .{an_object});
+    }
+
+    /// `+[NSArray arrayWithObjects:count:]`
+    pub fn arrayWithObjectsCount(objects: [*]const objc.Object, cnt: objc.UInteger) MutableArray {
+        return class().msgSend(MutableArray, "arrayWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `+[NSArray arrayWithArray:]`
+    pub fn arrayWithArray(array_: foundation.Array(objc.Object)) MutableArray {
+        return class().msgSend(MutableArray, "arrayWithArray:", .{array_});
+    }
+
+    /// `-[NSArray initWithArray:]`
+    pub fn initWithArray(self: Self, array_: foundation.Array(objc.Object)) MutableArray {
+        return self.object.msgSend(MutableArray, "initWithArray:", .{array_});
+    }
+
+    /// `-[NSArray initWithArray:copyItems:]`
+    pub fn initWithArrayCopyItems(self: Self, array_: foundation.Array(objc.Object), flag: bool) MutableArray {
+        return self.object.msgSend(MutableArray, "initWithArray:copyItems:", .{ array_, flag });
+    }
+
+    /// `-[NSArray initWithContentsOfURL:error:]`
+    pub fn initWithContentsOfURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "initWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSArray arrayWithContentsOfURL:error:]`
+    pub fn arrayWithContentsOfURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Array(objc.Object) {
+        return class().msgSend(?foundation.Array(objc.Object), "arrayWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSArray differenceFromArray:withOptions:usingEquivalenceTest:]`
+    pub fn differenceFromArrayWithOptionsUsingEquivalenceTest(self: Self, other: foundation.Array(objc.Object), options: OrderedCollectionDifferenceCalculationOptions, block: objc.BlockRef(fn (objc.Object, objc.Object) bool)) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:withOptions:usingEquivalenceTest:", .{ other, options, block });
+    }
+
+    /// `-[NSArray differenceFromArray:withOptions:]`
+    pub fn differenceFromArrayWithOptions(self: Self, other: foundation.Array(objc.Object), options: OrderedCollectionDifferenceCalculationOptions) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:withOptions:", .{ other, options });
+    }
+
+    /// `-[NSArray differenceFromArray:]`
+    pub fn differenceFromArray(self: Self, other: foundation.Array(objc.Object)) objc.Object {
+        return self.object.msgSend(objc.Object, "differenceFromArray:", .{other});
+    }
+
+    /// `-[NSArray arrayByApplyingDifference:]`
+    pub fn arrayByApplyingDifference(self: Self, difference: objc.Object) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "arrayByApplyingDifference:", .{difference});
+    }
+
+    /// `-[NSArray getObjects:]`
+    pub fn getObjects(self: Self, objects: [*]objc.Object) void {
+        return self.object.msgSend(void, "getObjects:", .{objects});
+    }
+
+    /// `-[NSArray writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSArray writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `-[NSArray pathsMatchingExtensions:]`
+    pub fn pathsMatchingExtensions(self: Self, filter_types: foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathsMatchingExtensions:", .{filter_types});
+    }
+
+    /// `-[NSArray valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "valueForKey:", .{key});
+    }
+
+    /// `-[NSArray setValue:forKey:]`
+    pub fn setValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSArray addObserver:toObjectsAtIndexes:forKeyPath:options:context:]`
+    pub fn addObserverToObjectsAtIndexesForKeyPathOptionsContext(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:toObjectsAtIndexes:forKeyPath:options:context:", .{ observer, indexes, key_path, options, context });
+    }
+
+    /// `-[NSArray removeObserver:fromObjectsAtIndexes:forKeyPath:context:]`
+    pub fn removeObserverFromObjectsAtIndexesForKeyPathContext(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:fromObjectsAtIndexes:forKeyPath:context:", .{ observer, indexes, key_path, context });
+    }
+
+    /// `-[NSArray removeObserver:fromObjectsAtIndexes:forKeyPath:]`
+    pub fn removeObserverFromObjectsAtIndexesForKeyPath(self: Self, observer: objc.Object, indexes: IndexSet, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:fromObjectsAtIndexes:forKeyPath:", .{ observer, indexes, key_path });
+    }
+
+    /// `-[NSArray addObserver:forKeyPath:options:context:]`
+    pub fn addObserverForKeyPathOptionsContext(self: Self, observer: objc.Object, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:forKeyPath:options:context:", .{ observer, key_path, options, context });
+    }
+
+    /// `-[NSArray removeObserver:forKeyPath:context:]`
+    pub fn removeObserverForKeyPathContext(self: Self, observer: objc.Object, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:context:", .{ observer, key_path, context });
+    }
+
+    /// `-[NSArray removeObserver:forKeyPath:]`
+    pub fn removeObserverForKeyPath(self: Self, observer: objc.Object, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:", .{ observer, key_path });
+    }
+
+    /// `-[NSArray sortedArrayUsingDescriptors:]`
+    pub fn sortedArrayUsingDescriptors(self: Self, sort_descriptors: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingDescriptors:", .{sort_descriptors});
+    }
+
+    /// `-[NSArray filteredArrayUsingPredicate:]`
+    pub fn filteredArrayUsingPredicate(self: Self, predicate: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "filteredArrayUsingPredicate:", .{predicate});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-addObject:" = fn (objc.Object) void;
+        pub const @"-insertObject:atIndex:" = fn (objc.Object, objc.UInteger) void;
+        pub const @"-removeLastObject" = fn () void;
+        pub const @"-removeObjectAtIndex:" = fn (objc.UInteger) void;
+        pub const @"-replaceObjectAtIndex:withObject:" = fn (objc.UInteger, objc.Object) void;
+        pub const @"-init" = fn () MutableArray;
+        pub const @"-initWithCapacity:" = fn (objc.UInteger) MutableArray;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?MutableArray;
+        pub const @"-addObjectsFromArray:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-exchangeObjectAtIndex:withObjectAtIndex:" = fn (objc.UInteger, objc.UInteger) void;
+        pub const @"-removeAllObjects" = fn () void;
+        pub const @"-removeObject:inRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-removeObject:" = fn (objc.Object) void;
+        pub const @"-removeObjectIdenticalTo:inRange:" = fn (objc.Object, objc.Range) void;
+        pub const @"-removeObjectIdenticalTo:" = fn (objc.Object) void;
+        pub const @"-removeObjectsFromIndices:numIndices:" = fn (?*objc.UInteger, objc.UInteger) void;
+        pub const @"-removeObjectsInArray:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-removeObjectsInRange:" = fn (objc.Range) void;
+        pub const @"-replaceObjectsInRange:withObjectsFromArray:range:" = fn (objc.Range, foundation.Array(objc.Object), objc.Range) void;
+        pub const @"-replaceObjectsInRange:withObjectsFromArray:" = fn (objc.Range, foundation.Array(objc.Object)) void;
+        pub const @"-setArray:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-sortUsingFunction:context:" = fn (*const fn (objc.Object, objc.Object, ?*anyopaque) callconv(.c) objc.Integer, ?*anyopaque) void;
+        pub const @"-sortUsingSelector:" = fn (objc.Sel) void;
+        pub const @"-insertObjects:atIndexes:" = fn (foundation.Array(objc.Object), IndexSet) void;
+        pub const @"-removeObjectsAtIndexes:" = fn (IndexSet) void;
+        pub const @"-replaceObjectsAtIndexes:withObjects:" = fn (IndexSet, foundation.Array(objc.Object)) void;
+        pub const @"-setObject:atIndexedSubscript:" = fn (objc.Object, objc.UInteger) void;
+        pub const @"-sortUsingComparator:" = fn (?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) void;
+        pub const @"-sortWithOptions:usingComparator:" = fn (SortOptions, ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) void;
+        pub const @"+arrayWithCapacity:" = fn (objc.UInteger) MutableArray;
+        pub const @"+arrayWithContentsOfFile:" = fn (foundation.String) ?foundation.MutableArray(objc.Object);
+        pub const @"+arrayWithContentsOfURL:" = fn (foundation.Url) ?foundation.MutableArray(objc.Object);
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?foundation.MutableArray(objc.Object);
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?foundation.MutableArray(objc.Object);
+        pub const @"-applyDifference:" = fn (objc.Object) void;
+        pub const @"-sortUsingDescriptors:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-filterUsingPredicate:" = fn (objc.Object) void;
+    };
+};
+
+/// `NSDictionary`, a subclass of `NSObject`.
+pub const Dictionary = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSDictionary";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSDictionary alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSDictionary`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSDictionary objectForKey:]`
+    pub fn objectForKey(self: Self, a_key: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKey:", .{a_key});
+    }
+
+    /// `-[NSDictionary keyEnumerator]`
+    pub fn keyEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "keyEnumerator", .{});
+    }
+
+    /// `-[NSDictionary init]`
+    pub fn init(self: Self) Dictionary {
+        return self.object.msgSend(Dictionary, "init", .{});
+    }
+
+    /// `-[NSDictionary initWithObjects:forKeys:count:]`
+    pub fn initWithObjectsForKeysCount(self: Self, objects: ?[*]const objc.Object, keys: ?[*]const objc.Object, cnt: objc.UInteger) Dictionary {
+        return self.object.msgSend(Dictionary, "initWithObjects:forKeys:count:", .{ objects, keys, cnt });
+    }
+
+    /// `-[NSDictionary initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Dictionary {
+        return self.object.msgSend(?Dictionary, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSDictionary count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSDictionary allKeysForObject:]`
+    pub fn allKeysForObject(self: Self, an_object: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allKeysForObject:", .{an_object});
+    }
+
+    /// `-[NSDictionary descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSDictionary descriptionWithLocale:indent:]`
+    pub fn descriptionWithLocaleIndent(self: Self, locale: ?objc.Object, level: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:indent:", .{ locale, level });
+    }
+
+    /// `-[NSDictionary isEqualToDictionary:]`
+    pub fn isEqualToDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) bool {
+        return self.object.msgSend(bool, "isEqualToDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSDictionary objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSDictionary objectsForKeys:notFoundMarker:]`
+    pub fn objectsForKeysNotFoundMarker(self: Self, keys: foundation.Array(objc.Object), marker: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "objectsForKeys:notFoundMarker:", .{ keys, marker });
+    }
+
+    /// `-[NSDictionary writeToURL:error:]`
+    pub fn writeToURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSDictionary keysSortedByValueUsingSelector:]`
+    pub fn keysSortedByValueUsingSelector(self: Self, comparator: objc.Sel) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueUsingSelector:", .{comparator});
+    }
+
+    /// `-[NSDictionary getObjects:andKeys:count:]`
+    pub fn getObjectsAndKeysCount(self: Self, objects: ?[*]objc.Object, keys: ?[*]objc.Object, count_: objc.UInteger) void {
+        return self.object.msgSend(void, "getObjects:andKeys:count:", .{ objects, keys, count_ });
+    }
+
+    /// `-[NSDictionary objectForKeyedSubscript:]`
+    pub fn objectForKeyedSubscript(self: Self, key: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKeyedSubscript:", .{key});
+    }
+
+    /// `-[NSDictionary enumerateKeysAndObjectsUsingBlock:]`
+    pub fn enumerateKeysAndObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateKeysAndObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSDictionary enumerateKeysAndObjectsWithOptions:usingBlock:]`
+    pub fn enumerateKeysAndObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateKeysAndObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSDictionary keysSortedByValueUsingComparator:]`
+    pub fn keysSortedByValueUsingComparator(self: Self, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueUsingComparator:", .{cmptr});
+    }
+
+    /// `-[NSDictionary keysSortedByValueWithOptions:usingComparator:]`
+    pub fn keysSortedByValueWithOptionsUsingComparator(self: Self, opts: SortOptions, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueWithOptions:usingComparator:", .{ opts, cmptr });
+    }
+
+    /// `-[NSDictionary keysOfEntriesPassingTest:]`
+    pub fn keysOfEntriesPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "keysOfEntriesPassingTest:", .{predicate});
+    }
+
+    /// `-[NSDictionary keysOfEntriesWithOptions:passingTest:]`
+    pub fn keysOfEntriesWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "keysOfEntriesWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSDictionary allKeys]`
+    pub fn allKeys(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allKeys", .{});
+    }
+
+    /// `-[NSDictionary allValues]`
+    pub fn allValues(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allValues", .{});
+    }
+
+    /// `-[NSDictionary description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSDictionary descriptionInStringsFileFormat]`
+    pub fn descriptionInStringsFileFormat(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionInStringsFileFormat", .{});
+    }
+
+    /// `-[NSDictionary getObjects:andKeys:]`
+    pub fn getObjectsAndKeys(self: Self, objects: ?[*]objc.Object, keys: ?[*]objc.Object) void {
+        return self.object.msgSend(void, "getObjects:andKeys:", .{ objects, keys });
+    }
+
+    /// `+[NSDictionary dictionaryWithContentsOfFile:]`
+    pub fn dictionaryWithContentsOfFile(path: foundation.String) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return class().msgSend(?foundation.Dictionary(objc.Object, objc.Object), "dictionaryWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSDictionary dictionaryWithContentsOfURL:]`
+    pub fn dictionaryWithContentsOfURL(url: foundation.Url) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return class().msgSend(?foundation.Dictionary(objc.Object, objc.Object), "dictionaryWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSDictionary initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSDictionary initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "initWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSDictionary writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSDictionary writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `+[NSDictionary dictionary]`
+    pub fn dictionary() Dictionary {
+        return class().msgSend(Dictionary, "dictionary", .{});
+    }
+
+    /// `+[NSDictionary dictionaryWithObject:forKey:]`
+    pub fn dictionaryWithObjectForKey(object_: objc.Object, key: ?objc.Object) Dictionary {
+        return class().msgSend(Dictionary, "dictionaryWithObject:forKey:", .{ object_, key });
+    }
+
+    /// `+[NSDictionary dictionaryWithObjects:forKeys:count:]`
+    pub fn dictionaryWithObjectsForKeysCount(objects: ?[*]const objc.Object, keys: ?[*]const objc.Object, cnt: objc.UInteger) Dictionary {
+        return class().msgSend(Dictionary, "dictionaryWithObjects:forKeys:count:", .{ objects, keys, cnt });
+    }
+
+    /// `+[NSDictionary dictionaryWithDictionary:]`
+    pub fn dictionaryWithDictionary(dict: foundation.Dictionary(objc.Object, objc.Object)) Dictionary {
+        return class().msgSend(Dictionary, "dictionaryWithDictionary:", .{dict});
+    }
+
+    /// `+[NSDictionary dictionaryWithObjects:forKeys:]`
+    pub fn dictionaryWithObjectsForKeys(objects: foundation.Array(objc.Object), keys: foundation.Array(objc.Object)) Dictionary {
+        return class().msgSend(Dictionary, "dictionaryWithObjects:forKeys:", .{ objects, keys });
+    }
+
+    /// `-[NSDictionary initWithDictionary:]`
+    pub fn initWithDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) Dictionary {
+        return self.object.msgSend(Dictionary, "initWithDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSDictionary initWithDictionary:copyItems:]`
+    pub fn initWithDictionaryCopyItems(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object), flag: bool) Dictionary {
+        return self.object.msgSend(Dictionary, "initWithDictionary:copyItems:", .{ other_dictionary, flag });
+    }
+
+    /// `-[NSDictionary initWithObjects:forKeys:]`
+    pub fn initWithObjectsForKeys(self: Self, objects: foundation.Array(objc.Object), keys: foundation.Array(objc.Object)) Dictionary {
+        return self.object.msgSend(Dictionary, "initWithObjects:forKeys:", .{ objects, keys });
+    }
+
+    /// `-[NSDictionary initWithContentsOfURL:error:]`
+    pub fn initWithContentsOfURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "initWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSDictionary dictionaryWithContentsOfURL:error:]`
+    pub fn dictionaryWithContentsOfURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return class().msgSend(?foundation.Dictionary(foundation.String, objc.Object), "dictionaryWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSDictionary sharedKeySetForKeys:]`
+    pub fn sharedKeySetForKeys(keys: foundation.Array(objc.Object)) objc.Object {
+        return class().msgSend(objc.Object, "sharedKeySetForKeys:", .{keys});
+    }
+
+    /// `-[NSDictionary countByEnumeratingWithState:objects:count:]`
+    pub fn countByEnumeratingWithStateObjectsCount(self: Self, state: objc.Object, buffer: [*]objc.Nullable(objc.Object), len: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "countByEnumeratingWithState:objects:count:", .{ state, buffer, len });
+    }
+
+    /// `-[NSDictionary fileSize]`
+    pub fn fileSize(self: Self) c_ulonglong {
+        return self.object.msgSend(c_ulonglong, "fileSize", .{});
+    }
+
+    /// `-[NSDictionary fileModificationDate]`
+    pub fn fileModificationDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "fileModificationDate", .{});
+    }
+
+    /// `-[NSDictionary fileType]`
+    pub fn fileType(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileType", .{});
+    }
+
+    /// `-[NSDictionary filePosixPermissions]`
+    pub fn filePosixPermissions(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "filePosixPermissions", .{});
+    }
+
+    /// `-[NSDictionary fileOwnerAccountName]`
+    pub fn fileOwnerAccountName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileOwnerAccountName", .{});
+    }
+
+    /// `-[NSDictionary fileGroupOwnerAccountName]`
+    pub fn fileGroupOwnerAccountName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileGroupOwnerAccountName", .{});
+    }
+
+    /// `-[NSDictionary fileSystemNumber]`
+    pub fn fileSystemNumber(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "fileSystemNumber", .{});
+    }
+
+    /// `-[NSDictionary fileSystemFileNumber]`
+    pub fn fileSystemFileNumber(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "fileSystemFileNumber", .{});
+    }
+
+    /// `-[NSDictionary fileExtensionHidden]`
+    pub fn fileExtensionHidden(self: Self) bool {
+        return self.object.msgSend(bool, "fileExtensionHidden", .{});
+    }
+
+    /// `-[NSDictionary fileHFSCreatorCode]`
+    pub fn fileHFSCreatorCode(self: Self) c_uint {
+        return self.object.msgSend(c_uint, "fileHFSCreatorCode", .{});
+    }
+
+    /// `-[NSDictionary fileHFSTypeCode]`
+    pub fn fileHFSTypeCode(self: Self) c_uint {
+        return self.object.msgSend(c_uint, "fileHFSTypeCode", .{});
+    }
+
+    /// `-[NSDictionary fileIsImmutable]`
+    pub fn fileIsImmutable(self: Self) bool {
+        return self.object.msgSend(bool, "fileIsImmutable", .{});
+    }
+
+    /// `-[NSDictionary fileIsAppendOnly]`
+    pub fn fileIsAppendOnly(self: Self) bool {
+        return self.object.msgSend(bool, "fileIsAppendOnly", .{});
+    }
+
+    /// `-[NSDictionary fileCreationDate]`
+    pub fn fileCreationDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "fileCreationDate", .{});
+    }
+
+    /// `-[NSDictionary fileOwnerAccountID]`
+    pub fn fileOwnerAccountID(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "fileOwnerAccountID", .{});
+    }
+
+    /// `-[NSDictionary fileGroupOwnerAccountID]`
+    pub fn fileGroupOwnerAccountID(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "fileGroupOwnerAccountID", .{});
+    }
+
+    /// `-[NSDictionary valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "valueForKey:", .{key});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-objectForKey:" = fn (objc.Object) ?objc.Object;
+        pub const @"-keyEnumerator" = fn () objc.Object;
+        pub const @"-init" = fn () Dictionary;
+        pub const @"-initWithObjects:forKeys:count:" = fn (?[*]const objc.Object, ?[*]const objc.Object, objc.UInteger) Dictionary;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Dictionary;
+        pub const @"-count" = fn () objc.UInteger;
+        pub const @"-allKeysForObject:" = fn (objc.Object) foundation.Array(objc.Object);
+        pub const @"-descriptionWithLocale:" = fn (?objc.Object) foundation.String;
+        pub const @"-descriptionWithLocale:indent:" = fn (?objc.Object, objc.UInteger) foundation.String;
+        pub const @"-isEqualToDictionary:" = fn (foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"-objectEnumerator" = fn () objc.Object;
+        pub const @"-objectsForKeys:notFoundMarker:" = fn (foundation.Array(objc.Object), objc.Object) foundation.Array(objc.Object);
+        pub const @"-writeToURL:error:" = fn (foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-keysSortedByValueUsingSelector:" = fn (objc.Sel) foundation.Array(objc.Object);
+        pub const @"-getObjects:andKeys:count:" = fn (?[*]objc.Object, ?[*]objc.Object, objc.UInteger) void;
+        pub const @"-objectForKeyedSubscript:" = fn (objc.Object) ?objc.Object;
+        pub const @"-enumerateKeysAndObjectsUsingBlock:" = fn (objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void;
+        pub const @"-enumerateKeysAndObjectsWithOptions:usingBlock:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void;
+        pub const @"-keysSortedByValueUsingComparator:" = fn (?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object);
+        pub const @"-keysSortedByValueWithOptions:usingComparator:" = fn (SortOptions, ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object);
+        pub const @"-keysOfEntriesPassingTest:" = fn (objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set;
+        pub const @"-keysOfEntriesWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set;
+        pub const @"-allKeys" = fn () foundation.Array(objc.Object);
+        pub const @"-allValues" = fn () foundation.Array(objc.Object);
+        pub const @"-description" = fn () foundation.String;
+        pub const @"-descriptionInStringsFileFormat" = fn () foundation.String;
+        pub const @"-getObjects:andKeys:" = fn (?[*]objc.Object, ?[*]objc.Object) void;
+        pub const @"+dictionaryWithContentsOfFile:" = fn (foundation.String) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"+dictionaryWithContentsOfURL:" = fn (foundation.Url) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-writeToFile:atomically:" = fn (foundation.String, bool) bool;
+        pub const @"-writeToURL:atomically:" = fn (foundation.Url, bool) bool;
+        pub const @"+dictionary" = fn () Dictionary;
+        pub const @"+dictionaryWithObject:forKey:" = fn (objc.Object, ?objc.Object) Dictionary;
+        pub const @"+dictionaryWithObjects:forKeys:count:" = fn (?[*]const objc.Object, ?[*]const objc.Object, objc.UInteger) Dictionary;
+        pub const @"+dictionaryWithDictionary:" = fn (foundation.Dictionary(objc.Object, objc.Object)) Dictionary;
+        pub const @"+dictionaryWithObjects:forKeys:" = fn (foundation.Array(objc.Object), foundation.Array(objc.Object)) Dictionary;
+        pub const @"-initWithDictionary:" = fn (foundation.Dictionary(objc.Object, objc.Object)) Dictionary;
+        pub const @"-initWithDictionary:copyItems:" = fn (foundation.Dictionary(objc.Object, objc.Object), bool) Dictionary;
+        pub const @"-initWithObjects:forKeys:" = fn (foundation.Array(objc.Object), foundation.Array(objc.Object)) Dictionary;
+        pub const @"-initWithContentsOfURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"+dictionaryWithContentsOfURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"+sharedKeySetForKeys:" = fn (foundation.Array(objc.Object)) objc.Object;
+        pub const @"-countByEnumeratingWithState:objects:count:" = fn (objc.Object, [*]objc.Nullable(objc.Object), objc.UInteger) objc.UInteger;
+        pub const @"-fileSize" = fn () c_ulonglong;
+        pub const @"-fileModificationDate" = fn () ?Date;
+        pub const @"-fileType" = fn () ?foundation.String;
+        pub const @"-filePosixPermissions" = fn () objc.UInteger;
+        pub const @"-fileOwnerAccountName" = fn () ?foundation.String;
+        pub const @"-fileGroupOwnerAccountName" = fn () ?foundation.String;
+        pub const @"-fileSystemNumber" = fn () objc.Integer;
+        pub const @"-fileSystemFileNumber" = fn () objc.UInteger;
+        pub const @"-fileExtensionHidden" = fn () bool;
+        pub const @"-fileHFSCreatorCode" = fn () c_uint;
+        pub const @"-fileHFSTypeCode" = fn () c_uint;
+        pub const @"-fileIsImmutable" = fn () bool;
+        pub const @"-fileIsAppendOnly" = fn () bool;
+        pub const @"-fileCreationDate" = fn () ?Date;
+        pub const @"-fileOwnerAccountID" = fn () ?foundation.Number;
+        pub const @"-fileGroupOwnerAccountID" = fn () ?foundation.Number;
+        pub const @"-valueForKey:" = fn (foundation.String) ?objc.Object;
+    };
+
+    // Not generated:
+    //   +[NSDictionary dictionaryWithObjectsAndKeys:]: variadic
+    //   -[NSDictionary initWithObjectsAndKeys:]: variadic
+};
+
+/// `NSMutableDictionary`, a subclass of `NSDictionary`.
+pub const MutableDictionary = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Dictionary;
+    pub const class_name = "NSMutableDictionary";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableDictionary alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableDictionary`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableDictionary removeObjectForKey:]`
+    pub fn removeObjectForKey(self: Self, a_key: objc.Object) void {
+        return self.object.msgSend(void, "removeObjectForKey:", .{a_key});
+    }
+
+    /// `-[NSMutableDictionary setObject:forKey:]`
+    pub fn setObjectForKey(self: Self, an_object: objc.Object, a_key: ?objc.Object) void {
+        return self.object.msgSend(void, "setObject:forKey:", .{ an_object, a_key });
+    }
+
+    /// `-[NSMutableDictionary init]`
+    pub fn init(self: Self) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "init", .{});
+    }
+
+    /// `-[NSMutableDictionary initWithCapacity:]`
+    pub fn initWithCapacity(self: Self, num_items: objc.UInteger) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "initWithCapacity:", .{num_items});
+    }
+
+    /// `-[NSMutableDictionary initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?MutableDictionary {
+        return self.object.msgSend(?MutableDictionary, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSMutableDictionary addEntriesFromDictionary:]`
+    pub fn addEntriesFromDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "addEntriesFromDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSMutableDictionary removeAllObjects]`
+    pub fn removeAllObjects(self: Self) void {
+        return self.object.msgSend(void, "removeAllObjects", .{});
+    }
+
+    /// `-[NSMutableDictionary removeObjectsForKeys:]`
+    pub fn removeObjectsForKeys(self: Self, key_array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "removeObjectsForKeys:", .{key_array});
+    }
+
+    /// `-[NSMutableDictionary setDictionary:]`
+    pub fn setDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "setDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSMutableDictionary setObject:forKeyedSubscript:]`
+    pub fn setObjectForKeyedSubscript(self: Self, obj: ?objc.Object, key: ?objc.Object) void {
+        return self.object.msgSend(void, "setObject:forKeyedSubscript:", .{ obj, key });
+    }
+
+    /// `+[NSMutableDictionary dictionaryWithCapacity:]`
+    pub fn dictionaryWithCapacity(num_items: objc.UInteger) MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionaryWithCapacity:", .{num_items});
+    }
+
+    /// `+[NSMutableDictionary dictionaryWithContentsOfFile:]`
+    pub fn dictionaryWithContentsOfFile(path: foundation.String) ?foundation.MutableDictionary(objc.Object, objc.Object) {
+        return class().msgSend(?foundation.MutableDictionary(objc.Object, objc.Object), "dictionaryWithContentsOfFile:", .{path});
+    }
+
+    /// `+[NSMutableDictionary dictionaryWithContentsOfURL:]`
+    pub fn dictionaryWithContentsOfURL(url: foundation.Url) ?foundation.MutableDictionary(objc.Object, objc.Object) {
+        return class().msgSend(?foundation.MutableDictionary(objc.Object, objc.Object), "dictionaryWithContentsOfURL:", .{url});
+    }
+
+    /// `-[NSMutableDictionary initWithContentsOfFile:]`
+    pub fn initWithContentsOfFile(self: Self, path: foundation.String) ?foundation.MutableDictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.MutableDictionary(objc.Object, objc.Object), "initWithContentsOfFile:", .{path});
+    }
+
+    /// `-[NSMutableDictionary initWithContentsOfURL:]`
+    pub fn initWithContentsOfURL(self: Self, url: foundation.Url) ?foundation.MutableDictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.MutableDictionary(objc.Object, objc.Object), "initWithContentsOfURL:", .{url});
+    }
+
+    /// `+[NSMutableDictionary dictionaryWithSharedKeySet:]`
+    pub fn dictionaryWithSharedKeySet(keyset: objc.Object) foundation.MutableDictionary(objc.Object, objc.Object) {
+        return class().msgSend(foundation.MutableDictionary(objc.Object, objc.Object), "dictionaryWithSharedKeySet:", .{keyset});
+    }
+
+    /// `-[NSMutableDictionary setValue:forKey:]`
+    pub fn setValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSDictionary objectForKey:]`
+    pub fn objectForKey(self: Self, a_key: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKey:", .{a_key});
+    }
+
+    /// `-[NSDictionary keyEnumerator]`
+    pub fn keyEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "keyEnumerator", .{});
+    }
+
+    /// `-[NSDictionary initWithObjects:forKeys:count:]`
+    pub fn initWithObjectsForKeysCount(self: Self, objects: ?[*]const objc.Object, keys: ?[*]const objc.Object, cnt: objc.UInteger) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "initWithObjects:forKeys:count:", .{ objects, keys, cnt });
+    }
+
+    /// `-[NSDictionary count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSDictionary allKeysForObject:]`
+    pub fn allKeysForObject(self: Self, an_object: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allKeysForObject:", .{an_object});
+    }
+
+    /// `-[NSDictionary descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSDictionary descriptionWithLocale:indent:]`
+    pub fn descriptionWithLocaleIndent(self: Self, locale: ?objc.Object, level: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:indent:", .{ locale, level });
+    }
+
+    /// `-[NSDictionary isEqualToDictionary:]`
+    pub fn isEqualToDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) bool {
+        return self.object.msgSend(bool, "isEqualToDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSDictionary objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSDictionary objectsForKeys:notFoundMarker:]`
+    pub fn objectsForKeysNotFoundMarker(self: Self, keys: foundation.Array(objc.Object), marker: objc.Object) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "objectsForKeys:notFoundMarker:", .{ keys, marker });
+    }
+
+    /// `-[NSDictionary writeToURL:error:]`
+    pub fn writeToURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeToURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSDictionary keysSortedByValueUsingSelector:]`
+    pub fn keysSortedByValueUsingSelector(self: Self, comparator: objc.Sel) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueUsingSelector:", .{comparator});
+    }
+
+    /// `-[NSDictionary getObjects:andKeys:count:]`
+    pub fn getObjectsAndKeysCount(self: Self, objects: ?[*]objc.Object, keys: ?[*]objc.Object, count_: objc.UInteger) void {
+        return self.object.msgSend(void, "getObjects:andKeys:count:", .{ objects, keys, count_ });
+    }
+
+    /// `-[NSDictionary objectForKeyedSubscript:]`
+    pub fn objectForKeyedSubscript(self: Self, key: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKeyedSubscript:", .{key});
+    }
+
+    /// `-[NSDictionary enumerateKeysAndObjectsUsingBlock:]`
+    pub fn enumerateKeysAndObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateKeysAndObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSDictionary enumerateKeysAndObjectsWithOptions:usingBlock:]`
+    pub fn enumerateKeysAndObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateKeysAndObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSDictionary keysSortedByValueUsingComparator:]`
+    pub fn keysSortedByValueUsingComparator(self: Self, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueUsingComparator:", .{cmptr});
+    }
+
+    /// `-[NSDictionary keysSortedByValueWithOptions:usingComparator:]`
+    pub fn keysSortedByValueWithOptionsUsingComparator(self: Self, opts: SortOptions, cmptr: ?objc.BlockRef(fn (objc.Object, objc.Object) ComparisonResult)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "keysSortedByValueWithOptions:usingComparator:", .{ opts, cmptr });
+    }
+
+    /// `-[NSDictionary keysOfEntriesPassingTest:]`
+    pub fn keysOfEntriesPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "keysOfEntriesPassingTest:", .{predicate});
+    }
+
+    /// `-[NSDictionary keysOfEntriesWithOptions:passingTest:]`
+    pub fn keysOfEntriesWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "keysOfEntriesWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSDictionary allKeys]`
+    pub fn allKeys(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allKeys", .{});
+    }
+
+    /// `-[NSDictionary allValues]`
+    pub fn allValues(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allValues", .{});
+    }
+
+    /// `-[NSDictionary description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `-[NSDictionary descriptionInStringsFileFormat]`
+    pub fn descriptionInStringsFileFormat(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionInStringsFileFormat", .{});
+    }
+
+    /// `-[NSDictionary getObjects:andKeys:]`
+    pub fn getObjectsAndKeys(self: Self, objects: ?[*]objc.Object, keys: ?[*]objc.Object) void {
+        return self.object.msgSend(void, "getObjects:andKeys:", .{ objects, keys });
+    }
+
+    /// `-[NSDictionary writeToFile:atomically:]`
+    pub fn writeToFileAtomically(self: Self, path: foundation.String, use_auxiliary_file: bool) bool {
+        return self.object.msgSend(bool, "writeToFile:atomically:", .{ path, use_auxiliary_file });
+    }
+
+    /// `-[NSDictionary writeToURL:atomically:]`
+    pub fn writeToURLAtomically(self: Self, url: foundation.Url, atomically: bool) bool {
+        return self.object.msgSend(bool, "writeToURL:atomically:", .{ url, atomically });
+    }
+
+    /// `+[NSDictionary dictionary]`
+    pub fn dictionary() MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionary", .{});
+    }
+
+    /// `+[NSDictionary dictionaryWithObject:forKey:]`
+    pub fn dictionaryWithObjectForKey(object_: objc.Object, key: ?objc.Object) MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionaryWithObject:forKey:", .{ object_, key });
+    }
+
+    /// `+[NSDictionary dictionaryWithObjects:forKeys:count:]`
+    pub fn dictionaryWithObjectsForKeysCount(objects: ?[*]const objc.Object, keys: ?[*]const objc.Object, cnt: objc.UInteger) MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionaryWithObjects:forKeys:count:", .{ objects, keys, cnt });
+    }
+
+    /// `+[NSDictionary dictionaryWithDictionary:]`
+    pub fn dictionaryWithDictionary(dict: foundation.Dictionary(objc.Object, objc.Object)) MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionaryWithDictionary:", .{dict});
+    }
+
+    /// `+[NSDictionary dictionaryWithObjects:forKeys:]`
+    pub fn dictionaryWithObjectsForKeys(objects: foundation.Array(objc.Object), keys: foundation.Array(objc.Object)) MutableDictionary {
+        return class().msgSend(MutableDictionary, "dictionaryWithObjects:forKeys:", .{ objects, keys });
+    }
+
+    /// `-[NSDictionary initWithDictionary:]`
+    pub fn initWithDictionary(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object)) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "initWithDictionary:", .{other_dictionary});
+    }
+
+    /// `-[NSDictionary initWithDictionary:copyItems:]`
+    pub fn initWithDictionaryCopyItems(self: Self, other_dictionary: foundation.Dictionary(objc.Object, objc.Object), flag: bool) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "initWithDictionary:copyItems:", .{ other_dictionary, flag });
+    }
+
+    /// `-[NSDictionary initWithObjects:forKeys:]`
+    pub fn initWithObjectsForKeys(self: Self, objects: foundation.Array(objc.Object), keys: foundation.Array(objc.Object)) MutableDictionary {
+        return self.object.msgSend(MutableDictionary, "initWithObjects:forKeys:", .{ objects, keys });
+    }
+
+    /// `-[NSDictionary initWithContentsOfURL:error:]`
+    pub fn initWithContentsOfURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "initWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSDictionary dictionaryWithContentsOfURL:error:]`
+    pub fn dictionaryWithContentsOfURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return class().msgSend(?foundation.Dictionary(foundation.String, objc.Object), "dictionaryWithContentsOfURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSDictionary sharedKeySetForKeys:]`
+    pub fn sharedKeySetForKeys(keys: foundation.Array(objc.Object)) objc.Object {
+        return class().msgSend(objc.Object, "sharedKeySetForKeys:", .{keys});
+    }
+
+    /// `-[NSDictionary countByEnumeratingWithState:objects:count:]`
+    pub fn countByEnumeratingWithStateObjectsCount(self: Self, state: objc.Object, buffer: [*]objc.Nullable(objc.Object), len: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "countByEnumeratingWithState:objects:count:", .{ state, buffer, len });
+    }
+
+    /// `-[NSDictionary fileSize]`
+    pub fn fileSize(self: Self) c_ulonglong {
+        return self.object.msgSend(c_ulonglong, "fileSize", .{});
+    }
+
+    /// `-[NSDictionary fileModificationDate]`
+    pub fn fileModificationDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "fileModificationDate", .{});
+    }
+
+    /// `-[NSDictionary fileType]`
+    pub fn fileType(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileType", .{});
+    }
+
+    /// `-[NSDictionary filePosixPermissions]`
+    pub fn filePosixPermissions(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "filePosixPermissions", .{});
+    }
+
+    /// `-[NSDictionary fileOwnerAccountName]`
+    pub fn fileOwnerAccountName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileOwnerAccountName", .{});
+    }
+
+    /// `-[NSDictionary fileGroupOwnerAccountName]`
+    pub fn fileGroupOwnerAccountName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fileGroupOwnerAccountName", .{});
+    }
+
+    /// `-[NSDictionary fileSystemNumber]`
+    pub fn fileSystemNumber(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "fileSystemNumber", .{});
+    }
+
+    /// `-[NSDictionary fileSystemFileNumber]`
+    pub fn fileSystemFileNumber(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "fileSystemFileNumber", .{});
+    }
+
+    /// `-[NSDictionary fileExtensionHidden]`
+    pub fn fileExtensionHidden(self: Self) bool {
+        return self.object.msgSend(bool, "fileExtensionHidden", .{});
+    }
+
+    /// `-[NSDictionary fileHFSCreatorCode]`
+    pub fn fileHFSCreatorCode(self: Self) c_uint {
+        return self.object.msgSend(c_uint, "fileHFSCreatorCode", .{});
+    }
+
+    /// `-[NSDictionary fileHFSTypeCode]`
+    pub fn fileHFSTypeCode(self: Self) c_uint {
+        return self.object.msgSend(c_uint, "fileHFSTypeCode", .{});
+    }
+
+    /// `-[NSDictionary fileIsImmutable]`
+    pub fn fileIsImmutable(self: Self) bool {
+        return self.object.msgSend(bool, "fileIsImmutable", .{});
+    }
+
+    /// `-[NSDictionary fileIsAppendOnly]`
+    pub fn fileIsAppendOnly(self: Self) bool {
+        return self.object.msgSend(bool, "fileIsAppendOnly", .{});
+    }
+
+    /// `-[NSDictionary fileCreationDate]`
+    pub fn fileCreationDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "fileCreationDate", .{});
+    }
+
+    /// `-[NSDictionary fileOwnerAccountID]`
+    pub fn fileOwnerAccountID(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "fileOwnerAccountID", .{});
+    }
+
+    /// `-[NSDictionary fileGroupOwnerAccountID]`
+    pub fn fileGroupOwnerAccountID(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "fileGroupOwnerAccountID", .{});
+    }
+
+    /// `-[NSDictionary valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "valueForKey:", .{key});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-removeObjectForKey:" = fn (objc.Object) void;
+        pub const @"-setObject:forKey:" = fn (objc.Object, ?objc.Object) void;
+        pub const @"-init" = fn () MutableDictionary;
+        pub const @"-initWithCapacity:" = fn (objc.UInteger) MutableDictionary;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?MutableDictionary;
+        pub const @"-addEntriesFromDictionary:" = fn (foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-removeAllObjects" = fn () void;
+        pub const @"-removeObjectsForKeys:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-setDictionary:" = fn (foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-setObject:forKeyedSubscript:" = fn (?objc.Object, ?objc.Object) void;
+        pub const @"+dictionaryWithCapacity:" = fn (objc.UInteger) MutableDictionary;
+        pub const @"+dictionaryWithContentsOfFile:" = fn (foundation.String) ?foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"+dictionaryWithContentsOfURL:" = fn (foundation.Url) ?foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"+dictionaryWithSharedKeySet:" = fn (objc.Object) foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"-setValue:forKey:" = fn (?objc.Object, foundation.String) void;
+    };
+};
+
+/// `NSSet`, a subclass of `NSObject`.
+pub const Set = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSSet";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSSet alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSSet`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSSet member:]`
+    pub fn member(self: Self, object_: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "member:", .{object_});
+    }
+
+    /// `-[NSSet objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSSet init]`
+    pub fn init(self: Self) Set {
+        return self.object.msgSend(Set, "init", .{});
+    }
+
+    /// `-[NSSet initWithObjects:count:]`
+    pub fn initWithObjectsCount(self: Self, objects: ?[*]const objc.Object, cnt: objc.UInteger) Set {
+        return self.object.msgSend(Set, "initWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `-[NSSet initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Set {
+        return self.object.msgSend(?Set, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSSet count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSSet anyObject]`
+    pub fn anyObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "anyObject", .{});
+    }
+
+    /// `-[NSSet containsObject:]`
+    pub fn containsObject(self: Self, an_object: objc.Object) bool {
+        return self.object.msgSend(bool, "containsObject:", .{an_object});
+    }
+
+    /// `-[NSSet descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSSet intersectsSet:]`
+    pub fn intersectsSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "intersectsSet:", .{other_set});
+    }
+
+    /// `-[NSSet isEqualToSet:]`
+    pub fn isEqualToSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "isEqualToSet:", .{other_set});
+    }
+
+    /// `-[NSSet isSubsetOfSet:]`
+    pub fn isSubsetOfSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "isSubsetOfSet:", .{other_set});
+    }
+
+    /// `-[NSSet makeObjectsPerformSelector:]`
+    pub fn makeObjectsPerformSelector(self: Self, a_selector: objc.Sel) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:", .{a_selector});
+    }
+
+    /// `-[NSSet makeObjectsPerformSelector:withObject:]`
+    pub fn makeObjectsPerformSelectorWithObject(self: Self, a_selector: objc.Sel, argument: ?objc.Object) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:withObject:", .{ a_selector, argument });
+    }
+
+    /// `-[NSSet setByAddingObject:]`
+    pub fn setByAddingObject(self: Self, an_object: objc.Object) Set {
+        return self.object.msgSend(Set, "setByAddingObject:", .{an_object});
+    }
+
+    /// `-[NSSet setByAddingObjectsFromSet:]`
+    pub fn setByAddingObjectsFromSet(self: Self, other: Set) Set {
+        return self.object.msgSend(Set, "setByAddingObjectsFromSet:", .{other});
+    }
+
+    /// `-[NSSet setByAddingObjectsFromArray:]`
+    pub fn setByAddingObjectsFromArray(self: Self, other: foundation.Array(objc.Object)) Set {
+        return self.object.msgSend(Set, "setByAddingObjectsFromArray:", .{other});
+    }
+
+    /// `-[NSSet enumerateObjectsUsingBlock:]`
+    pub fn enumerateObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSSet enumerateObjectsWithOptions:usingBlock:]`
+    pub fn enumerateObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSSet objectsPassingTest:]`
+    pub fn objectsPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "objectsPassingTest:", .{predicate});
+    }
+
+    /// `-[NSSet objectsWithOptions:passingTest:]`
+    pub fn objectsWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "objectsWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSSet allObjects]`
+    pub fn allObjects(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allObjects", .{});
+    }
+
+    /// `-[NSSet description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSSet set]`
+    pub fn set() Set {
+        return class().msgSend(Set, "set", .{});
+    }
+
+    /// `+[NSSet setWithObject:]`
+    pub fn setWithObject(object_: objc.Object) Set {
+        return class().msgSend(Set, "setWithObject:", .{object_});
+    }
+
+    /// `+[NSSet setWithObjects:count:]`
+    pub fn setWithObjectsCount(objects: [*]const objc.Object, cnt: objc.UInteger) Set {
+        return class().msgSend(Set, "setWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `+[NSSet setWithSet:]`
+    pub fn setWithSet(set_: Set) Set {
+        return class().msgSend(Set, "setWithSet:", .{set_});
+    }
+
+    /// `+[NSSet setWithArray:]`
+    pub fn setWithArray(array: foundation.Array(objc.Object)) Set {
+        return class().msgSend(Set, "setWithArray:", .{array});
+    }
+
+    /// `-[NSSet initWithSet:]`
+    pub fn initWithSet(self: Self, set_: Set) Set {
+        return self.object.msgSend(Set, "initWithSet:", .{set_});
+    }
+
+    /// `-[NSSet initWithSet:copyItems:]`
+    pub fn initWithSetCopyItems(self: Self, set_: Set, flag: bool) Set {
+        return self.object.msgSend(Set, "initWithSet:copyItems:", .{ set_, flag });
+    }
+
+    /// `-[NSSet initWithArray:]`
+    pub fn initWithArray(self: Self, array: foundation.Array(objc.Object)) Set {
+        return self.object.msgSend(Set, "initWithArray:", .{array});
+    }
+
+    /// `-[NSSet valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "valueForKey:", .{key});
+    }
+
+    /// `-[NSSet setValue:forKey:]`
+    pub fn setValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSSet addObserver:forKeyPath:options:context:]`
+    pub fn addObserverForKeyPathOptionsContext(self: Self, observer: objc.Object, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:forKeyPath:options:context:", .{ observer, key_path, options, context });
+    }
+
+    /// `-[NSSet removeObserver:forKeyPath:context:]`
+    pub fn removeObserverForKeyPathContext(self: Self, observer: objc.Object, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:context:", .{ observer, key_path, context });
+    }
+
+    /// `-[NSSet removeObserver:forKeyPath:]`
+    pub fn removeObserverForKeyPath(self: Self, observer: objc.Object, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:", .{ observer, key_path });
+    }
+
+    /// `-[NSSet sortedArrayUsingDescriptors:]`
+    pub fn sortedArrayUsingDescriptors(self: Self, sort_descriptors: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingDescriptors:", .{sort_descriptors});
+    }
+
+    /// `-[NSSet filteredSetUsingPredicate:]`
+    pub fn filteredSetUsingPredicate(self: Self, predicate: objc.Object) Set {
+        return self.object.msgSend(Set, "filteredSetUsingPredicate:", .{predicate});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-member:" = fn (objc.Object) ?objc.Object;
+        pub const @"-objectEnumerator" = fn () objc.Object;
+        pub const @"-init" = fn () Set;
+        pub const @"-initWithObjects:count:" = fn (?[*]const objc.Object, objc.UInteger) Set;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Set;
+        pub const @"-count" = fn () objc.UInteger;
+        pub const @"-anyObject" = fn () ?objc.Object;
+        pub const @"-containsObject:" = fn (objc.Object) bool;
+        pub const @"-descriptionWithLocale:" = fn (?objc.Object) foundation.String;
+        pub const @"-intersectsSet:" = fn (Set) bool;
+        pub const @"-isEqualToSet:" = fn (Set) bool;
+        pub const @"-isSubsetOfSet:" = fn (Set) bool;
+        pub const @"-makeObjectsPerformSelector:" = fn (objc.Sel) void;
+        pub const @"-makeObjectsPerformSelector:withObject:" = fn (objc.Sel, ?objc.Object) void;
+        pub const @"-setByAddingObject:" = fn (objc.Object) Set;
+        pub const @"-setByAddingObjectsFromSet:" = fn (Set) Set;
+        pub const @"-setByAddingObjectsFromArray:" = fn (foundation.Array(objc.Object)) Set;
+        pub const @"-enumerateObjectsUsingBlock:" = fn (objc.BlockRef(fn (objc.Object, ?*bool) void)) void;
+        pub const @"-enumerateObjectsWithOptions:usingBlock:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, ?*bool) void)) void;
+        pub const @"-objectsPassingTest:" = fn (objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set;
+        pub const @"-objectsWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set;
+        pub const @"-allObjects" = fn () foundation.Array(objc.Object);
+        pub const @"-description" = fn () foundation.String;
+        pub const @"+set" = fn () Set;
+        pub const @"+setWithObject:" = fn (objc.Object) Set;
+        pub const @"+setWithObjects:count:" = fn ([*]const objc.Object, objc.UInteger) Set;
+        pub const @"+setWithSet:" = fn (Set) Set;
+        pub const @"+setWithArray:" = fn (foundation.Array(objc.Object)) Set;
+        pub const @"-initWithSet:" = fn (Set) Set;
+        pub const @"-initWithSet:copyItems:" = fn (Set, bool) Set;
+        pub const @"-initWithArray:" = fn (foundation.Array(objc.Object)) Set;
+        pub const @"-valueForKey:" = fn (foundation.String) objc.Object;
+        pub const @"-setValue:forKey:" = fn (?objc.Object, foundation.String) void;
+        pub const @"-addObserver:forKeyPath:options:context:" = fn (objc.Object, foundation.String, KeyValueObservingOptions, ?*anyopaque) void;
+        pub const @"-removeObserver:forKeyPath:context:" = fn (objc.Object, foundation.String, ?*anyopaque) void;
+        pub const @"-removeObserver:forKeyPath:" = fn (objc.Object, foundation.String) void;
+        pub const @"-sortedArrayUsingDescriptors:" = fn (foundation.Array(objc.Object)) foundation.Array(objc.Object);
+        pub const @"-filteredSetUsingPredicate:" = fn (objc.Object) Set;
+    };
+
+    // Not generated:
+    //   +[NSSet setWithObjects:]: variadic
+    //   -[NSSet initWithObjects:]: variadic
+};
+
+/// `NSMutableSet`, a subclass of `NSSet`.
+pub const MutableSet = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Set;
+    pub const class_name = "NSMutableSet";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableSet alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableSet`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableSet addObject:]`
+    pub fn addObject(self: Self, object_: objc.Object) void {
+        return self.object.msgSend(void, "addObject:", .{object_});
+    }
+
+    /// `-[NSMutableSet removeObject:]`
+    pub fn removeObject(self: Self, object_: objc.Object) void {
+        return self.object.msgSend(void, "removeObject:", .{object_});
+    }
+
+    /// `-[NSMutableSet initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?MutableSet {
+        return self.object.msgSend(?MutableSet, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSMutableSet init]`
+    pub fn init(self: Self) MutableSet {
+        return self.object.msgSend(MutableSet, "init", .{});
+    }
+
+    /// `-[NSMutableSet initWithCapacity:]`
+    pub fn initWithCapacity(self: Self, num_items: objc.UInteger) MutableSet {
+        return self.object.msgSend(MutableSet, "initWithCapacity:", .{num_items});
+    }
+
+    /// `-[NSMutableSet addObjectsFromArray:]`
+    pub fn addObjectsFromArray(self: Self, array: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "addObjectsFromArray:", .{array});
+    }
+
+    /// `-[NSMutableSet intersectSet:]`
+    pub fn intersectSet(self: Self, other_set: Set) void {
+        return self.object.msgSend(void, "intersectSet:", .{other_set});
+    }
+
+    /// `-[NSMutableSet minusSet:]`
+    pub fn minusSet(self: Self, other_set: Set) void {
+        return self.object.msgSend(void, "minusSet:", .{other_set});
+    }
+
+    /// `-[NSMutableSet removeAllObjects]`
+    pub fn removeAllObjects(self: Self) void {
+        return self.object.msgSend(void, "removeAllObjects", .{});
+    }
+
+    /// `-[NSMutableSet unionSet:]`
+    pub fn unionSet(self: Self, other_set: Set) void {
+        return self.object.msgSend(void, "unionSet:", .{other_set});
+    }
+
+    /// `-[NSMutableSet setSet:]`
+    pub fn setSet(self: Self, other_set: Set) void {
+        return self.object.msgSend(void, "setSet:", .{other_set});
+    }
+
+    /// `+[NSMutableSet setWithCapacity:]`
+    pub fn setWithCapacity(num_items: objc.UInteger) MutableSet {
+        return class().msgSend(MutableSet, "setWithCapacity:", .{num_items});
+    }
+
+    /// `-[NSMutableSet filterUsingPredicate:]`
+    pub fn filterUsingPredicate(self: Self, predicate: objc.Object) void {
+        return self.object.msgSend(void, "filterUsingPredicate:", .{predicate});
+    }
+
+    /// `-[NSSet member:]`
+    pub fn member(self: Self, object_: objc.Object) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "member:", .{object_});
+    }
+
+    /// `-[NSSet objectEnumerator]`
+    pub fn objectEnumerator(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "objectEnumerator", .{});
+    }
+
+    /// `-[NSSet initWithObjects:count:]`
+    pub fn initWithObjectsCount(self: Self, objects: ?[*]const objc.Object, cnt: objc.UInteger) MutableSet {
+        return self.object.msgSend(MutableSet, "initWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `-[NSSet count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSSet anyObject]`
+    pub fn anyObject(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "anyObject", .{});
+    }
+
+    /// `-[NSSet containsObject:]`
+    pub fn containsObject(self: Self, an_object: objc.Object) bool {
+        return self.object.msgSend(bool, "containsObject:", .{an_object});
+    }
+
+    /// `-[NSSet descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSSet intersectsSet:]`
+    pub fn intersectsSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "intersectsSet:", .{other_set});
+    }
+
+    /// `-[NSSet isEqualToSet:]`
+    pub fn isEqualToSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "isEqualToSet:", .{other_set});
+    }
+
+    /// `-[NSSet isSubsetOfSet:]`
+    pub fn isSubsetOfSet(self: Self, other_set: Set) bool {
+        return self.object.msgSend(bool, "isSubsetOfSet:", .{other_set});
+    }
+
+    /// `-[NSSet makeObjectsPerformSelector:]`
+    pub fn makeObjectsPerformSelector(self: Self, a_selector: objc.Sel) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:", .{a_selector});
+    }
+
+    /// `-[NSSet makeObjectsPerformSelector:withObject:]`
+    pub fn makeObjectsPerformSelectorWithObject(self: Self, a_selector: objc.Sel, argument: ?objc.Object) void {
+        return self.object.msgSend(void, "makeObjectsPerformSelector:withObject:", .{ a_selector, argument });
+    }
+
+    /// `-[NSSet setByAddingObject:]`
+    pub fn setByAddingObject(self: Self, an_object: objc.Object) Set {
+        return self.object.msgSend(Set, "setByAddingObject:", .{an_object});
+    }
+
+    /// `-[NSSet setByAddingObjectsFromSet:]`
+    pub fn setByAddingObjectsFromSet(self: Self, other: Set) Set {
+        return self.object.msgSend(Set, "setByAddingObjectsFromSet:", .{other});
+    }
+
+    /// `-[NSSet setByAddingObjectsFromArray:]`
+    pub fn setByAddingObjectsFromArray(self: Self, other: foundation.Array(objc.Object)) Set {
+        return self.object.msgSend(Set, "setByAddingObjectsFromArray:", .{other});
+    }
+
+    /// `-[NSSet enumerateObjectsUsingBlock:]`
+    pub fn enumerateObjectsUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsUsingBlock:", .{block});
+    }
+
+    /// `-[NSSet enumerateObjectsWithOptions:usingBlock:]`
+    pub fn enumerateObjectsWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Object, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateObjectsWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSSet objectsPassingTest:]`
+    pub fn objectsPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "objectsPassingTest:", .{predicate});
+    }
+
+    /// `-[NSSet objectsWithOptions:passingTest:]`
+    pub fn objectsWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.Object, ?*bool) bool)) Set {
+        return self.object.msgSend(Set, "objectsWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSSet allObjects]`
+    pub fn allObjects(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "allObjects", .{});
+    }
+
+    /// `-[NSSet description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSSet set]`
+    pub fn set() MutableSet {
+        return class().msgSend(MutableSet, "set", .{});
+    }
+
+    /// `+[NSSet setWithObject:]`
+    pub fn setWithObject(object_: objc.Object) MutableSet {
+        return class().msgSend(MutableSet, "setWithObject:", .{object_});
+    }
+
+    /// `+[NSSet setWithObjects:count:]`
+    pub fn setWithObjectsCount(objects: [*]const objc.Object, cnt: objc.UInteger) MutableSet {
+        return class().msgSend(MutableSet, "setWithObjects:count:", .{ objects, cnt });
+    }
+
+    /// `+[NSSet setWithSet:]`
+    pub fn setWithSet(set_: Set) MutableSet {
+        return class().msgSend(MutableSet, "setWithSet:", .{set_});
+    }
+
+    /// `+[NSSet setWithArray:]`
+    pub fn setWithArray(array: foundation.Array(objc.Object)) MutableSet {
+        return class().msgSend(MutableSet, "setWithArray:", .{array});
+    }
+
+    /// `-[NSSet initWithSet:]`
+    pub fn initWithSet(self: Self, set_: Set) MutableSet {
+        return self.object.msgSend(MutableSet, "initWithSet:", .{set_});
+    }
+
+    /// `-[NSSet initWithSet:copyItems:]`
+    pub fn initWithSetCopyItems(self: Self, set_: Set, flag: bool) MutableSet {
+        return self.object.msgSend(MutableSet, "initWithSet:copyItems:", .{ set_, flag });
+    }
+
+    /// `-[NSSet initWithArray:]`
+    pub fn initWithArray(self: Self, array: foundation.Array(objc.Object)) MutableSet {
+        return self.object.msgSend(MutableSet, "initWithArray:", .{array});
+    }
+
+    /// `-[NSSet valueForKey:]`
+    pub fn valueForKey(self: Self, key: foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "valueForKey:", .{key});
+    }
+
+    /// `-[NSSet setValue:forKey:]`
+    pub fn setValueForKey(self: Self, value: ?objc.Object, key: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forKey:", .{ value, key });
+    }
+
+    /// `-[NSSet addObserver:forKeyPath:options:context:]`
+    pub fn addObserverForKeyPathOptionsContext(self: Self, observer: objc.Object, key_path: foundation.String, options: KeyValueObservingOptions, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "addObserver:forKeyPath:options:context:", .{ observer, key_path, options, context });
+    }
+
+    /// `-[NSSet removeObserver:forKeyPath:context:]`
+    pub fn removeObserverForKeyPathContext(self: Self, observer: objc.Object, key_path: foundation.String, context: ?*anyopaque) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:context:", .{ observer, key_path, context });
+    }
+
+    /// `-[NSSet removeObserver:forKeyPath:]`
+    pub fn removeObserverForKeyPath(self: Self, observer: objc.Object, key_path: foundation.String) void {
+        return self.object.msgSend(void, "removeObserver:forKeyPath:", .{ observer, key_path });
+    }
+
+    /// `-[NSSet sortedArrayUsingDescriptors:]`
+    pub fn sortedArrayUsingDescriptors(self: Self, sort_descriptors: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "sortedArrayUsingDescriptors:", .{sort_descriptors});
+    }
+
+    /// `-[NSSet filteredSetUsingPredicate:]`
+    pub fn filteredSetUsingPredicate(self: Self, predicate: objc.Object) Set {
+        return self.object.msgSend(Set, "filteredSetUsingPredicate:", .{predicate});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-addObject:" = fn (objc.Object) void;
+        pub const @"-removeObject:" = fn (objc.Object) void;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?MutableSet;
+        pub const @"-init" = fn () MutableSet;
+        pub const @"-initWithCapacity:" = fn (objc.UInteger) MutableSet;
+        pub const @"-addObjectsFromArray:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-intersectSet:" = fn (Set) void;
+        pub const @"-minusSet:" = fn (Set) void;
+        pub const @"-removeAllObjects" = fn () void;
+        pub const @"-unionSet:" = fn (Set) void;
+        pub const @"-setSet:" = fn (Set) void;
+        pub const @"+setWithCapacity:" = fn (objc.UInteger) MutableSet;
+        pub const @"-filterUsingPredicate:" = fn (objc.Object) void;
+    };
+};
+
+/// `NSIndexSet`, a subclass of `NSObject`.
+pub const IndexSet = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSIndexSet";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSIndexSet alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSIndexSet`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSIndexSet indexSet]`
+    pub fn indexSet() IndexSet {
+        return class().msgSend(IndexSet, "indexSet", .{});
+    }
+
+    /// `+[NSIndexSet indexSetWithIndex:]`
+    pub fn indexSetWithIndex(value: objc.UInteger) IndexSet {
+        return class().msgSend(IndexSet, "indexSetWithIndex:", .{value});
+    }
+
+    /// `+[NSIndexSet indexSetWithIndexesInRange:]`
+    pub fn indexSetWithIndexesInRange(range: objc.Range) IndexSet {
+        return class().msgSend(IndexSet, "indexSetWithIndexesInRange:", .{range});
+    }
+
+    /// `-[NSIndexSet initWithIndexesInRange:]`
+    pub fn initWithIndexesInRange(self: Self, range: objc.Range) IndexSet {
+        return self.object.msgSend(IndexSet, "initWithIndexesInRange:", .{range});
+    }
+
+    /// `-[NSIndexSet initWithIndexSet:]`
+    pub fn initWithIndexSet(self: Self, index_set: IndexSet) IndexSet {
+        return self.object.msgSend(IndexSet, "initWithIndexSet:", .{index_set});
+    }
+
+    /// `-[NSIndexSet initWithIndex:]`
+    pub fn initWithIndex(self: Self, value: objc.UInteger) IndexSet {
+        return self.object.msgSend(IndexSet, "initWithIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet isEqualToIndexSet:]`
+    pub fn isEqualToIndexSet(self: Self, index_set: IndexSet) bool {
+        return self.object.msgSend(bool, "isEqualToIndexSet:", .{index_set});
+    }
+
+    /// `-[NSIndexSet indexGreaterThanIndex:]`
+    pub fn indexGreaterThanIndex(self: Self, value: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexGreaterThanIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet indexLessThanIndex:]`
+    pub fn indexLessThanIndex(self: Self, value: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexLessThanIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet indexGreaterThanOrEqualToIndex:]`
+    pub fn indexGreaterThanOrEqualToIndex(self: Self, value: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexGreaterThanOrEqualToIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet indexLessThanOrEqualToIndex:]`
+    pub fn indexLessThanOrEqualToIndex(self: Self, value: objc.UInteger) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexLessThanOrEqualToIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet getIndexes:maxCount:inIndexRange:]`
+    pub fn getIndexesMaxCountInIndexRange(self: Self, index_buffer: ?*objc.UInteger, buffer_size: objc.UInteger, range: ?*objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "getIndexes:maxCount:inIndexRange:", .{ index_buffer, buffer_size, range });
+    }
+
+    /// `-[NSIndexSet countOfIndexesInRange:]`
+    pub fn countOfIndexesInRange(self: Self, range: objc.Range) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "countOfIndexesInRange:", .{range});
+    }
+
+    /// `-[NSIndexSet containsIndex:]`
+    pub fn containsIndex(self: Self, value: objc.UInteger) bool {
+        return self.object.msgSend(bool, "containsIndex:", .{value});
+    }
+
+    /// `-[NSIndexSet containsIndexesInRange:]`
+    pub fn containsIndexesInRange(self: Self, range: objc.Range) bool {
+        return self.object.msgSend(bool, "containsIndexesInRange:", .{range});
+    }
+
+    /// `-[NSIndexSet containsIndexes:]`
+    pub fn containsIndexes(self: Self, index_set: IndexSet) bool {
+        return self.object.msgSend(bool, "containsIndexes:", .{index_set});
+    }
+
+    /// `-[NSIndexSet intersectsIndexesInRange:]`
+    pub fn intersectsIndexesInRange(self: Self, range: objc.Range) bool {
+        return self.object.msgSend(bool, "intersectsIndexesInRange:", .{range});
+    }
+
+    /// `-[NSIndexSet enumerateIndexesUsingBlock:]`
+    pub fn enumerateIndexesUsingBlock(self: Self, block: objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateIndexesUsingBlock:", .{block});
+    }
+
+    /// `-[NSIndexSet enumerateIndexesWithOptions:usingBlock:]`
+    pub fn enumerateIndexesWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateIndexesWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSIndexSet enumerateIndexesInRange:options:usingBlock:]`
+    pub fn enumerateIndexesInRangeOptionsUsingBlock(self: Self, range: objc.Range, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateIndexesInRange:options:usingBlock:", .{ range, opts, block });
+    }
+
+    /// `-[NSIndexSet indexPassingTest:]`
+    pub fn indexPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexPassingTest:", .{predicate});
+    }
+
+    /// `-[NSIndexSet indexWithOptions:passingTest:]`
+    pub fn indexWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSIndexSet indexInRange:options:passingTest:]`
+    pub fn indexInRangeOptionsPassingTest(self: Self, range: objc.Range, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "indexInRange:options:passingTest:", .{ range, opts, predicate });
+    }
+
+    /// `-[NSIndexSet indexesPassingTest:]`
+    pub fn indexesPassingTest(self: Self, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesPassingTest:", .{predicate});
+    }
+
+    /// `-[NSIndexSet indexesWithOptions:passingTest:]`
+    pub fn indexesWithOptionsPassingTest(self: Self, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesWithOptions:passingTest:", .{ opts, predicate });
+    }
+
+    /// `-[NSIndexSet indexesInRange:options:passingTest:]`
+    pub fn indexesInRangeOptionsPassingTest(self: Self, range: objc.Range, opts: EnumerationOptions, predicate: objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet {
+        return self.object.msgSend(IndexSet, "indexesInRange:options:passingTest:", .{ range, opts, predicate });
+    }
+
+    /// `-[NSIndexSet enumerateRangesUsingBlock:]`
+    pub fn enumerateRangesUsingBlock(self: Self, block: objc.BlockRef(fn (objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateRangesUsingBlock:", .{block});
+    }
+
+    /// `-[NSIndexSet enumerateRangesWithOptions:usingBlock:]`
+    pub fn enumerateRangesWithOptionsUsingBlock(self: Self, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateRangesWithOptions:usingBlock:", .{ opts, block });
+    }
+
+    /// `-[NSIndexSet enumerateRangesInRange:options:usingBlock:]`
+    pub fn enumerateRangesInRangeOptionsUsingBlock(self: Self, range: objc.Range, opts: EnumerationOptions, block: objc.BlockRef(fn (objc.Range, ?*bool) void)) void {
+        return self.object.msgSend(void, "enumerateRangesInRange:options:usingBlock:", .{ range, opts, block });
+    }
+
+    /// `-[NSIndexSet count]`
+    pub fn count(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "count", .{});
+    }
+
+    /// `-[NSIndexSet firstIndex]`
+    pub fn firstIndex(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "firstIndex", .{});
+    }
+
+    /// `-[NSIndexSet lastIndex]`
+    pub fn lastIndex(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "lastIndex", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+indexSet" = fn () IndexSet;
+        pub const @"+indexSetWithIndex:" = fn (objc.UInteger) IndexSet;
+        pub const @"+indexSetWithIndexesInRange:" = fn (objc.Range) IndexSet;
+        pub const @"-initWithIndexesInRange:" = fn (objc.Range) IndexSet;
+        pub const @"-initWithIndexSet:" = fn (IndexSet) IndexSet;
+        pub const @"-initWithIndex:" = fn (objc.UInteger) IndexSet;
+        pub const @"-isEqualToIndexSet:" = fn (IndexSet) bool;
+        pub const @"-indexGreaterThanIndex:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"-indexLessThanIndex:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"-indexGreaterThanOrEqualToIndex:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"-indexLessThanOrEqualToIndex:" = fn (objc.UInteger) objc.UInteger;
+        pub const @"-getIndexes:maxCount:inIndexRange:" = fn (?*objc.UInteger, objc.UInteger, ?*objc.Range) objc.UInteger;
+        pub const @"-countOfIndexesInRange:" = fn (objc.Range) objc.UInteger;
+        pub const @"-containsIndex:" = fn (objc.UInteger) bool;
+        pub const @"-containsIndexesInRange:" = fn (objc.Range) bool;
+        pub const @"-containsIndexes:" = fn (IndexSet) bool;
+        pub const @"-intersectsIndexesInRange:" = fn (objc.Range) bool;
+        pub const @"-enumerateIndexesUsingBlock:" = fn (objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void;
+        pub const @"-enumerateIndexesWithOptions:usingBlock:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void;
+        pub const @"-enumerateIndexesInRange:options:usingBlock:" = fn (objc.Range, EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) void)) void;
+        pub const @"-indexPassingTest:" = fn (objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexInRange:options:passingTest:" = fn (objc.Range, EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) objc.UInteger;
+        pub const @"-indexesPassingTest:" = fn (objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-indexesWithOptions:passingTest:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-indexesInRange:options:passingTest:" = fn (objc.Range, EnumerationOptions, objc.BlockRef(fn (objc.UInteger, ?*bool) bool)) IndexSet;
+        pub const @"-enumerateRangesUsingBlock:" = fn (objc.BlockRef(fn (objc.Range, ?*bool) void)) void;
+        pub const @"-enumerateRangesWithOptions:usingBlock:" = fn (EnumerationOptions, objc.BlockRef(fn (objc.Range, ?*bool) void)) void;
+        pub const @"-enumerateRangesInRange:options:usingBlock:" = fn (objc.Range, EnumerationOptions, objc.BlockRef(fn (objc.Range, ?*bool) void)) void;
+        pub const @"-count" = fn () objc.UInteger;
+        pub const @"-firstIndex" = fn () objc.UInteger;
+        pub const @"-lastIndex" = fn () objc.UInteger;
+    };
+};
+
+/// `NSCharacterSet`, a subclass of `NSObject`.
+pub const CharacterSet = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSCharacterSet";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSCharacterSet alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSCharacterSet`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSCharacterSet characterSetWithRange:]`
+    pub fn characterSetWithRange(a_range: objc.Range) CharacterSet {
+        return class().msgSend(CharacterSet, "characterSetWithRange:", .{a_range});
+    }
+
+    /// `+[NSCharacterSet characterSetWithCharactersInString:]`
+    pub fn characterSetWithCharactersInString(a_string: foundation.String) CharacterSet {
+        return class().msgSend(CharacterSet, "characterSetWithCharactersInString:", .{a_string});
+    }
+
+    /// `+[NSCharacterSet characterSetWithBitmapRepresentation:]`
+    pub fn characterSetWithBitmapRepresentation(data: foundation.Data) CharacterSet {
+        return class().msgSend(CharacterSet, "characterSetWithBitmapRepresentation:", .{data});
+    }
+
+    /// `+[NSCharacterSet characterSetWithContentsOfFile:]`
+    pub fn characterSetWithContentsOfFile(f_name: foundation.String) ?CharacterSet {
+        return class().msgSend(?CharacterSet, "characterSetWithContentsOfFile:", .{f_name});
+    }
+
+    /// `-[NSCharacterSet initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) CharacterSet {
+        return self.object.msgSend(CharacterSet, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSCharacterSet characterIsMember:]`
+    pub fn characterIsMember(self: Self, a_character: u16) bool {
+        return self.object.msgSend(bool, "characterIsMember:", .{a_character});
+    }
+
+    /// `-[NSCharacterSet longCharacterIsMember:]`
+    pub fn longCharacterIsMember(self: Self, the_long_char: c_uint) bool {
+        return self.object.msgSend(bool, "longCharacterIsMember:", .{the_long_char});
+    }
+
+    /// `-[NSCharacterSet isSupersetOfSet:]`
+    pub fn isSupersetOfSet(self: Self, the_other_set: CharacterSet) bool {
+        return self.object.msgSend(bool, "isSupersetOfSet:", .{the_other_set});
+    }
+
+    /// `-[NSCharacterSet hasMemberInPlane:]`
+    pub fn hasMemberInPlane(self: Self, the_plane: u8) bool {
+        return self.object.msgSend(bool, "hasMemberInPlane:", .{the_plane});
+    }
+
+    /// `+[NSCharacterSet controlCharacterSet]`
+    pub fn controlCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "controlCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet whitespaceCharacterSet]`
+    pub fn whitespaceCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "whitespaceCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet whitespaceAndNewlineCharacterSet]`
+    pub fn whitespaceAndNewlineCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "whitespaceAndNewlineCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet decimalDigitCharacterSet]`
+    pub fn decimalDigitCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "decimalDigitCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet letterCharacterSet]`
+    pub fn letterCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "letterCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet lowercaseLetterCharacterSet]`
+    pub fn lowercaseLetterCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "lowercaseLetterCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet uppercaseLetterCharacterSet]`
+    pub fn uppercaseLetterCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "uppercaseLetterCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet nonBaseCharacterSet]`
+    pub fn nonBaseCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "nonBaseCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet alphanumericCharacterSet]`
+    pub fn alphanumericCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "alphanumericCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet decomposableCharacterSet]`
+    pub fn decomposableCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "decomposableCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet illegalCharacterSet]`
+    pub fn illegalCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "illegalCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet punctuationCharacterSet]`
+    pub fn punctuationCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "punctuationCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet capitalizedLetterCharacterSet]`
+    pub fn capitalizedLetterCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "capitalizedLetterCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet symbolCharacterSet]`
+    pub fn symbolCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "symbolCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet newlineCharacterSet]`
+    pub fn newlineCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "newlineCharacterSet", .{});
+    }
+
+    /// `-[NSCharacterSet bitmapRepresentation]`
+    pub fn bitmapRepresentation(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "bitmapRepresentation", .{});
+    }
+
+    /// `-[NSCharacterSet invertedSet]`
+    pub fn invertedSet(self: Self) CharacterSet {
+        return self.object.msgSend(CharacterSet, "invertedSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLUserAllowedCharacterSet]`
+    pub fn urlUserAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLUserAllowedCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLPasswordAllowedCharacterSet]`
+    pub fn urlPasswordAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLPasswordAllowedCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLHostAllowedCharacterSet]`
+    pub fn urlHostAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLHostAllowedCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLPathAllowedCharacterSet]`
+    pub fn urlPathAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLPathAllowedCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLQueryAllowedCharacterSet]`
+    pub fn urlQueryAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLQueryAllowedCharacterSet", .{});
+    }
+
+    /// `+[NSCharacterSet URLFragmentAllowedCharacterSet]`
+    pub fn urlFragmentAllowedCharacterSet() CharacterSet {
+        return class().msgSend(CharacterSet, "URLFragmentAllowedCharacterSet", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+characterSetWithRange:" = fn (objc.Range) CharacterSet;
+        pub const @"+characterSetWithCharactersInString:" = fn (foundation.String) CharacterSet;
+        pub const @"+characterSetWithBitmapRepresentation:" = fn (foundation.Data) CharacterSet;
+        pub const @"+characterSetWithContentsOfFile:" = fn (foundation.String) ?CharacterSet;
+        pub const @"-initWithCoder:" = fn (objc.Object) CharacterSet;
+        pub const @"-characterIsMember:" = fn (u16) bool;
+        pub const @"-longCharacterIsMember:" = fn (c_uint) bool;
+        pub const @"-isSupersetOfSet:" = fn (CharacterSet) bool;
+        pub const @"-hasMemberInPlane:" = fn (u8) bool;
+        pub const @"+controlCharacterSet" = fn () CharacterSet;
+        pub const @"+whitespaceCharacterSet" = fn () CharacterSet;
+        pub const @"+whitespaceAndNewlineCharacterSet" = fn () CharacterSet;
+        pub const @"+decimalDigitCharacterSet" = fn () CharacterSet;
+        pub const @"+letterCharacterSet" = fn () CharacterSet;
+        pub const @"+lowercaseLetterCharacterSet" = fn () CharacterSet;
+        pub const @"+uppercaseLetterCharacterSet" = fn () CharacterSet;
+        pub const @"+nonBaseCharacterSet" = fn () CharacterSet;
+        pub const @"+alphanumericCharacterSet" = fn () CharacterSet;
+        pub const @"+decomposableCharacterSet" = fn () CharacterSet;
+        pub const @"+illegalCharacterSet" = fn () CharacterSet;
+        pub const @"+punctuationCharacterSet" = fn () CharacterSet;
+        pub const @"+capitalizedLetterCharacterSet" = fn () CharacterSet;
+        pub const @"+symbolCharacterSet" = fn () CharacterSet;
+        pub const @"+newlineCharacterSet" = fn () CharacterSet;
+        pub const @"-bitmapRepresentation" = fn () foundation.Data;
+        pub const @"-invertedSet" = fn () CharacterSet;
+        pub const @"+URLUserAllowedCharacterSet" = fn () CharacterSet;
+        pub const @"+URLPasswordAllowedCharacterSet" = fn () CharacterSet;
+        pub const @"+URLHostAllowedCharacterSet" = fn () CharacterSet;
+        pub const @"+URLPathAllowedCharacterSet" = fn () CharacterSet;
+        pub const @"+URLQueryAllowedCharacterSet" = fn () CharacterSet;
+        pub const @"+URLFragmentAllowedCharacterSet" = fn () CharacterSet;
+    };
+};
+
+/// `NSDate`, a subclass of `NSObject`.
+pub const Date = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSDate";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSDate alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSDate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSDate init]`
+    pub fn init(self: Self) Date {
+        return self.object.msgSend(Date, "init", .{});
+    }
+
+    /// `-[NSDate initWithTimeIntervalSinceReferenceDate:]`
+    pub fn initWithTimeIntervalSinceReferenceDate(self: Self, ti: f64) Date {
+        return self.object.msgSend(Date, "initWithTimeIntervalSinceReferenceDate:", .{ti});
+    }
+
+    /// `-[NSDate initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Date {
+        return self.object.msgSend(?Date, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSDate timeIntervalSinceReferenceDate]`
+    pub fn timeIntervalSinceReferenceDate(self: Self) f64 {
+        return self.object.msgSend(f64, "timeIntervalSinceReferenceDate", .{});
+    }
+
+    /// `-[NSDate timeIntervalSinceDate:]`
+    pub fn timeIntervalSinceDate(self: Self, another_date: Date) f64 {
+        return self.object.msgSend(f64, "timeIntervalSinceDate:", .{another_date});
+    }
+
+    /// `-[NSDate addTimeInterval:]`
+    pub fn addTimeInterval(self: Self, seconds: f64) objc.Object {
+        return self.object.msgSend(objc.Object, "addTimeInterval:", .{seconds});
+    }
+
+    /// `-[NSDate dateByAddingTimeInterval:]`
+    pub fn dateByAddingTimeInterval(self: Self, ti: f64) Date {
+        return self.object.msgSend(Date, "dateByAddingTimeInterval:", .{ti});
+    }
+
+    /// `-[NSDate earlierDate:]`
+    pub fn earlierDate(self: Self, another_date: Date) Date {
+        return self.object.msgSend(Date, "earlierDate:", .{another_date});
+    }
+
+    /// `-[NSDate laterDate:]`
+    pub fn laterDate(self: Self, another_date: Date) Date {
+        return self.object.msgSend(Date, "laterDate:", .{another_date});
+    }
+
+    /// `-[NSDate compare:]`
+    pub fn compare(self: Self, other: Date) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:", .{other});
+    }
+
+    /// `-[NSDate isEqualToDate:]`
+    pub fn isEqualToDate(self: Self, other_date: Date) bool {
+        return self.object.msgSend(bool, "isEqualToDate:", .{other_date});
+    }
+
+    /// `-[NSDate descriptionWithLocale:]`
+    pub fn descriptionWithLocale(self: Self, locale: ?objc.Object) foundation.String {
+        return self.object.msgSend(foundation.String, "descriptionWithLocale:", .{locale});
+    }
+
+    /// `-[NSDate timeIntervalSinceNow]`
+    pub fn timeIntervalSinceNow(self: Self) f64 {
+        return self.object.msgSend(f64, "timeIntervalSinceNow", .{});
+    }
+
+    /// `-[NSDate timeIntervalSince1970]`
+    pub fn timeIntervalSince1970(self: Self) f64 {
+        return self.object.msgSend(f64, "timeIntervalSince1970", .{});
+    }
+
+    /// `-[NSDate description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSDate timeIntervalSinceReferenceDate]`
+    pub fn classTimeIntervalSinceReferenceDate() f64 {
+        return class().msgSend(f64, "timeIntervalSinceReferenceDate", .{});
+    }
+
+    /// `+[NSDate date]`
+    pub fn date() Date {
+        return class().msgSend(Date, "date", .{});
+    }
+
+    /// `+[NSDate dateWithTimeIntervalSinceNow:]`
+    pub fn dateWithTimeIntervalSinceNow(secs: f64) Date {
+        return class().msgSend(Date, "dateWithTimeIntervalSinceNow:", .{secs});
+    }
+
+    /// `+[NSDate dateWithTimeIntervalSinceReferenceDate:]`
+    pub fn dateWithTimeIntervalSinceReferenceDate(ti: f64) Date {
+        return class().msgSend(Date, "dateWithTimeIntervalSinceReferenceDate:", .{ti});
+    }
+
+    /// `+[NSDate dateWithTimeIntervalSince1970:]`
+    pub fn dateWithTimeIntervalSince1970(secs: f64) Date {
+        return class().msgSend(Date, "dateWithTimeIntervalSince1970:", .{secs});
+    }
+
+    /// `+[NSDate dateWithTimeInterval:sinceDate:]`
+    pub fn dateWithTimeIntervalSinceDate(secs_to_be_added: f64, date_: Date) Date {
+        return class().msgSend(Date, "dateWithTimeInterval:sinceDate:", .{ secs_to_be_added, date_ });
+    }
+
+    /// `-[NSDate initWithTimeIntervalSinceNow:]`
+    pub fn initWithTimeIntervalSinceNow(self: Self, secs: f64) Date {
+        return self.object.msgSend(Date, "initWithTimeIntervalSinceNow:", .{secs});
+    }
+
+    /// `-[NSDate initWithTimeIntervalSince1970:]`
+    pub fn initWithTimeIntervalSince1970(self: Self, secs: f64) Date {
+        return self.object.msgSend(Date, "initWithTimeIntervalSince1970:", .{secs});
+    }
+
+    /// `-[NSDate initWithTimeInterval:sinceDate:]`
+    pub fn initWithTimeIntervalSinceDate(self: Self, secs_to_be_added: f64, date_: Date) Date {
+        return self.object.msgSend(Date, "initWithTimeInterval:sinceDate:", .{ secs_to_be_added, date_ });
+    }
+
+    /// `+[NSDate distantFuture]`
+    pub fn distantFuture() Date {
+        return class().msgSend(Date, "distantFuture", .{});
+    }
+
+    /// `+[NSDate distantPast]`
+    pub fn distantPast() Date {
+        return class().msgSend(Date, "distantPast", .{});
+    }
+
+    /// `+[NSDate now]`
+    pub fn now() Date {
+        return class().msgSend(Date, "now", .{});
+    }
+
+    /// `+[NSDate dateWithNaturalLanguageString:locale:]`
+    pub fn dateWithNaturalLanguageStringLocale(string: foundation.String, locale: ?objc.Object) ?objc.Object {
+        return class().msgSend(?objc.Object, "dateWithNaturalLanguageString:locale:", .{ string, locale });
+    }
+
+    /// `+[NSDate dateWithNaturalLanguageString:]`
+    pub fn dateWithNaturalLanguageString(string: foundation.String) ?objc.Object {
+        return class().msgSend(?objc.Object, "dateWithNaturalLanguageString:", .{string});
+    }
+
+    /// `+[NSDate dateWithString:]`
+    pub fn dateWithString(a_string: foundation.String) objc.Object {
+        return class().msgSend(objc.Object, "dateWithString:", .{a_string});
+    }
+
+    /// `-[NSDate dateWithCalendarFormat:timeZone:]`
+    pub fn dateWithCalendarFormatTimeZone(self: Self, format: ?foundation.String, a_time_zone: ?TimeZone) objc.Object {
+        return self.object.msgSend(objc.Object, "dateWithCalendarFormat:timeZone:", .{ format, a_time_zone });
+    }
+
+    /// `-[NSDate descriptionWithCalendarFormat:timeZone:locale:]`
+    pub fn descriptionWithCalendarFormatTimeZoneLocale(self: Self, format: ?foundation.String, a_time_zone: ?TimeZone, locale: ?objc.Object) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "descriptionWithCalendarFormat:timeZone:locale:", .{ format, a_time_zone, locale });
+    }
+
+    /// `-[NSDate initWithString:]`
+    pub fn initWithString(self: Self, description_: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithString:", .{description_});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-init" = fn () Date;
+        pub const @"-initWithTimeIntervalSinceReferenceDate:" = fn (f64) Date;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Date;
+        pub const @"-timeIntervalSinceReferenceDate" = fn () f64;
+        pub const @"-timeIntervalSinceDate:" = fn (Date) f64;
+        pub const @"-addTimeInterval:" = fn (f64) objc.Object;
+        pub const @"-dateByAddingTimeInterval:" = fn (f64) Date;
+        pub const @"-earlierDate:" = fn (Date) Date;
+        pub const @"-laterDate:" = fn (Date) Date;
+        pub const @"-compare:" = fn (Date) ComparisonResult;
+        pub const @"-isEqualToDate:" = fn (Date) bool;
+        pub const @"-descriptionWithLocale:" = fn (?objc.Object) foundation.String;
+        pub const @"-timeIntervalSinceNow" = fn () f64;
+        pub const @"-timeIntervalSince1970" = fn () f64;
+        pub const @"-description" = fn () foundation.String;
+        pub const @"+timeIntervalSinceReferenceDate" = fn () f64;
+        pub const @"+date" = fn () Date;
+        pub const @"+dateWithTimeIntervalSinceNow:" = fn (f64) Date;
+        pub const @"+dateWithTimeIntervalSinceReferenceDate:" = fn (f64) Date;
+        pub const @"+dateWithTimeIntervalSince1970:" = fn (f64) Date;
+        pub const @"+dateWithTimeInterval:sinceDate:" = fn (f64, Date) Date;
+        pub const @"-initWithTimeIntervalSinceNow:" = fn (f64) Date;
+        pub const @"-initWithTimeIntervalSince1970:" = fn (f64) Date;
+        pub const @"-initWithTimeInterval:sinceDate:" = fn (f64, Date) Date;
+        pub const @"+distantFuture" = fn () Date;
+        pub const @"+distantPast" = fn () Date;
+        pub const @"+now" = fn () Date;
+        pub const @"+dateWithNaturalLanguageString:locale:" = fn (foundation.String, ?objc.Object) ?objc.Object;
+        pub const @"+dateWithNaturalLanguageString:" = fn (foundation.String) ?objc.Object;
+        pub const @"+dateWithString:" = fn (foundation.String) objc.Object;
+        pub const @"-dateWithCalendarFormat:timeZone:" = fn (?foundation.String, ?TimeZone) objc.Object;
+        pub const @"-descriptionWithCalendarFormat:timeZone:locale:" = fn (?foundation.String, ?TimeZone, ?objc.Object) ?foundation.String;
+        pub const @"-initWithString:" = fn (foundation.String) ?objc.Object;
+    };
+};
+
+/// `NSTimeZone`, a subclass of `NSObject`.
+pub const TimeZone = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSTimeZone";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSTimeZone alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSTimeZone`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSTimeZone secondsFromGMTForDate:]`
+    pub fn secondsFromGMTForDate(self: Self, a_date: Date) objc.Integer {
+        return self.object.msgSend(objc.Integer, "secondsFromGMTForDate:", .{a_date});
+    }
+
+    /// `-[NSTimeZone abbreviationForDate:]`
+    pub fn abbreviationForDate(self: Self, a_date: Date) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "abbreviationForDate:", .{a_date});
+    }
+
+    /// `-[NSTimeZone isDaylightSavingTimeForDate:]`
+    pub fn isDaylightSavingTimeForDate(self: Self, a_date: Date) bool {
+        return self.object.msgSend(bool, "isDaylightSavingTimeForDate:", .{a_date});
+    }
+
+    /// `-[NSTimeZone daylightSavingTimeOffsetForDate:]`
+    pub fn daylightSavingTimeOffsetForDate(self: Self, a_date: Date) f64 {
+        return self.object.msgSend(f64, "daylightSavingTimeOffsetForDate:", .{a_date});
+    }
+
+    /// `-[NSTimeZone nextDaylightSavingTimeTransitionAfterDate:]`
+    pub fn nextDaylightSavingTimeTransitionAfterDate(self: Self, a_date: Date) ?Date {
+        return self.object.msgSend(?Date, "nextDaylightSavingTimeTransitionAfterDate:", .{a_date});
+    }
+
+    /// `-[NSTimeZone name]`
+    pub fn name(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "name", .{});
+    }
+
+    /// `-[NSTimeZone data]`
+    pub fn data(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "data", .{});
+    }
+
+    /// `+[NSTimeZone resetSystemTimeZone]`
+    pub fn resetSystemTimeZone() void {
+        return class().msgSend(void, "resetSystemTimeZone", .{});
+    }
+
+    /// `+[NSTimeZone abbreviationDictionary]`
+    pub fn abbreviationDictionary() foundation.Dictionary(foundation.String, foundation.String) {
+        return class().msgSend(foundation.Dictionary(foundation.String, foundation.String), "abbreviationDictionary", .{});
+    }
+
+    /// `-[NSTimeZone isEqualToTimeZone:]`
+    pub fn isEqualToTimeZone(self: Self, a_time_zone: TimeZone) bool {
+        return self.object.msgSend(bool, "isEqualToTimeZone:", .{a_time_zone});
+    }
+
+    /// `-[NSTimeZone localizedName:locale:]`
+    pub fn localizedNameLocale(self: Self, style: TimeZoneNameStyle, locale: ?Locale) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedName:locale:", .{ style, locale });
+    }
+
+    /// `+[NSTimeZone systemTimeZone]`
+    pub fn systemTimeZone() TimeZone {
+        return class().msgSend(TimeZone, "systemTimeZone", .{});
+    }
+
+    /// `+[NSTimeZone defaultTimeZone]`
+    pub fn defaultTimeZone() TimeZone {
+        return class().msgSend(TimeZone, "defaultTimeZone", .{});
+    }
+
+    /// `+[NSTimeZone setDefaultTimeZone:]`
+    pub fn setDefaultTimeZone(default_time_zone: TimeZone) void {
+        return class().msgSend(void, "setDefaultTimeZone:", .{default_time_zone});
+    }
+
+    /// `+[NSTimeZone localTimeZone]`
+    pub fn localTimeZone() TimeZone {
+        return class().msgSend(TimeZone, "localTimeZone", .{});
+    }
+
+    /// `+[NSTimeZone knownTimeZoneNames]`
+    pub fn knownTimeZoneNames() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "knownTimeZoneNames", .{});
+    }
+
+    /// `+[NSTimeZone setAbbreviationDictionary:]`
+    pub fn setAbbreviationDictionary(abbreviation_dictionary: foundation.Dictionary(foundation.String, foundation.String)) void {
+        return class().msgSend(void, "setAbbreviationDictionary:", .{abbreviation_dictionary});
+    }
+
+    /// `+[NSTimeZone timeZoneDataVersion]`
+    pub fn timeZoneDataVersion() foundation.String {
+        return class().msgSend(foundation.String, "timeZoneDataVersion", .{});
+    }
+
+    /// `-[NSTimeZone secondsFromGMT]`
+    pub fn secondsFromGMT(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "secondsFromGMT", .{});
+    }
+
+    /// `-[NSTimeZone abbreviation]`
+    pub fn abbreviation(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "abbreviation", .{});
+    }
+
+    /// `-[NSTimeZone isDaylightSavingTime]`
+    pub fn isDaylightSavingTime(self: Self) bool {
+        return self.object.msgSend(bool, "isDaylightSavingTime", .{});
+    }
+
+    /// `-[NSTimeZone daylightSavingTimeOffset]`
+    pub fn daylightSavingTimeOffset(self: Self) f64 {
+        return self.object.msgSend(f64, "daylightSavingTimeOffset", .{});
+    }
+
+    /// `-[NSTimeZone nextDaylightSavingTimeTransition]`
+    pub fn nextDaylightSavingTimeTransition(self: Self) ?Date {
+        return self.object.msgSend(?Date, "nextDaylightSavingTimeTransition", .{});
+    }
+
+    /// `-[NSTimeZone description]`
+    pub fn description(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "description", .{});
+    }
+
+    /// `+[NSTimeZone timeZoneWithName:]`
+    pub fn timeZoneWithName(tz_name: foundation.String) ?TimeZone {
+        return class().msgSend(?TimeZone, "timeZoneWithName:", .{tz_name});
+    }
+
+    /// `+[NSTimeZone timeZoneWithName:data:]`
+    pub fn timeZoneWithNameData(tz_name: foundation.String, a_data: ?foundation.Data) ?TimeZone {
+        return class().msgSend(?TimeZone, "timeZoneWithName:data:", .{ tz_name, a_data });
+    }
+
+    /// `-[NSTimeZone initWithName:]`
+    pub fn initWithName(self: Self, tz_name: foundation.String) ?TimeZone {
+        return self.object.msgSend(?TimeZone, "initWithName:", .{tz_name});
+    }
+
+    /// `-[NSTimeZone initWithName:data:]`
+    pub fn initWithNameData(self: Self, tz_name: foundation.String, a_data: ?foundation.Data) ?TimeZone {
+        return self.object.msgSend(?TimeZone, "initWithName:data:", .{ tz_name, a_data });
+    }
+
+    /// `+[NSTimeZone timeZoneForSecondsFromGMT:]`
+    pub fn timeZoneForSecondsFromGMT(seconds: objc.Integer) TimeZone {
+        return class().msgSend(TimeZone, "timeZoneForSecondsFromGMT:", .{seconds});
+    }
+
+    /// `+[NSTimeZone timeZoneWithAbbreviation:]`
+    pub fn timeZoneWithAbbreviation(abbreviation_: foundation.String) ?TimeZone {
+        return class().msgSend(?TimeZone, "timeZoneWithAbbreviation:", .{abbreviation_});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-secondsFromGMTForDate:" = fn (Date) objc.Integer;
+        pub const @"-abbreviationForDate:" = fn (Date) ?foundation.String;
+        pub const @"-isDaylightSavingTimeForDate:" = fn (Date) bool;
+        pub const @"-daylightSavingTimeOffsetForDate:" = fn (Date) f64;
+        pub const @"-nextDaylightSavingTimeTransitionAfterDate:" = fn (Date) ?Date;
+        pub const @"-name" = fn () foundation.String;
+        pub const @"-data" = fn () foundation.Data;
+        pub const @"+resetSystemTimeZone" = fn () void;
+        pub const @"+abbreviationDictionary" = fn () foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"-isEqualToTimeZone:" = fn (TimeZone) bool;
+        pub const @"-localizedName:locale:" = fn (TimeZoneNameStyle, ?Locale) ?foundation.String;
+        pub const @"+systemTimeZone" = fn () TimeZone;
+        pub const @"+defaultTimeZone" = fn () TimeZone;
+        pub const @"+setDefaultTimeZone:" = fn (TimeZone) void;
+        pub const @"+localTimeZone" = fn () TimeZone;
+        pub const @"+knownTimeZoneNames" = fn () foundation.Array(foundation.String);
+        pub const @"+setAbbreviationDictionary:" = fn (foundation.Dictionary(foundation.String, foundation.String)) void;
+        pub const @"+timeZoneDataVersion" = fn () foundation.String;
+        pub const @"-secondsFromGMT" = fn () objc.Integer;
+        pub const @"-abbreviation" = fn () ?foundation.String;
+        pub const @"-isDaylightSavingTime" = fn () bool;
+        pub const @"-daylightSavingTimeOffset" = fn () f64;
+        pub const @"-nextDaylightSavingTimeTransition" = fn () ?Date;
+        pub const @"-description" = fn () foundation.String;
+        pub const @"+timeZoneWithName:" = fn (foundation.String) ?TimeZone;
+        pub const @"+timeZoneWithName:data:" = fn (foundation.String, ?foundation.Data) ?TimeZone;
+        pub const @"-initWithName:" = fn (foundation.String) ?TimeZone;
+        pub const @"-initWithName:data:" = fn (foundation.String, ?foundation.Data) ?TimeZone;
+        pub const @"+timeZoneForSecondsFromGMT:" = fn (objc.Integer) TimeZone;
+        pub const @"+timeZoneWithAbbreviation:" = fn (foundation.String) ?TimeZone;
+    };
+};
+
+/// `NSLocale`, a subclass of `NSObject`.
+pub const Locale = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSLocale";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSLocale alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSLocale`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSLocale objectForKey:]`
+    pub fn objectForKey(self: Self, key: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKey:", .{key});
+    }
+
+    /// `-[NSLocale displayNameForKey:value:]`
+    pub fn displayNameForKeyValue(self: Self, key: foundation.String, value: objc.Object) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "displayNameForKey:value:", .{ key, value });
+    }
+
+    /// `-[NSLocale initWithLocaleIdentifier:]`
+    pub fn initWithLocaleIdentifier(self: Self, string: foundation.String) Locale {
+        return self.object.msgSend(Locale, "initWithLocaleIdentifier:", .{string});
+    }
+
+    /// `-[NSLocale initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Locale {
+        return self.object.msgSend(?Locale, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSLocale localizedStringForLocaleIdentifier:]`
+    pub fn localizedStringForLocaleIdentifier(self: Self, locale_identifier: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedStringForLocaleIdentifier:", .{locale_identifier});
+    }
+
+    /// `-[NSLocale localizedStringForLanguageCode:]`
+    pub fn localizedStringForLanguageCode(self: Self, language_code: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForLanguageCode:", .{language_code});
+    }
+
+    /// `-[NSLocale localizedStringForCountryCode:]`
+    pub fn localizedStringForCountryCode(self: Self, country_code: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForCountryCode:", .{country_code});
+    }
+
+    /// `-[NSLocale localizedStringForScriptCode:]`
+    pub fn localizedStringForScriptCode(self: Self, script_code: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForScriptCode:", .{script_code});
+    }
+
+    /// `-[NSLocale localizedStringForVariantCode:]`
+    pub fn localizedStringForVariantCode(self: Self, variant_code: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForVariantCode:", .{variant_code});
+    }
+
+    /// `-[NSLocale localizedStringForCalendarIdentifier:]`
+    pub fn localizedStringForCalendarIdentifier(self: Self, calendar_identifier: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForCalendarIdentifier:", .{calendar_identifier});
+    }
+
+    /// `-[NSLocale localizedStringForCollationIdentifier:]`
+    pub fn localizedStringForCollationIdentifier(self: Self, collation_identifier: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForCollationIdentifier:", .{collation_identifier});
+    }
+
+    /// `-[NSLocale localizedStringForCurrencyCode:]`
+    pub fn localizedStringForCurrencyCode(self: Self, currency_code: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForCurrencyCode:", .{currency_code});
+    }
+
+    /// `-[NSLocale localizedStringForCollatorIdentifier:]`
+    pub fn localizedStringForCollatorIdentifier(self: Self, collator_identifier: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "localizedStringForCollatorIdentifier:", .{collator_identifier});
+    }
+
+    /// `-[NSLocale localeIdentifier]`
+    pub fn localeIdentifier(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "localeIdentifier", .{});
+    }
+
+    /// `-[NSLocale languageCode]`
+    pub fn languageCode(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "languageCode", .{});
+    }
+
+    /// `-[NSLocale languageIdentifier]`
+    pub fn languageIdentifier(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "languageIdentifier", .{});
+    }
+
+    /// `-[NSLocale countryCode]`
+    pub fn countryCode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "countryCode", .{});
+    }
+
+    /// `-[NSLocale regionCode]`
+    pub fn regionCode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "regionCode", .{});
+    }
+
+    /// `-[NSLocale scriptCode]`
+    pub fn scriptCode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "scriptCode", .{});
+    }
+
+    /// `-[NSLocale variantCode]`
+    pub fn variantCode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "variantCode", .{});
+    }
+
+    /// `-[NSLocale exemplarCharacterSet]`
+    pub fn exemplarCharacterSet(self: Self) CharacterSet {
+        return self.object.msgSend(CharacterSet, "exemplarCharacterSet", .{});
+    }
+
+    /// `-[NSLocale calendarIdentifier]`
+    pub fn calendarIdentifier(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "calendarIdentifier", .{});
+    }
+
+    /// `-[NSLocale collationIdentifier]`
+    pub fn collationIdentifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "collationIdentifier", .{});
+    }
+
+    /// `-[NSLocale usesMetricSystem]`
+    pub fn usesMetricSystem(self: Self) bool {
+        return self.object.msgSend(bool, "usesMetricSystem", .{});
+    }
+
+    /// `-[NSLocale decimalSeparator]`
+    pub fn decimalSeparator(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "decimalSeparator", .{});
+    }
+
+    /// `-[NSLocale groupingSeparator]`
+    pub fn groupingSeparator(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "groupingSeparator", .{});
+    }
+
+    /// `-[NSLocale currencySymbol]`
+    pub fn currencySymbol(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "currencySymbol", .{});
+    }
+
+    /// `-[NSLocale currencyCode]`
+    pub fn currencyCode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "currencyCode", .{});
+    }
+
+    /// `-[NSLocale collatorIdentifier]`
+    pub fn collatorIdentifier(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "collatorIdentifier", .{});
+    }
+
+    /// `-[NSLocale quotationBeginDelimiter]`
+    pub fn quotationBeginDelimiter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "quotationBeginDelimiter", .{});
+    }
+
+    /// `-[NSLocale quotationEndDelimiter]`
+    pub fn quotationEndDelimiter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "quotationEndDelimiter", .{});
+    }
+
+    /// `-[NSLocale alternateQuotationBeginDelimiter]`
+    pub fn alternateQuotationBeginDelimiter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "alternateQuotationBeginDelimiter", .{});
+    }
+
+    /// `-[NSLocale alternateQuotationEndDelimiter]`
+    pub fn alternateQuotationEndDelimiter(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "alternateQuotationEndDelimiter", .{});
+    }
+
+    /// `+[NSLocale localeWithLocaleIdentifier:]`
+    pub fn localeWithLocaleIdentifier(ident: foundation.String) Locale {
+        return class().msgSend(Locale, "localeWithLocaleIdentifier:", .{ident});
+    }
+
+    /// `+[NSLocale autoupdatingCurrentLocale]`
+    pub fn autoupdatingCurrentLocale() Locale {
+        return class().msgSend(Locale, "autoupdatingCurrentLocale", .{});
+    }
+
+    /// `+[NSLocale currentLocale]`
+    pub fn currentLocale() Locale {
+        return class().msgSend(Locale, "currentLocale", .{});
+    }
+
+    /// `+[NSLocale systemLocale]`
+    pub fn systemLocale() Locale {
+        return class().msgSend(Locale, "systemLocale", .{});
+    }
+
+    /// `+[NSLocale componentsFromLocaleIdentifier:]`
+    pub fn componentsFromLocaleIdentifier(string: foundation.String) foundation.Dictionary(foundation.String, foundation.String) {
+        return class().msgSend(foundation.Dictionary(foundation.String, foundation.String), "componentsFromLocaleIdentifier:", .{string});
+    }
+
+    /// `+[NSLocale localeIdentifierFromComponents:]`
+    pub fn localeIdentifierFromComponents(dict: foundation.Dictionary(foundation.String, foundation.String)) foundation.String {
+        return class().msgSend(foundation.String, "localeIdentifierFromComponents:", .{dict});
+    }
+
+    /// `+[NSLocale canonicalLocaleIdentifierFromString:]`
+    pub fn canonicalLocaleIdentifierFromString(string: foundation.String) foundation.String {
+        return class().msgSend(foundation.String, "canonicalLocaleIdentifierFromString:", .{string});
+    }
+
+    /// `+[NSLocale canonicalLanguageIdentifierFromString:]`
+    pub fn canonicalLanguageIdentifierFromString(string: foundation.String) foundation.String {
+        return class().msgSend(foundation.String, "canonicalLanguageIdentifierFromString:", .{string});
+    }
+
+    /// `+[NSLocale localeIdentifierFromWindowsLocaleCode:]`
+    pub fn localeIdentifierFromWindowsLocaleCode(lcid: u32) ?foundation.String {
+        return class().msgSend(?foundation.String, "localeIdentifierFromWindowsLocaleCode:", .{lcid});
+    }
+
+    /// `+[NSLocale windowsLocaleCodeFromLocaleIdentifier:]`
+    pub fn windowsLocaleCodeFromLocaleIdentifier(locale_identifier: foundation.String) u32 {
+        return class().msgSend(u32, "windowsLocaleCodeFromLocaleIdentifier:", .{locale_identifier});
+    }
+
+    /// `+[NSLocale characterDirectionForLanguage:]`
+    pub fn characterDirectionForLanguage(iso_lang_code: foundation.String) LocaleLanguageDirection {
+        return class().msgSend(LocaleLanguageDirection, "characterDirectionForLanguage:", .{iso_lang_code});
+    }
+
+    /// `+[NSLocale lineDirectionForLanguage:]`
+    pub fn lineDirectionForLanguage(iso_lang_code: foundation.String) LocaleLanguageDirection {
+        return class().msgSend(LocaleLanguageDirection, "lineDirectionForLanguage:", .{iso_lang_code});
+    }
+
+    /// `+[NSLocale availableLocaleIdentifiers]`
+    pub fn availableLocaleIdentifiers() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "availableLocaleIdentifiers", .{});
+    }
+
+    /// `+[NSLocale ISOLanguageCodes]`
+    pub fn isoLanguageCodes() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "ISOLanguageCodes", .{});
+    }
+
+    /// `+[NSLocale ISOCountryCodes]`
+    pub fn isoCountryCodes() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "ISOCountryCodes", .{});
+    }
+
+    /// `+[NSLocale ISOCurrencyCodes]`
+    pub fn isoCurrencyCodes() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "ISOCurrencyCodes", .{});
+    }
+
+    /// `+[NSLocale commonISOCurrencyCodes]`
+    pub fn commonISOCurrencyCodes() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "commonISOCurrencyCodes", .{});
+    }
+
+    /// `+[NSLocale preferredLanguages]`
+    pub fn preferredLanguages() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "preferredLanguages", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-objectForKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-displayNameForKey:value:" = fn (foundation.String, objc.Object) ?foundation.String;
+        pub const @"-initWithLocaleIdentifier:" = fn (foundation.String) Locale;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Locale;
+        pub const @"-localizedStringForLocaleIdentifier:" = fn (foundation.String) foundation.String;
+        pub const @"-localizedStringForLanguageCode:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForCountryCode:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForScriptCode:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForVariantCode:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForCalendarIdentifier:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForCollationIdentifier:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForCurrencyCode:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localizedStringForCollatorIdentifier:" = fn (foundation.String) ?foundation.String;
+        pub const @"-localeIdentifier" = fn () foundation.String;
+        pub const @"-languageCode" = fn () foundation.String;
+        pub const @"-languageIdentifier" = fn () foundation.String;
+        pub const @"-countryCode" = fn () ?foundation.String;
+        pub const @"-regionCode" = fn () ?foundation.String;
+        pub const @"-scriptCode" = fn () ?foundation.String;
+        pub const @"-variantCode" = fn () ?foundation.String;
+        pub const @"-exemplarCharacterSet" = fn () CharacterSet;
+        pub const @"-calendarIdentifier" = fn () foundation.String;
+        pub const @"-collationIdentifier" = fn () ?foundation.String;
+        pub const @"-usesMetricSystem" = fn () bool;
+        pub const @"-decimalSeparator" = fn () foundation.String;
+        pub const @"-groupingSeparator" = fn () foundation.String;
+        pub const @"-currencySymbol" = fn () foundation.String;
+        pub const @"-currencyCode" = fn () ?foundation.String;
+        pub const @"-collatorIdentifier" = fn () foundation.String;
+        pub const @"-quotationBeginDelimiter" = fn () foundation.String;
+        pub const @"-quotationEndDelimiter" = fn () foundation.String;
+        pub const @"-alternateQuotationBeginDelimiter" = fn () foundation.String;
+        pub const @"-alternateQuotationEndDelimiter" = fn () foundation.String;
+        pub const @"+localeWithLocaleIdentifier:" = fn (foundation.String) Locale;
+        pub const @"+autoupdatingCurrentLocale" = fn () Locale;
+        pub const @"+currentLocale" = fn () Locale;
+        pub const @"+systemLocale" = fn () Locale;
+        pub const @"+componentsFromLocaleIdentifier:" = fn (foundation.String) foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"+localeIdentifierFromComponents:" = fn (foundation.Dictionary(foundation.String, foundation.String)) foundation.String;
+        pub const @"+canonicalLocaleIdentifierFromString:" = fn (foundation.String) foundation.String;
+        pub const @"+canonicalLanguageIdentifierFromString:" = fn (foundation.String) foundation.String;
+        pub const @"+localeIdentifierFromWindowsLocaleCode:" = fn (u32) ?foundation.String;
+        pub const @"+windowsLocaleCodeFromLocaleIdentifier:" = fn (foundation.String) u32;
+        pub const @"+characterDirectionForLanguage:" = fn (foundation.String) LocaleLanguageDirection;
+        pub const @"+lineDirectionForLanguage:" = fn (foundation.String) LocaleLanguageDirection;
+        pub const @"+availableLocaleIdentifiers" = fn () foundation.Array(foundation.String);
+        pub const @"+ISOLanguageCodes" = fn () foundation.Array(foundation.String);
+        pub const @"+ISOCountryCodes" = fn () foundation.Array(foundation.String);
+        pub const @"+ISOCurrencyCodes" = fn () foundation.Array(foundation.String);
+        pub const @"+commonISOCurrencyCodes" = fn () foundation.Array(foundation.String);
+        pub const @"+preferredLanguages" = fn () foundation.Array(foundation.String);
+    };
+};
+
+/// `NSUUID`, a subclass of `NSObject`.
+pub const UUID = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSUUID";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSUUID alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSUUID`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSUUID UUID]`
+    pub fn uuid() UUID {
+        return class().msgSend(UUID, "UUID", .{});
+    }
+
+    /// `-[NSUUID init]`
+    pub fn init(self: Self) UUID {
+        return self.object.msgSend(UUID, "init", .{});
+    }
+
+    /// `-[NSUUID initWithUUIDString:]`
+    pub fn initWithUUIDString(self: Self, string: foundation.String) ?UUID {
+        return self.object.msgSend(?UUID, "initWithUUIDString:", .{string});
+    }
+
+    /// `-[NSUUID initWithUUIDBytes:]`
+    pub fn initWithUUIDBytes(self: Self, bytes: ?[*]const u8) UUID {
+        return self.object.msgSend(UUID, "initWithUUIDBytes:", .{bytes});
+    }
+
+    /// `-[NSUUID getUUIDBytes:]`
+    pub fn getUUIDBytes(self: Self, uuid_: ?[*]u8) void {
+        return self.object.msgSend(void, "getUUIDBytes:", .{uuid_});
+    }
+
+    /// `-[NSUUID compare:]`
+    pub fn compare(self: Self, other_uuid: UUID) ComparisonResult {
+        return self.object.msgSend(ComparisonResult, "compare:", .{other_uuid});
+    }
+
+    /// `-[NSUUID UUIDString]`
+    pub fn uuidString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "UUIDString", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+UUID" = fn () UUID;
+        pub const @"-init" = fn () UUID;
+        pub const @"-initWithUUIDString:" = fn (foundation.String) ?UUID;
+        pub const @"-initWithUUIDBytes:" = fn (?[*]const u8) UUID;
+        pub const @"-getUUIDBytes:" = fn (?[*]u8) void;
+        pub const @"-compare:" = fn (UUID) ComparisonResult;
+        pub const @"-UUIDString" = fn () foundation.String;
+    };
+};
+
+/// `NSFileManager`, a subclass of `NSObject`.
+pub const FileManager = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSFileManager";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSFileManager alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSFileManager`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSFileManager mountedVolumeURLsIncludingResourceValuesForKeys:options:]`
+    pub fn mountedVolumeURLsIncludingResourceValuesForKeysOptions(self: Self, property_keys: ?foundation.Array(objc.Object), options: VolumeEnumerationOptions) ?foundation.Array(foundation.Url) {
+        return self.object.msgSend(?foundation.Array(foundation.Url), "mountedVolumeURLsIncludingResourceValuesForKeys:options:", .{ property_keys, options });
+    }
+
+    /// `-[NSFileManager unmountVolumeAtURL:options:completionHandler:]`
+    pub fn unmountVolumeAtURLOptionsCompletionHandler(self: Self, url: foundation.Url, mask: FileManagerUnmountOptions, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "unmountVolumeAtURL:options:completionHandler:", .{ url, mask, completion_handler });
+    }
+
+    /// `-[NSFileManager contentsOfDirectoryAtURL:includingPropertiesForKeys:options:error:]`
+    pub fn contentsOfDirectoryAtURLIncludingPropertiesForKeysOptionsError(self: Self, url: foundation.Url, keys: ?foundation.Array(objc.Object), mask: DirectoryEnumerationOptions, @"error": ?*objc.abi.Id) ?foundation.Array(foundation.Url) {
+        return self.object.msgSend(?foundation.Array(foundation.Url), "contentsOfDirectoryAtURL:includingPropertiesForKeys:options:error:", .{ url, keys, mask, @"error" });
+    }
+
+    /// `-[NSFileManager URLsForDirectory:inDomains:]`
+    pub fn urLsForDirectoryInDomains(self: Self, directory: SearchPathDirectory, domain_mask: SearchPathDomainMask) foundation.Array(foundation.Url) {
+        return self.object.msgSend(foundation.Array(foundation.Url), "URLsForDirectory:inDomains:", .{ directory, domain_mask });
+    }
+
+    /// `-[NSFileManager URLForDirectory:inDomain:appropriateForURL:create:error:]`
+    pub fn urlForDirectoryInDomainAppropriateForURLCreateError(self: Self, directory: SearchPathDirectory, domain: SearchPathDomainMask, url: ?foundation.Url, should_create: bool, @"error": ?*objc.abi.Id) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForDirectory:inDomain:appropriateForURL:create:error:", .{ directory, domain, url, should_create, @"error" });
+    }
+
+    /// `-[NSFileManager getRelationship:ofDirectoryAtURL:toItemAtURL:error:]`
+    pub fn getRelationshipOfDirectoryAtURLToItemAtURLError(self: Self, out_relationship: objc.Object, directory_url: foundation.Url, other_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "getRelationship:ofDirectoryAtURL:toItemAtURL:error:", .{ out_relationship, directory_url, other_url, @"error" });
+    }
+
+    /// `-[NSFileManager getRelationship:ofDirectory:inDomain:toItemAtURL:error:]`
+    pub fn getRelationshipOfDirectoryInDomainToItemAtURLError(self: Self, out_relationship: objc.Object, directory: SearchPathDirectory, domain_mask: SearchPathDomainMask, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "getRelationship:ofDirectory:inDomain:toItemAtURL:error:", .{ out_relationship, directory, domain_mask, url, @"error" });
+    }
+
+    /// `-[NSFileManager createDirectoryAtURL:withIntermediateDirectories:attributes:error:]`
+    pub fn createDirectoryAtURLWithIntermediateDirectoriesAttributesError(self: Self, url: foundation.Url, create_intermediates: bool, attributes: ?foundation.Dictionary(objc.Object, objc.Object), @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "createDirectoryAtURL:withIntermediateDirectories:attributes:error:", .{ url, create_intermediates, attributes, @"error" });
+    }
+
+    /// `-[NSFileManager createSymbolicLinkAtURL:withDestinationURL:error:]`
+    pub fn createSymbolicLinkAtURLWithDestinationURLError(self: Self, url: foundation.Url, dest_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "createSymbolicLinkAtURL:withDestinationURL:error:", .{ url, dest_url, @"error" });
+    }
+
+    /// `-[NSFileManager setAttributes:ofItemAtPath:error:]`
+    pub fn setAttributesOfItemAtPathError(self: Self, attributes: foundation.Dictionary(objc.Object, objc.Object), path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "setAttributes:ofItemAtPath:error:", .{ attributes, path, @"error" });
+    }
+
+    /// `-[NSFileManager createDirectoryAtPath:withIntermediateDirectories:attributes:error:]`
+    pub fn createDirectoryAtPathWithIntermediateDirectoriesAttributesError(self: Self, path: foundation.String, create_intermediates: bool, attributes: ?foundation.Dictionary(objc.Object, objc.Object), @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "createDirectoryAtPath:withIntermediateDirectories:attributes:error:", .{ path, create_intermediates, attributes, @"error" });
+    }
+
+    /// `-[NSFileManager contentsOfDirectoryAtPath:error:]`
+    pub fn contentsOfDirectoryAtPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "contentsOfDirectoryAtPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager subpathsOfDirectoryAtPath:error:]`
+    pub fn subpathsOfDirectoryAtPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "subpathsOfDirectoryAtPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager attributesOfItemAtPath:error:]`
+    pub fn attributesOfItemAtPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "attributesOfItemAtPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager attributesOfFileSystemForPath:error:]`
+    pub fn attributesOfFileSystemForPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "attributesOfFileSystemForPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager createSymbolicLinkAtPath:withDestinationPath:error:]`
+    pub fn createSymbolicLinkAtPathWithDestinationPathError(self: Self, path: foundation.String, dest_path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "createSymbolicLinkAtPath:withDestinationPath:error:", .{ path, dest_path, @"error" });
+    }
+
+    /// `-[NSFileManager destinationOfSymbolicLinkAtPath:error:]`
+    pub fn destinationOfSymbolicLinkAtPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "destinationOfSymbolicLinkAtPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager copyItemAtPath:toPath:error:]`
+    pub fn copyItemAtPathToPathError(self: Self, src_path: foundation.String, dst_path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "copyItemAtPath:toPath:error:", .{ src_path, dst_path, @"error" });
+    }
+
+    /// `-[NSFileManager moveItemAtPath:toPath:error:]`
+    pub fn moveItemAtPathToPathError(self: Self, src_path: foundation.String, dst_path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "moveItemAtPath:toPath:error:", .{ src_path, dst_path, @"error" });
+    }
+
+    /// `-[NSFileManager linkItemAtPath:toPath:error:]`
+    pub fn linkItemAtPathToPathError(self: Self, src_path: foundation.String, dst_path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "linkItemAtPath:toPath:error:", .{ src_path, dst_path, @"error" });
+    }
+
+    /// `-[NSFileManager removeItemAtPath:error:]`
+    pub fn removeItemAtPathError(self: Self, path: foundation.String, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "removeItemAtPath:error:", .{ path, @"error" });
+    }
+
+    /// `-[NSFileManager copyItemAtURL:toURL:error:]`
+    pub fn copyItemAtURLToURLError(self: Self, src_url: foundation.Url, dst_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "copyItemAtURL:toURL:error:", .{ src_url, dst_url, @"error" });
+    }
+
+    /// `-[NSFileManager moveItemAtURL:toURL:error:]`
+    pub fn moveItemAtURLToURLError(self: Self, src_url: foundation.Url, dst_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "moveItemAtURL:toURL:error:", .{ src_url, dst_url, @"error" });
+    }
+
+    /// `-[NSFileManager linkItemAtURL:toURL:error:]`
+    pub fn linkItemAtURLToURLError(self: Self, src_url: foundation.Url, dst_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "linkItemAtURL:toURL:error:", .{ src_url, dst_url, @"error" });
+    }
+
+    /// `-[NSFileManager removeItemAtURL:error:]`
+    pub fn removeItemAtURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "removeItemAtURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSFileManager trashItemAtURL:resultingItemURL:error:]`
+    pub fn trashItemAtURLResultingItemURLError(self: Self, url: foundation.Url, out_resulting_url: ?*objc.abi.Id, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "trashItemAtURL:resultingItemURL:error:", .{ url, out_resulting_url, @"error" });
+    }
+
+    /// `-[NSFileManager fileAttributesAtPath:traverseLink:]`
+    pub fn fileAttributesAtPathTraverseLink(self: Self, path: foundation.String, yorn: bool) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "fileAttributesAtPath:traverseLink:", .{ path, yorn });
+    }
+
+    /// `-[NSFileManager changeFileAttributes:atPath:]`
+    pub fn changeFileAttributesAtPath(self: Self, attributes: foundation.Dictionary(objc.Object, objc.Object), path: foundation.String) bool {
+        return self.object.msgSend(bool, "changeFileAttributes:atPath:", .{ attributes, path });
+    }
+
+    /// `-[NSFileManager directoryContentsAtPath:]`
+    pub fn directoryContentsAtPath(self: Self, path: foundation.String) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "directoryContentsAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager fileSystemAttributesAtPath:]`
+    pub fn fileSystemAttributesAtPath(self: Self, path: foundation.String) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "fileSystemAttributesAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager pathContentOfSymbolicLinkAtPath:]`
+    pub fn pathContentOfSymbolicLinkAtPath(self: Self, path: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathContentOfSymbolicLinkAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager createSymbolicLinkAtPath:pathContent:]`
+    pub fn createSymbolicLinkAtPathPathContent(self: Self, path: foundation.String, otherpath: foundation.String) bool {
+        return self.object.msgSend(bool, "createSymbolicLinkAtPath:pathContent:", .{ path, otherpath });
+    }
+
+    /// `-[NSFileManager createDirectoryAtPath:attributes:]`
+    pub fn createDirectoryAtPathAttributes(self: Self, path: foundation.String, attributes: foundation.Dictionary(objc.Object, objc.Object)) bool {
+        return self.object.msgSend(bool, "createDirectoryAtPath:attributes:", .{ path, attributes });
+    }
+
+    /// `-[NSFileManager linkPath:toPath:handler:]`
+    pub fn linkPathToPathHandler(self: Self, src: foundation.String, dest: foundation.String, handler: ?objc.Object) bool {
+        return self.object.msgSend(bool, "linkPath:toPath:handler:", .{ src, dest, handler });
+    }
+
+    /// `-[NSFileManager copyPath:toPath:handler:]`
+    pub fn copyPathToPathHandler(self: Self, src: foundation.String, dest: foundation.String, handler: ?objc.Object) bool {
+        return self.object.msgSend(bool, "copyPath:toPath:handler:", .{ src, dest, handler });
+    }
+
+    /// `-[NSFileManager movePath:toPath:handler:]`
+    pub fn movePathToPathHandler(self: Self, src: foundation.String, dest: foundation.String, handler: ?objc.Object) bool {
+        return self.object.msgSend(bool, "movePath:toPath:handler:", .{ src, dest, handler });
+    }
+
+    /// `-[NSFileManager removeFileAtPath:handler:]`
+    pub fn removeFileAtPathHandler(self: Self, path: foundation.String, handler: ?objc.Object) bool {
+        return self.object.msgSend(bool, "removeFileAtPath:handler:", .{ path, handler });
+    }
+
+    /// `-[NSFileManager changeCurrentDirectoryPath:]`
+    pub fn changeCurrentDirectoryPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "changeCurrentDirectoryPath:", .{path});
+    }
+
+    /// `-[NSFileManager fileExistsAtPath:]`
+    pub fn fileExistsAtPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileExistsAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager fileExistsAtPath:isDirectory:]`
+    pub fn fileExistsAtPathIsDirectory(self: Self, path: foundation.String, is_directory: ?*bool) bool {
+        return self.object.msgSend(bool, "fileExistsAtPath:isDirectory:", .{ path, is_directory });
+    }
+
+    /// `-[NSFileManager isReadableFileAtPath:]`
+    pub fn isReadableFileAtPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "isReadableFileAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager isWritableFileAtPath:]`
+    pub fn isWritableFileAtPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "isWritableFileAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager isExecutableFileAtPath:]`
+    pub fn isExecutableFileAtPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "isExecutableFileAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager isDeletableFileAtPath:]`
+    pub fn isDeletableFileAtPath(self: Self, path: foundation.String) bool {
+        return self.object.msgSend(bool, "isDeletableFileAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager contentsEqualAtPath:andPath:]`
+    pub fn contentsEqualAtPathAndPath(self: Self, path1: foundation.String, path2: foundation.String) bool {
+        return self.object.msgSend(bool, "contentsEqualAtPath:andPath:", .{ path1, path2 });
+    }
+
+    /// `-[NSFileManager displayNameAtPath:]`
+    pub fn displayNameAtPath(self: Self, path: foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "displayNameAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager componentsToDisplayForPath:]`
+    pub fn componentsToDisplayForPath(self: Self, path: foundation.String) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "componentsToDisplayForPath:", .{path});
+    }
+
+    /// `-[NSFileManager enumeratorAtPath:]`
+    pub fn enumeratorAtPath(self: Self, path: foundation.String) ?DirectoryEnumerator {
+        return self.object.msgSend(?DirectoryEnumerator, "enumeratorAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager enumeratorAtURL:includingPropertiesForKeys:options:errorHandler:]`
+    pub fn enumeratorAtURLIncludingPropertiesForKeysOptionsErrorHandler(self: Self, url: foundation.Url, keys: ?foundation.Array(objc.Object), mask: DirectoryEnumerationOptions, handler: ?objc.BlockRef(fn (foundation.Url, foundation.ErrorObject) bool)) ?DirectoryEnumerator {
+        return self.object.msgSend(?DirectoryEnumerator, "enumeratorAtURL:includingPropertiesForKeys:options:errorHandler:", .{ url, keys, mask, handler });
+    }
+
+    /// `-[NSFileManager subpathsAtPath:]`
+    pub fn subpathsAtPath(self: Self, path: foundation.String) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "subpathsAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager contentsAtPath:]`
+    pub fn contentsAtPath(self: Self, path: foundation.String) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "contentsAtPath:", .{path});
+    }
+
+    /// `-[NSFileManager createFileAtPath:contents:attributes:]`
+    pub fn createFileAtPathContentsAttributes(self: Self, path: foundation.String, data: ?foundation.Data, attr: ?foundation.Dictionary(objc.Object, objc.Object)) bool {
+        return self.object.msgSend(bool, "createFileAtPath:contents:attributes:", .{ path, data, attr });
+    }
+
+    /// `-[NSFileManager fileSystemRepresentationWithPath:]`
+    pub fn fileSystemRepresentationWithPath(self: Self, path: foundation.String) [*:0]const u8 {
+        return self.object.msgSend([*:0]const u8, "fileSystemRepresentationWithPath:", .{path});
+    }
+
+    /// `-[NSFileManager stringWithFileSystemRepresentation:length:]`
+    pub fn stringWithFileSystemRepresentationLength(self: Self, str: [*:0]const u8, len: objc.UInteger) foundation.String {
+        return self.object.msgSend(foundation.String, "stringWithFileSystemRepresentation:length:", .{ str, len });
+    }
+
+    /// `-[NSFileManager replaceItemAtURL:withItemAtURL:backupItemName:options:resultingItemURL:error:]`
+    pub fn replaceItemAtURLWithItemAtURLBackupItemNameOptionsResultingItemURLError(self: Self, original_item_url: foundation.Url, new_item_url: foundation.Url, backup_item_name: ?foundation.String, options: FileManagerItemReplacementOptions, resulting_url: ?*objc.abi.Id, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "replaceItemAtURL:withItemAtURL:backupItemName:options:resultingItemURL:error:", .{ original_item_url, new_item_url, backup_item_name, options, resulting_url, @"error" });
+    }
+
+    /// `-[NSFileManager setUbiquitous:itemAtURL:destinationURL:error:]`
+    pub fn setUbiquitousItemAtURLDestinationURLError(self: Self, flag: bool, url: foundation.Url, destination_url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "setUbiquitous:itemAtURL:destinationURL:error:", .{ flag, url, destination_url, @"error" });
+    }
+
+    /// `-[NSFileManager isUbiquitousItemAtURL:]`
+    pub fn isUbiquitousItemAtURL(self: Self, url: foundation.Url) bool {
+        return self.object.msgSend(bool, "isUbiquitousItemAtURL:", .{url});
+    }
+
+    /// `-[NSFileManager startDownloadingUbiquitousItemAtURL:error:]`
+    pub fn startDownloadingUbiquitousItemAtURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "startDownloadingUbiquitousItemAtURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSFileManager evictUbiquitousItemAtURL:error:]`
+    pub fn evictUbiquitousItemAtURLError(self: Self, url: foundation.Url, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "evictUbiquitousItemAtURL:error:", .{ url, @"error" });
+    }
+
+    /// `-[NSFileManager URLForUbiquityContainerIdentifier:]`
+    pub fn urlForUbiquityContainerIdentifier(self: Self, container_identifier: ?foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForUbiquityContainerIdentifier:", .{container_identifier});
+    }
+
+    /// `-[NSFileManager URLForPublishingUbiquitousItemAtURL:expirationDate:error:]`
+    pub fn urlForPublishingUbiquitousItemAtURLExpirationDateError(self: Self, url: foundation.Url, out_date: ?*objc.abi.Id, @"error": ?*objc.abi.Id) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForPublishingUbiquitousItemAtURL:expirationDate:error:", .{ url, out_date, @"error" });
+    }
+
+    /// `-[NSFileManager pauseSyncForUbiquitousItemAtURL:completionHandler:]`
+    pub fn pauseSyncForUbiquitousItemAtURLCompletionHandler(self: Self, url: foundation.Url, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "pauseSyncForUbiquitousItemAtURL:completionHandler:", .{ url, completion_handler });
+    }
+
+    /// `-[NSFileManager resumeSyncForUbiquitousItemAtURL:withBehavior:completionHandler:]`
+    pub fn resumeSyncForUbiquitousItemAtURLWithBehaviorCompletionHandler(self: Self, url: foundation.Url, behavior: FileManagerResumeSyncBehavior, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "resumeSyncForUbiquitousItemAtURL:withBehavior:completionHandler:", .{ url, behavior, completion_handler });
+    }
+
+    /// `-[NSFileManager fetchLatestRemoteVersionOfItemAtURL:completionHandler:]`
+    pub fn fetchLatestRemoteVersionOfItemAtURLCompletionHandler(self: Self, url: foundation.Url, completion_handler: objc.BlockRef(fn (?objc.Object, ?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "fetchLatestRemoteVersionOfItemAtURL:completionHandler:", .{ url, completion_handler });
+    }
+
+    /// `-[NSFileManager uploadLocalVersionOfUbiquitousItemAtURL:withConflictResolutionPolicy:completionHandler:]`
+    pub fn uploadLocalVersionOfUbiquitousItemAtURLWithConflictResolutionPolicyCompletionHandler(self: Self, url: foundation.Url, conflict_resolution_policy: FileManagerUploadLocalVersionConflictPolicy, completion_handler: objc.BlockRef(fn (?objc.Object, ?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "uploadLocalVersionOfUbiquitousItemAtURL:withConflictResolutionPolicy:completionHandler:", .{ url, conflict_resolution_policy, completion_handler });
+    }
+
+    /// `-[NSFileManager getFileProviderServicesForItemAtURL:completionHandler:]`
+    pub fn getFileProviderServicesForItemAtURLCompletionHandler(self: Self, url: foundation.Url, completion_handler: objc.BlockRef(fn (?foundation.Dictionary(objc.Object, objc.Object), ?foundation.ErrorObject) void)) void {
+        return self.object.msgSend(void, "getFileProviderServicesForItemAtURL:completionHandler:", .{ url, completion_handler });
+    }
+
+    /// `-[NSFileManager containerURLForSecurityApplicationGroupIdentifier:]`
+    pub fn containerURLForSecurityApplicationGroupIdentifier(self: Self, group_identifier: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "containerURLForSecurityApplicationGroupIdentifier:", .{group_identifier});
+    }
+
+    /// `+[NSFileManager defaultManager]`
+    pub fn defaultManager() FileManager {
+        return class().msgSend(FileManager, "defaultManager", .{});
+    }
+
+    /// `-[NSFileManager delegate]`
+    pub fn delegate(self: Self) ?FileManagerDelegate {
+        return self.object.msgSend(?FileManagerDelegate, "delegate", .{});
+    }
+
+    /// `-[NSFileManager setDelegate:]`
+    pub fn setDelegate(self: Self, delegate_: ?FileManagerDelegate) void {
+        return self.object.msgSend(void, "setDelegate:", .{delegate_});
+    }
+
+    /// `-[NSFileManager currentDirectoryPath]`
+    pub fn currentDirectoryPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "currentDirectoryPath", .{});
+    }
+
+    /// `-[NSFileManager ubiquityIdentityToken]`
+    pub fn ubiquityIdentityToken(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "ubiquityIdentityToken", .{});
+    }
+
+    /// `-[NSFileManager homeDirectoryForUser:]`
+    pub fn homeDirectoryForUser(self: Self, user_name: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "homeDirectoryForUser:", .{user_name});
+    }
+
+    /// `-[NSFileManager homeDirectoryForCurrentUser]`
+    pub fn homeDirectoryForCurrentUser(self: Self) foundation.Url {
+        return self.object.msgSend(foundation.Url, "homeDirectoryForCurrentUser", .{});
+    }
+
+    /// `-[NSFileManager temporaryDirectory]`
+    pub fn temporaryDirectory(self: Self) foundation.Url {
+        return self.object.msgSend(foundation.Url, "temporaryDirectory", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-mountedVolumeURLsIncludingResourceValuesForKeys:options:" = fn (?foundation.Array(objc.Object), VolumeEnumerationOptions) ?foundation.Array(foundation.Url);
+        pub const @"-unmountVolumeAtURL:options:completionHandler:" = fn (foundation.Url, FileManagerUnmountOptions, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-contentsOfDirectoryAtURL:includingPropertiesForKeys:options:error:" = fn (foundation.Url, ?foundation.Array(objc.Object), DirectoryEnumerationOptions, ?*objc.abi.Id) ?foundation.Array(foundation.Url);
+        pub const @"-URLsForDirectory:inDomains:" = fn (SearchPathDirectory, SearchPathDomainMask) foundation.Array(foundation.Url);
+        pub const @"-URLForDirectory:inDomain:appropriateForURL:create:error:" = fn (SearchPathDirectory, SearchPathDomainMask, ?foundation.Url, bool, ?*objc.abi.Id) ?foundation.Url;
+        pub const @"-getRelationship:ofDirectoryAtURL:toItemAtURL:error:" = fn (objc.Object, foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-getRelationship:ofDirectory:inDomain:toItemAtURL:error:" = fn (objc.Object, SearchPathDirectory, SearchPathDomainMask, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-createDirectoryAtURL:withIntermediateDirectories:attributes:error:" = fn (foundation.Url, bool, ?foundation.Dictionary(objc.Object, objc.Object), ?*objc.abi.Id) bool;
+        pub const @"-createSymbolicLinkAtURL:withDestinationURL:error:" = fn (foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-setAttributes:ofItemAtPath:error:" = fn (foundation.Dictionary(objc.Object, objc.Object), foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-createDirectoryAtPath:withIntermediateDirectories:attributes:error:" = fn (foundation.String, bool, ?foundation.Dictionary(objc.Object, objc.Object), ?*objc.abi.Id) bool;
+        pub const @"-contentsOfDirectoryAtPath:error:" = fn (foundation.String, ?*objc.abi.Id) ?foundation.Array(foundation.String);
+        pub const @"-subpathsOfDirectoryAtPath:error:" = fn (foundation.String, ?*objc.abi.Id) ?foundation.Array(foundation.String);
+        pub const @"-attributesOfItemAtPath:error:" = fn (foundation.String, ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-attributesOfFileSystemForPath:error:" = fn (foundation.String, ?*objc.abi.Id) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-createSymbolicLinkAtPath:withDestinationPath:error:" = fn (foundation.String, foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-destinationOfSymbolicLinkAtPath:error:" = fn (foundation.String, ?*objc.abi.Id) ?foundation.String;
+        pub const @"-copyItemAtPath:toPath:error:" = fn (foundation.String, foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-moveItemAtPath:toPath:error:" = fn (foundation.String, foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-linkItemAtPath:toPath:error:" = fn (foundation.String, foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-removeItemAtPath:error:" = fn (foundation.String, ?*objc.abi.Id) bool;
+        pub const @"-copyItemAtURL:toURL:error:" = fn (foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-moveItemAtURL:toURL:error:" = fn (foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-linkItemAtURL:toURL:error:" = fn (foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-removeItemAtURL:error:" = fn (foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-trashItemAtURL:resultingItemURL:error:" = fn (foundation.Url, ?*objc.abi.Id, ?*objc.abi.Id) bool;
+        pub const @"-fileAttributesAtPath:traverseLink:" = fn (foundation.String, bool) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-changeFileAttributes:atPath:" = fn (foundation.Dictionary(objc.Object, objc.Object), foundation.String) bool;
+        pub const @"-directoryContentsAtPath:" = fn (foundation.String) ?foundation.Array(objc.Object);
+        pub const @"-fileSystemAttributesAtPath:" = fn (foundation.String) ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-pathContentOfSymbolicLinkAtPath:" = fn (foundation.String) ?foundation.String;
+        pub const @"-createSymbolicLinkAtPath:pathContent:" = fn (foundation.String, foundation.String) bool;
+        pub const @"-createDirectoryAtPath:attributes:" = fn (foundation.String, foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"-linkPath:toPath:handler:" = fn (foundation.String, foundation.String, ?objc.Object) bool;
+        pub const @"-copyPath:toPath:handler:" = fn (foundation.String, foundation.String, ?objc.Object) bool;
+        pub const @"-movePath:toPath:handler:" = fn (foundation.String, foundation.String, ?objc.Object) bool;
+        pub const @"-removeFileAtPath:handler:" = fn (foundation.String, ?objc.Object) bool;
+        pub const @"-changeCurrentDirectoryPath:" = fn (foundation.String) bool;
+        pub const @"-fileExistsAtPath:" = fn (foundation.String) bool;
+        pub const @"-fileExistsAtPath:isDirectory:" = fn (foundation.String, ?*bool) bool;
+        pub const @"-isReadableFileAtPath:" = fn (foundation.String) bool;
+        pub const @"-isWritableFileAtPath:" = fn (foundation.String) bool;
+        pub const @"-isExecutableFileAtPath:" = fn (foundation.String) bool;
+        pub const @"-isDeletableFileAtPath:" = fn (foundation.String) bool;
+        pub const @"-contentsEqualAtPath:andPath:" = fn (foundation.String, foundation.String) bool;
+        pub const @"-displayNameAtPath:" = fn (foundation.String) foundation.String;
+        pub const @"-componentsToDisplayForPath:" = fn (foundation.String) ?foundation.Array(foundation.String);
+        pub const @"-enumeratorAtPath:" = fn (foundation.String) ?DirectoryEnumerator;
+        pub const @"-enumeratorAtURL:includingPropertiesForKeys:options:errorHandler:" = fn (foundation.Url, ?foundation.Array(objc.Object), DirectoryEnumerationOptions, ?objc.BlockRef(fn (foundation.Url, foundation.ErrorObject) bool)) ?DirectoryEnumerator;
+        pub const @"-subpathsAtPath:" = fn (foundation.String) ?foundation.Array(foundation.String);
+        pub const @"-contentsAtPath:" = fn (foundation.String) ?foundation.Data;
+        pub const @"-createFileAtPath:contents:attributes:" = fn (foundation.String, ?foundation.Data, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"-fileSystemRepresentationWithPath:" = fn (foundation.String) [*:0]const u8;
+        pub const @"-stringWithFileSystemRepresentation:length:" = fn ([*:0]const u8, objc.UInteger) foundation.String;
+        pub const @"-replaceItemAtURL:withItemAtURL:backupItemName:options:resultingItemURL:error:" = fn (foundation.Url, foundation.Url, ?foundation.String, FileManagerItemReplacementOptions, ?*objc.abi.Id, ?*objc.abi.Id) bool;
+        pub const @"-setUbiquitous:itemAtURL:destinationURL:error:" = fn (bool, foundation.Url, foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-isUbiquitousItemAtURL:" = fn (foundation.Url) bool;
+        pub const @"-startDownloadingUbiquitousItemAtURL:error:" = fn (foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-evictUbiquitousItemAtURL:error:" = fn (foundation.Url, ?*objc.abi.Id) bool;
+        pub const @"-URLForUbiquityContainerIdentifier:" = fn (?foundation.String) ?foundation.Url;
+        pub const @"-URLForPublishingUbiquitousItemAtURL:expirationDate:error:" = fn (foundation.Url, ?*objc.abi.Id, ?*objc.abi.Id) ?foundation.Url;
+        pub const @"-pauseSyncForUbiquitousItemAtURL:completionHandler:" = fn (foundation.Url, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-resumeSyncForUbiquitousItemAtURL:withBehavior:completionHandler:" = fn (foundation.Url, FileManagerResumeSyncBehavior, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-fetchLatestRemoteVersionOfItemAtURL:completionHandler:" = fn (foundation.Url, objc.BlockRef(fn (?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-uploadLocalVersionOfUbiquitousItemAtURL:withConflictResolutionPolicy:completionHandler:" = fn (foundation.Url, FileManagerUploadLocalVersionConflictPolicy, objc.BlockRef(fn (?objc.Object, ?foundation.ErrorObject) void)) void;
+        pub const @"-getFileProviderServicesForItemAtURL:completionHandler:" = fn (foundation.Url, objc.BlockRef(fn (?foundation.Dictionary(objc.Object, objc.Object), ?foundation.ErrorObject) void)) void;
+        pub const @"-containerURLForSecurityApplicationGroupIdentifier:" = fn (foundation.String) ?foundation.Url;
+        pub const @"+defaultManager" = fn () FileManager;
+        pub const @"-delegate" = fn () ?FileManagerDelegate;
+        pub const @"-setDelegate:" = fn (?FileManagerDelegate) void;
+        pub const @"-currentDirectoryPath" = fn () foundation.String;
+        pub const @"-ubiquityIdentityToken" = fn () ?objc.Object;
+        pub const @"-homeDirectoryForUser:" = fn (foundation.String) ?foundation.Url;
+        pub const @"-homeDirectoryForCurrentUser" = fn () foundation.Url;
+        pub const @"-temporaryDirectory" = fn () foundation.Url;
+    };
+};
+
+/// `NSDirectoryEnumerator`, a subclass of `NSEnumerator`.
+pub const DirectoryEnumerator = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSDirectoryEnumerator";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSDirectoryEnumerator alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSDirectoryEnumerator`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSDirectoryEnumerator skipDescendents]`
+    pub fn skipDescendents(self: Self) void {
+        return self.object.msgSend(void, "skipDescendents", .{});
+    }
+
+    /// `-[NSDirectoryEnumerator skipDescendants]`
+    pub fn skipDescendants(self: Self) void {
+        return self.object.msgSend(void, "skipDescendants", .{});
+    }
+
+    /// `-[NSDirectoryEnumerator fileAttributes]`
+    pub fn fileAttributes(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "fileAttributes", .{});
+    }
+
+    /// `-[NSDirectoryEnumerator directoryAttributes]`
+    pub fn directoryAttributes(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "directoryAttributes", .{});
+    }
+
+    /// `-[NSDirectoryEnumerator isEnumeratingDirectoryPostOrder]`
+    pub fn isEnumeratingDirectoryPostOrder(self: Self) bool {
+        return self.object.msgSend(bool, "isEnumeratingDirectoryPostOrder", .{});
+    }
+
+    /// `-[NSDirectoryEnumerator level]`
+    pub fn level(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "level", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-skipDescendents" = fn () void;
+        pub const @"-skipDescendants" = fn () void;
+        pub const @"-fileAttributes" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-directoryAttributes" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-isEnumeratingDirectoryPostOrder" = fn () bool;
+        pub const @"-level" = fn () objc.UInteger;
+    };
+};
+
+/// `NSFileHandle`, a subclass of `NSObject`.
+pub const FileHandle = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSFileHandle";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSFileHandle alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSFileHandle`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSFileHandle initWithFileDescriptor:closeOnDealloc:]`
+    pub fn initWithFileDescriptorCloseOnDealloc(self: Self, fd: c_int, closeopt: bool) FileHandle {
+        return self.object.msgSend(FileHandle, "initWithFileDescriptor:closeOnDealloc:", .{ fd, closeopt });
+    }
+
+    /// `-[NSFileHandle initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?FileHandle {
+        return self.object.msgSend(?FileHandle, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSFileHandle readDataToEndOfFileAndReturnError:]`
+    pub fn readDataToEndOfFileAndReturnError(self: Self, @"error": ?*objc.abi.Id) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "readDataToEndOfFileAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSFileHandle readDataUpToLength:error:]`
+    pub fn readDataUpToLengthError(self: Self, length: objc.UInteger, @"error": ?*objc.abi.Id) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "readDataUpToLength:error:", .{ length, @"error" });
+    }
+
+    /// `-[NSFileHandle writeData:error:]`
+    pub fn writeDataError(self: Self, data: foundation.Data, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "writeData:error:", .{ data, @"error" });
+    }
+
+    /// `-[NSFileHandle getOffset:error:]`
+    pub fn getOffsetError(self: Self, offset_in_file: ?*c_ulonglong, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "getOffset:error:", .{ offset_in_file, @"error" });
+    }
+
+    /// `-[NSFileHandle seekToEndReturningOffset:error:]`
+    pub fn seekToEndReturningOffsetError(self: Self, offset_in_file: ?*c_ulonglong, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "seekToEndReturningOffset:error:", .{ offset_in_file, @"error" });
+    }
+
+    /// `-[NSFileHandle seekToOffset:error:]`
+    pub fn seekToOffsetError(self: Self, offset: c_ulonglong, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "seekToOffset:error:", .{ offset, @"error" });
+    }
+
+    /// `-[NSFileHandle truncateAtOffset:error:]`
+    pub fn truncateAtOffsetError(self: Self, offset: c_ulonglong, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "truncateAtOffset:error:", .{ offset, @"error" });
+    }
+
+    /// `-[NSFileHandle synchronizeAndReturnError:]`
+    pub fn synchronizeAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "synchronizeAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSFileHandle closeAndReturnError:]`
+    pub fn closeAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "closeAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSFileHandle availableData]`
+    pub fn availableData(self: Self) foundation.Data {
+        return self.object.msgSend(foundation.Data, "availableData", .{});
+    }
+
+    /// `+[NSFileHandle fileHandleForReadingAtPath:]`
+    pub fn fileHandleForReadingAtPath(path: foundation.String) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForReadingAtPath:", .{path});
+    }
+
+    /// `+[NSFileHandle fileHandleForWritingAtPath:]`
+    pub fn fileHandleForWritingAtPath(path: foundation.String) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForWritingAtPath:", .{path});
+    }
+
+    /// `+[NSFileHandle fileHandleForUpdatingAtPath:]`
+    pub fn fileHandleForUpdatingAtPath(path: foundation.String) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForUpdatingAtPath:", .{path});
+    }
+
+    /// `+[NSFileHandle fileHandleForReadingFromURL:error:]`
+    pub fn fileHandleForReadingFromURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForReadingFromURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSFileHandle fileHandleForWritingToURL:error:]`
+    pub fn fileHandleForWritingToURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForWritingToURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSFileHandle fileHandleForUpdatingURL:error:]`
+    pub fn fileHandleForUpdatingURLError(url: foundation.Url, @"error": ?*objc.abi.Id) ?FileHandle {
+        return class().msgSend(?FileHandle, "fileHandleForUpdatingURL:error:", .{ url, @"error" });
+    }
+
+    /// `+[NSFileHandle fileHandleWithStandardInput]`
+    pub fn fileHandleWithStandardInput() FileHandle {
+        return class().msgSend(FileHandle, "fileHandleWithStandardInput", .{});
+    }
+
+    /// `+[NSFileHandle fileHandleWithStandardOutput]`
+    pub fn fileHandleWithStandardOutput() FileHandle {
+        return class().msgSend(FileHandle, "fileHandleWithStandardOutput", .{});
+    }
+
+    /// `+[NSFileHandle fileHandleWithStandardError]`
+    pub fn fileHandleWithStandardError() FileHandle {
+        return class().msgSend(FileHandle, "fileHandleWithStandardError", .{});
+    }
+
+    /// `+[NSFileHandle fileHandleWithNullDevice]`
+    pub fn fileHandleWithNullDevice() FileHandle {
+        return class().msgSend(FileHandle, "fileHandleWithNullDevice", .{});
+    }
+
+    /// `-[NSFileHandle readInBackgroundAndNotifyForModes:]`
+    pub fn readInBackgroundAndNotifyForModes(self: Self, modes: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "readInBackgroundAndNotifyForModes:", .{modes});
+    }
+
+    /// `-[NSFileHandle readInBackgroundAndNotify]`
+    pub fn readInBackgroundAndNotify(self: Self) void {
+        return self.object.msgSend(void, "readInBackgroundAndNotify", .{});
+    }
+
+    /// `-[NSFileHandle readToEndOfFileInBackgroundAndNotifyForModes:]`
+    pub fn readToEndOfFileInBackgroundAndNotifyForModes(self: Self, modes: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "readToEndOfFileInBackgroundAndNotifyForModes:", .{modes});
+    }
+
+    /// `-[NSFileHandle readToEndOfFileInBackgroundAndNotify]`
+    pub fn readToEndOfFileInBackgroundAndNotify(self: Self) void {
+        return self.object.msgSend(void, "readToEndOfFileInBackgroundAndNotify", .{});
+    }
+
+    /// `-[NSFileHandle acceptConnectionInBackgroundAndNotifyForModes:]`
+    pub fn acceptConnectionInBackgroundAndNotifyForModes(self: Self, modes: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "acceptConnectionInBackgroundAndNotifyForModes:", .{modes});
+    }
+
+    /// `-[NSFileHandle acceptConnectionInBackgroundAndNotify]`
+    pub fn acceptConnectionInBackgroundAndNotify(self: Self) void {
+        return self.object.msgSend(void, "acceptConnectionInBackgroundAndNotify", .{});
+    }
+
+    /// `-[NSFileHandle waitForDataInBackgroundAndNotifyForModes:]`
+    pub fn waitForDataInBackgroundAndNotifyForModes(self: Self, modes: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "waitForDataInBackgroundAndNotifyForModes:", .{modes});
+    }
+
+    /// `-[NSFileHandle waitForDataInBackgroundAndNotify]`
+    pub fn waitForDataInBackgroundAndNotify(self: Self) void {
+        return self.object.msgSend(void, "waitForDataInBackgroundAndNotify", .{});
+    }
+
+    /// `-[NSFileHandle readabilityHandler]`
+    pub fn readabilityHandler(self: Self) ?objc.BlockRef(fn (FileHandle) void) {
+        return self.object.msgSend(?objc.BlockRef(fn (FileHandle) void), "readabilityHandler", .{});
+    }
+
+    /// `-[NSFileHandle setReadabilityHandler:]`
+    pub fn setReadabilityHandler(self: Self, readability_handler: ?objc.BlockRef(fn (FileHandle) void)) void {
+        return self.object.msgSend(void, "setReadabilityHandler:", .{readability_handler});
+    }
+
+    /// `-[NSFileHandle writeabilityHandler]`
+    pub fn writeabilityHandler(self: Self) ?objc.BlockRef(fn (FileHandle) void) {
+        return self.object.msgSend(?objc.BlockRef(fn (FileHandle) void), "writeabilityHandler", .{});
+    }
+
+    /// `-[NSFileHandle setWriteabilityHandler:]`
+    pub fn setWriteabilityHandler(self: Self, writeability_handler: ?objc.BlockRef(fn (FileHandle) void)) void {
+        return self.object.msgSend(void, "setWriteabilityHandler:", .{writeability_handler});
+    }
+
+    /// `-[NSFileHandle initWithFileDescriptor:]`
+    pub fn initWithFileDescriptor(self: Self, fd: c_int) FileHandle {
+        return self.object.msgSend(FileHandle, "initWithFileDescriptor:", .{fd});
+    }
+
+    /// `-[NSFileHandle fileDescriptor]`
+    pub fn fileDescriptor(self: Self) c_int {
+        return self.object.msgSend(c_int, "fileDescriptor", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithFileDescriptor:closeOnDealloc:" = fn (c_int, bool) FileHandle;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?FileHandle;
+        pub const @"-readDataToEndOfFileAndReturnError:" = fn (?*objc.abi.Id) ?foundation.Data;
+        pub const @"-readDataUpToLength:error:" = fn (objc.UInteger, ?*objc.abi.Id) ?foundation.Data;
+        pub const @"-writeData:error:" = fn (foundation.Data, ?*objc.abi.Id) bool;
+        pub const @"-getOffset:error:" = fn (?*c_ulonglong, ?*objc.abi.Id) bool;
+        pub const @"-seekToEndReturningOffset:error:" = fn (?*c_ulonglong, ?*objc.abi.Id) bool;
+        pub const @"-seekToOffset:error:" = fn (c_ulonglong, ?*objc.abi.Id) bool;
+        pub const @"-truncateAtOffset:error:" = fn (c_ulonglong, ?*objc.abi.Id) bool;
+        pub const @"-synchronizeAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-closeAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-availableData" = fn () foundation.Data;
+        pub const @"+fileHandleForReadingAtPath:" = fn (foundation.String) ?FileHandle;
+        pub const @"+fileHandleForWritingAtPath:" = fn (foundation.String) ?FileHandle;
+        pub const @"+fileHandleForUpdatingAtPath:" = fn (foundation.String) ?FileHandle;
+        pub const @"+fileHandleForReadingFromURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?FileHandle;
+        pub const @"+fileHandleForWritingToURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?FileHandle;
+        pub const @"+fileHandleForUpdatingURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?FileHandle;
+        pub const @"+fileHandleWithStandardInput" = fn () FileHandle;
+        pub const @"+fileHandleWithStandardOutput" = fn () FileHandle;
+        pub const @"+fileHandleWithStandardError" = fn () FileHandle;
+        pub const @"+fileHandleWithNullDevice" = fn () FileHandle;
+        pub const @"-readInBackgroundAndNotifyForModes:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-readInBackgroundAndNotify" = fn () void;
+        pub const @"-readToEndOfFileInBackgroundAndNotifyForModes:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-readToEndOfFileInBackgroundAndNotify" = fn () void;
+        pub const @"-acceptConnectionInBackgroundAndNotifyForModes:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-acceptConnectionInBackgroundAndNotify" = fn () void;
+        pub const @"-waitForDataInBackgroundAndNotifyForModes:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-waitForDataInBackgroundAndNotify" = fn () void;
+        pub const @"-readabilityHandler" = fn () ?objc.BlockRef(fn (FileHandle) void);
+        pub const @"-setReadabilityHandler:" = fn (?objc.BlockRef(fn (FileHandle) void)) void;
+        pub const @"-writeabilityHandler" = fn () ?objc.BlockRef(fn (FileHandle) void);
+        pub const @"-setWriteabilityHandler:" = fn (?objc.BlockRef(fn (FileHandle) void)) void;
+        pub const @"-initWithFileDescriptor:" = fn (c_int) FileHandle;
+        pub const @"-fileDescriptor" = fn () c_int;
+    };
+};
+
+/// `NSPipe`, a subclass of `NSObject`.
+pub const Pipe = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSPipe";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSPipe alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSPipe`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSPipe pipe]`
+    pub fn pipe() Pipe {
+        return class().msgSend(Pipe, "pipe", .{});
+    }
+
+    /// `-[NSPipe fileHandleForReading]`
+    pub fn fileHandleForReading(self: Self) FileHandle {
+        return self.object.msgSend(FileHandle, "fileHandleForReading", .{});
+    }
+
+    /// `-[NSPipe fileHandleForWriting]`
+    pub fn fileHandleForWriting(self: Self) FileHandle {
+        return self.object.msgSend(FileHandle, "fileHandleForWriting", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+pipe" = fn () Pipe;
+        pub const @"-fileHandleForReading" = fn () FileHandle;
+        pub const @"-fileHandleForWriting" = fn () FileHandle;
+    };
+};
+
+/// `NSTask`, a subclass of `NSObject`.
+pub const Task = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSTask";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSTask alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSTask`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSTask init]`
+    pub fn init(self: Self) Task {
+        return self.object.msgSend(Task, "init", .{});
+    }
+
+    /// `-[NSTask launchAndReturnError:]`
+    pub fn launchAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "launchAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSTask interrupt]`
+    pub fn interrupt(self: Self) void {
+        return self.object.msgSend(void, "interrupt", .{});
+    }
+
+    /// `-[NSTask terminate]`
+    pub fn terminate(self: Self) void {
+        return self.object.msgSend(void, "terminate", .{});
+    }
+
+    /// `-[NSTask suspend]`
+    pub fn @"suspend"(self: Self) bool {
+        return self.object.msgSend(bool, "suspend", .{});
+    }
+
+    /// `-[NSTask resume]`
+    pub fn @"resume"(self: Self) bool {
+        return self.object.msgSend(bool, "resume", .{});
+    }
+
+    /// `-[NSTask executableURL]`
+    pub fn executableURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "executableURL", .{});
+    }
+
+    /// `-[NSTask setExecutableURL:]`
+    pub fn setExecutableURL(self: Self, executable_url: ?foundation.Url) void {
+        return self.object.msgSend(void, "setExecutableURL:", .{executable_url});
+    }
+
+    /// `-[NSTask arguments]`
+    pub fn arguments(self: Self) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "arguments", .{});
+    }
+
+    /// `-[NSTask setArguments:]`
+    pub fn setArguments(self: Self, arguments_: ?foundation.Array(foundation.String)) void {
+        return self.object.msgSend(void, "setArguments:", .{arguments_});
+    }
+
+    /// `-[NSTask environment]`
+    pub fn environment(self: Self) ?foundation.Dictionary(foundation.String, foundation.String) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, foundation.String), "environment", .{});
+    }
+
+    /// `-[NSTask setEnvironment:]`
+    pub fn setEnvironment(self: Self, environment_: ?foundation.Dictionary(foundation.String, foundation.String)) void {
+        return self.object.msgSend(void, "setEnvironment:", .{environment_});
+    }
+
+    /// `-[NSTask currentDirectoryURL]`
+    pub fn currentDirectoryURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "currentDirectoryURL", .{});
+    }
+
+    /// `-[NSTask setCurrentDirectoryURL:]`
+    pub fn setCurrentDirectoryURL(self: Self, current_directory_url: ?foundation.Url) void {
+        return self.object.msgSend(void, "setCurrentDirectoryURL:", .{current_directory_url});
+    }
+
+    /// `-[NSTask launchRequirementData]`
+    pub fn launchRequirementData(self: Self) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "launchRequirementData", .{});
+    }
+
+    /// `-[NSTask setLaunchRequirementData:]`
+    pub fn setLaunchRequirementData(self: Self, launch_requirement_data: ?foundation.Data) void {
+        return self.object.msgSend(void, "setLaunchRequirementData:", .{launch_requirement_data});
+    }
+
+    /// `-[NSTask standardInput]`
+    pub fn standardInput(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "standardInput", .{});
+    }
+
+    /// `-[NSTask setStandardInput:]`
+    pub fn setStandardInput(self: Self, standard_input: ?objc.Object) void {
+        return self.object.msgSend(void, "setStandardInput:", .{standard_input});
+    }
+
+    /// `-[NSTask standardOutput]`
+    pub fn standardOutput(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "standardOutput", .{});
+    }
+
+    /// `-[NSTask setStandardOutput:]`
+    pub fn setStandardOutput(self: Self, standard_output: ?objc.Object) void {
+        return self.object.msgSend(void, "setStandardOutput:", .{standard_output});
+    }
+
+    /// `-[NSTask standardError]`
+    pub fn standardError(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "standardError", .{});
+    }
+
+    /// `-[NSTask setStandardError:]`
+    pub fn setStandardError(self: Self, standard_error: ?objc.Object) void {
+        return self.object.msgSend(void, "setStandardError:", .{standard_error});
+    }
+
+    /// `-[NSTask processIdentifier]`
+    pub fn processIdentifier(self: Self) c_int {
+        return self.object.msgSend(c_int, "processIdentifier", .{});
+    }
+
+    /// `-[NSTask isRunning]`
+    pub fn isRunning(self: Self) bool {
+        return self.object.msgSend(bool, "isRunning", .{});
+    }
+
+    /// `-[NSTask terminationStatus]`
+    pub fn terminationStatus(self: Self) c_int {
+        return self.object.msgSend(c_int, "terminationStatus", .{});
+    }
+
+    /// `-[NSTask terminationReason]`
+    pub fn terminationReason(self: Self) TaskTerminationReason {
+        return self.object.msgSend(TaskTerminationReason, "terminationReason", .{});
+    }
+
+    /// `-[NSTask terminationHandler]`
+    pub fn terminationHandler(self: Self) ?objc.BlockRef(fn (Task) void) {
+        return self.object.msgSend(?objc.BlockRef(fn (Task) void), "terminationHandler", .{});
+    }
+
+    /// `-[NSTask setTerminationHandler:]`
+    pub fn setTerminationHandler(self: Self, termination_handler: ?objc.BlockRef(fn (Task) void)) void {
+        return self.object.msgSend(void, "setTerminationHandler:", .{termination_handler});
+    }
+
+    /// `-[NSTask qualityOfService]`
+    pub fn qualityOfService(self: Self) QualityOfService {
+        return self.object.msgSend(QualityOfService, "qualityOfService", .{});
+    }
+
+    /// `-[NSTask setQualityOfService:]`
+    pub fn setQualityOfService(self: Self, quality_of_service: QualityOfService) void {
+        return self.object.msgSend(void, "setQualityOfService:", .{quality_of_service});
+    }
+
+    /// `+[NSTask launchedTaskWithExecutableURL:arguments:error:terminationHandler:]`
+    pub fn launchedTaskWithExecutableURLArgumentsErrorTerminationHandler(url: foundation.Url, arguments_: foundation.Array(foundation.String), @"error": ?*objc.abi.Id, termination_handler: ?objc.BlockRef(fn (Task) void)) ?Task {
+        return class().msgSend(?Task, "launchedTaskWithExecutableURL:arguments:error:terminationHandler:", .{ url, arguments_, @"error", termination_handler });
+    }
+
+    /// `-[NSTask waitUntilExit]`
+    pub fn waitUntilExit(self: Self) void {
+        return self.object.msgSend(void, "waitUntilExit", .{});
+    }
+
+    /// `-[NSTask launch]`
+    pub fn launch(self: Self) void {
+        return self.object.msgSend(void, "launch", .{});
+    }
+
+    /// `+[NSTask launchedTaskWithLaunchPath:arguments:]`
+    pub fn launchedTaskWithLaunchPathArguments(path: foundation.String, arguments_: foundation.Array(foundation.String)) Task {
+        return class().msgSend(Task, "launchedTaskWithLaunchPath:arguments:", .{ path, arguments_ });
+    }
+
+    /// `-[NSTask launchPath]`
+    pub fn launchPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "launchPath", .{});
+    }
+
+    /// `-[NSTask setLaunchPath:]`
+    pub fn setLaunchPath(self: Self, launch_path: ?foundation.String) void {
+        return self.object.msgSend(void, "setLaunchPath:", .{launch_path});
+    }
+
+    /// `-[NSTask currentDirectoryPath]`
+    pub fn currentDirectoryPath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "currentDirectoryPath", .{});
+    }
+
+    /// `-[NSTask setCurrentDirectoryPath:]`
+    pub fn setCurrentDirectoryPath(self: Self, current_directory_path: foundation.String) void {
+        return self.object.msgSend(void, "setCurrentDirectoryPath:", .{current_directory_path});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-init" = fn () Task;
+        pub const @"-launchAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-interrupt" = fn () void;
+        pub const @"-terminate" = fn () void;
+        pub const @"-suspend" = fn () bool;
+        pub const @"-resume" = fn () bool;
+        pub const @"-executableURL" = fn () ?foundation.Url;
+        pub const @"-setExecutableURL:" = fn (?foundation.Url) void;
+        pub const @"-arguments" = fn () ?foundation.Array(foundation.String);
+        pub const @"-setArguments:" = fn (?foundation.Array(foundation.String)) void;
+        pub const @"-environment" = fn () ?foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"-setEnvironment:" = fn (?foundation.Dictionary(foundation.String, foundation.String)) void;
+        pub const @"-currentDirectoryURL" = fn () ?foundation.Url;
+        pub const @"-setCurrentDirectoryURL:" = fn (?foundation.Url) void;
+        pub const @"-launchRequirementData" = fn () ?foundation.Data;
+        pub const @"-setLaunchRequirementData:" = fn (?foundation.Data) void;
+        pub const @"-standardInput" = fn () ?objc.Object;
+        pub const @"-setStandardInput:" = fn (?objc.Object) void;
+        pub const @"-standardOutput" = fn () ?objc.Object;
+        pub const @"-setStandardOutput:" = fn (?objc.Object) void;
+        pub const @"-standardError" = fn () ?objc.Object;
+        pub const @"-setStandardError:" = fn (?objc.Object) void;
+        pub const @"-processIdentifier" = fn () c_int;
+        pub const @"-isRunning" = fn () bool;
+        pub const @"-terminationStatus" = fn () c_int;
+        pub const @"-terminationReason" = fn () TaskTerminationReason;
+        pub const @"-terminationHandler" = fn () ?objc.BlockRef(fn (Task) void);
+        pub const @"-setTerminationHandler:" = fn (?objc.BlockRef(fn (Task) void)) void;
+        pub const @"-qualityOfService" = fn () QualityOfService;
+        pub const @"-setQualityOfService:" = fn (QualityOfService) void;
+        pub const @"+launchedTaskWithExecutableURL:arguments:error:terminationHandler:" = fn (foundation.Url, foundation.Array(foundation.String), ?*objc.abi.Id, ?objc.BlockRef(fn (Task) void)) ?Task;
+        pub const @"-waitUntilExit" = fn () void;
+        pub const @"-launch" = fn () void;
+        pub const @"+launchedTaskWithLaunchPath:arguments:" = fn (foundation.String, foundation.Array(foundation.String)) Task;
+        pub const @"-launchPath" = fn () ?foundation.String;
+        pub const @"-setLaunchPath:" = fn (?foundation.String) void;
+        pub const @"-currentDirectoryPath" = fn () foundation.String;
+        pub const @"-setCurrentDirectoryPath:" = fn (foundation.String) void;
+    };
+};
+
+/// `NSBundle`, a subclass of `NSObject`.
+pub const Bundle = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSBundle";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSBundle alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSBundle`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSBundle bundleWithPath:]`
+    pub fn bundleWithPath(path: foundation.String) ?Bundle {
+        return class().msgSend(?Bundle, "bundleWithPath:", .{path});
+    }
+
+    /// `-[NSBundle initWithPath:]`
+    pub fn initWithPath(self: Self, path: foundation.String) ?Bundle {
+        return self.object.msgSend(?Bundle, "initWithPath:", .{path});
+    }
+
+    /// `+[NSBundle bundleWithURL:]`
+    pub fn bundleWithURL(url: foundation.Url) ?Bundle {
+        return class().msgSend(?Bundle, "bundleWithURL:", .{url});
+    }
+
+    /// `-[NSBundle initWithURL:]`
+    pub fn initWithURL(self: Self, url: foundation.Url) ?Bundle {
+        return self.object.msgSend(?Bundle, "initWithURL:", .{url});
+    }
+
+    /// `+[NSBundle bundleForClass:]`
+    pub fn bundleForClass(a_class: objc.Class) Bundle {
+        return class().msgSend(Bundle, "bundleForClass:", .{a_class});
+    }
+
+    /// `+[NSBundle bundleWithIdentifier:]`
+    pub fn bundleWithIdentifier(identifier: foundation.String) ?Bundle {
+        return class().msgSend(?Bundle, "bundleWithIdentifier:", .{identifier});
+    }
+
+    /// `-[NSBundle load]`
+    pub fn load(self: Self) bool {
+        return self.object.msgSend(bool, "load", .{});
+    }
+
+    /// `-[NSBundle unload]`
+    pub fn unload(self: Self) bool {
+        return self.object.msgSend(bool, "unload", .{});
+    }
+
+    /// `-[NSBundle preflightAndReturnError:]`
+    pub fn preflightAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "preflightAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSBundle loadAndReturnError:]`
+    pub fn loadAndReturnError(self: Self, @"error": ?*objc.abi.Id) bool {
+        return self.object.msgSend(bool, "loadAndReturnError:", .{@"error"});
+    }
+
+    /// `-[NSBundle URLForAuxiliaryExecutable:]`
+    pub fn urlForAuxiliaryExecutable(self: Self, executable_name: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForAuxiliaryExecutable:", .{executable_name});
+    }
+
+    /// `-[NSBundle pathForAuxiliaryExecutable:]`
+    pub fn pathForAuxiliaryExecutable(self: Self, executable_name: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathForAuxiliaryExecutable:", .{executable_name});
+    }
+
+    /// `+[NSBundle URLForResource:withExtension:subdirectory:inBundleWithURL:]`
+    pub fn urlForResourceWithExtensionSubdirectoryInBundleWithURL(name: ?foundation.String, ext: ?foundation.String, subpath: ?foundation.String, bundle_url: foundation.Url) ?foundation.Url {
+        return class().msgSend(?foundation.Url, "URLForResource:withExtension:subdirectory:inBundleWithURL:", .{ name, ext, subpath, bundle_url });
+    }
+
+    /// `+[NSBundle URLsForResourcesWithExtension:subdirectory:inBundleWithURL:]`
+    pub fn urLsForResourcesWithExtensionSubdirectoryInBundleWithURL(ext: ?foundation.String, subpath: ?foundation.String, bundle_url: foundation.Url) ?foundation.Array(foundation.Url) {
+        return class().msgSend(?foundation.Array(foundation.Url), "URLsForResourcesWithExtension:subdirectory:inBundleWithURL:", .{ ext, subpath, bundle_url });
+    }
+
+    /// `-[NSBundle URLForResource:withExtension:]`
+    pub fn urlForResourceWithExtension(self: Self, name: ?foundation.String, ext: ?foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForResource:withExtension:", .{ name, ext });
+    }
+
+    /// `-[NSBundle URLForResource:withExtension:subdirectory:]`
+    pub fn urlForResourceWithExtensionSubdirectory(self: Self, name: ?foundation.String, ext: ?foundation.String, subpath: ?foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForResource:withExtension:subdirectory:", .{ name, ext, subpath });
+    }
+
+    /// `-[NSBundle URLForResource:withExtension:subdirectory:localization:]`
+    pub fn urlForResourceWithExtensionSubdirectoryLocalization(self: Self, name: ?foundation.String, ext: ?foundation.String, subpath: ?foundation.String, localization_name: ?foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForResource:withExtension:subdirectory:localization:", .{ name, ext, subpath, localization_name });
+    }
+
+    /// `-[NSBundle URLsForResourcesWithExtension:subdirectory:]`
+    pub fn urLsForResourcesWithExtensionSubdirectory(self: Self, ext: ?foundation.String, subpath: ?foundation.String) ?foundation.Array(foundation.Url) {
+        return self.object.msgSend(?foundation.Array(foundation.Url), "URLsForResourcesWithExtension:subdirectory:", .{ ext, subpath });
+    }
+
+    /// `-[NSBundle URLsForResourcesWithExtension:subdirectory:localization:]`
+    pub fn urLsForResourcesWithExtensionSubdirectoryLocalization(self: Self, ext: ?foundation.String, subpath: ?foundation.String, localization_name: ?foundation.String) ?foundation.Array(foundation.Url) {
+        return self.object.msgSend(?foundation.Array(foundation.Url), "URLsForResourcesWithExtension:subdirectory:localization:", .{ ext, subpath, localization_name });
+    }
+
+    /// `+[NSBundle pathForResource:ofType:inDirectory:]`
+    pub fn pathForResourceOfTypeInDirectory(name: ?foundation.String, ext: ?foundation.String, bundle_path: foundation.String) ?foundation.String {
+        return class().msgSend(?foundation.String, "pathForResource:ofType:inDirectory:", .{ name, ext, bundle_path });
+    }
+
+    /// `+[NSBundle pathsForResourcesOfType:inDirectory:]`
+    pub fn pathsForResourcesOfTypeInDirectory(ext: ?foundation.String, bundle_path: foundation.String) foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "pathsForResourcesOfType:inDirectory:", .{ ext, bundle_path });
+    }
+
+    /// `-[NSBundle pathForResource:ofType:]`
+    pub fn pathForResourceOfType(self: Self, name: ?foundation.String, ext: ?foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathForResource:ofType:", .{ name, ext });
+    }
+
+    /// `-[NSBundle pathForResource:ofType:inDirectory:]`
+    pub fn pathForResourceOfTypeInDirectory_(self: Self, name: ?foundation.String, ext: ?foundation.String, subpath: ?foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathForResource:ofType:inDirectory:", .{ name, ext, subpath });
+    }
+
+    /// `-[NSBundle pathForResource:ofType:inDirectory:forLocalization:]`
+    pub fn pathForResourceOfTypeInDirectoryForLocalization(self: Self, name: ?foundation.String, ext: ?foundation.String, subpath: ?foundation.String, localization_name: ?foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "pathForResource:ofType:inDirectory:forLocalization:", .{ name, ext, subpath, localization_name });
+    }
+
+    /// `-[NSBundle pathsForResourcesOfType:inDirectory:]`
+    pub fn pathsForResourcesOfTypeInDirectory_(self: Self, ext: ?foundation.String, subpath: ?foundation.String) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathsForResourcesOfType:inDirectory:", .{ ext, subpath });
+    }
+
+    /// `-[NSBundle pathsForResourcesOfType:inDirectory:forLocalization:]`
+    pub fn pathsForResourcesOfTypeInDirectoryForLocalization(self: Self, ext: ?foundation.String, subpath: ?foundation.String, localization_name: ?foundation.String) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "pathsForResourcesOfType:inDirectory:forLocalization:", .{ ext, subpath, localization_name });
+    }
+
+    /// `-[NSBundle localizedStringForKey:value:table:]`
+    pub fn localizedStringForKeyValueTable(self: Self, key: foundation.String, value: ?foundation.String, table_name: ?foundation.String) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedStringForKey:value:table:", .{ key, value, table_name });
+    }
+
+    /// `-[NSBundle localizedAttributedStringForKey:value:table:]`
+    pub fn localizedAttributedStringForKeyValueTable(self: Self, key: foundation.String, value: ?foundation.String, table_name: ?foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "localizedAttributedStringForKey:value:table:", .{ key, value, table_name });
+    }
+
+    /// `-[NSBundle localizedStringForKey:value:table:localizations:]`
+    pub fn localizedStringForKeyValueTableLocalizations(self: Self, key: foundation.String, value: ?foundation.String, table_name: ?foundation.String, localizations_: foundation.Array(foundation.String)) foundation.String {
+        return self.object.msgSend(foundation.String, "localizedStringForKey:value:table:localizations:", .{ key, value, table_name, localizations_ });
+    }
+
+    /// `-[NSBundle objectForInfoDictionaryKey:]`
+    pub fn objectForInfoDictionaryKey(self: Self, key: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForInfoDictionaryKey:", .{key});
+    }
+
+    /// `-[NSBundle classNamed:]`
+    pub fn classNamed(self: Self, class_name_: foundation.String) ?objc.Class {
+        return self.object.msgSend(?objc.Class, "classNamed:", .{class_name_});
+    }
+
+    /// `+[NSBundle preferredLocalizationsFromArray:]`
+    pub fn preferredLocalizationsFromArray(localizations_array: foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "preferredLocalizationsFromArray:", .{localizations_array});
+    }
+
+    /// `+[NSBundle preferredLocalizationsFromArray:forPreferences:]`
+    pub fn preferredLocalizationsFromArrayForPreferences(localizations_array: foundation.Array(foundation.String), preferences_array: ?foundation.Array(foundation.String)) foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "preferredLocalizationsFromArray:forPreferences:", .{ localizations_array, preferences_array });
+    }
+
+    /// `+[NSBundle mainBundle]`
+    pub fn mainBundle() Bundle {
+        return class().msgSend(Bundle, "mainBundle", .{});
+    }
+
+    /// `+[NSBundle allBundles]`
+    pub fn allBundles() foundation.Array(Bundle) {
+        return class().msgSend(foundation.Array(Bundle), "allBundles", .{});
+    }
+
+    /// `+[NSBundle allFrameworks]`
+    pub fn allFrameworks() foundation.Array(Bundle) {
+        return class().msgSend(foundation.Array(Bundle), "allFrameworks", .{});
+    }
+
+    /// `-[NSBundle isLoaded]`
+    pub fn isLoaded(self: Self) bool {
+        return self.object.msgSend(bool, "isLoaded", .{});
+    }
+
+    /// `-[NSBundle bundleURL]`
+    pub fn bundleURL(self: Self) foundation.Url {
+        return self.object.msgSend(foundation.Url, "bundleURL", .{});
+    }
+
+    /// `-[NSBundle resourceURL]`
+    pub fn resourceURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "resourceURL", .{});
+    }
+
+    /// `-[NSBundle executableURL]`
+    pub fn executableURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "executableURL", .{});
+    }
+
+    /// `-[NSBundle privateFrameworksURL]`
+    pub fn privateFrameworksURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "privateFrameworksURL", .{});
+    }
+
+    /// `-[NSBundle sharedFrameworksURL]`
+    pub fn sharedFrameworksURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "sharedFrameworksURL", .{});
+    }
+
+    /// `-[NSBundle sharedSupportURL]`
+    pub fn sharedSupportURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "sharedSupportURL", .{});
+    }
+
+    /// `-[NSBundle builtInPlugInsURL]`
+    pub fn builtInPlugInsURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "builtInPlugInsURL", .{});
+    }
+
+    /// `-[NSBundle appStoreReceiptURL]`
+    pub fn appStoreReceiptURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "appStoreReceiptURL", .{});
+    }
+
+    /// `-[NSBundle bundlePath]`
+    pub fn bundlePath(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "bundlePath", .{});
+    }
+
+    /// `-[NSBundle resourcePath]`
+    pub fn resourcePath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "resourcePath", .{});
+    }
+
+    /// `-[NSBundle executablePath]`
+    pub fn executablePath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "executablePath", .{});
+    }
+
+    /// `-[NSBundle privateFrameworksPath]`
+    pub fn privateFrameworksPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "privateFrameworksPath", .{});
+    }
+
+    /// `-[NSBundle sharedFrameworksPath]`
+    pub fn sharedFrameworksPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "sharedFrameworksPath", .{});
+    }
+
+    /// `-[NSBundle sharedSupportPath]`
+    pub fn sharedSupportPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "sharedSupportPath", .{});
+    }
+
+    /// `-[NSBundle builtInPlugInsPath]`
+    pub fn builtInPlugInsPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "builtInPlugInsPath", .{});
+    }
+
+    /// `-[NSBundle bundleIdentifier]`
+    pub fn bundleIdentifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "bundleIdentifier", .{});
+    }
+
+    /// `-[NSBundle infoDictionary]`
+    pub fn infoDictionary(self: Self) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "infoDictionary", .{});
+    }
+
+    /// `-[NSBundle localizedInfoDictionary]`
+    pub fn localizedInfoDictionary(self: Self) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "localizedInfoDictionary", .{});
+    }
+
+    /// `-[NSBundle principalClass]`
+    pub fn principalClass(self: Self) ?objc.Class {
+        return self.object.msgSend(?objc.Class, "principalClass", .{});
+    }
+
+    /// `-[NSBundle preferredLocalizations]`
+    pub fn preferredLocalizations(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "preferredLocalizations", .{});
+    }
+
+    /// `-[NSBundle localizations]`
+    pub fn localizations(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "localizations", .{});
+    }
+
+    /// `-[NSBundle developmentLocalization]`
+    pub fn developmentLocalization(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "developmentLocalization", .{});
+    }
+
+    /// `-[NSBundle executableArchitectures]`
+    pub fn executableArchitectures(self: Self) ?foundation.Array(foundation.Number) {
+        return self.object.msgSend(?foundation.Array(foundation.Number), "executableArchitectures", .{});
+    }
+
+    /// `-[NSBundle setPreservationPriority:forTags:]`
+    pub fn setPreservationPriorityForTags(self: Self, priority: f64, tags: Set) void {
+        return self.object.msgSend(void, "setPreservationPriority:forTags:", .{ priority, tags });
+    }
+
+    /// `-[NSBundle preservationPriorityForTag:]`
+    pub fn preservationPriorityForTag(self: Self, tag: foundation.String) f64 {
+        return self.object.msgSend(f64, "preservationPriorityForTag:", .{tag});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+bundleWithPath:" = fn (foundation.String) ?Bundle;
+        pub const @"-initWithPath:" = fn (foundation.String) ?Bundle;
+        pub const @"+bundleWithURL:" = fn (foundation.Url) ?Bundle;
+        pub const @"-initWithURL:" = fn (foundation.Url) ?Bundle;
+        pub const @"+bundleForClass:" = fn (objc.Class) Bundle;
+        pub const @"+bundleWithIdentifier:" = fn (foundation.String) ?Bundle;
+        pub const @"-load" = fn () bool;
+        pub const @"-unload" = fn () bool;
+        pub const @"-preflightAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-loadAndReturnError:" = fn (?*objc.abi.Id) bool;
+        pub const @"-URLForAuxiliaryExecutable:" = fn (foundation.String) ?foundation.Url;
+        pub const @"-pathForAuxiliaryExecutable:" = fn (foundation.String) ?foundation.String;
+        pub const @"+URLForResource:withExtension:subdirectory:inBundleWithURL:" = fn (?foundation.String, ?foundation.String, ?foundation.String, foundation.Url) ?foundation.Url;
+        pub const @"+URLsForResourcesWithExtension:subdirectory:inBundleWithURL:" = fn (?foundation.String, ?foundation.String, foundation.Url) ?foundation.Array(foundation.Url);
+        pub const @"-URLForResource:withExtension:" = fn (?foundation.String, ?foundation.String) ?foundation.Url;
+        pub const @"-URLForResource:withExtension:subdirectory:" = fn (?foundation.String, ?foundation.String, ?foundation.String) ?foundation.Url;
+        pub const @"-URLForResource:withExtension:subdirectory:localization:" = fn (?foundation.String, ?foundation.String, ?foundation.String, ?foundation.String) ?foundation.Url;
+        pub const @"-URLsForResourcesWithExtension:subdirectory:" = fn (?foundation.String, ?foundation.String) ?foundation.Array(foundation.Url);
+        pub const @"-URLsForResourcesWithExtension:subdirectory:localization:" = fn (?foundation.String, ?foundation.String, ?foundation.String) ?foundation.Array(foundation.Url);
+        pub const @"+pathForResource:ofType:inDirectory:" = fn (?foundation.String, ?foundation.String, foundation.String) ?foundation.String;
+        pub const @"+pathsForResourcesOfType:inDirectory:" = fn (?foundation.String, foundation.String) foundation.Array(foundation.String);
+        pub const @"-pathForResource:ofType:" = fn (?foundation.String, ?foundation.String) ?foundation.String;
+        pub const @"-pathForResource:ofType:inDirectory:" = fn (?foundation.String, ?foundation.String, ?foundation.String) ?foundation.String;
+        pub const @"-pathForResource:ofType:inDirectory:forLocalization:" = fn (?foundation.String, ?foundation.String, ?foundation.String, ?foundation.String) ?foundation.String;
+        pub const @"-pathsForResourcesOfType:inDirectory:" = fn (?foundation.String, ?foundation.String) foundation.Array(foundation.String);
+        pub const @"-pathsForResourcesOfType:inDirectory:forLocalization:" = fn (?foundation.String, ?foundation.String, ?foundation.String) foundation.Array(foundation.String);
+        pub const @"-localizedStringForKey:value:table:" = fn (foundation.String, ?foundation.String, ?foundation.String) foundation.String;
+        pub const @"-localizedAttributedStringForKey:value:table:" = fn (foundation.String, ?foundation.String, ?foundation.String) objc.Object;
+        pub const @"-localizedStringForKey:value:table:localizations:" = fn (foundation.String, ?foundation.String, ?foundation.String, foundation.Array(foundation.String)) foundation.String;
+        pub const @"-objectForInfoDictionaryKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-classNamed:" = fn (foundation.String) ?objc.Class;
+        pub const @"+preferredLocalizationsFromArray:" = fn (foundation.Array(foundation.String)) foundation.Array(foundation.String);
+        pub const @"+preferredLocalizationsFromArray:forPreferences:" = fn (foundation.Array(foundation.String), ?foundation.Array(foundation.String)) foundation.Array(foundation.String);
+        pub const @"+mainBundle" = fn () Bundle;
+        pub const @"+allBundles" = fn () foundation.Array(Bundle);
+        pub const @"+allFrameworks" = fn () foundation.Array(Bundle);
+        pub const @"-isLoaded" = fn () bool;
+        pub const @"-bundleURL" = fn () foundation.Url;
+        pub const @"-resourceURL" = fn () ?foundation.Url;
+        pub const @"-executableURL" = fn () ?foundation.Url;
+        pub const @"-privateFrameworksURL" = fn () ?foundation.Url;
+        pub const @"-sharedFrameworksURL" = fn () ?foundation.Url;
+        pub const @"-sharedSupportURL" = fn () ?foundation.Url;
+        pub const @"-builtInPlugInsURL" = fn () ?foundation.Url;
+        pub const @"-appStoreReceiptURL" = fn () ?foundation.Url;
+        pub const @"-bundlePath" = fn () foundation.String;
+        pub const @"-resourcePath" = fn () ?foundation.String;
+        pub const @"-executablePath" = fn () ?foundation.String;
+        pub const @"-privateFrameworksPath" = fn () ?foundation.String;
+        pub const @"-sharedFrameworksPath" = fn () ?foundation.String;
+        pub const @"-sharedSupportPath" = fn () ?foundation.String;
+        pub const @"-builtInPlugInsPath" = fn () ?foundation.String;
+        pub const @"-bundleIdentifier" = fn () ?foundation.String;
+        pub const @"-infoDictionary" = fn () ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-localizedInfoDictionary" = fn () ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-principalClass" = fn () ?objc.Class;
+        pub const @"-preferredLocalizations" = fn () foundation.Array(foundation.String);
+        pub const @"-localizations" = fn () foundation.Array(foundation.String);
+        pub const @"-developmentLocalization" = fn () ?foundation.String;
+        pub const @"-executableArchitectures" = fn () ?foundation.Array(foundation.Number);
+        pub const @"-setPreservationPriority:forTags:" = fn (f64, Set) void;
+        pub const @"-preservationPriorityForTag:" = fn (foundation.String) f64;
+    };
+};
+
+/// `NSProcessInfo`, a subclass of `NSObject`.
+pub const ProcessInfo = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSProcessInfo";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSProcessInfo alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSProcessInfo`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSProcessInfo operatingSystem]`
+    pub fn operatingSystem(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "operatingSystem", .{});
+    }
+
+    /// `-[NSProcessInfo operatingSystemName]`
+    pub fn operatingSystemName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "operatingSystemName", .{});
+    }
+
+    /// `-[NSProcessInfo isOperatingSystemAtLeastVersion:]`
+    pub fn isOperatingSystemAtLeastVersion(self: Self, version: OperatingSystemVersion) bool {
+        return self.object.msgSend(bool, "isOperatingSystemAtLeastVersion:", .{version});
+    }
+
+    /// `-[NSProcessInfo disableSuddenTermination]`
+    pub fn disableSuddenTermination(self: Self) void {
+        return self.object.msgSend(void, "disableSuddenTermination", .{});
+    }
+
+    /// `-[NSProcessInfo enableSuddenTermination]`
+    pub fn enableSuddenTermination(self: Self) void {
+        return self.object.msgSend(void, "enableSuddenTermination", .{});
+    }
+
+    /// `-[NSProcessInfo disableAutomaticTermination:]`
+    pub fn disableAutomaticTermination(self: Self, reason: foundation.String) void {
+        return self.object.msgSend(void, "disableAutomaticTermination:", .{reason});
+    }
+
+    /// `-[NSProcessInfo enableAutomaticTermination:]`
+    pub fn enableAutomaticTermination(self: Self, reason: foundation.String) void {
+        return self.object.msgSend(void, "enableAutomaticTermination:", .{reason});
+    }
+
+    /// `+[NSProcessInfo processInfo]`
+    pub fn processInfo() ProcessInfo {
+        return class().msgSend(ProcessInfo, "processInfo", .{});
+    }
+
+    /// `-[NSProcessInfo environment]`
+    pub fn environment(self: Self) foundation.Dictionary(foundation.String, foundation.String) {
+        return self.object.msgSend(foundation.Dictionary(foundation.String, foundation.String), "environment", .{});
+    }
+
+    /// `-[NSProcessInfo arguments]`
+    pub fn arguments(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "arguments", .{});
+    }
+
+    /// `-[NSProcessInfo hostName]`
+    pub fn hostName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "hostName", .{});
+    }
+
+    /// `-[NSProcessInfo processName]`
+    pub fn processName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "processName", .{});
+    }
+
+    /// `-[NSProcessInfo setProcessName:]`
+    pub fn setProcessName(self: Self, process_name: foundation.String) void {
+        return self.object.msgSend(void, "setProcessName:", .{process_name});
+    }
+
+    /// `-[NSProcessInfo processIdentifier]`
+    pub fn processIdentifier(self: Self) c_int {
+        return self.object.msgSend(c_int, "processIdentifier", .{});
+    }
+
+    /// `-[NSProcessInfo globallyUniqueString]`
+    pub fn globallyUniqueString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "globallyUniqueString", .{});
+    }
+
+    /// `-[NSProcessInfo operatingSystemVersionString]`
+    pub fn operatingSystemVersionString(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "operatingSystemVersionString", .{});
+    }
+
+    /// `-[NSProcessInfo operatingSystemVersion]`
+    pub fn operatingSystemVersion(self: Self) OperatingSystemVersion {
+        return self.object.msgSend(OperatingSystemVersion, "operatingSystemVersion", .{});
+    }
+
+    /// `-[NSProcessInfo processorCount]`
+    pub fn processorCount(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "processorCount", .{});
+    }
+
+    /// `-[NSProcessInfo activeProcessorCount]`
+    pub fn activeProcessorCount(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "activeProcessorCount", .{});
+    }
+
+    /// `-[NSProcessInfo physicalMemory]`
+    pub fn physicalMemory(self: Self) c_ulonglong {
+        return self.object.msgSend(c_ulonglong, "physicalMemory", .{});
+    }
+
+    /// `-[NSProcessInfo systemUptime]`
+    pub fn systemUptime(self: Self) f64 {
+        return self.object.msgSend(f64, "systemUptime", .{});
+    }
+
+    /// `-[NSProcessInfo automaticTerminationSupportEnabled]`
+    pub fn automaticTerminationSupportEnabled(self: Self) bool {
+        return self.object.msgSend(bool, "automaticTerminationSupportEnabled", .{});
+    }
+
+    /// `-[NSProcessInfo setAutomaticTerminationSupportEnabled:]`
+    pub fn setAutomaticTerminationSupportEnabled(self: Self, automatic_termination_support_enabled: bool) void {
+        return self.object.msgSend(void, "setAutomaticTerminationSupportEnabled:", .{automatic_termination_support_enabled});
+    }
+
+    /// `-[NSProcessInfo beginActivityWithOptions:reason:]`
+    pub fn beginActivityWithOptionsReason(self: Self, options: ActivityOptions, reason: foundation.String) objc.Object {
+        return self.object.msgSend(objc.Object, "beginActivityWithOptions:reason:", .{ options, reason });
+    }
+
+    /// `-[NSProcessInfo endActivity:]`
+    pub fn endActivity(self: Self, activity: objc.Object) void {
+        return self.object.msgSend(void, "endActivity:", .{activity});
+    }
+
+    /// `-[NSProcessInfo performActivityWithOptions:reason:usingBlock:]`
+    pub fn performActivityWithOptionsReasonUsingBlock(self: Self, options: ActivityOptions, reason: foundation.String, block: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "performActivityWithOptions:reason:usingBlock:", .{ options, reason, block });
+    }
+
+    /// `-[NSProcessInfo performExpiringActivityWithReason:usingBlock:]`
+    pub fn performExpiringActivityWithReasonUsingBlock(self: Self, reason: foundation.String, block: objc.BlockRef(fn (bool) void)) void {
+        return self.object.msgSend(void, "performExpiringActivityWithReason:usingBlock:", .{ reason, block });
+    }
+
+    /// `-[NSProcessInfo userName]`
+    pub fn userName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "userName", .{});
+    }
+
+    /// `-[NSProcessInfo fullUserName]`
+    pub fn fullUserName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "fullUserName", .{});
+    }
+
+    /// `-[NSProcessInfo thermalState]`
+    pub fn thermalState(self: Self) ProcessInfoThermalState {
+        return self.object.msgSend(ProcessInfoThermalState, "thermalState", .{});
+    }
+
+    /// `-[NSProcessInfo isLowPowerModeEnabled]`
+    pub fn isLowPowerModeEnabled(self: Self) bool {
+        return self.object.msgSend(bool, "isLowPowerModeEnabled", .{});
+    }
+
+    /// `-[NSProcessInfo isMacCatalystApp]`
+    pub fn isMacCatalystApp(self: Self) bool {
+        return self.object.msgSend(bool, "isMacCatalystApp", .{});
+    }
+
+    /// `-[NSProcessInfo isiOSAppOnMac]`
+    pub fn isiOSAppOnMac(self: Self) bool {
+        return self.object.msgSend(bool, "isiOSAppOnMac", .{});
+    }
+
+    /// `-[NSProcessInfo isiOSAppOnVision]`
+    pub fn isiOSAppOnVision(self: Self) bool {
+        return self.object.msgSend(bool, "isiOSAppOnVision", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-operatingSystem" = fn () objc.UInteger;
+        pub const @"-operatingSystemName" = fn () foundation.String;
+        pub const @"-isOperatingSystemAtLeastVersion:" = fn (OperatingSystemVersion) bool;
+        pub const @"-disableSuddenTermination" = fn () void;
+        pub const @"-enableSuddenTermination" = fn () void;
+        pub const @"-disableAutomaticTermination:" = fn (foundation.String) void;
+        pub const @"-enableAutomaticTermination:" = fn (foundation.String) void;
+        pub const @"+processInfo" = fn () ProcessInfo;
+        pub const @"-environment" = fn () foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"-arguments" = fn () foundation.Array(foundation.String);
+        pub const @"-hostName" = fn () foundation.String;
+        pub const @"-processName" = fn () foundation.String;
+        pub const @"-setProcessName:" = fn (foundation.String) void;
+        pub const @"-processIdentifier" = fn () c_int;
+        pub const @"-globallyUniqueString" = fn () foundation.String;
+        pub const @"-operatingSystemVersionString" = fn () foundation.String;
+        pub const @"-operatingSystemVersion" = fn () OperatingSystemVersion;
+        pub const @"-processorCount" = fn () objc.UInteger;
+        pub const @"-activeProcessorCount" = fn () objc.UInteger;
+        pub const @"-physicalMemory" = fn () c_ulonglong;
+        pub const @"-systemUptime" = fn () f64;
+        pub const @"-automaticTerminationSupportEnabled" = fn () bool;
+        pub const @"-setAutomaticTerminationSupportEnabled:" = fn (bool) void;
+        pub const @"-beginActivityWithOptions:reason:" = fn (ActivityOptions, foundation.String) objc.Object;
+        pub const @"-endActivity:" = fn (objc.Object) void;
+        pub const @"-performActivityWithOptions:reason:usingBlock:" = fn (ActivityOptions, foundation.String, objc.BlockRef(fn () void)) void;
+        pub const @"-performExpiringActivityWithReason:usingBlock:" = fn (foundation.String, objc.BlockRef(fn (bool) void)) void;
+        pub const @"-userName" = fn () foundation.String;
+        pub const @"-fullUserName" = fn () foundation.String;
+        pub const @"-thermalState" = fn () ProcessInfoThermalState;
+        pub const @"-isLowPowerModeEnabled" = fn () bool;
+        pub const @"-isMacCatalystApp" = fn () bool;
+        pub const @"-isiOSAppOnMac" = fn () bool;
+        pub const @"-isiOSAppOnVision" = fn () bool;
+    };
+};
+
+/// `NSUserDefaults`, a subclass of `NSObject`.
+pub const UserDefaults = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSUserDefaults";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSUserDefaults alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSUserDefaults`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSUserDefaults resetStandardUserDefaults]`
+    pub fn resetStandardUserDefaults() void {
+        return class().msgSend(void, "resetStandardUserDefaults", .{});
+    }
+
+    /// `-[NSUserDefaults init]`
+    pub fn init(self: Self) UserDefaults {
+        return self.object.msgSend(UserDefaults, "init", .{});
+    }
+
+    /// `-[NSUserDefaults initWithSuiteName:]`
+    pub fn initWithSuiteName(self: Self, suitename: ?foundation.String) ?UserDefaults {
+        return self.object.msgSend(?UserDefaults, "initWithSuiteName:", .{suitename});
+    }
+
+    /// `-[NSUserDefaults initWithUser:]`
+    pub fn initWithUser(self: Self, username: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "initWithUser:", .{username});
+    }
+
+    /// `-[NSUserDefaults objectForKey:]`
+    pub fn objectForKey(self: Self, default_name: foundation.String) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "objectForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults setObject:forKey:]`
+    pub fn setObjectForKey(self: Self, value: ?objc.Object, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setObject:forKey:", .{ value, default_name });
+    }
+
+    /// `-[NSUserDefaults removeObjectForKey:]`
+    pub fn removeObjectForKey(self: Self, default_name: foundation.String) void {
+        return self.object.msgSend(void, "removeObjectForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults stringForKey:]`
+    pub fn stringForKey(self: Self, default_name: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "stringForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults arrayForKey:]`
+    pub fn arrayForKey(self: Self, default_name: foundation.String) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "arrayForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults dictionaryForKey:]`
+    pub fn dictionaryForKey(self: Self, default_name: foundation.String) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "dictionaryForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults dataForKey:]`
+    pub fn dataForKey(self: Self, default_name: foundation.String) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "dataForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults stringArrayForKey:]`
+    pub fn stringArrayForKey(self: Self, default_name: foundation.String) ?foundation.Array(foundation.String) {
+        return self.object.msgSend(?foundation.Array(foundation.String), "stringArrayForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults integerForKey:]`
+    pub fn integerForKey(self: Self, default_name: foundation.String) objc.Integer {
+        return self.object.msgSend(objc.Integer, "integerForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults floatForKey:]`
+    pub fn floatForKey(self: Self, default_name: foundation.String) f32 {
+        return self.object.msgSend(f32, "floatForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults doubleForKey:]`
+    pub fn doubleForKey(self: Self, default_name: foundation.String) f64 {
+        return self.object.msgSend(f64, "doubleForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults boolForKey:]`
+    pub fn boolForKey(self: Self, default_name: foundation.String) bool {
+        return self.object.msgSend(bool, "boolForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults URLForKey:]`
+    pub fn urlForKey(self: Self, default_name: foundation.String) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLForKey:", .{default_name});
+    }
+
+    /// `-[NSUserDefaults setInteger:forKey:]`
+    pub fn setIntegerForKey(self: Self, value: objc.Integer, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setInteger:forKey:", .{ value, default_name });
+    }
+
+    /// `-[NSUserDefaults setFloat:forKey:]`
+    pub fn setFloatForKey(self: Self, value: f32, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setFloat:forKey:", .{ value, default_name });
+    }
+
+    /// `-[NSUserDefaults setDouble:forKey:]`
+    pub fn setDoubleForKey(self: Self, value: f64, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setDouble:forKey:", .{ value, default_name });
+    }
+
+    /// `-[NSUserDefaults setBool:forKey:]`
+    pub fn setBoolForKey(self: Self, value: bool, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setBool:forKey:", .{ value, default_name });
+    }
+
+    /// `-[NSUserDefaults setURL:forKey:]`
+    pub fn setURLForKey(self: Self, url: ?foundation.Url, default_name: foundation.String) void {
+        return self.object.msgSend(void, "setURL:forKey:", .{ url, default_name });
+    }
+
+    /// `-[NSUserDefaults registerDefaults:]`
+    pub fn registerDefaults(self: Self, registration_dictionary: foundation.Dictionary(foundation.String, objc.Object)) void {
+        return self.object.msgSend(void, "registerDefaults:", .{registration_dictionary});
+    }
+
+    /// `-[NSUserDefaults addSuiteNamed:]`
+    pub fn addSuiteNamed(self: Self, suite_name: foundation.String) void {
+        return self.object.msgSend(void, "addSuiteNamed:", .{suite_name});
+    }
+
+    /// `-[NSUserDefaults removeSuiteNamed:]`
+    pub fn removeSuiteNamed(self: Self, suite_name: foundation.String) void {
+        return self.object.msgSend(void, "removeSuiteNamed:", .{suite_name});
+    }
+
+    /// `-[NSUserDefaults dictionaryRepresentation]`
+    pub fn dictionaryRepresentation(self: Self) foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(foundation.Dictionary(foundation.String, objc.Object), "dictionaryRepresentation", .{});
+    }
+
+    /// `-[NSUserDefaults volatileDomainForName:]`
+    pub fn volatileDomainForName(self: Self, domain_name: foundation.String) foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(foundation.Dictionary(foundation.String, objc.Object), "volatileDomainForName:", .{domain_name});
+    }
+
+    /// `-[NSUserDefaults setVolatileDomain:forName:]`
+    pub fn setVolatileDomainForName(self: Self, domain: foundation.Dictionary(foundation.String, objc.Object), domain_name: foundation.String) void {
+        return self.object.msgSend(void, "setVolatileDomain:forName:", .{ domain, domain_name });
+    }
+
+    /// `-[NSUserDefaults removeVolatileDomainForName:]`
+    pub fn removeVolatileDomainForName(self: Self, domain_name: foundation.String) void {
+        return self.object.msgSend(void, "removeVolatileDomainForName:", .{domain_name});
+    }
+
+    /// `-[NSUserDefaults persistentDomainNames]`
+    pub fn persistentDomainNames(self: Self) foundation.Array(objc.Object) {
+        return self.object.msgSend(foundation.Array(objc.Object), "persistentDomainNames", .{});
+    }
+
+    /// `-[NSUserDefaults persistentDomainForName:]`
+    pub fn persistentDomainForName(self: Self, domain_name: foundation.String) ?foundation.Dictionary(foundation.String, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, objc.Object), "persistentDomainForName:", .{domain_name});
+    }
+
+    /// `-[NSUserDefaults setPersistentDomain:forName:]`
+    pub fn setPersistentDomainForName(self: Self, domain: foundation.Dictionary(foundation.String, objc.Object), domain_name: foundation.String) void {
+        return self.object.msgSend(void, "setPersistentDomain:forName:", .{ domain, domain_name });
+    }
+
+    /// `-[NSUserDefaults removePersistentDomainForName:]`
+    pub fn removePersistentDomainForName(self: Self, domain_name: foundation.String) void {
+        return self.object.msgSend(void, "removePersistentDomainForName:", .{domain_name});
+    }
+
+    /// `-[NSUserDefaults synchronize]`
+    pub fn synchronize(self: Self) bool {
+        return self.object.msgSend(bool, "synchronize", .{});
+    }
+
+    /// `-[NSUserDefaults objectIsForcedForKey:]`
+    pub fn objectIsForcedForKey(self: Self, key: foundation.String) bool {
+        return self.object.msgSend(bool, "objectIsForcedForKey:", .{key});
+    }
+
+    /// `-[NSUserDefaults objectIsForcedForKey:inDomain:]`
+    pub fn objectIsForcedForKeyInDomain(self: Self, key: foundation.String, domain: foundation.String) bool {
+        return self.object.msgSend(bool, "objectIsForcedForKey:inDomain:", .{ key, domain });
+    }
+
+    /// `+[NSUserDefaults standardUserDefaults]`
+    pub fn standardUserDefaults() UserDefaults {
+        return class().msgSend(UserDefaults, "standardUserDefaults", .{});
+    }
+
+    /// `-[NSUserDefaults volatileDomainNames]`
+    pub fn volatileDomainNames(self: Self) foundation.Array(foundation.String) {
+        return self.object.msgSend(foundation.Array(foundation.String), "volatileDomainNames", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+resetStandardUserDefaults" = fn () void;
+        pub const @"-init" = fn () UserDefaults;
+        pub const @"-initWithSuiteName:" = fn (?foundation.String) ?UserDefaults;
+        pub const @"-initWithUser:" = fn (foundation.String) ?objc.Object;
+        pub const @"-objectForKey:" = fn (foundation.String) ?objc.Object;
+        pub const @"-setObject:forKey:" = fn (?objc.Object, foundation.String) void;
+        pub const @"-removeObjectForKey:" = fn (foundation.String) void;
+        pub const @"-stringForKey:" = fn (foundation.String) ?foundation.String;
+        pub const @"-arrayForKey:" = fn (foundation.String) ?foundation.Array(objc.Object);
+        pub const @"-dictionaryForKey:" = fn (foundation.String) ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-dataForKey:" = fn (foundation.String) ?foundation.Data;
+        pub const @"-stringArrayForKey:" = fn (foundation.String) ?foundation.Array(foundation.String);
+        pub const @"-integerForKey:" = fn (foundation.String) objc.Integer;
+        pub const @"-floatForKey:" = fn (foundation.String) f32;
+        pub const @"-doubleForKey:" = fn (foundation.String) f64;
+        pub const @"-boolForKey:" = fn (foundation.String) bool;
+        pub const @"-URLForKey:" = fn (foundation.String) ?foundation.Url;
+        pub const @"-setInteger:forKey:" = fn (objc.Integer, foundation.String) void;
+        pub const @"-setFloat:forKey:" = fn (f32, foundation.String) void;
+        pub const @"-setDouble:forKey:" = fn (f64, foundation.String) void;
+        pub const @"-setBool:forKey:" = fn (bool, foundation.String) void;
+        pub const @"-setURL:forKey:" = fn (?foundation.Url, foundation.String) void;
+        pub const @"-registerDefaults:" = fn (foundation.Dictionary(foundation.String, objc.Object)) void;
+        pub const @"-addSuiteNamed:" = fn (foundation.String) void;
+        pub const @"-removeSuiteNamed:" = fn (foundation.String) void;
+        pub const @"-dictionaryRepresentation" = fn () foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-volatileDomainForName:" = fn (foundation.String) foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-setVolatileDomain:forName:" = fn (foundation.Dictionary(foundation.String, objc.Object), foundation.String) void;
+        pub const @"-removeVolatileDomainForName:" = fn (foundation.String) void;
+        pub const @"-persistentDomainNames" = fn () foundation.Array(objc.Object);
+        pub const @"-persistentDomainForName:" = fn (foundation.String) ?foundation.Dictionary(foundation.String, objc.Object);
+        pub const @"-setPersistentDomain:forName:" = fn (foundation.Dictionary(foundation.String, objc.Object), foundation.String) void;
+        pub const @"-removePersistentDomainForName:" = fn (foundation.String) void;
+        pub const @"-synchronize" = fn () bool;
+        pub const @"-objectIsForcedForKey:" = fn (foundation.String) bool;
+        pub const @"-objectIsForcedForKey:inDomain:" = fn (foundation.String, foundation.String) bool;
+        pub const @"+standardUserDefaults" = fn () UserDefaults;
+        pub const @"-volatileDomainNames" = fn () foundation.Array(foundation.String);
+    };
+};
+
+/// `NSNotification`, a subclass of `NSObject`.
+pub const Notification = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSNotification";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSNotification alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSNotification`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSNotification initWithName:object:userInfo:]`
+    pub fn initWithNameObjectUserInfo(self: Self, name_: foundation.String, object__: ?objc.Object, user_info: ?foundation.Dictionary(objc.Object, objc.Object)) Notification {
+        return self.object.msgSend(Notification, "initWithName:object:userInfo:", .{ name_, object__, user_info });
+    }
+
+    /// `-[NSNotification initWithCoder:]`
+    pub fn initWithCoder(self: Self, coder: objc.Object) ?Notification {
+        return self.object.msgSend(?Notification, "initWithCoder:", .{coder});
+    }
+
+    /// `-[NSNotification name]`
+    pub fn name(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "name", .{});
+    }
+
+    /// `-[NSNotification object]`
+    pub fn object_(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "object", .{});
+    }
+
+    /// `-[NSNotification userInfo]`
+    pub fn userInfo(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "userInfo", .{});
+    }
+
+    /// `+[NSNotification notificationWithName:object:]`
+    pub fn notificationWithNameObject(a_name: foundation.String, an_object: ?objc.Object) Notification {
+        return class().msgSend(Notification, "notificationWithName:object:", .{ a_name, an_object });
+    }
+
+    /// `+[NSNotification notificationWithName:object:userInfo:]`
+    pub fn notificationWithNameObjectUserInfo(a_name: foundation.String, an_object: ?objc.Object, a_user_info: ?foundation.Dictionary(objc.Object, objc.Object)) Notification {
+        return class().msgSend(Notification, "notificationWithName:object:userInfo:", .{ a_name, an_object, a_user_info });
+    }
+
+    /// `-[NSNotification init]`
+    pub fn init(self: Self) Notification {
+        return self.object.msgSend(Notification, "init", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithName:object:userInfo:" = fn (foundation.String, ?objc.Object, ?foundation.Dictionary(objc.Object, objc.Object)) Notification;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Notification;
+        pub const @"-name" = fn () foundation.String;
+        pub const @"-object" = fn () ?objc.Object;
+        pub const @"-userInfo" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"+notificationWithName:object:" = fn (foundation.String, ?objc.Object) Notification;
+        pub const @"+notificationWithName:object:userInfo:" = fn (foundation.String, ?objc.Object, ?foundation.Dictionary(objc.Object, objc.Object)) Notification;
+        pub const @"-init" = fn () Notification;
+    };
+};
+
+/// `NSNotificationCenter`, a subclass of `NSObject`.
+pub const NotificationCenter = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSNotificationCenter";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSNotificationCenter alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSNotificationCenter`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSNotificationCenter addObserver:selector:name:object:]`
+    pub fn addObserverSelectorNameObject(self: Self, observer: objc.Object, a_selector: objc.Sel, a_name: ?foundation.String, an_object: ?objc.Object) void {
+        return self.object.msgSend(void, "addObserver:selector:name:object:", .{ observer, a_selector, a_name, an_object });
+    }
+
+    /// `-[NSNotificationCenter postNotification:]`
+    pub fn postNotification(self: Self, notification: Notification) void {
+        return self.object.msgSend(void, "postNotification:", .{notification});
+    }
+
+    /// `-[NSNotificationCenter postNotificationName:object:]`
+    pub fn postNotificationNameObject(self: Self, a_name: foundation.String, an_object: ?objc.Object) void {
+        return self.object.msgSend(void, "postNotificationName:object:", .{ a_name, an_object });
+    }
+
+    /// `-[NSNotificationCenter postNotificationName:object:userInfo:]`
+    pub fn postNotificationNameObjectUserInfo(self: Self, a_name: foundation.String, an_object: ?objc.Object, a_user_info: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "postNotificationName:object:userInfo:", .{ a_name, an_object, a_user_info });
+    }
+
+    /// `-[NSNotificationCenter removeObserver:]`
+    pub fn removeObserver(self: Self, observer: objc.Object) void {
+        return self.object.msgSend(void, "removeObserver:", .{observer});
+    }
+
+    /// `-[NSNotificationCenter removeObserver:name:object:]`
+    pub fn removeObserverNameObject(self: Self, observer: objc.Object, a_name: ?foundation.String, an_object: ?objc.Object) void {
+        return self.object.msgSend(void, "removeObserver:name:object:", .{ observer, a_name, an_object });
+    }
+
+    /// `-[NSNotificationCenter addObserverForName:object:queue:usingBlock:]`
+    pub fn addObserverForNameObjectQueueUsingBlock(self: Self, name: ?foundation.String, obj: ?objc.Object, queue: ?OperationQueue, block: objc.BlockRef(fn (Notification) void)) objc.Object {
+        return self.object.msgSend(objc.Object, "addObserverForName:object:queue:usingBlock:", .{ name, obj, queue, block });
+    }
+
+    /// `+[NSNotificationCenter defaultCenter]`
+    pub fn defaultCenter() NotificationCenter {
+        return class().msgSend(NotificationCenter, "defaultCenter", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-addObserver:selector:name:object:" = fn (objc.Object, objc.Sel, ?foundation.String, ?objc.Object) void;
+        pub const @"-postNotification:" = fn (Notification) void;
+        pub const @"-postNotificationName:object:" = fn (foundation.String, ?objc.Object) void;
+        pub const @"-postNotificationName:object:userInfo:" = fn (foundation.String, ?objc.Object, ?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-removeObserver:" = fn (objc.Object) void;
+        pub const @"-removeObserver:name:object:" = fn (objc.Object, ?foundation.String, ?objc.Object) void;
+        pub const @"-addObserverForName:object:queue:usingBlock:" = fn (?foundation.String, ?objc.Object, ?OperationQueue, objc.BlockRef(fn (Notification) void)) objc.Object;
+        pub const @"+defaultCenter" = fn () NotificationCenter;
+    };
+};
+
+/// `NSTimer`, a subclass of `NSObject`.
+pub const Timer = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSTimer";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSTimer alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSTimer`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSTimer timerWithTimeInterval:invocation:repeats:]`
+    pub fn timerWithTimeIntervalInvocationRepeats(ti: f64, invocation: objc.Object, yes_or_no: bool) Timer {
+        return class().msgSend(Timer, "timerWithTimeInterval:invocation:repeats:", .{ ti, invocation, yes_or_no });
+    }
+
+    /// `+[NSTimer scheduledTimerWithTimeInterval:invocation:repeats:]`
+    pub fn scheduledTimerWithTimeIntervalInvocationRepeats(ti: f64, invocation: objc.Object, yes_or_no: bool) Timer {
+        return class().msgSend(Timer, "scheduledTimerWithTimeInterval:invocation:repeats:", .{ ti, invocation, yes_or_no });
+    }
+
+    /// `+[NSTimer timerWithTimeInterval:target:selector:userInfo:repeats:]`
+    pub fn timerWithTimeIntervalTargetSelectorUserInfoRepeats(ti: f64, a_target: objc.Object, a_selector: objc.Sel, user_info: ?objc.Object, yes_or_no: bool) Timer {
+        return class().msgSend(Timer, "timerWithTimeInterval:target:selector:userInfo:repeats:", .{ ti, a_target, a_selector, user_info, yes_or_no });
+    }
+
+    /// `+[NSTimer scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:]`
+    pub fn scheduledTimerWithTimeIntervalTargetSelectorUserInfoRepeats(ti: f64, a_target: objc.Object, a_selector: objc.Sel, user_info: ?objc.Object, yes_or_no: bool) Timer {
+        return class().msgSend(Timer, "scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:", .{ ti, a_target, a_selector, user_info, yes_or_no });
+    }
+
+    /// `+[NSTimer timerWithTimeInterval:repeats:block:]`
+    pub fn timerWithTimeIntervalRepeatsBlock(interval: f64, repeats: bool, block: objc.BlockRef(fn (Timer) void)) Timer {
+        return class().msgSend(Timer, "timerWithTimeInterval:repeats:block:", .{ interval, repeats, block });
+    }
+
+    /// `+[NSTimer scheduledTimerWithTimeInterval:repeats:block:]`
+    pub fn scheduledTimerWithTimeIntervalRepeatsBlock(interval: f64, repeats: bool, block: objc.BlockRef(fn (Timer) void)) Timer {
+        return class().msgSend(Timer, "scheduledTimerWithTimeInterval:repeats:block:", .{ interval, repeats, block });
+    }
+
+    /// `-[NSTimer initWithFireDate:interval:repeats:block:]`
+    pub fn initWithFireDateIntervalRepeatsBlock(self: Self, date: Date, interval: f64, repeats: bool, block: objc.BlockRef(fn (Timer) void)) Timer {
+        return self.object.msgSend(Timer, "initWithFireDate:interval:repeats:block:", .{ date, interval, repeats, block });
+    }
+
+    /// `-[NSTimer initWithFireDate:interval:target:selector:userInfo:repeats:]`
+    pub fn initWithFireDateIntervalTargetSelectorUserInfoRepeats(self: Self, date: Date, ti: f64, t: objc.Object, s: objc.Sel, ui: ?objc.Object, rep: bool) Timer {
+        return self.object.msgSend(Timer, "initWithFireDate:interval:target:selector:userInfo:repeats:", .{ date, ti, t, s, ui, rep });
+    }
+
+    /// `-[NSTimer fire]`
+    pub fn fire(self: Self) void {
+        return self.object.msgSend(void, "fire", .{});
+    }
+
+    /// `-[NSTimer invalidate]`
+    pub fn invalidate(self: Self) void {
+        return self.object.msgSend(void, "invalidate", .{});
+    }
+
+    /// `-[NSTimer fireDate]`
+    pub fn fireDate(self: Self) Date {
+        return self.object.msgSend(Date, "fireDate", .{});
+    }
+
+    /// `-[NSTimer setFireDate:]`
+    pub fn setFireDate(self: Self, fire_date: Date) void {
+        return self.object.msgSend(void, "setFireDate:", .{fire_date});
+    }
+
+    /// `-[NSTimer timeInterval]`
+    pub fn timeInterval(self: Self) f64 {
+        return self.object.msgSend(f64, "timeInterval", .{});
+    }
+
+    /// `-[NSTimer tolerance]`
+    pub fn tolerance(self: Self) f64 {
+        return self.object.msgSend(f64, "tolerance", .{});
+    }
+
+    /// `-[NSTimer setTolerance:]`
+    pub fn setTolerance(self: Self, tolerance_: f64) void {
+        return self.object.msgSend(void, "setTolerance:", .{tolerance_});
+    }
+
+    /// `-[NSTimer isValid]`
+    pub fn isValid(self: Self) bool {
+        return self.object.msgSend(bool, "isValid", .{});
+    }
+
+    /// `-[NSTimer userInfo]`
+    pub fn userInfo(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "userInfo", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+timerWithTimeInterval:invocation:repeats:" = fn (f64, objc.Object, bool) Timer;
+        pub const @"+scheduledTimerWithTimeInterval:invocation:repeats:" = fn (f64, objc.Object, bool) Timer;
+        pub const @"+timerWithTimeInterval:target:selector:userInfo:repeats:" = fn (f64, objc.Object, objc.Sel, ?objc.Object, bool) Timer;
+        pub const @"+scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:" = fn (f64, objc.Object, objc.Sel, ?objc.Object, bool) Timer;
+        pub const @"+timerWithTimeInterval:repeats:block:" = fn (f64, bool, objc.BlockRef(fn (Timer) void)) Timer;
+        pub const @"+scheduledTimerWithTimeInterval:repeats:block:" = fn (f64, bool, objc.BlockRef(fn (Timer) void)) Timer;
+        pub const @"-initWithFireDate:interval:repeats:block:" = fn (Date, f64, bool, objc.BlockRef(fn (Timer) void)) Timer;
+        pub const @"-initWithFireDate:interval:target:selector:userInfo:repeats:" = fn (Date, f64, objc.Object, objc.Sel, ?objc.Object, bool) Timer;
+        pub const @"-fire" = fn () void;
+        pub const @"-invalidate" = fn () void;
+        pub const @"-fireDate" = fn () Date;
+        pub const @"-setFireDate:" = fn (Date) void;
+        pub const @"-timeInterval" = fn () f64;
+        pub const @"-tolerance" = fn () f64;
+        pub const @"-setTolerance:" = fn (f64) void;
+        pub const @"-isValid" = fn () bool;
+        pub const @"-userInfo" = fn () ?objc.Object;
+    };
+};
+
+/// `NSRunLoop`, a subclass of `NSObject`.
+pub const RunLoop = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSRunLoop";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSRunLoop alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSRunLoop`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSRunLoop getCFRunLoop]`
+    pub fn getCFRunLoop(self: Self) ?*anyopaque {
+        return self.object.msgSend(?*anyopaque, "getCFRunLoop", .{});
+    }
+
+    /// `-[NSRunLoop addTimer:forMode:]`
+    pub fn addTimerForMode(self: Self, timer: Timer, mode: foundation.String) void {
+        return self.object.msgSend(void, "addTimer:forMode:", .{ timer, mode });
+    }
+
+    /// `-[NSRunLoop addPort:forMode:]`
+    pub fn addPortForMode(self: Self, a_port: objc.Object, mode: foundation.String) void {
+        return self.object.msgSend(void, "addPort:forMode:", .{ a_port, mode });
+    }
+
+    /// `-[NSRunLoop removePort:forMode:]`
+    pub fn removePortForMode(self: Self, a_port: objc.Object, mode: foundation.String) void {
+        return self.object.msgSend(void, "removePort:forMode:", .{ a_port, mode });
+    }
+
+    /// `-[NSRunLoop limitDateForMode:]`
+    pub fn limitDateForMode(self: Self, mode: foundation.String) ?Date {
+        return self.object.msgSend(?Date, "limitDateForMode:", .{mode});
+    }
+
+    /// `-[NSRunLoop acceptInputForMode:beforeDate:]`
+    pub fn acceptInputForModeBeforeDate(self: Self, mode: foundation.String, limit_date: Date) void {
+        return self.object.msgSend(void, "acceptInputForMode:beforeDate:", .{ mode, limit_date });
+    }
+
+    /// `+[NSRunLoop currentRunLoop]`
+    pub fn currentRunLoop() RunLoop {
+        return class().msgSend(RunLoop, "currentRunLoop", .{});
+    }
+
+    /// `+[NSRunLoop mainRunLoop]`
+    pub fn mainRunLoop() RunLoop {
+        return class().msgSend(RunLoop, "mainRunLoop", .{});
+    }
+
+    /// `-[NSRunLoop currentMode]`
+    pub fn currentMode(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "currentMode", .{});
+    }
+
+    /// `-[NSRunLoop run]`
+    pub fn run(self: Self) void {
+        return self.object.msgSend(void, "run", .{});
+    }
+
+    /// `-[NSRunLoop runUntilDate:]`
+    pub fn runUntilDate(self: Self, limit_date: Date) void {
+        return self.object.msgSend(void, "runUntilDate:", .{limit_date});
+    }
+
+    /// `-[NSRunLoop runMode:beforeDate:]`
+    pub fn runModeBeforeDate(self: Self, mode: foundation.String, limit_date: Date) bool {
+        return self.object.msgSend(bool, "runMode:beforeDate:", .{ mode, limit_date });
+    }
+
+    /// `-[NSRunLoop configureAsServer]`
+    pub fn configureAsServer(self: Self) void {
+        return self.object.msgSend(void, "configureAsServer", .{});
+    }
+
+    /// `-[NSRunLoop performInModes:block:]`
+    pub fn performInModesBlock(self: Self, modes: foundation.Array(objc.Object), block: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "performInModes:block:", .{ modes, block });
+    }
+
+    /// `-[NSRunLoop performBlock:]`
+    pub fn performBlock(self: Self, block: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "performBlock:", .{block});
+    }
+
+    /// `-[NSRunLoop performSelector:target:argument:order:modes:]`
+    pub fn performSelectorTargetArgumentOrderModes(self: Self, a_selector: objc.Sel, target: objc.Object, arg: ?objc.Object, order: objc.UInteger, modes: foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "performSelector:target:argument:order:modes:", .{ a_selector, target, arg, order, modes });
+    }
+
+    /// `-[NSRunLoop cancelPerformSelector:target:argument:]`
+    pub fn cancelPerformSelectorTargetArgument(self: Self, a_selector: objc.Sel, target: objc.Object, arg: ?objc.Object) void {
+        return self.object.msgSend(void, "cancelPerformSelector:target:argument:", .{ a_selector, target, arg });
+    }
+
+    /// `-[NSRunLoop cancelPerformSelectorsWithTarget:]`
+    pub fn cancelPerformSelectorsWithTarget(self: Self, target: objc.Object) void {
+        return self.object.msgSend(void, "cancelPerformSelectorsWithTarget:", .{target});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-getCFRunLoop" = fn () ?*anyopaque;
+        pub const @"-addTimer:forMode:" = fn (Timer, foundation.String) void;
+        pub const @"-addPort:forMode:" = fn (objc.Object, foundation.String) void;
+        pub const @"-removePort:forMode:" = fn (objc.Object, foundation.String) void;
+        pub const @"-limitDateForMode:" = fn (foundation.String) ?Date;
+        pub const @"-acceptInputForMode:beforeDate:" = fn (foundation.String, Date) void;
+        pub const @"+currentRunLoop" = fn () RunLoop;
+        pub const @"+mainRunLoop" = fn () RunLoop;
+        pub const @"-currentMode" = fn () ?foundation.String;
+        pub const @"-run" = fn () void;
+        pub const @"-runUntilDate:" = fn (Date) void;
+        pub const @"-runMode:beforeDate:" = fn (foundation.String, Date) bool;
+        pub const @"-configureAsServer" = fn () void;
+        pub const @"-performInModes:block:" = fn (foundation.Array(objc.Object), objc.BlockRef(fn () void)) void;
+        pub const @"-performBlock:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"-performSelector:target:argument:order:modes:" = fn (objc.Sel, objc.Object, ?objc.Object, objc.UInteger, foundation.Array(objc.Object)) void;
+        pub const @"-cancelPerformSelector:target:argument:" = fn (objc.Sel, objc.Object, ?objc.Object) void;
+        pub const @"-cancelPerformSelectorsWithTarget:" = fn (objc.Object) void;
+    };
+};
+
+/// `NSThread`, a subclass of `NSObject`.
+pub const Thread = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSThread";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSThread alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSThread`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSThread detachNewThreadWithBlock:]`
+    pub fn detachNewThreadWithBlock(block: objc.BlockRef(fn () void)) void {
+        return class().msgSend(void, "detachNewThreadWithBlock:", .{block});
+    }
+
+    /// `+[NSThread detachNewThreadSelector:toTarget:withObject:]`
+    pub fn detachNewThreadSelectorToTargetWithObject(selector: objc.Sel, target: objc.Object, argument: ?objc.Object) void {
+        return class().msgSend(void, "detachNewThreadSelector:toTarget:withObject:", .{ selector, target, argument });
+    }
+
+    /// `+[NSThread isMultiThreaded]`
+    pub fn isMultiThreaded() bool {
+        return class().msgSend(bool, "isMultiThreaded", .{});
+    }
+
+    /// `+[NSThread sleepUntilDate:]`
+    pub fn sleepUntilDate(date: Date) void {
+        return class().msgSend(void, "sleepUntilDate:", .{date});
+    }
+
+    /// `+[NSThread sleepForTimeInterval:]`
+    pub fn sleepForTimeInterval(ti: f64) void {
+        return class().msgSend(void, "sleepForTimeInterval:", .{ti});
+    }
+
+    /// `+[NSThread exit]`
+    pub fn exit() void {
+        return class().msgSend(void, "exit", .{});
+    }
+
+    /// `+[NSThread threadPriority]`
+    pub fn threadPriority() f64 {
+        return class().msgSend(f64, "threadPriority", .{});
+    }
+
+    /// `+[NSThread setThreadPriority:]`
+    pub fn setThreadPriority(p: f64) bool {
+        return class().msgSend(bool, "setThreadPriority:", .{p});
+    }
+
+    /// `-[NSThread init]`
+    pub fn init(self: Self) Thread {
+        return self.object.msgSend(Thread, "init", .{});
+    }
+
+    /// `-[NSThread initWithTarget:selector:object:]`
+    pub fn initWithTargetSelectorObject(self: Self, target: objc.Object, selector: objc.Sel, argument: ?objc.Object) Thread {
+        return self.object.msgSend(Thread, "initWithTarget:selector:object:", .{ target, selector, argument });
+    }
+
+    /// `-[NSThread initWithBlock:]`
+    pub fn initWithBlock(self: Self, block: objc.BlockRef(fn () void)) Thread {
+        return self.object.msgSend(Thread, "initWithBlock:", .{block});
+    }
+
+    /// `-[NSThread cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSThread start]`
+    pub fn start(self: Self) void {
+        return self.object.msgSend(void, "start", .{});
+    }
+
+    /// `-[NSThread main]`
+    pub fn main(self: Self) void {
+        return self.object.msgSend(void, "main", .{});
+    }
+
+    /// `+[NSThread currentThread]`
+    pub fn currentThread() Thread {
+        return class().msgSend(Thread, "currentThread", .{});
+    }
+
+    /// `-[NSThread threadDictionary]`
+    pub fn threadDictionary(self: Self) foundation.MutableDictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(foundation.MutableDictionary(objc.Object, objc.Object), "threadDictionary", .{});
+    }
+
+    /// `-[NSThread threadPriority]`
+    pub fn threadPriority_(self: Self) f64 {
+        return self.object.msgSend(f64, "threadPriority", .{});
+    }
+
+    /// `-[NSThread setThreadPriority:]`
+    pub fn setThreadPriority_(self: Self, thread_priority: f64) void {
+        return self.object.msgSend(void, "setThreadPriority:", .{thread_priority});
+    }
+
+    /// `-[NSThread qualityOfService]`
+    pub fn qualityOfService(self: Self) QualityOfService {
+        return self.object.msgSend(QualityOfService, "qualityOfService", .{});
+    }
+
+    /// `-[NSThread setQualityOfService:]`
+    pub fn setQualityOfService(self: Self, quality_of_service: QualityOfService) void {
+        return self.object.msgSend(void, "setQualityOfService:", .{quality_of_service});
+    }
+
+    /// `+[NSThread callStackReturnAddresses]`
+    pub fn callStackReturnAddresses() foundation.Array(foundation.Number) {
+        return class().msgSend(foundation.Array(foundation.Number), "callStackReturnAddresses", .{});
+    }
+
+    /// `+[NSThread callStackSymbols]`
+    pub fn callStackSymbols() foundation.Array(foundation.String) {
+        return class().msgSend(foundation.Array(foundation.String), "callStackSymbols", .{});
+    }
+
+    /// `-[NSThread name]`
+    pub fn name(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "name", .{});
+    }
+
+    /// `-[NSThread setName:]`
+    pub fn setName(self: Self, name_: ?foundation.String) void {
+        return self.object.msgSend(void, "setName:", .{name_});
+    }
+
+    /// `-[NSThread stackSize]`
+    pub fn stackSize(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "stackSize", .{});
+    }
+
+    /// `-[NSThread setStackSize:]`
+    pub fn setStackSize(self: Self, stack_size: objc.UInteger) void {
+        return self.object.msgSend(void, "setStackSize:", .{stack_size});
+    }
+
+    /// `-[NSThread isMainThread]`
+    pub fn isMainThread(self: Self) bool {
+        return self.object.msgSend(bool, "isMainThread", .{});
+    }
+
+    /// `+[NSThread isMainThread]`
+    pub fn classIsMainThread() bool {
+        return class().msgSend(bool, "isMainThread", .{});
+    }
+
+    /// `+[NSThread mainThread]`
+    pub fn mainThread() Thread {
+        return class().msgSend(Thread, "mainThread", .{});
+    }
+
+    /// `-[NSThread isExecuting]`
+    pub fn isExecuting(self: Self) bool {
+        return self.object.msgSend(bool, "isExecuting", .{});
+    }
+
+    /// `-[NSThread isFinished]`
+    pub fn isFinished(self: Self) bool {
+        return self.object.msgSend(bool, "isFinished", .{});
+    }
+
+    /// `-[NSThread isCancelled]`
+    pub fn isCancelled(self: Self) bool {
+        return self.object.msgSend(bool, "isCancelled", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+detachNewThreadWithBlock:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"+detachNewThreadSelector:toTarget:withObject:" = fn (objc.Sel, objc.Object, ?objc.Object) void;
+        pub const @"+isMultiThreaded" = fn () bool;
+        pub const @"+sleepUntilDate:" = fn (Date) void;
+        pub const @"+sleepForTimeInterval:" = fn (f64) void;
+        pub const @"+exit" = fn () void;
+        pub const @"+threadPriority" = fn () f64;
+        pub const @"+setThreadPriority:" = fn (f64) bool;
+        pub const @"-init" = fn () Thread;
+        pub const @"-initWithTarget:selector:object:" = fn (objc.Object, objc.Sel, ?objc.Object) Thread;
+        pub const @"-initWithBlock:" = fn (objc.BlockRef(fn () void)) Thread;
+        pub const @"-cancel" = fn () void;
+        pub const @"-start" = fn () void;
+        pub const @"-main" = fn () void;
+        pub const @"+currentThread" = fn () Thread;
+        pub const @"-threadDictionary" = fn () foundation.MutableDictionary(objc.Object, objc.Object);
+        pub const @"-threadPriority" = fn () f64;
+        pub const @"-setThreadPriority:" = fn (f64) void;
+        pub const @"-qualityOfService" = fn () QualityOfService;
+        pub const @"-setQualityOfService:" = fn (QualityOfService) void;
+        pub const @"+callStackReturnAddresses" = fn () foundation.Array(foundation.Number);
+        pub const @"+callStackSymbols" = fn () foundation.Array(foundation.String);
+        pub const @"-name" = fn () ?foundation.String;
+        pub const @"-setName:" = fn (?foundation.String) void;
+        pub const @"-stackSize" = fn () objc.UInteger;
+        pub const @"-setStackSize:" = fn (objc.UInteger) void;
+        pub const @"-isMainThread" = fn () bool;
+        pub const @"+isMainThread" = fn () bool;
+        pub const @"+mainThread" = fn () Thread;
+        pub const @"-isExecuting" = fn () bool;
+        pub const @"-isFinished" = fn () bool;
+        pub const @"-isCancelled" = fn () bool;
+    };
+};
+
+/// `NSOperation`, a subclass of `NSObject`.
+pub const Operation = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSOperation";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSOperation alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSOperation`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSOperation start]`
+    pub fn start(self: Self) void {
+        return self.object.msgSend(void, "start", .{});
+    }
+
+    /// `-[NSOperation main]`
+    pub fn main(self: Self) void {
+        return self.object.msgSend(void, "main", .{});
+    }
+
+    /// `-[NSOperation cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSOperation addDependency:]`
+    pub fn addDependency(self: Self, op: Operation) void {
+        return self.object.msgSend(void, "addDependency:", .{op});
+    }
+
+    /// `-[NSOperation removeDependency:]`
+    pub fn removeDependency(self: Self, op: Operation) void {
+        return self.object.msgSend(void, "removeDependency:", .{op});
+    }
+
+    /// `-[NSOperation waitUntilFinished]`
+    pub fn waitUntilFinished(self: Self) void {
+        return self.object.msgSend(void, "waitUntilFinished", .{});
+    }
+
+    /// `-[NSOperation isCancelled]`
+    pub fn isCancelled(self: Self) bool {
+        return self.object.msgSend(bool, "isCancelled", .{});
+    }
+
+    /// `-[NSOperation isExecuting]`
+    pub fn isExecuting(self: Self) bool {
+        return self.object.msgSend(bool, "isExecuting", .{});
+    }
+
+    /// `-[NSOperation isFinished]`
+    pub fn isFinished(self: Self) bool {
+        return self.object.msgSend(bool, "isFinished", .{});
+    }
+
+    /// `-[NSOperation isConcurrent]`
+    pub fn isConcurrent(self: Self) bool {
+        return self.object.msgSend(bool, "isConcurrent", .{});
+    }
+
+    /// `-[NSOperation isAsynchronous]`
+    pub fn isAsynchronous(self: Self) bool {
+        return self.object.msgSend(bool, "isAsynchronous", .{});
+    }
+
+    /// `-[NSOperation isReady]`
+    pub fn isReady(self: Self) bool {
+        return self.object.msgSend(bool, "isReady", .{});
+    }
+
+    /// `-[NSOperation dependencies]`
+    pub fn dependencies(self: Self) foundation.Array(Operation) {
+        return self.object.msgSend(foundation.Array(Operation), "dependencies", .{});
+    }
+
+    /// `-[NSOperation queuePriority]`
+    pub fn queuePriority(self: Self) OperationQueuePriority {
+        return self.object.msgSend(OperationQueuePriority, "queuePriority", .{});
+    }
+
+    /// `-[NSOperation setQueuePriority:]`
+    pub fn setQueuePriority(self: Self, queue_priority: OperationQueuePriority) void {
+        return self.object.msgSend(void, "setQueuePriority:", .{queue_priority});
+    }
+
+    /// `-[NSOperation completionBlock]`
+    pub fn completionBlock(self: Self) ?objc.BlockRef(fn () void) {
+        return self.object.msgSend(?objc.BlockRef(fn () void), "completionBlock", .{});
+    }
+
+    /// `-[NSOperation setCompletionBlock:]`
+    pub fn setCompletionBlock(self: Self, completion_block: ?objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "setCompletionBlock:", .{completion_block});
+    }
+
+    /// `-[NSOperation threadPriority]`
+    pub fn threadPriority(self: Self) f64 {
+        return self.object.msgSend(f64, "threadPriority", .{});
+    }
+
+    /// `-[NSOperation setThreadPriority:]`
+    pub fn setThreadPriority(self: Self, thread_priority: f64) void {
+        return self.object.msgSend(void, "setThreadPriority:", .{thread_priority});
+    }
+
+    /// `-[NSOperation qualityOfService]`
+    pub fn qualityOfService(self: Self) QualityOfService {
+        return self.object.msgSend(QualityOfService, "qualityOfService", .{});
+    }
+
+    /// `-[NSOperation setQualityOfService:]`
+    pub fn setQualityOfService(self: Self, quality_of_service: QualityOfService) void {
+        return self.object.msgSend(void, "setQualityOfService:", .{quality_of_service});
+    }
+
+    /// `-[NSOperation name]`
+    pub fn name(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "name", .{});
+    }
+
+    /// `-[NSOperation setName:]`
+    pub fn setName(self: Self, name_: ?foundation.String) void {
+        return self.object.msgSend(void, "setName:", .{name_});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-start" = fn () void;
+        pub const @"-main" = fn () void;
+        pub const @"-cancel" = fn () void;
+        pub const @"-addDependency:" = fn (Operation) void;
+        pub const @"-removeDependency:" = fn (Operation) void;
+        pub const @"-waitUntilFinished" = fn () void;
+        pub const @"-isCancelled" = fn () bool;
+        pub const @"-isExecuting" = fn () bool;
+        pub const @"-isFinished" = fn () bool;
+        pub const @"-isConcurrent" = fn () bool;
+        pub const @"-isAsynchronous" = fn () bool;
+        pub const @"-isReady" = fn () bool;
+        pub const @"-dependencies" = fn () foundation.Array(Operation);
+        pub const @"-queuePriority" = fn () OperationQueuePriority;
+        pub const @"-setQueuePriority:" = fn (OperationQueuePriority) void;
+        pub const @"-completionBlock" = fn () ?objc.BlockRef(fn () void);
+        pub const @"-setCompletionBlock:" = fn (?objc.BlockRef(fn () void)) void;
+        pub const @"-threadPriority" = fn () f64;
+        pub const @"-setThreadPriority:" = fn (f64) void;
+        pub const @"-qualityOfService" = fn () QualityOfService;
+        pub const @"-setQualityOfService:" = fn (QualityOfService) void;
+        pub const @"-name" = fn () ?foundation.String;
+        pub const @"-setName:" = fn (?foundation.String) void;
+    };
+};
+
+/// `NSBlockOperation`, a subclass of `NSOperation`.
+pub const BlockOperation = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = Operation;
+    pub const class_name = "NSBlockOperation";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSBlockOperation alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSBlockOperation`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSBlockOperation blockOperationWithBlock:]`
+    pub fn blockOperationWithBlock(block: objc.BlockRef(fn () void)) BlockOperation {
+        return class().msgSend(BlockOperation, "blockOperationWithBlock:", .{block});
+    }
+
+    /// `-[NSBlockOperation addExecutionBlock:]`
+    pub fn addExecutionBlock(self: Self, block: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "addExecutionBlock:", .{block});
+    }
+
+    /// `-[NSOperation start]`
+    pub fn start(self: Self) void {
+        return self.object.msgSend(void, "start", .{});
+    }
+
+    /// `-[NSOperation main]`
+    pub fn main(self: Self) void {
+        return self.object.msgSend(void, "main", .{});
+    }
+
+    /// `-[NSOperation cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSOperation addDependency:]`
+    pub fn addDependency(self: Self, op: Operation) void {
+        return self.object.msgSend(void, "addDependency:", .{op});
+    }
+
+    /// `-[NSOperation removeDependency:]`
+    pub fn removeDependency(self: Self, op: Operation) void {
+        return self.object.msgSend(void, "removeDependency:", .{op});
+    }
+
+    /// `-[NSOperation waitUntilFinished]`
+    pub fn waitUntilFinished(self: Self) void {
+        return self.object.msgSend(void, "waitUntilFinished", .{});
+    }
+
+    /// `-[NSOperation isCancelled]`
+    pub fn isCancelled(self: Self) bool {
+        return self.object.msgSend(bool, "isCancelled", .{});
+    }
+
+    /// `-[NSOperation isExecuting]`
+    pub fn isExecuting(self: Self) bool {
+        return self.object.msgSend(bool, "isExecuting", .{});
+    }
+
+    /// `-[NSOperation isFinished]`
+    pub fn isFinished(self: Self) bool {
+        return self.object.msgSend(bool, "isFinished", .{});
+    }
+
+    /// `-[NSOperation isConcurrent]`
+    pub fn isConcurrent(self: Self) bool {
+        return self.object.msgSend(bool, "isConcurrent", .{});
+    }
+
+    /// `-[NSOperation isAsynchronous]`
+    pub fn isAsynchronous(self: Self) bool {
+        return self.object.msgSend(bool, "isAsynchronous", .{});
+    }
+
+    /// `-[NSOperation isReady]`
+    pub fn isReady(self: Self) bool {
+        return self.object.msgSend(bool, "isReady", .{});
+    }
+
+    /// `-[NSOperation dependencies]`
+    pub fn dependencies(self: Self) foundation.Array(Operation) {
+        return self.object.msgSend(foundation.Array(Operation), "dependencies", .{});
+    }
+
+    /// `-[NSOperation queuePriority]`
+    pub fn queuePriority(self: Self) OperationQueuePriority {
+        return self.object.msgSend(OperationQueuePriority, "queuePriority", .{});
+    }
+
+    /// `-[NSOperation setQueuePriority:]`
+    pub fn setQueuePriority(self: Self, queue_priority: OperationQueuePriority) void {
+        return self.object.msgSend(void, "setQueuePriority:", .{queue_priority});
+    }
+
+    /// `-[NSOperation completionBlock]`
+    pub fn completionBlock(self: Self) ?objc.BlockRef(fn () void) {
+        return self.object.msgSend(?objc.BlockRef(fn () void), "completionBlock", .{});
+    }
+
+    /// `-[NSOperation setCompletionBlock:]`
+    pub fn setCompletionBlock(self: Self, completion_block: ?objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "setCompletionBlock:", .{completion_block});
+    }
+
+    /// `-[NSOperation threadPriority]`
+    pub fn threadPriority(self: Self) f64 {
+        return self.object.msgSend(f64, "threadPriority", .{});
+    }
+
+    /// `-[NSOperation setThreadPriority:]`
+    pub fn setThreadPriority(self: Self, thread_priority: f64) void {
+        return self.object.msgSend(void, "setThreadPriority:", .{thread_priority});
+    }
+
+    /// `-[NSOperation qualityOfService]`
+    pub fn qualityOfService(self: Self) QualityOfService {
+        return self.object.msgSend(QualityOfService, "qualityOfService", .{});
+    }
+
+    /// `-[NSOperation setQualityOfService:]`
+    pub fn setQualityOfService(self: Self, quality_of_service: QualityOfService) void {
+        return self.object.msgSend(void, "setQualityOfService:", .{quality_of_service});
+    }
+
+    /// `-[NSOperation name]`
+    pub fn name(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "name", .{});
+    }
+
+    /// `-[NSOperation setName:]`
+    pub fn setName(self: Self, name_: ?foundation.String) void {
+        return self.object.msgSend(void, "setName:", .{name_});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+blockOperationWithBlock:" = fn (objc.BlockRef(fn () void)) BlockOperation;
+        pub const @"-addExecutionBlock:" = fn (objc.BlockRef(fn () void)) void;
+    };
+
+    // Not generated:
+    //   -[NSBlockOperation executionBlocks]: NSArray<void (^)(void)> * _Nonnull
+};
+
+/// `NSOperationQueue`, a subclass of `NSObject`.
+pub const OperationQueue = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSOperationQueue";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSOperationQueue alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSOperationQueue`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSOperationQueue addOperation:]`
+    pub fn addOperation(self: Self, op: Operation) void {
+        return self.object.msgSend(void, "addOperation:", .{op});
+    }
+
+    /// `-[NSOperationQueue addOperations:waitUntilFinished:]`
+    pub fn addOperationsWaitUntilFinished(self: Self, ops: foundation.Array(Operation), wait: bool) void {
+        return self.object.msgSend(void, "addOperations:waitUntilFinished:", .{ ops, wait });
+    }
+
+    /// `-[NSOperationQueue addOperationWithBlock:]`
+    pub fn addOperationWithBlock(self: Self, block: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "addOperationWithBlock:", .{block});
+    }
+
+    /// `-[NSOperationQueue addBarrierBlock:]`
+    pub fn addBarrierBlock(self: Self, barrier: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "addBarrierBlock:", .{barrier});
+    }
+
+    /// `-[NSOperationQueue cancelAllOperations]`
+    pub fn cancelAllOperations(self: Self) void {
+        return self.object.msgSend(void, "cancelAllOperations", .{});
+    }
+
+    /// `-[NSOperationQueue waitUntilAllOperationsAreFinished]`
+    pub fn waitUntilAllOperationsAreFinished(self: Self) void {
+        return self.object.msgSend(void, "waitUntilAllOperationsAreFinished", .{});
+    }
+
+    /// `-[NSOperationQueue progress]`
+    pub fn progress(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "progress", .{});
+    }
+
+    /// `-[NSOperationQueue maxConcurrentOperationCount]`
+    pub fn maxConcurrentOperationCount(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "maxConcurrentOperationCount", .{});
+    }
+
+    /// `-[NSOperationQueue setMaxConcurrentOperationCount:]`
+    pub fn setMaxConcurrentOperationCount(self: Self, max_concurrent_operation_count: objc.Integer) void {
+        return self.object.msgSend(void, "setMaxConcurrentOperationCount:", .{max_concurrent_operation_count});
+    }
+
+    /// `-[NSOperationQueue isSuspended]`
+    pub fn isSuspended(self: Self) bool {
+        return self.object.msgSend(bool, "isSuspended", .{});
+    }
+
+    /// `-[NSOperationQueue setSuspended:]`
+    pub fn setSuspended(self: Self, suspended: bool) void {
+        return self.object.msgSend(void, "setSuspended:", .{suspended});
+    }
+
+    /// `-[NSOperationQueue name]`
+    pub fn name(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "name", .{});
+    }
+
+    /// `-[NSOperationQueue setName:]`
+    pub fn setName(self: Self, name_: ?foundation.String) void {
+        return self.object.msgSend(void, "setName:", .{name_});
+    }
+
+    /// `-[NSOperationQueue qualityOfService]`
+    pub fn qualityOfService(self: Self) QualityOfService {
+        return self.object.msgSend(QualityOfService, "qualityOfService", .{});
+    }
+
+    /// `-[NSOperationQueue setQualityOfService:]`
+    pub fn setQualityOfService(self: Self, quality_of_service: QualityOfService) void {
+        return self.object.msgSend(void, "setQualityOfService:", .{quality_of_service});
+    }
+
+    /// `-[NSOperationQueue underlyingQueue]`
+    pub fn underlyingQueue(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "underlyingQueue", .{});
+    }
+
+    /// `-[NSOperationQueue setUnderlyingQueue:]`
+    pub fn setUnderlyingQueue(self: Self, underlying_queue: ?objc.Object) void {
+        return self.object.msgSend(void, "setUnderlyingQueue:", .{underlying_queue});
+    }
+
+    /// `+[NSOperationQueue currentQueue]`
+    pub fn currentQueue() ?OperationQueue {
+        return class().msgSend(?OperationQueue, "currentQueue", .{});
+    }
+
+    /// `+[NSOperationQueue mainQueue]`
+    pub fn mainQueue() OperationQueue {
+        return class().msgSend(OperationQueue, "mainQueue", .{});
+    }
+
+    /// `-[NSOperationQueue operations]`
+    pub fn operations(self: Self) foundation.Array(Operation) {
+        return self.object.msgSend(foundation.Array(Operation), "operations", .{});
+    }
+
+    /// `-[NSOperationQueue operationCount]`
+    pub fn operationCount(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "operationCount", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-addOperation:" = fn (Operation) void;
+        pub const @"-addOperations:waitUntilFinished:" = fn (foundation.Array(Operation), bool) void;
+        pub const @"-addOperationWithBlock:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"-addBarrierBlock:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"-cancelAllOperations" = fn () void;
+        pub const @"-waitUntilAllOperationsAreFinished" = fn () void;
+        pub const @"-progress" = fn () objc.Object;
+        pub const @"-maxConcurrentOperationCount" = fn () objc.Integer;
+        pub const @"-setMaxConcurrentOperationCount:" = fn (objc.Integer) void;
+        pub const @"-isSuspended" = fn () bool;
+        pub const @"-setSuspended:" = fn (bool) void;
+        pub const @"-name" = fn () ?foundation.String;
+        pub const @"-setName:" = fn (?foundation.String) void;
+        pub const @"-qualityOfService" = fn () QualityOfService;
+        pub const @"-setQualityOfService:" = fn (QualityOfService) void;
+        pub const @"-underlyingQueue" = fn () ?objc.Object;
+        pub const @"-setUnderlyingQueue:" = fn (?objc.Object) void;
+        pub const @"+currentQueue" = fn () ?OperationQueue;
+        pub const @"+mainQueue" = fn () OperationQueue;
+        pub const @"-operations" = fn () foundation.Array(Operation);
+        pub const @"-operationCount" = fn () objc.UInteger;
+    };
+};
+
+/// `NSJSONSerialization`, a subclass of `NSObject`.
+pub const JSONSerialization = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSJSONSerialization";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSJSONSerialization alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSJSONSerialization`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSJSONSerialization isValidJSONObject:]`
+    pub fn isValidJSONObject(obj: objc.Object) bool {
+        return class().msgSend(bool, "isValidJSONObject:", .{obj});
+    }
+
+    /// `+[NSJSONSerialization dataWithJSONObject:options:error:]`
+    pub fn dataWithJSONObjectOptionsError(obj: objc.Object, opt: JSONWritingOptions, @"error": ?*objc.abi.Id) ?foundation.Data {
+        return class().msgSend(?foundation.Data, "dataWithJSONObject:options:error:", .{ obj, opt, @"error" });
+    }
+
+    /// `+[NSJSONSerialization JSONObjectWithData:options:error:]`
+    pub fn jsonObjectWithDataOptionsError(data: foundation.Data, opt: JSONReadingOptions, @"error": ?*objc.abi.Id) ?objc.Object {
+        return class().msgSend(?objc.Object, "JSONObjectWithData:options:error:", .{ data, opt, @"error" });
+    }
+
+    /// `+[NSJSONSerialization writeJSONObject:toStream:options:error:]`
+    pub fn writeJSONObjectToStreamOptionsError(obj: objc.Object, stream: objc.Object, opt: JSONWritingOptions, @"error": ?*objc.abi.Id) objc.Integer {
+        return class().msgSend(objc.Integer, "writeJSONObject:toStream:options:error:", .{ obj, stream, opt, @"error" });
+    }
+
+    /// `+[NSJSONSerialization JSONObjectWithStream:options:error:]`
+    pub fn jsonObjectWithStreamOptionsError(stream: objc.Object, opt: JSONReadingOptions, @"error": ?*objc.abi.Id) ?objc.Object {
+        return class().msgSend(?objc.Object, "JSONObjectWithStream:options:error:", .{ stream, opt, @"error" });
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+isValidJSONObject:" = fn (objc.Object) bool;
+        pub const @"+dataWithJSONObject:options:error:" = fn (objc.Object, JSONWritingOptions, ?*objc.abi.Id) ?foundation.Data;
+        pub const @"+JSONObjectWithData:options:error:" = fn (foundation.Data, JSONReadingOptions, ?*objc.abi.Id) ?objc.Object;
+        pub const @"+writeJSONObject:toStream:options:error:" = fn (objc.Object, objc.Object, JSONWritingOptions, ?*objc.abi.Id) objc.Integer;
+        pub const @"+JSONObjectWithStream:options:error:" = fn (objc.Object, JSONReadingOptions, ?*objc.abi.Id) ?objc.Object;
+    };
+};
+
+/// `NSURLComponents`, a subclass of `NSObject`.
+pub const URLComponents = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLComponents";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLComponents alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLComponents`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLComponents init]`
+    pub fn init(self: Self) URLComponents {
+        return self.object.msgSend(URLComponents, "init", .{});
+    }
+
+    /// `-[NSURLComponents initWithURL:resolvingAgainstBaseURL:]`
+    pub fn initWithURLResolvingAgainstBaseURL(self: Self, url_: foundation.Url, resolve: bool) ?URLComponents {
+        return self.object.msgSend(?URLComponents, "initWithURL:resolvingAgainstBaseURL:", .{ url_, resolve });
+    }
+
+    /// `+[NSURLComponents componentsWithURL:resolvingAgainstBaseURL:]`
+    pub fn componentsWithURLResolvingAgainstBaseURL(url_: foundation.Url, resolve: bool) ?URLComponents {
+        return class().msgSend(?URLComponents, "componentsWithURL:resolvingAgainstBaseURL:", .{ url_, resolve });
+    }
+
+    /// `-[NSURLComponents initWithString:]`
+    pub fn initWithString(self: Self, url_string: foundation.String) ?URLComponents {
+        return self.object.msgSend(?URLComponents, "initWithString:", .{url_string});
+    }
+
+    /// `+[NSURLComponents componentsWithString:]`
+    pub fn componentsWithString(url_string: foundation.String) ?URLComponents {
+        return class().msgSend(?URLComponents, "componentsWithString:", .{url_string});
+    }
+
+    /// `-[NSURLComponents initWithString:encodingInvalidCharacters:]`
+    pub fn initWithStringEncodingInvalidCharacters(self: Self, url_string: foundation.String, encoding_invalid_characters: bool) ?URLComponents {
+        return self.object.msgSend(?URLComponents, "initWithString:encodingInvalidCharacters:", .{ url_string, encoding_invalid_characters });
+    }
+
+    /// `+[NSURLComponents componentsWithString:encodingInvalidCharacters:]`
+    pub fn componentsWithStringEncodingInvalidCharacters(url_string: foundation.String, encoding_invalid_characters: bool) ?URLComponents {
+        return class().msgSend(?URLComponents, "componentsWithString:encodingInvalidCharacters:", .{ url_string, encoding_invalid_characters });
+    }
+
+    /// `-[NSURLComponents URLRelativeToURL:]`
+    pub fn urlRelativeToURL(self: Self, base_url: ?foundation.Url) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URLRelativeToURL:", .{base_url});
+    }
+
+    /// `-[NSURLComponents URL]`
+    pub fn url(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URL", .{});
+    }
+
+    /// `-[NSURLComponents string]`
+    pub fn string(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "string", .{});
+    }
+
+    /// `-[NSURLComponents scheme]`
+    pub fn scheme(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "scheme", .{});
+    }
+
+    /// `-[NSURLComponents setScheme:]`
+    pub fn setScheme(self: Self, scheme_: ?foundation.String) void {
+        return self.object.msgSend(void, "setScheme:", .{scheme_});
+    }
+
+    /// `-[NSURLComponents user]`
+    pub fn user(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "user", .{});
+    }
+
+    /// `-[NSURLComponents setUser:]`
+    pub fn setUser(self: Self, user_: ?foundation.String) void {
+        return self.object.msgSend(void, "setUser:", .{user_});
+    }
+
+    /// `-[NSURLComponents password]`
+    pub fn password(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "password", .{});
+    }
+
+    /// `-[NSURLComponents setPassword:]`
+    pub fn setPassword(self: Self, password_: ?foundation.String) void {
+        return self.object.msgSend(void, "setPassword:", .{password_});
+    }
+
+    /// `-[NSURLComponents host]`
+    pub fn host(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "host", .{});
+    }
+
+    /// `-[NSURLComponents setHost:]`
+    pub fn setHost(self: Self, host_: ?foundation.String) void {
+        return self.object.msgSend(void, "setHost:", .{host_});
+    }
+
+    /// `-[NSURLComponents port]`
+    pub fn port(self: Self) ?foundation.Number {
+        return self.object.msgSend(?foundation.Number, "port", .{});
+    }
+
+    /// `-[NSURLComponents setPort:]`
+    pub fn setPort(self: Self, port_: ?foundation.Number) void {
+        return self.object.msgSend(void, "setPort:", .{port_});
+    }
+
+    /// `-[NSURLComponents path]`
+    pub fn path(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "path", .{});
+    }
+
+    /// `-[NSURLComponents setPath:]`
+    pub fn setPath(self: Self, path_: ?foundation.String) void {
+        return self.object.msgSend(void, "setPath:", .{path_});
+    }
+
+    /// `-[NSURLComponents query]`
+    pub fn query(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "query", .{});
+    }
+
+    /// `-[NSURLComponents setQuery:]`
+    pub fn setQuery(self: Self, query_: ?foundation.String) void {
+        return self.object.msgSend(void, "setQuery:", .{query_});
+    }
+
+    /// `-[NSURLComponents fragment]`
+    pub fn fragment(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "fragment", .{});
+    }
+
+    /// `-[NSURLComponents setFragment:]`
+    pub fn setFragment(self: Self, fragment_: ?foundation.String) void {
+        return self.object.msgSend(void, "setFragment:", .{fragment_});
+    }
+
+    /// `-[NSURLComponents percentEncodedUser]`
+    pub fn percentEncodedUser(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedUser", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedUser:]`
+    pub fn setPercentEncodedUser(self: Self, percent_encoded_user: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedUser:", .{percent_encoded_user});
+    }
+
+    /// `-[NSURLComponents percentEncodedPassword]`
+    pub fn percentEncodedPassword(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedPassword", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedPassword:]`
+    pub fn setPercentEncodedPassword(self: Self, percent_encoded_password: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedPassword:", .{percent_encoded_password});
+    }
+
+    /// `-[NSURLComponents percentEncodedHost]`
+    pub fn percentEncodedHost(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedHost", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedHost:]`
+    pub fn setPercentEncodedHost(self: Self, percent_encoded_host: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedHost:", .{percent_encoded_host});
+    }
+
+    /// `-[NSURLComponents percentEncodedPath]`
+    pub fn percentEncodedPath(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedPath", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedPath:]`
+    pub fn setPercentEncodedPath(self: Self, percent_encoded_path: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedPath:", .{percent_encoded_path});
+    }
+
+    /// `-[NSURLComponents percentEncodedQuery]`
+    pub fn percentEncodedQuery(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedQuery", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedQuery:]`
+    pub fn setPercentEncodedQuery(self: Self, percent_encoded_query: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedQuery:", .{percent_encoded_query});
+    }
+
+    /// `-[NSURLComponents percentEncodedFragment]`
+    pub fn percentEncodedFragment(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "percentEncodedFragment", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedFragment:]`
+    pub fn setPercentEncodedFragment(self: Self, percent_encoded_fragment: ?foundation.String) void {
+        return self.object.msgSend(void, "setPercentEncodedFragment:", .{percent_encoded_fragment});
+    }
+
+    /// `-[NSURLComponents encodedHost]`
+    pub fn encodedHost(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "encodedHost", .{});
+    }
+
+    /// `-[NSURLComponents setEncodedHost:]`
+    pub fn setEncodedHost(self: Self, encoded_host: ?foundation.String) void {
+        return self.object.msgSend(void, "setEncodedHost:", .{encoded_host});
+    }
+
+    /// `-[NSURLComponents rangeOfScheme]`
+    pub fn rangeOfScheme(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfScheme", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfUser]`
+    pub fn rangeOfUser(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfUser", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfPassword]`
+    pub fn rangeOfPassword(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfPassword", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfHost]`
+    pub fn rangeOfHost(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfHost", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfPort]`
+    pub fn rangeOfPort(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfPort", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfPath]`
+    pub fn rangeOfPath(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfPath", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfQuery]`
+    pub fn rangeOfQuery(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfQuery", .{});
+    }
+
+    /// `-[NSURLComponents rangeOfFragment]`
+    pub fn rangeOfFragment(self: Self) objc.Range {
+        return self.object.msgSend(objc.Range, "rangeOfFragment", .{});
+    }
+
+    /// `-[NSURLComponents queryItems]`
+    pub fn queryItems(self: Self) ?foundation.Array(URLQueryItem) {
+        return self.object.msgSend(?foundation.Array(URLQueryItem), "queryItems", .{});
+    }
+
+    /// `-[NSURLComponents setQueryItems:]`
+    pub fn setQueryItems(self: Self, query_items: ?foundation.Array(URLQueryItem)) void {
+        return self.object.msgSend(void, "setQueryItems:", .{query_items});
+    }
+
+    /// `-[NSURLComponents percentEncodedQueryItems]`
+    pub fn percentEncodedQueryItems(self: Self) ?foundation.Array(URLQueryItem) {
+        return self.object.msgSend(?foundation.Array(URLQueryItem), "percentEncodedQueryItems", .{});
+    }
+
+    /// `-[NSURLComponents setPercentEncodedQueryItems:]`
+    pub fn setPercentEncodedQueryItems(self: Self, percent_encoded_query_items: ?foundation.Array(URLQueryItem)) void {
+        return self.object.msgSend(void, "setPercentEncodedQueryItems:", .{percent_encoded_query_items});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-init" = fn () URLComponents;
+        pub const @"-initWithURL:resolvingAgainstBaseURL:" = fn (foundation.Url, bool) ?URLComponents;
+        pub const @"+componentsWithURL:resolvingAgainstBaseURL:" = fn (foundation.Url, bool) ?URLComponents;
+        pub const @"-initWithString:" = fn (foundation.String) ?URLComponents;
+        pub const @"+componentsWithString:" = fn (foundation.String) ?URLComponents;
+        pub const @"-initWithString:encodingInvalidCharacters:" = fn (foundation.String, bool) ?URLComponents;
+        pub const @"+componentsWithString:encodingInvalidCharacters:" = fn (foundation.String, bool) ?URLComponents;
+        pub const @"-URLRelativeToURL:" = fn (?foundation.Url) ?foundation.Url;
+        pub const @"-URL" = fn () ?foundation.Url;
+        pub const @"-string" = fn () ?foundation.String;
+        pub const @"-scheme" = fn () ?foundation.String;
+        pub const @"-setScheme:" = fn (?foundation.String) void;
+        pub const @"-user" = fn () ?foundation.String;
+        pub const @"-setUser:" = fn (?foundation.String) void;
+        pub const @"-password" = fn () ?foundation.String;
+        pub const @"-setPassword:" = fn (?foundation.String) void;
+        pub const @"-host" = fn () ?foundation.String;
+        pub const @"-setHost:" = fn (?foundation.String) void;
+        pub const @"-port" = fn () ?foundation.Number;
+        pub const @"-setPort:" = fn (?foundation.Number) void;
+        pub const @"-path" = fn () ?foundation.String;
+        pub const @"-setPath:" = fn (?foundation.String) void;
+        pub const @"-query" = fn () ?foundation.String;
+        pub const @"-setQuery:" = fn (?foundation.String) void;
+        pub const @"-fragment" = fn () ?foundation.String;
+        pub const @"-setFragment:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedUser" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedUser:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedPassword" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedPassword:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedHost" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedHost:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedPath" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedPath:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedQuery" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedQuery:" = fn (?foundation.String) void;
+        pub const @"-percentEncodedFragment" = fn () ?foundation.String;
+        pub const @"-setPercentEncodedFragment:" = fn (?foundation.String) void;
+        pub const @"-encodedHost" = fn () ?foundation.String;
+        pub const @"-setEncodedHost:" = fn (?foundation.String) void;
+        pub const @"-rangeOfScheme" = fn () objc.Range;
+        pub const @"-rangeOfUser" = fn () objc.Range;
+        pub const @"-rangeOfPassword" = fn () objc.Range;
+        pub const @"-rangeOfHost" = fn () objc.Range;
+        pub const @"-rangeOfPort" = fn () objc.Range;
+        pub const @"-rangeOfPath" = fn () objc.Range;
+        pub const @"-rangeOfQuery" = fn () objc.Range;
+        pub const @"-rangeOfFragment" = fn () objc.Range;
+        pub const @"-queryItems" = fn () ?foundation.Array(URLQueryItem);
+        pub const @"-setQueryItems:" = fn (?foundation.Array(URLQueryItem)) void;
+        pub const @"-percentEncodedQueryItems" = fn () ?foundation.Array(URLQueryItem);
+        pub const @"-setPercentEncodedQueryItems:" = fn (?foundation.Array(URLQueryItem)) void;
+    };
+};
+
+/// `NSURLQueryItem`, a subclass of `NSObject`.
+pub const URLQueryItem = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLQueryItem";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLQueryItem alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLQueryItem`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLQueryItem initWithName:value:]`
+    pub fn initWithNameValue(self: Self, name_: foundation.String, value_: ?foundation.String) URLQueryItem {
+        return self.object.msgSend(URLQueryItem, "initWithName:value:", .{ name_, value_ });
+    }
+
+    /// `+[NSURLQueryItem queryItemWithName:value:]`
+    pub fn queryItemWithNameValue(name_: foundation.String, value_: ?foundation.String) URLQueryItem {
+        return class().msgSend(URLQueryItem, "queryItemWithName:value:", .{ name_, value_ });
+    }
+
+    /// `-[NSURLQueryItem name]`
+    pub fn name(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "name", .{});
+    }
+
+    /// `-[NSURLQueryItem value]`
+    pub fn value(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "value", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithName:value:" = fn (foundation.String, ?foundation.String) URLQueryItem;
+        pub const @"+queryItemWithName:value:" = fn (foundation.String, ?foundation.String) URLQueryItem;
+        pub const @"-name" = fn () foundation.String;
+        pub const @"-value" = fn () ?foundation.String;
+    };
+};
+
+/// `NSURLRequest`, a subclass of `NSObject`.
+pub const URLRequest = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLRequest";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLRequest alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLRequest`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSURLRequest requestWithURL:]`
+    pub fn requestWithURL(url_: foundation.Url) URLRequest {
+        return class().msgSend(URLRequest, "requestWithURL:", .{url_});
+    }
+
+    /// `+[NSURLRequest requestWithURL:cachePolicy:timeoutInterval:]`
+    pub fn requestWithURLCachePolicyTimeoutInterval(url_: foundation.Url, cache_policy: URLRequestCachePolicy, timeout_interval: f64) URLRequest {
+        return class().msgSend(URLRequest, "requestWithURL:cachePolicy:timeoutInterval:", .{ url_, cache_policy, timeout_interval });
+    }
+
+    /// `-[NSURLRequest initWithURL:]`
+    pub fn initWithURL(self: Self, url_: foundation.Url) URLRequest {
+        return self.object.msgSend(URLRequest, "initWithURL:", .{url_});
+    }
+
+    /// `-[NSURLRequest initWithURL:cachePolicy:timeoutInterval:]`
+    pub fn initWithURLCachePolicyTimeoutInterval(self: Self, url_: foundation.Url, cache_policy: URLRequestCachePolicy, timeout_interval: f64) URLRequest {
+        return self.object.msgSend(URLRequest, "initWithURL:cachePolicy:timeoutInterval:", .{ url_, cache_policy, timeout_interval });
+    }
+
+    /// `+[NSURLRequest supportsSecureCoding]`
+    pub fn supportsSecureCoding() bool {
+        return class().msgSend(bool, "supportsSecureCoding", .{});
+    }
+
+    /// `-[NSURLRequest URL]`
+    pub fn url(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URL", .{});
+    }
+
+    /// `-[NSURLRequest cachePolicy]`
+    pub fn cachePolicy(self: Self) URLRequestCachePolicy {
+        return self.object.msgSend(URLRequestCachePolicy, "cachePolicy", .{});
+    }
+
+    /// `-[NSURLRequest timeoutInterval]`
+    pub fn timeoutInterval(self: Self) f64 {
+        return self.object.msgSend(f64, "timeoutInterval", .{});
+    }
+
+    /// `-[NSURLRequest mainDocumentURL]`
+    pub fn mainDocumentURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "mainDocumentURL", .{});
+    }
+
+    /// `-[NSURLRequest networkServiceType]`
+    pub fn networkServiceType(self: Self) URLRequestNetworkServiceType {
+        return self.object.msgSend(URLRequestNetworkServiceType, "networkServiceType", .{});
+    }
+
+    /// `-[NSURLRequest allowsCellularAccess]`
+    pub fn allowsCellularAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsCellularAccess", .{});
+    }
+
+    /// `-[NSURLRequest allowsExpensiveNetworkAccess]`
+    pub fn allowsExpensiveNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsExpensiveNetworkAccess", .{});
+    }
+
+    /// `-[NSURLRequest allowsConstrainedNetworkAccess]`
+    pub fn allowsConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSURLRequest allowsUltraConstrainedNetworkAccess]`
+    pub fn allowsUltraConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsUltraConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSURLRequest assumesHTTP3Capable]`
+    pub fn assumesHTTP3Capable(self: Self) bool {
+        return self.object.msgSend(bool, "assumesHTTP3Capable", .{});
+    }
+
+    /// `-[NSURLRequest attribution]`
+    pub fn attribution(self: Self) URLRequestAttribution {
+        return self.object.msgSend(URLRequestAttribution, "attribution", .{});
+    }
+
+    /// `-[NSURLRequest requiresDNSSECValidation]`
+    pub fn requiresDNSSECValidation(self: Self) bool {
+        return self.object.msgSend(bool, "requiresDNSSECValidation", .{});
+    }
+
+    /// `-[NSURLRequest allowsPersistentDNS]`
+    pub fn allowsPersistentDNS(self: Self) bool {
+        return self.object.msgSend(bool, "allowsPersistentDNS", .{});
+    }
+
+    /// `-[NSURLRequest cookiePartitionIdentifier]`
+    pub fn cookiePartitionIdentifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "cookiePartitionIdentifier", .{});
+    }
+
+    /// `-[NSURLRequest valueForHTTPHeaderField:]`
+    pub fn valueForHTTPHeaderField(self: Self, field: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "valueForHTTPHeaderField:", .{field});
+    }
+
+    /// `-[NSURLRequest HTTPMethod]`
+    pub fn httpMethod(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "HTTPMethod", .{});
+    }
+
+    /// `-[NSURLRequest allHTTPHeaderFields]`
+    pub fn allHTTPHeaderFields(self: Self) ?foundation.Dictionary(foundation.String, foundation.String) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, foundation.String), "allHTTPHeaderFields", .{});
+    }
+
+    /// `-[NSURLRequest HTTPBody]`
+    pub fn httpBody(self: Self) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "HTTPBody", .{});
+    }
+
+    /// `-[NSURLRequest HTTPBodyStream]`
+    pub fn httpBodyStream(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "HTTPBodyStream", .{});
+    }
+
+    /// `-[NSURLRequest HTTPShouldHandleCookies]`
+    pub fn httpShouldHandleCookies(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldHandleCookies", .{});
+    }
+
+    /// `-[NSURLRequest HTTPShouldUsePipelining]`
+    pub fn httpShouldUsePipelining(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldUsePipelining", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+requestWithURL:" = fn (foundation.Url) URLRequest;
+        pub const @"+requestWithURL:cachePolicy:timeoutInterval:" = fn (foundation.Url, URLRequestCachePolicy, f64) URLRequest;
+        pub const @"-initWithURL:" = fn (foundation.Url) URLRequest;
+        pub const @"-initWithURL:cachePolicy:timeoutInterval:" = fn (foundation.Url, URLRequestCachePolicy, f64) URLRequest;
+        pub const @"+supportsSecureCoding" = fn () bool;
+        pub const @"-URL" = fn () ?foundation.Url;
+        pub const @"-cachePolicy" = fn () URLRequestCachePolicy;
+        pub const @"-timeoutInterval" = fn () f64;
+        pub const @"-mainDocumentURL" = fn () ?foundation.Url;
+        pub const @"-networkServiceType" = fn () URLRequestNetworkServiceType;
+        pub const @"-allowsCellularAccess" = fn () bool;
+        pub const @"-allowsExpensiveNetworkAccess" = fn () bool;
+        pub const @"-allowsConstrainedNetworkAccess" = fn () bool;
+        pub const @"-allowsUltraConstrainedNetworkAccess" = fn () bool;
+        pub const @"-assumesHTTP3Capable" = fn () bool;
+        pub const @"-attribution" = fn () URLRequestAttribution;
+        pub const @"-requiresDNSSECValidation" = fn () bool;
+        pub const @"-allowsPersistentDNS" = fn () bool;
+        pub const @"-cookiePartitionIdentifier" = fn () ?foundation.String;
+        pub const @"-valueForHTTPHeaderField:" = fn (foundation.String) ?foundation.String;
+        pub const @"-HTTPMethod" = fn () ?foundation.String;
+        pub const @"-allHTTPHeaderFields" = fn () ?foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"-HTTPBody" = fn () ?foundation.Data;
+        pub const @"-HTTPBodyStream" = fn () ?objc.Object;
+        pub const @"-HTTPShouldHandleCookies" = fn () bool;
+        pub const @"-HTTPShouldUsePipelining" = fn () bool;
+    };
+};
+
+/// `NSMutableURLRequest`, a subclass of `NSURLRequest`.
+pub const MutableURLRequest = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLRequest;
+    pub const class_name = "NSMutableURLRequest";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSMutableURLRequest alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSMutableURLRequest`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSMutableURLRequest URL]`
+    pub fn url(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URL", .{});
+    }
+
+    /// `-[NSMutableURLRequest setURL:]`
+    pub fn setURL(self: Self, url_: ?foundation.Url) void {
+        return self.object.msgSend(void, "setURL:", .{url_});
+    }
+
+    /// `-[NSMutableURLRequest cachePolicy]`
+    pub fn cachePolicy(self: Self) URLRequestCachePolicy {
+        return self.object.msgSend(URLRequestCachePolicy, "cachePolicy", .{});
+    }
+
+    /// `-[NSMutableURLRequest setCachePolicy:]`
+    pub fn setCachePolicy(self: Self, cache_policy: URLRequestCachePolicy) void {
+        return self.object.msgSend(void, "setCachePolicy:", .{cache_policy});
+    }
+
+    /// `-[NSMutableURLRequest timeoutInterval]`
+    pub fn timeoutInterval(self: Self) f64 {
+        return self.object.msgSend(f64, "timeoutInterval", .{});
+    }
+
+    /// `-[NSMutableURLRequest setTimeoutInterval:]`
+    pub fn setTimeoutInterval(self: Self, timeout_interval: f64) void {
+        return self.object.msgSend(void, "setTimeoutInterval:", .{timeout_interval});
+    }
+
+    /// `-[NSMutableURLRequest mainDocumentURL]`
+    pub fn mainDocumentURL(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "mainDocumentURL", .{});
+    }
+
+    /// `-[NSMutableURLRequest setMainDocumentURL:]`
+    pub fn setMainDocumentURL(self: Self, main_document_url: ?foundation.Url) void {
+        return self.object.msgSend(void, "setMainDocumentURL:", .{main_document_url});
+    }
+
+    /// `-[NSMutableURLRequest networkServiceType]`
+    pub fn networkServiceType(self: Self) URLRequestNetworkServiceType {
+        return self.object.msgSend(URLRequestNetworkServiceType, "networkServiceType", .{});
+    }
+
+    /// `-[NSMutableURLRequest setNetworkServiceType:]`
+    pub fn setNetworkServiceType(self: Self, network_service_type: URLRequestNetworkServiceType) void {
+        return self.object.msgSend(void, "setNetworkServiceType:", .{network_service_type});
+    }
+
+    /// `-[NSMutableURLRequest allowsCellularAccess]`
+    pub fn allowsCellularAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsCellularAccess", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllowsCellularAccess:]`
+    pub fn setAllowsCellularAccess(self: Self, allows_cellular_access: bool) void {
+        return self.object.msgSend(void, "setAllowsCellularAccess:", .{allows_cellular_access});
+    }
+
+    /// `-[NSMutableURLRequest allowsExpensiveNetworkAccess]`
+    pub fn allowsExpensiveNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsExpensiveNetworkAccess", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllowsExpensiveNetworkAccess:]`
+    pub fn setAllowsExpensiveNetworkAccess(self: Self, allows_expensive_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsExpensiveNetworkAccess:", .{allows_expensive_network_access});
+    }
+
+    /// `-[NSMutableURLRequest allowsConstrainedNetworkAccess]`
+    pub fn allowsConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllowsConstrainedNetworkAccess:]`
+    pub fn setAllowsConstrainedNetworkAccess(self: Self, allows_constrained_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsConstrainedNetworkAccess:", .{allows_constrained_network_access});
+    }
+
+    /// `-[NSMutableURLRequest allowsUltraConstrainedNetworkAccess]`
+    pub fn allowsUltraConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsUltraConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllowsUltraConstrainedNetworkAccess:]`
+    pub fn setAllowsUltraConstrainedNetworkAccess(self: Self, allows_ultra_constrained_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsUltraConstrainedNetworkAccess:", .{allows_ultra_constrained_network_access});
+    }
+
+    /// `-[NSMutableURLRequest assumesHTTP3Capable]`
+    pub fn assumesHTTP3Capable(self: Self) bool {
+        return self.object.msgSend(bool, "assumesHTTP3Capable", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAssumesHTTP3Capable:]`
+    pub fn setAssumesHTTP3Capable(self: Self, assumes_http3_capable: bool) void {
+        return self.object.msgSend(void, "setAssumesHTTP3Capable:", .{assumes_http3_capable});
+    }
+
+    /// `-[NSMutableURLRequest attribution]`
+    pub fn attribution(self: Self) URLRequestAttribution {
+        return self.object.msgSend(URLRequestAttribution, "attribution", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAttribution:]`
+    pub fn setAttribution(self: Self, attribution_: URLRequestAttribution) void {
+        return self.object.msgSend(void, "setAttribution:", .{attribution_});
+    }
+
+    /// `-[NSMutableURLRequest requiresDNSSECValidation]`
+    pub fn requiresDNSSECValidation(self: Self) bool {
+        return self.object.msgSend(bool, "requiresDNSSECValidation", .{});
+    }
+
+    /// `-[NSMutableURLRequest setRequiresDNSSECValidation:]`
+    pub fn setRequiresDNSSECValidation(self: Self, requires_dnssec_validation: bool) void {
+        return self.object.msgSend(void, "setRequiresDNSSECValidation:", .{requires_dnssec_validation});
+    }
+
+    /// `-[NSMutableURLRequest allowsPersistentDNS]`
+    pub fn allowsPersistentDNS(self: Self) bool {
+        return self.object.msgSend(bool, "allowsPersistentDNS", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllowsPersistentDNS:]`
+    pub fn setAllowsPersistentDNS(self: Self, allows_persistent_dns: bool) void {
+        return self.object.msgSend(void, "setAllowsPersistentDNS:", .{allows_persistent_dns});
+    }
+
+    /// `-[NSMutableURLRequest cookiePartitionIdentifier]`
+    pub fn cookiePartitionIdentifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "cookiePartitionIdentifier", .{});
+    }
+
+    /// `-[NSMutableURLRequest setCookiePartitionIdentifier:]`
+    pub fn setCookiePartitionIdentifier(self: Self, cookie_partition_identifier: ?foundation.String) void {
+        return self.object.msgSend(void, "setCookiePartitionIdentifier:", .{cookie_partition_identifier});
+    }
+
+    /// `-[NSMutableURLRequest setValue:forHTTPHeaderField:]`
+    pub fn setValueForHTTPHeaderField(self: Self, value: ?foundation.String, field: foundation.String) void {
+        return self.object.msgSend(void, "setValue:forHTTPHeaderField:", .{ value, field });
+    }
+
+    /// `-[NSMutableURLRequest addValue:forHTTPHeaderField:]`
+    pub fn addValueForHTTPHeaderField(self: Self, value: foundation.String, field: foundation.String) void {
+        return self.object.msgSend(void, "addValue:forHTTPHeaderField:", .{ value, field });
+    }
+
+    /// `-[NSMutableURLRequest HTTPMethod]`
+    pub fn httpMethod(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "HTTPMethod", .{});
+    }
+
+    /// `-[NSMutableURLRequest setHTTPMethod:]`
+    pub fn setHTTPMethod(self: Self, http_method: foundation.String) void {
+        return self.object.msgSend(void, "setHTTPMethod:", .{http_method});
+    }
+
+    /// `-[NSMutableURLRequest allHTTPHeaderFields]`
+    pub fn allHTTPHeaderFields(self: Self) ?foundation.Dictionary(foundation.String, foundation.String) {
+        return self.object.msgSend(?foundation.Dictionary(foundation.String, foundation.String), "allHTTPHeaderFields", .{});
+    }
+
+    /// `-[NSMutableURLRequest setAllHTTPHeaderFields:]`
+    pub fn setAllHTTPHeaderFields(self: Self, all_http_header_fields: ?foundation.Dictionary(foundation.String, foundation.String)) void {
+        return self.object.msgSend(void, "setAllHTTPHeaderFields:", .{all_http_header_fields});
+    }
+
+    /// `-[NSMutableURLRequest HTTPBody]`
+    pub fn httpBody(self: Self) ?foundation.Data {
+        return self.object.msgSend(?foundation.Data, "HTTPBody", .{});
+    }
+
+    /// `-[NSMutableURLRequest setHTTPBody:]`
+    pub fn setHTTPBody(self: Self, http_body: ?foundation.Data) void {
+        return self.object.msgSend(void, "setHTTPBody:", .{http_body});
+    }
+
+    /// `-[NSMutableURLRequest HTTPBodyStream]`
+    pub fn httpBodyStream(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "HTTPBodyStream", .{});
+    }
+
+    /// `-[NSMutableURLRequest setHTTPBodyStream:]`
+    pub fn setHTTPBodyStream(self: Self, http_body_stream: ?objc.Object) void {
+        return self.object.msgSend(void, "setHTTPBodyStream:", .{http_body_stream});
+    }
+
+    /// `-[NSMutableURLRequest HTTPShouldHandleCookies]`
+    pub fn httpShouldHandleCookies(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldHandleCookies", .{});
+    }
+
+    /// `-[NSMutableURLRequest setHTTPShouldHandleCookies:]`
+    pub fn setHTTPShouldHandleCookies(self: Self, http_should_handle_cookies: bool) void {
+        return self.object.msgSend(void, "setHTTPShouldHandleCookies:", .{http_should_handle_cookies});
+    }
+
+    /// `-[NSMutableURLRequest HTTPShouldUsePipelining]`
+    pub fn httpShouldUsePipelining(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldUsePipelining", .{});
+    }
+
+    /// `-[NSMutableURLRequest setHTTPShouldUsePipelining:]`
+    pub fn setHTTPShouldUsePipelining(self: Self, http_should_use_pipelining: bool) void {
+        return self.object.msgSend(void, "setHTTPShouldUsePipelining:", .{http_should_use_pipelining});
+    }
+
+    /// `+[NSURLRequest requestWithURL:]`
+    pub fn requestWithURL(url_: foundation.Url) MutableURLRequest {
+        return class().msgSend(MutableURLRequest, "requestWithURL:", .{url_});
+    }
+
+    /// `+[NSURLRequest requestWithURL:cachePolicy:timeoutInterval:]`
+    pub fn requestWithURLCachePolicyTimeoutInterval(url_: foundation.Url, cache_policy: URLRequestCachePolicy, timeout_interval: f64) MutableURLRequest {
+        return class().msgSend(MutableURLRequest, "requestWithURL:cachePolicy:timeoutInterval:", .{ url_, cache_policy, timeout_interval });
+    }
+
+    /// `-[NSURLRequest initWithURL:]`
+    pub fn initWithURL(self: Self, url_: foundation.Url) MutableURLRequest {
+        return self.object.msgSend(MutableURLRequest, "initWithURL:", .{url_});
+    }
+
+    /// `-[NSURLRequest initWithURL:cachePolicy:timeoutInterval:]`
+    pub fn initWithURLCachePolicyTimeoutInterval(self: Self, url_: foundation.Url, cache_policy: URLRequestCachePolicy, timeout_interval: f64) MutableURLRequest {
+        return self.object.msgSend(MutableURLRequest, "initWithURL:cachePolicy:timeoutInterval:", .{ url_, cache_policy, timeout_interval });
+    }
+
+    /// `+[NSURLRequest supportsSecureCoding]`
+    pub fn supportsSecureCoding() bool {
+        return class().msgSend(bool, "supportsSecureCoding", .{});
+    }
+
+    /// `-[NSURLRequest valueForHTTPHeaderField:]`
+    pub fn valueForHTTPHeaderField(self: Self, field: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "valueForHTTPHeaderField:", .{field});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-URL" = fn () ?foundation.Url;
+        pub const @"-setURL:" = fn (?foundation.Url) void;
+        pub const @"-cachePolicy" = fn () URLRequestCachePolicy;
+        pub const @"-setCachePolicy:" = fn (URLRequestCachePolicy) void;
+        pub const @"-timeoutInterval" = fn () f64;
+        pub const @"-setTimeoutInterval:" = fn (f64) void;
+        pub const @"-mainDocumentURL" = fn () ?foundation.Url;
+        pub const @"-setMainDocumentURL:" = fn (?foundation.Url) void;
+        pub const @"-networkServiceType" = fn () URLRequestNetworkServiceType;
+        pub const @"-setNetworkServiceType:" = fn (URLRequestNetworkServiceType) void;
+        pub const @"-allowsCellularAccess" = fn () bool;
+        pub const @"-setAllowsCellularAccess:" = fn (bool) void;
+        pub const @"-allowsExpensiveNetworkAccess" = fn () bool;
+        pub const @"-setAllowsExpensiveNetworkAccess:" = fn (bool) void;
+        pub const @"-allowsConstrainedNetworkAccess" = fn () bool;
+        pub const @"-setAllowsConstrainedNetworkAccess:" = fn (bool) void;
+        pub const @"-allowsUltraConstrainedNetworkAccess" = fn () bool;
+        pub const @"-setAllowsUltraConstrainedNetworkAccess:" = fn (bool) void;
+        pub const @"-assumesHTTP3Capable" = fn () bool;
+        pub const @"-setAssumesHTTP3Capable:" = fn (bool) void;
+        pub const @"-attribution" = fn () URLRequestAttribution;
+        pub const @"-setAttribution:" = fn (URLRequestAttribution) void;
+        pub const @"-requiresDNSSECValidation" = fn () bool;
+        pub const @"-setRequiresDNSSECValidation:" = fn (bool) void;
+        pub const @"-allowsPersistentDNS" = fn () bool;
+        pub const @"-setAllowsPersistentDNS:" = fn (bool) void;
+        pub const @"-cookiePartitionIdentifier" = fn () ?foundation.String;
+        pub const @"-setCookiePartitionIdentifier:" = fn (?foundation.String) void;
+        pub const @"-setValue:forHTTPHeaderField:" = fn (?foundation.String, foundation.String) void;
+        pub const @"-addValue:forHTTPHeaderField:" = fn (foundation.String, foundation.String) void;
+        pub const @"-HTTPMethod" = fn () foundation.String;
+        pub const @"-setHTTPMethod:" = fn (foundation.String) void;
+        pub const @"-allHTTPHeaderFields" = fn () ?foundation.Dictionary(foundation.String, foundation.String);
+        pub const @"-setAllHTTPHeaderFields:" = fn (?foundation.Dictionary(foundation.String, foundation.String)) void;
+        pub const @"-HTTPBody" = fn () ?foundation.Data;
+        pub const @"-setHTTPBody:" = fn (?foundation.Data) void;
+        pub const @"-HTTPBodyStream" = fn () ?objc.Object;
+        pub const @"-setHTTPBodyStream:" = fn (?objc.Object) void;
+        pub const @"-HTTPShouldHandleCookies" = fn () bool;
+        pub const @"-setHTTPShouldHandleCookies:" = fn (bool) void;
+        pub const @"-HTTPShouldUsePipelining" = fn () bool;
+        pub const @"-setHTTPShouldUsePipelining:" = fn (bool) void;
+    };
+};
+
+/// `NSURLResponse`, a subclass of `NSObject`.
+pub const URLResponse = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLResponse";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLResponse alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLResponse`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLResponse initWithURL:MIMEType:expectedContentLength:textEncodingName:]`
+    pub fn initWithURLMIMETypeExpectedContentLengthTextEncodingName(self: Self, url_: foundation.Url, mime_type: ?foundation.String, length: objc.Integer, name: ?foundation.String) URLResponse {
+        return self.object.msgSend(URLResponse, "initWithURL:MIMEType:expectedContentLength:textEncodingName:", .{ url_, mime_type, length, name });
+    }
+
+    /// `-[NSURLResponse URL]`
+    pub fn url(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URL", .{});
+    }
+
+    /// `-[NSURLResponse MIMEType]`
+    pub fn mimeType(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "MIMEType", .{});
+    }
+
+    /// `-[NSURLResponse expectedContentLength]`
+    pub fn expectedContentLength(self: Self) c_longlong {
+        return self.object.msgSend(c_longlong, "expectedContentLength", .{});
+    }
+
+    /// `-[NSURLResponse textEncodingName]`
+    pub fn textEncodingName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "textEncodingName", .{});
+    }
+
+    /// `-[NSURLResponse suggestedFilename]`
+    pub fn suggestedFilename(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "suggestedFilename", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithURL:MIMEType:expectedContentLength:textEncodingName:" = fn (foundation.Url, ?foundation.String, objc.Integer, ?foundation.String) URLResponse;
+        pub const @"-URL" = fn () ?foundation.Url;
+        pub const @"-MIMEType" = fn () ?foundation.String;
+        pub const @"-expectedContentLength" = fn () c_longlong;
+        pub const @"-textEncodingName" = fn () ?foundation.String;
+        pub const @"-suggestedFilename" = fn () ?foundation.String;
+    };
+};
+
+/// `NSHTTPURLResponse`, a subclass of `NSURLResponse`.
+pub const HTTPURLResponse = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLResponse;
+    pub const class_name = "NSHTTPURLResponse";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSHTTPURLResponse alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSHTTPURLResponse`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSHTTPURLResponse initWithURL:statusCode:HTTPVersion:headerFields:]`
+    pub fn initWithURLStatusCodeHTTPVersionHeaderFields(self: Self, url_: foundation.Url, status_code: objc.Integer, http_version: ?foundation.String, header_fields: ?foundation.Dictionary(foundation.String, foundation.String)) ?HTTPURLResponse {
+        return self.object.msgSend(?HTTPURLResponse, "initWithURL:statusCode:HTTPVersion:headerFields:", .{ url_, status_code, http_version, header_fields });
+    }
+
+    /// `-[NSHTTPURLResponse valueForHTTPHeaderField:]`
+    pub fn valueForHTTPHeaderField(self: Self, field: foundation.String) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "valueForHTTPHeaderField:", .{field});
+    }
+
+    /// `+[NSHTTPURLResponse localizedStringForStatusCode:]`
+    pub fn localizedStringForStatusCode(status_code: objc.Integer) foundation.String {
+        return class().msgSend(foundation.String, "localizedStringForStatusCode:", .{status_code});
+    }
+
+    /// `-[NSHTTPURLResponse statusCode]`
+    pub fn statusCode(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "statusCode", .{});
+    }
+
+    /// `-[NSHTTPURLResponse allHeaderFields]`
+    pub fn allHeaderFields(self: Self) foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(foundation.Dictionary(objc.Object, objc.Object), "allHeaderFields", .{});
+    }
+
+    /// `-[NSURLResponse initWithURL:MIMEType:expectedContentLength:textEncodingName:]`
+    pub fn initWithURLMIMETypeExpectedContentLengthTextEncodingName(self: Self, url_: foundation.Url, mime_type: ?foundation.String, length: objc.Integer, name: ?foundation.String) HTTPURLResponse {
+        return self.object.msgSend(HTTPURLResponse, "initWithURL:MIMEType:expectedContentLength:textEncodingName:", .{ url_, mime_type, length, name });
+    }
+
+    /// `-[NSURLResponse URL]`
+    pub fn url(self: Self) ?foundation.Url {
+        return self.object.msgSend(?foundation.Url, "URL", .{});
+    }
+
+    /// `-[NSURLResponse MIMEType]`
+    pub fn mimeType(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "MIMEType", .{});
+    }
+
+    /// `-[NSURLResponse expectedContentLength]`
+    pub fn expectedContentLength(self: Self) c_longlong {
+        return self.object.msgSend(c_longlong, "expectedContentLength", .{});
+    }
+
+    /// `-[NSURLResponse textEncodingName]`
+    pub fn textEncodingName(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "textEncodingName", .{});
+    }
+
+    /// `-[NSURLResponse suggestedFilename]`
+    pub fn suggestedFilename(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "suggestedFilename", .{});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-initWithURL:statusCode:HTTPVersion:headerFields:" = fn (foundation.Url, objc.Integer, ?foundation.String, ?foundation.Dictionary(foundation.String, foundation.String)) ?HTTPURLResponse;
+        pub const @"-valueForHTTPHeaderField:" = fn (foundation.String) ?foundation.String;
+        pub const @"+localizedStringForStatusCode:" = fn (objc.Integer) foundation.String;
+        pub const @"-statusCode" = fn () objc.Integer;
+        pub const @"-allHeaderFields" = fn () foundation.Dictionary(objc.Object, objc.Object);
+    };
+};
+
+/// `NSURLSession`, a subclass of `NSObject`.
+pub const URLSession = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLSession";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSession alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSession`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSURLSession sessionWithConfiguration:]`
+    pub fn sessionWithConfiguration(configuration_: URLSessionConfiguration) URLSession {
+        return class().msgSend(URLSession, "sessionWithConfiguration:", .{configuration_});
+    }
+
+    /// `+[NSURLSession sessionWithConfiguration:delegate:delegateQueue:]`
+    pub fn sessionWithConfigurationDelegateDelegateQueue(configuration_: URLSessionConfiguration, delegate_: ?URLSessionDelegate, queue: ?OperationQueue) URLSession {
+        return class().msgSend(URLSession, "sessionWithConfiguration:delegate:delegateQueue:", .{ configuration_, delegate_, queue });
+    }
+
+    /// `-[NSURLSession finishTasksAndInvalidate]`
+    pub fn finishTasksAndInvalidate(self: Self) void {
+        return self.object.msgSend(void, "finishTasksAndInvalidate", .{});
+    }
+
+    /// `-[NSURLSession invalidateAndCancel]`
+    pub fn invalidateAndCancel(self: Self) void {
+        return self.object.msgSend(void, "invalidateAndCancel", .{});
+    }
+
+    /// `-[NSURLSession resetWithCompletionHandler:]`
+    pub fn resetWithCompletionHandler(self: Self, completion_handler: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "resetWithCompletionHandler:", .{completion_handler});
+    }
+
+    /// `-[NSURLSession flushWithCompletionHandler:]`
+    pub fn flushWithCompletionHandler(self: Self, completion_handler: objc.BlockRef(fn () void)) void {
+        return self.object.msgSend(void, "flushWithCompletionHandler:", .{completion_handler});
+    }
+
+    /// `-[NSURLSession getTasksWithCompletionHandler:]`
+    pub fn getTasksWithCompletionHandler(self: Self, completion_handler: objc.BlockRef(fn (foundation.Array(URLSessionDataTask), foundation.Array(URLSessionUploadTask), foundation.Array(URLSessionDownloadTask)) void)) void {
+        return self.object.msgSend(void, "getTasksWithCompletionHandler:", .{completion_handler});
+    }
+
+    /// `-[NSURLSession getAllTasksWithCompletionHandler:]`
+    pub fn getAllTasksWithCompletionHandler(self: Self, completion_handler: objc.BlockRef(fn (foundation.Array(URLSessionTask)) void)) void {
+        return self.object.msgSend(void, "getAllTasksWithCompletionHandler:", .{completion_handler});
+    }
+
+    /// `-[NSURLSession dataTaskWithRequest:]`
+    pub fn dataTaskWithRequest(self: Self, request: URLRequest) URLSessionDataTask {
+        return self.object.msgSend(URLSessionDataTask, "dataTaskWithRequest:", .{request});
+    }
+
+    /// `-[NSURLSession dataTaskWithURL:]`
+    pub fn dataTaskWithURL(self: Self, url: foundation.Url) URLSessionDataTask {
+        return self.object.msgSend(URLSessionDataTask, "dataTaskWithURL:", .{url});
+    }
+
+    /// `-[NSURLSession uploadTaskWithRequest:fromFile:]`
+    pub fn uploadTaskWithRequestFromFile(self: Self, request: URLRequest, file_url: foundation.Url) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithRequest:fromFile:", .{ request, file_url });
+    }
+
+    /// `-[NSURLSession uploadTaskWithRequest:fromData:]`
+    pub fn uploadTaskWithRequestFromData(self: Self, request: URLRequest, body_data: foundation.Data) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithRequest:fromData:", .{ request, body_data });
+    }
+
+    /// `-[NSURLSession uploadTaskWithResumeData:]`
+    pub fn uploadTaskWithResumeData(self: Self, resume_data: foundation.Data) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithResumeData:", .{resume_data});
+    }
+
+    /// `-[NSURLSession uploadTaskWithStreamedRequest:]`
+    pub fn uploadTaskWithStreamedRequest(self: Self, request: URLRequest) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithStreamedRequest:", .{request});
+    }
+
+    /// `-[NSURLSession downloadTaskWithRequest:]`
+    pub fn downloadTaskWithRequest(self: Self, request: URLRequest) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithRequest:", .{request});
+    }
+
+    /// `-[NSURLSession downloadTaskWithURL:]`
+    pub fn downloadTaskWithURL(self: Self, url: foundation.Url) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithURL:", .{url});
+    }
+
+    /// `-[NSURLSession downloadTaskWithResumeData:]`
+    pub fn downloadTaskWithResumeData(self: Self, resume_data: foundation.Data) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithResumeData:", .{resume_data});
+    }
+
+    /// `-[NSURLSession streamTaskWithHostName:port:]`
+    pub fn streamTaskWithHostNamePort(self: Self, hostname: foundation.String, port: objc.Integer) objc.Object {
+        return self.object.msgSend(objc.Object, "streamTaskWithHostName:port:", .{ hostname, port });
+    }
+
+    /// `-[NSURLSession streamTaskWithNetService:]`
+    pub fn streamTaskWithNetService(self: Self, service: objc.Object) objc.Object {
+        return self.object.msgSend(objc.Object, "streamTaskWithNetService:", .{service});
+    }
+
+    /// `-[NSURLSession webSocketTaskWithURL:]`
+    pub fn webSocketTaskWithURL(self: Self, url: foundation.Url) objc.Object {
+        return self.object.msgSend(objc.Object, "webSocketTaskWithURL:", .{url});
+    }
+
+    /// `-[NSURLSession webSocketTaskWithURL:protocols:]`
+    pub fn webSocketTaskWithURLProtocols(self: Self, url: foundation.Url, protocols: foundation.Array(foundation.String)) objc.Object {
+        return self.object.msgSend(objc.Object, "webSocketTaskWithURL:protocols:", .{ url, protocols });
+    }
+
+    /// `-[NSURLSession webSocketTaskWithRequest:]`
+    pub fn webSocketTaskWithRequest(self: Self, request: URLRequest) objc.Object {
+        return self.object.msgSend(objc.Object, "webSocketTaskWithRequest:", .{request});
+    }
+
+    /// `-[NSURLSession init]`
+    pub fn init(self: Self) URLSession {
+        return self.object.msgSend(URLSession, "init", .{});
+    }
+
+    /// `+[NSURLSession new]`
+    pub fn classNew() URLSession {
+        return class().msgSend(URLSession, "new", .{});
+    }
+
+    /// `+[NSURLSession sharedSession]`
+    pub fn sharedSession() URLSession {
+        return class().msgSend(URLSession, "sharedSession", .{});
+    }
+
+    /// `-[NSURLSession delegateQueue]`
+    pub fn delegateQueue(self: Self) OperationQueue {
+        return self.object.msgSend(OperationQueue, "delegateQueue", .{});
+    }
+
+    /// `-[NSURLSession delegate]`
+    pub fn delegate(self: Self) ?URLSessionDelegate {
+        return self.object.msgSend(?URLSessionDelegate, "delegate", .{});
+    }
+
+    /// `-[NSURLSession configuration]`
+    pub fn configuration(self: Self) URLSessionConfiguration {
+        return self.object.msgSend(URLSessionConfiguration, "configuration", .{});
+    }
+
+    /// `-[NSURLSession sessionDescription]`
+    pub fn sessionDescription(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "sessionDescription", .{});
+    }
+
+    /// `-[NSURLSession setSessionDescription:]`
+    pub fn setSessionDescription(self: Self, session_description: ?foundation.String) void {
+        return self.object.msgSend(void, "setSessionDescription:", .{session_description});
+    }
+
+    /// `-[NSURLSession dataTaskWithRequest:completionHandler:]`
+    pub fn dataTaskWithRequestCompletionHandler(self: Self, request: URLRequest, completion_handler: objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDataTask {
+        return self.object.msgSend(URLSessionDataTask, "dataTaskWithRequest:completionHandler:", .{ request, completion_handler });
+    }
+
+    /// `-[NSURLSession dataTaskWithURL:completionHandler:]`
+    pub fn dataTaskWithURLCompletionHandler(self: Self, url: foundation.Url, completion_handler: objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDataTask {
+        return self.object.msgSend(URLSessionDataTask, "dataTaskWithURL:completionHandler:", .{ url, completion_handler });
+    }
+
+    /// `-[NSURLSession uploadTaskWithRequest:fromFile:completionHandler:]`
+    pub fn uploadTaskWithRequestFromFileCompletionHandler(self: Self, request: URLRequest, file_url: foundation.Url, completion_handler: objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithRequest:fromFile:completionHandler:", .{ request, file_url, completion_handler });
+    }
+
+    /// `-[NSURLSession uploadTaskWithRequest:fromData:completionHandler:]`
+    pub fn uploadTaskWithRequestFromDataCompletionHandler(self: Self, request: URLRequest, body_data: ?foundation.Data, completion_handler: objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithRequest:fromData:completionHandler:", .{ request, body_data, completion_handler });
+    }
+
+    /// `-[NSURLSession uploadTaskWithResumeData:completionHandler:]`
+    pub fn uploadTaskWithResumeDataCompletionHandler(self: Self, resume_data: foundation.Data, completion_handler: objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "uploadTaskWithResumeData:completionHandler:", .{ resume_data, completion_handler });
+    }
+
+    /// `-[NSURLSession downloadTaskWithRequest:completionHandler:]`
+    pub fn downloadTaskWithRequestCompletionHandler(self: Self, request: URLRequest, completion_handler: objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithRequest:completionHandler:", .{ request, completion_handler });
+    }
+
+    /// `-[NSURLSession downloadTaskWithURL:completionHandler:]`
+    pub fn downloadTaskWithURLCompletionHandler(self: Self, url: foundation.Url, completion_handler: objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithURL:completionHandler:", .{ url, completion_handler });
+    }
+
+    /// `-[NSURLSession downloadTaskWithResumeData:completionHandler:]`
+    pub fn downloadTaskWithResumeDataCompletionHandler(self: Self, resume_data: foundation.Data, completion_handler: objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "downloadTaskWithResumeData:completionHandler:", .{ resume_data, completion_handler });
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+sessionWithConfiguration:" = fn (URLSessionConfiguration) URLSession;
+        pub const @"+sessionWithConfiguration:delegate:delegateQueue:" = fn (URLSessionConfiguration, ?URLSessionDelegate, ?OperationQueue) URLSession;
+        pub const @"-finishTasksAndInvalidate" = fn () void;
+        pub const @"-invalidateAndCancel" = fn () void;
+        pub const @"-resetWithCompletionHandler:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"-flushWithCompletionHandler:" = fn (objc.BlockRef(fn () void)) void;
+        pub const @"-getTasksWithCompletionHandler:" = fn (objc.BlockRef(fn (foundation.Array(URLSessionDataTask), foundation.Array(URLSessionUploadTask), foundation.Array(URLSessionDownloadTask)) void)) void;
+        pub const @"-getAllTasksWithCompletionHandler:" = fn (objc.BlockRef(fn (foundation.Array(URLSessionTask)) void)) void;
+        pub const @"-dataTaskWithRequest:" = fn (URLRequest) URLSessionDataTask;
+        pub const @"-dataTaskWithURL:" = fn (foundation.Url) URLSessionDataTask;
+        pub const @"-uploadTaskWithRequest:fromFile:" = fn (URLRequest, foundation.Url) URLSessionUploadTask;
+        pub const @"-uploadTaskWithRequest:fromData:" = fn (URLRequest, foundation.Data) URLSessionUploadTask;
+        pub const @"-uploadTaskWithResumeData:" = fn (foundation.Data) URLSessionUploadTask;
+        pub const @"-uploadTaskWithStreamedRequest:" = fn (URLRequest) URLSessionUploadTask;
+        pub const @"-downloadTaskWithRequest:" = fn (URLRequest) URLSessionDownloadTask;
+        pub const @"-downloadTaskWithURL:" = fn (foundation.Url) URLSessionDownloadTask;
+        pub const @"-downloadTaskWithResumeData:" = fn (foundation.Data) URLSessionDownloadTask;
+        pub const @"-streamTaskWithHostName:port:" = fn (foundation.String, objc.Integer) objc.Object;
+        pub const @"-streamTaskWithNetService:" = fn (objc.Object) objc.Object;
+        pub const @"-webSocketTaskWithURL:" = fn (foundation.Url) objc.Object;
+        pub const @"-webSocketTaskWithURL:protocols:" = fn (foundation.Url, foundation.Array(foundation.String)) objc.Object;
+        pub const @"-webSocketTaskWithRequest:" = fn (URLRequest) objc.Object;
+        pub const @"-init" = fn () URLSession;
+        pub const @"+new" = fn () URLSession;
+        pub const @"+sharedSession" = fn () URLSession;
+        pub const @"-delegateQueue" = fn () OperationQueue;
+        pub const @"-delegate" = fn () ?URLSessionDelegate;
+        pub const @"-configuration" = fn () URLSessionConfiguration;
+        pub const @"-sessionDescription" = fn () ?foundation.String;
+        pub const @"-setSessionDescription:" = fn (?foundation.String) void;
+        pub const @"-dataTaskWithRequest:completionHandler:" = fn (URLRequest, objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDataTask;
+        pub const @"-dataTaskWithURL:completionHandler:" = fn (foundation.Url, objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDataTask;
+        pub const @"-uploadTaskWithRequest:fromFile:completionHandler:" = fn (URLRequest, foundation.Url, objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask;
+        pub const @"-uploadTaskWithRequest:fromData:completionHandler:" = fn (URLRequest, ?foundation.Data, objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask;
+        pub const @"-uploadTaskWithResumeData:completionHandler:" = fn (foundation.Data, objc.BlockRef(fn (?foundation.Data, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionUploadTask;
+        pub const @"-downloadTaskWithRequest:completionHandler:" = fn (URLRequest, objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask;
+        pub const @"-downloadTaskWithURL:completionHandler:" = fn (foundation.Url, objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask;
+        pub const @"-downloadTaskWithResumeData:completionHandler:" = fn (foundation.Data, objc.BlockRef(fn (?foundation.Url, ?URLResponse, ?foundation.ErrorObject) void)) URLSessionDownloadTask;
+    };
+};
+
+/// `NSURLSessionConfiguration`, a subclass of `NSObject`.
+pub const URLSessionConfiguration = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLSessionConfiguration";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSessionConfiguration alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSessionConfiguration`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `+[NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:]`
+    pub fn backgroundSessionConfigurationWithIdentifier(identifier_: foundation.String) URLSessionConfiguration {
+        return class().msgSend(URLSessionConfiguration, "backgroundSessionConfigurationWithIdentifier:", .{identifier_});
+    }
+
+    /// `-[NSURLSessionConfiguration init]`
+    pub fn init(self: Self) URLSessionConfiguration {
+        return self.object.msgSend(URLSessionConfiguration, "init", .{});
+    }
+
+    /// `+[NSURLSessionConfiguration new]`
+    pub fn classNew() URLSessionConfiguration {
+        return class().msgSend(URLSessionConfiguration, "new", .{});
+    }
+
+    /// `+[NSURLSessionConfiguration defaultSessionConfiguration]`
+    pub fn defaultSessionConfiguration() URLSessionConfiguration {
+        return class().msgSend(URLSessionConfiguration, "defaultSessionConfiguration", .{});
+    }
+
+    /// `+[NSURLSessionConfiguration ephemeralSessionConfiguration]`
+    pub fn ephemeralSessionConfiguration() URLSessionConfiguration {
+        return class().msgSend(URLSessionConfiguration, "ephemeralSessionConfiguration", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration identifier]`
+    pub fn identifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "identifier", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration requestCachePolicy]`
+    pub fn requestCachePolicy(self: Self) URLRequestCachePolicy {
+        return self.object.msgSend(URLRequestCachePolicy, "requestCachePolicy", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setRequestCachePolicy:]`
+    pub fn setRequestCachePolicy(self: Self, request_cache_policy: URLRequestCachePolicy) void {
+        return self.object.msgSend(void, "setRequestCachePolicy:", .{request_cache_policy});
+    }
+
+    /// `-[NSURLSessionConfiguration timeoutIntervalForRequest]`
+    pub fn timeoutIntervalForRequest(self: Self) f64 {
+        return self.object.msgSend(f64, "timeoutIntervalForRequest", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setTimeoutIntervalForRequest:]`
+    pub fn setTimeoutIntervalForRequest(self: Self, timeout_interval_for_request: f64) void {
+        return self.object.msgSend(void, "setTimeoutIntervalForRequest:", .{timeout_interval_for_request});
+    }
+
+    /// `-[NSURLSessionConfiguration timeoutIntervalForResource]`
+    pub fn timeoutIntervalForResource(self: Self) f64 {
+        return self.object.msgSend(f64, "timeoutIntervalForResource", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setTimeoutIntervalForResource:]`
+    pub fn setTimeoutIntervalForResource(self: Self, timeout_interval_for_resource: f64) void {
+        return self.object.msgSend(void, "setTimeoutIntervalForResource:", .{timeout_interval_for_resource});
+    }
+
+    /// `-[NSURLSessionConfiguration networkServiceType]`
+    pub fn networkServiceType(self: Self) URLRequestNetworkServiceType {
+        return self.object.msgSend(URLRequestNetworkServiceType, "networkServiceType", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setNetworkServiceType:]`
+    pub fn setNetworkServiceType(self: Self, network_service_type: URLRequestNetworkServiceType) void {
+        return self.object.msgSend(void, "setNetworkServiceType:", .{network_service_type});
+    }
+
+    /// `-[NSURLSessionConfiguration allowsCellularAccess]`
+    pub fn allowsCellularAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsCellularAccess", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setAllowsCellularAccess:]`
+    pub fn setAllowsCellularAccess(self: Self, allows_cellular_access: bool) void {
+        return self.object.msgSend(void, "setAllowsCellularAccess:", .{allows_cellular_access});
+    }
+
+    /// `-[NSURLSessionConfiguration allowsExpensiveNetworkAccess]`
+    pub fn allowsExpensiveNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsExpensiveNetworkAccess", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setAllowsExpensiveNetworkAccess:]`
+    pub fn setAllowsExpensiveNetworkAccess(self: Self, allows_expensive_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsExpensiveNetworkAccess:", .{allows_expensive_network_access});
+    }
+
+    /// `-[NSURLSessionConfiguration allowsConstrainedNetworkAccess]`
+    pub fn allowsConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setAllowsConstrainedNetworkAccess:]`
+    pub fn setAllowsConstrainedNetworkAccess(self: Self, allows_constrained_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsConstrainedNetworkAccess:", .{allows_constrained_network_access});
+    }
+
+    /// `-[NSURLSessionConfiguration allowsUltraConstrainedNetworkAccess]`
+    pub fn allowsUltraConstrainedNetworkAccess(self: Self) bool {
+        return self.object.msgSend(bool, "allowsUltraConstrainedNetworkAccess", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setAllowsUltraConstrainedNetworkAccess:]`
+    pub fn setAllowsUltraConstrainedNetworkAccess(self: Self, allows_ultra_constrained_network_access: bool) void {
+        return self.object.msgSend(void, "setAllowsUltraConstrainedNetworkAccess:", .{allows_ultra_constrained_network_access});
+    }
+
+    /// `-[NSURLSessionConfiguration requiresDNSSECValidation]`
+    pub fn requiresDNSSECValidation(self: Self) bool {
+        return self.object.msgSend(bool, "requiresDNSSECValidation", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setRequiresDNSSECValidation:]`
+    pub fn setRequiresDNSSECValidation(self: Self, requires_dnssec_validation: bool) void {
+        return self.object.msgSend(void, "setRequiresDNSSECValidation:", .{requires_dnssec_validation});
+    }
+
+    /// `-[NSURLSessionConfiguration waitsForConnectivity]`
+    pub fn waitsForConnectivity(self: Self) bool {
+        return self.object.msgSend(bool, "waitsForConnectivity", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setWaitsForConnectivity:]`
+    pub fn setWaitsForConnectivity(self: Self, waits_for_connectivity: bool) void {
+        return self.object.msgSend(void, "setWaitsForConnectivity:", .{waits_for_connectivity});
+    }
+
+    /// `-[NSURLSessionConfiguration isDiscretionary]`
+    pub fn isDiscretionary(self: Self) bool {
+        return self.object.msgSend(bool, "isDiscretionary", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setDiscretionary:]`
+    pub fn setDiscretionary(self: Self, discretionary: bool) void {
+        return self.object.msgSend(void, "setDiscretionary:", .{discretionary});
+    }
+
+    /// `-[NSURLSessionConfiguration sharedContainerIdentifier]`
+    pub fn sharedContainerIdentifier(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "sharedContainerIdentifier", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setSharedContainerIdentifier:]`
+    pub fn setSharedContainerIdentifier(self: Self, shared_container_identifier: ?foundation.String) void {
+        return self.object.msgSend(void, "setSharedContainerIdentifier:", .{shared_container_identifier});
+    }
+
+    /// `-[NSURLSessionConfiguration sessionSendsLaunchEvents]`
+    pub fn sessionSendsLaunchEvents(self: Self) bool {
+        return self.object.msgSend(bool, "sessionSendsLaunchEvents", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setSessionSendsLaunchEvents:]`
+    pub fn setSessionSendsLaunchEvents(self: Self, session_sends_launch_events: bool) void {
+        return self.object.msgSend(void, "setSessionSendsLaunchEvents:", .{session_sends_launch_events});
+    }
+
+    /// `-[NSURLSessionConfiguration connectionProxyDictionary]`
+    pub fn connectionProxyDictionary(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "connectionProxyDictionary", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setConnectionProxyDictionary:]`
+    pub fn setConnectionProxyDictionary(self: Self, connection_proxy_dictionary: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "setConnectionProxyDictionary:", .{connection_proxy_dictionary});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPShouldUsePipelining]`
+    pub fn httpShouldUsePipelining(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldUsePipelining", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPShouldUsePipelining:]`
+    pub fn setHTTPShouldUsePipelining(self: Self, http_should_use_pipelining: bool) void {
+        return self.object.msgSend(void, "setHTTPShouldUsePipelining:", .{http_should_use_pipelining});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPShouldSetCookies]`
+    pub fn httpShouldSetCookies(self: Self) bool {
+        return self.object.msgSend(bool, "HTTPShouldSetCookies", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPShouldSetCookies:]`
+    pub fn setHTTPShouldSetCookies(self: Self, http_should_set_cookies: bool) void {
+        return self.object.msgSend(void, "setHTTPShouldSetCookies:", .{http_should_set_cookies});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPCookieAcceptPolicy]`
+    pub fn httpCookieAcceptPolicy(self: Self) HTTPCookieAcceptPolicy {
+        return self.object.msgSend(HTTPCookieAcceptPolicy, "HTTPCookieAcceptPolicy", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPCookieAcceptPolicy:]`
+    pub fn setHTTPCookieAcceptPolicy(self: Self, http_cookie_accept_policy: HTTPCookieAcceptPolicy) void {
+        return self.object.msgSend(void, "setHTTPCookieAcceptPolicy:", .{http_cookie_accept_policy});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPAdditionalHeaders]`
+    pub fn httpAdditionalHeaders(self: Self) ?foundation.Dictionary(objc.Object, objc.Object) {
+        return self.object.msgSend(?foundation.Dictionary(objc.Object, objc.Object), "HTTPAdditionalHeaders", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPAdditionalHeaders:]`
+    pub fn setHTTPAdditionalHeaders(self: Self, http_additional_headers: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+        return self.object.msgSend(void, "setHTTPAdditionalHeaders:", .{http_additional_headers});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPMaximumConnectionsPerHost]`
+    pub fn httpMaximumConnectionsPerHost(self: Self) objc.Integer {
+        return self.object.msgSend(objc.Integer, "HTTPMaximumConnectionsPerHost", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPMaximumConnectionsPerHost:]`
+    pub fn setHTTPMaximumConnectionsPerHost(self: Self, http_maximum_connections_per_host: objc.Integer) void {
+        return self.object.msgSend(void, "setHTTPMaximumConnectionsPerHost:", .{http_maximum_connections_per_host});
+    }
+
+    /// `-[NSURLSessionConfiguration HTTPCookieStorage]`
+    pub fn httpCookieStorage(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "HTTPCookieStorage", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setHTTPCookieStorage:]`
+    pub fn setHTTPCookieStorage(self: Self, http_cookie_storage: ?objc.Object) void {
+        return self.object.msgSend(void, "setHTTPCookieStorage:", .{http_cookie_storage});
+    }
+
+    /// `-[NSURLSessionConfiguration URLCredentialStorage]`
+    pub fn urlCredentialStorage(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "URLCredentialStorage", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setURLCredentialStorage:]`
+    pub fn setURLCredentialStorage(self: Self, url_credential_storage: ?objc.Object) void {
+        return self.object.msgSend(void, "setURLCredentialStorage:", .{url_credential_storage});
+    }
+
+    /// `-[NSURLSessionConfiguration URLCache]`
+    pub fn urlCache(self: Self) ?objc.Object {
+        return self.object.msgSend(?objc.Object, "URLCache", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setURLCache:]`
+    pub fn setURLCache(self: Self, url_cache: ?objc.Object) void {
+        return self.object.msgSend(void, "setURLCache:", .{url_cache});
+    }
+
+    /// `-[NSURLSessionConfiguration shouldUseExtendedBackgroundIdleMode]`
+    pub fn shouldUseExtendedBackgroundIdleMode(self: Self) bool {
+        return self.object.msgSend(bool, "shouldUseExtendedBackgroundIdleMode", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setShouldUseExtendedBackgroundIdleMode:]`
+    pub fn setShouldUseExtendedBackgroundIdleMode(self: Self, should_use_extended_background_idle_mode: bool) void {
+        return self.object.msgSend(void, "setShouldUseExtendedBackgroundIdleMode:", .{should_use_extended_background_idle_mode});
+    }
+
+    /// `-[NSURLSessionConfiguration protocolClasses]`
+    pub fn protocolClasses(self: Self) ?foundation.Array(objc.Object) {
+        return self.object.msgSend(?foundation.Array(objc.Object), "protocolClasses", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setProtocolClasses:]`
+    pub fn setProtocolClasses(self: Self, protocol_classes: ?foundation.Array(objc.Object)) void {
+        return self.object.msgSend(void, "setProtocolClasses:", .{protocol_classes});
+    }
+
+    /// `-[NSURLSessionConfiguration multipathServiceType]`
+    pub fn multipathServiceType(self: Self) URLSessionMultipathServiceType {
+        return self.object.msgSend(URLSessionMultipathServiceType, "multipathServiceType", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setMultipathServiceType:]`
+    pub fn setMultipathServiceType(self: Self, multipath_service_type: URLSessionMultipathServiceType) void {
+        return self.object.msgSend(void, "setMultipathServiceType:", .{multipath_service_type});
+    }
+
+    /// `-[NSURLSessionConfiguration usesClassicLoadingMode]`
+    pub fn usesClassicLoadingMode(self: Self) bool {
+        return self.object.msgSend(bool, "usesClassicLoadingMode", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setUsesClassicLoadingMode:]`
+    pub fn setUsesClassicLoadingMode(self: Self, uses_classic_loading_mode: bool) void {
+        return self.object.msgSend(void, "setUsesClassicLoadingMode:", .{uses_classic_loading_mode});
+    }
+
+    /// `-[NSURLSessionConfiguration enablesEarlyData]`
+    pub fn enablesEarlyData(self: Self) bool {
+        return self.object.msgSend(bool, "enablesEarlyData", .{});
+    }
+
+    /// `-[NSURLSessionConfiguration setEnablesEarlyData:]`
+    pub fn setEnablesEarlyData(self: Self, enables_early_data: bool) void {
+        return self.object.msgSend(void, "setEnablesEarlyData:", .{enables_early_data});
+    }
+
+    /// `+[NSURLSessionConfiguration backgroundSessionConfiguration:]`
+    pub fn backgroundSessionConfiguration(identifier_: foundation.String) URLSessionConfiguration {
+        return class().msgSend(URLSessionConfiguration, "backgroundSessionConfiguration:", .{identifier_});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"+backgroundSessionConfigurationWithIdentifier:" = fn (foundation.String) URLSessionConfiguration;
+        pub const @"-init" = fn () URLSessionConfiguration;
+        pub const @"+new" = fn () URLSessionConfiguration;
+        pub const @"+defaultSessionConfiguration" = fn () URLSessionConfiguration;
+        pub const @"+ephemeralSessionConfiguration" = fn () URLSessionConfiguration;
+        pub const @"-identifier" = fn () ?foundation.String;
+        pub const @"-requestCachePolicy" = fn () URLRequestCachePolicy;
+        pub const @"-setRequestCachePolicy:" = fn (URLRequestCachePolicy) void;
+        pub const @"-timeoutIntervalForRequest" = fn () f64;
+        pub const @"-setTimeoutIntervalForRequest:" = fn (f64) void;
+        pub const @"-timeoutIntervalForResource" = fn () f64;
+        pub const @"-setTimeoutIntervalForResource:" = fn (f64) void;
+        pub const @"-networkServiceType" = fn () URLRequestNetworkServiceType;
+        pub const @"-setNetworkServiceType:" = fn (URLRequestNetworkServiceType) void;
+        pub const @"-allowsCellularAccess" = fn () bool;
+        pub const @"-setAllowsCellularAccess:" = fn (bool) void;
+        pub const @"-allowsExpensiveNetworkAccess" = fn () bool;
+        pub const @"-setAllowsExpensiveNetworkAccess:" = fn (bool) void;
+        pub const @"-allowsConstrainedNetworkAccess" = fn () bool;
+        pub const @"-setAllowsConstrainedNetworkAccess:" = fn (bool) void;
+        pub const @"-allowsUltraConstrainedNetworkAccess" = fn () bool;
+        pub const @"-setAllowsUltraConstrainedNetworkAccess:" = fn (bool) void;
+        pub const @"-requiresDNSSECValidation" = fn () bool;
+        pub const @"-setRequiresDNSSECValidation:" = fn (bool) void;
+        pub const @"-waitsForConnectivity" = fn () bool;
+        pub const @"-setWaitsForConnectivity:" = fn (bool) void;
+        pub const @"-isDiscretionary" = fn () bool;
+        pub const @"-setDiscretionary:" = fn (bool) void;
+        pub const @"-sharedContainerIdentifier" = fn () ?foundation.String;
+        pub const @"-setSharedContainerIdentifier:" = fn (?foundation.String) void;
+        pub const @"-sessionSendsLaunchEvents" = fn () bool;
+        pub const @"-setSessionSendsLaunchEvents:" = fn (bool) void;
+        pub const @"-connectionProxyDictionary" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-setConnectionProxyDictionary:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-HTTPShouldUsePipelining" = fn () bool;
+        pub const @"-setHTTPShouldUsePipelining:" = fn (bool) void;
+        pub const @"-HTTPShouldSetCookies" = fn () bool;
+        pub const @"-setHTTPShouldSetCookies:" = fn (bool) void;
+        pub const @"-HTTPCookieAcceptPolicy" = fn () HTTPCookieAcceptPolicy;
+        pub const @"-setHTTPCookieAcceptPolicy:" = fn (HTTPCookieAcceptPolicy) void;
+        pub const @"-HTTPAdditionalHeaders" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-setHTTPAdditionalHeaders:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-HTTPMaximumConnectionsPerHost" = fn () objc.Integer;
+        pub const @"-setHTTPMaximumConnectionsPerHost:" = fn (objc.Integer) void;
+        pub const @"-HTTPCookieStorage" = fn () ?objc.Object;
+        pub const @"-setHTTPCookieStorage:" = fn (?objc.Object) void;
+        pub const @"-URLCredentialStorage" = fn () ?objc.Object;
+        pub const @"-setURLCredentialStorage:" = fn (?objc.Object) void;
+        pub const @"-URLCache" = fn () ?objc.Object;
+        pub const @"-setURLCache:" = fn (?objc.Object) void;
+        pub const @"-shouldUseExtendedBackgroundIdleMode" = fn () bool;
+        pub const @"-setShouldUseExtendedBackgroundIdleMode:" = fn (bool) void;
+        pub const @"-protocolClasses" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setProtocolClasses:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-multipathServiceType" = fn () URLSessionMultipathServiceType;
+        pub const @"-setMultipathServiceType:" = fn (URLSessionMultipathServiceType) void;
+        pub const @"-usesClassicLoadingMode" = fn () bool;
+        pub const @"-setUsesClassicLoadingMode:" = fn (bool) void;
+        pub const @"-enablesEarlyData" = fn () bool;
+        pub const @"-setEnablesEarlyData:" = fn (bool) void;
+        pub const @"+backgroundSessionConfiguration:" = fn (foundation.String) URLSessionConfiguration;
+    };
+
+    // Not generated:
+    //   -[NSURLSessionConfiguration TLSMinimumSupportedProtocol]: SSLProtocol
+    //   -[NSURLSessionConfiguration setTLSMinimumSupportedProtocol:]: SSLProtocol
+    //   -[NSURLSessionConfiguration TLSMaximumSupportedProtocol]: SSLProtocol
+    //   -[NSURLSessionConfiguration setTLSMaximumSupportedProtocol:]: SSLProtocol
+    //   -[NSURLSessionConfiguration TLSMinimumSupportedProtocolVersion]: tls_protocol_version_t
+    //   -[NSURLSessionConfiguration setTLSMinimumSupportedProtocolVersion:]: tls_protocol_version_t
+    //   -[NSURLSessionConfiguration TLSMaximumSupportedProtocolVersion]: tls_protocol_version_t
+    //   -[NSURLSessionConfiguration setTLSMaximumSupportedProtocolVersion:]: tls_protocol_version_t
+};
+
+/// `NSURLSessionTask`, a subclass of `NSObject`.
+pub const URLSessionTask = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const class_name = "NSURLSessionTask";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSessionTask alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSessionTask`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionTask cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSURLSessionTask suspend]`
+    pub fn @"suspend"(self: Self) void {
+        return self.object.msgSend(void, "suspend", .{});
+    }
+
+    /// `-[NSURLSessionTask resume]`
+    pub fn @"resume"(self: Self) void {
+        return self.object.msgSend(void, "resume", .{});
+    }
+
+    /// `-[NSURLSessionTask init]`
+    pub fn init(self: Self) URLSessionTask {
+        return self.object.msgSend(URLSessionTask, "init", .{});
+    }
+
+    /// `+[NSURLSessionTask new]`
+    pub fn classNew() URLSessionTask {
+        return class().msgSend(URLSessionTask, "new", .{});
+    }
+
+    /// `-[NSURLSessionTask taskIdentifier]`
+    pub fn taskIdentifier(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "taskIdentifier", .{});
+    }
+
+    /// `-[NSURLSessionTask originalRequest]`
+    pub fn originalRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "originalRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask currentRequest]`
+    pub fn currentRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "currentRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask response]`
+    pub fn response(self: Self) ?URLResponse {
+        return self.object.msgSend(?URLResponse, "response", .{});
+    }
+
+    /// `-[NSURLSessionTask delegate]`
+    pub fn delegate(self: Self) ?URLSessionTaskDelegate {
+        return self.object.msgSend(?URLSessionTaskDelegate, "delegate", .{});
+    }
+
+    /// `-[NSURLSessionTask setDelegate:]`
+    pub fn setDelegate(self: Self, delegate_: ?URLSessionTaskDelegate) void {
+        return self.object.msgSend(void, "setDelegate:", .{delegate_});
+    }
+
+    /// `-[NSURLSessionTask progress]`
+    pub fn progress(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "progress", .{});
+    }
+
+    /// `-[NSURLSessionTask earliestBeginDate]`
+    pub fn earliestBeginDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "earliestBeginDate", .{});
+    }
+
+    /// `-[NSURLSessionTask setEarliestBeginDate:]`
+    pub fn setEarliestBeginDate(self: Self, earliest_begin_date: ?Date) void {
+        return self.object.msgSend(void, "setEarliestBeginDate:", .{earliest_begin_date});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToSend]`
+    pub fn countOfBytesClientExpectsToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToSend:]`
+    pub fn setCountOfBytesClientExpectsToSend(self: Self, count_of_bytes_client_expects_to_send: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToSend:", .{count_of_bytes_client_expects_to_send});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToReceive]`
+    pub fn countOfBytesClientExpectsToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToReceive:]`
+    pub fn setCountOfBytesClientExpectsToReceive(self: Self, count_of_bytes_client_expects_to_receive: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToReceive:", .{count_of_bytes_client_expects_to_receive});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesSent]`
+    pub fn countOfBytesSent(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesSent", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesReceived]`
+    pub fn countOfBytesReceived(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesReceived", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToSend]`
+    pub fn countOfBytesExpectedToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToReceive]`
+    pub fn countOfBytesExpectedToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask taskDescription]`
+    pub fn taskDescription(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "taskDescription", .{});
+    }
+
+    /// `-[NSURLSessionTask setTaskDescription:]`
+    pub fn setTaskDescription(self: Self, task_description: ?foundation.String) void {
+        return self.object.msgSend(void, "setTaskDescription:", .{task_description});
+    }
+
+    /// `-[NSURLSessionTask state]`
+    pub fn state(self: Self) URLSessionTaskState {
+        return self.object.msgSend(URLSessionTaskState, "state", .{});
+    }
+
+    /// `-[NSURLSessionTask error]`
+    pub fn @"error"(self: Self) ?foundation.ErrorObject {
+        return self.object.msgSend(?foundation.ErrorObject, "error", .{});
+    }
+
+    /// `-[NSURLSessionTask priority]`
+    pub fn priority(self: Self) f32 {
+        return self.object.msgSend(f32, "priority", .{});
+    }
+
+    /// `-[NSURLSessionTask setPriority:]`
+    pub fn setPriority(self: Self, priority_: f32) void {
+        return self.object.msgSend(void, "setPriority:", .{priority_});
+    }
+
+    /// `-[NSURLSessionTask prefersIncrementalDelivery]`
+    pub fn prefersIncrementalDelivery(self: Self) bool {
+        return self.object.msgSend(bool, "prefersIncrementalDelivery", .{});
+    }
+
+    /// `-[NSURLSessionTask setPrefersIncrementalDelivery:]`
+    pub fn setPrefersIncrementalDelivery(self: Self, prefers_incremental_delivery: bool) void {
+        return self.object.msgSend(void, "setPrefersIncrementalDelivery:", .{prefers_incremental_delivery});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-cancel" = fn () void;
+        pub const @"-suspend" = fn () void;
+        pub const @"-resume" = fn () void;
+        pub const @"-init" = fn () URLSessionTask;
+        pub const @"+new" = fn () URLSessionTask;
+        pub const @"-taskIdentifier" = fn () objc.UInteger;
+        pub const @"-originalRequest" = fn () ?URLRequest;
+        pub const @"-currentRequest" = fn () ?URLRequest;
+        pub const @"-response" = fn () ?URLResponse;
+        pub const @"-delegate" = fn () ?URLSessionTaskDelegate;
+        pub const @"-setDelegate:" = fn (?URLSessionTaskDelegate) void;
+        pub const @"-progress" = fn () objc.Object;
+        pub const @"-earliestBeginDate" = fn () ?Date;
+        pub const @"-setEarliestBeginDate:" = fn (?Date) void;
+        pub const @"-countOfBytesClientExpectsToSend" = fn () i64;
+        pub const @"-setCountOfBytesClientExpectsToSend:" = fn (i64) void;
+        pub const @"-countOfBytesClientExpectsToReceive" = fn () i64;
+        pub const @"-setCountOfBytesClientExpectsToReceive:" = fn (i64) void;
+        pub const @"-countOfBytesSent" = fn () i64;
+        pub const @"-countOfBytesReceived" = fn () i64;
+        pub const @"-countOfBytesExpectedToSend" = fn () i64;
+        pub const @"-countOfBytesExpectedToReceive" = fn () i64;
+        pub const @"-taskDescription" = fn () ?foundation.String;
+        pub const @"-setTaskDescription:" = fn (?foundation.String) void;
+        pub const @"-state" = fn () URLSessionTaskState;
+        pub const @"-error" = fn () ?foundation.ErrorObject;
+        pub const @"-priority" = fn () f32;
+        pub const @"-setPriority:" = fn (f32) void;
+        pub const @"-prefersIncrementalDelivery" = fn () bool;
+        pub const @"-setPrefersIncrementalDelivery:" = fn (bool) void;
+    };
+};
+
+/// `NSURLSessionDataTask`, a subclass of `NSURLSessionTask`.
+pub const URLSessionDataTask = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLSessionTask;
+    pub const class_name = "NSURLSessionDataTask";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSessionDataTask alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSessionDataTask`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionDataTask init]`
+    pub fn init(self: Self) URLSessionDataTask {
+        return self.object.msgSend(URLSessionDataTask, "init", .{});
+    }
+
+    /// `+[NSURLSessionDataTask new]`
+    pub fn classNew() URLSessionDataTask {
+        return class().msgSend(URLSessionDataTask, "new", .{});
+    }
+
+    /// `-[NSURLSessionTask cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSURLSessionTask suspend]`
+    pub fn @"suspend"(self: Self) void {
+        return self.object.msgSend(void, "suspend", .{});
+    }
+
+    /// `-[NSURLSessionTask resume]`
+    pub fn @"resume"(self: Self) void {
+        return self.object.msgSend(void, "resume", .{});
+    }
+
+    /// `-[NSURLSessionTask taskIdentifier]`
+    pub fn taskIdentifier(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "taskIdentifier", .{});
+    }
+
+    /// `-[NSURLSessionTask originalRequest]`
+    pub fn originalRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "originalRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask currentRequest]`
+    pub fn currentRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "currentRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask response]`
+    pub fn response(self: Self) ?URLResponse {
+        return self.object.msgSend(?URLResponse, "response", .{});
+    }
+
+    /// `-[NSURLSessionTask delegate]`
+    pub fn delegate(self: Self) ?URLSessionTaskDelegate {
+        return self.object.msgSend(?URLSessionTaskDelegate, "delegate", .{});
+    }
+
+    /// `-[NSURLSessionTask setDelegate:]`
+    pub fn setDelegate(self: Self, delegate_: ?URLSessionTaskDelegate) void {
+        return self.object.msgSend(void, "setDelegate:", .{delegate_});
+    }
+
+    /// `-[NSURLSessionTask progress]`
+    pub fn progress(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "progress", .{});
+    }
+
+    /// `-[NSURLSessionTask earliestBeginDate]`
+    pub fn earliestBeginDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "earliestBeginDate", .{});
+    }
+
+    /// `-[NSURLSessionTask setEarliestBeginDate:]`
+    pub fn setEarliestBeginDate(self: Self, earliest_begin_date: ?Date) void {
+        return self.object.msgSend(void, "setEarliestBeginDate:", .{earliest_begin_date});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToSend]`
+    pub fn countOfBytesClientExpectsToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToSend:]`
+    pub fn setCountOfBytesClientExpectsToSend(self: Self, count_of_bytes_client_expects_to_send: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToSend:", .{count_of_bytes_client_expects_to_send});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToReceive]`
+    pub fn countOfBytesClientExpectsToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToReceive:]`
+    pub fn setCountOfBytesClientExpectsToReceive(self: Self, count_of_bytes_client_expects_to_receive: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToReceive:", .{count_of_bytes_client_expects_to_receive});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesSent]`
+    pub fn countOfBytesSent(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesSent", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesReceived]`
+    pub fn countOfBytesReceived(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesReceived", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToSend]`
+    pub fn countOfBytesExpectedToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToReceive]`
+    pub fn countOfBytesExpectedToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask taskDescription]`
+    pub fn taskDescription(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "taskDescription", .{});
+    }
+
+    /// `-[NSURLSessionTask setTaskDescription:]`
+    pub fn setTaskDescription(self: Self, task_description: ?foundation.String) void {
+        return self.object.msgSend(void, "setTaskDescription:", .{task_description});
+    }
+
+    /// `-[NSURLSessionTask state]`
+    pub fn state(self: Self) URLSessionTaskState {
+        return self.object.msgSend(URLSessionTaskState, "state", .{});
+    }
+
+    /// `-[NSURLSessionTask error]`
+    pub fn @"error"(self: Self) ?foundation.ErrorObject {
+        return self.object.msgSend(?foundation.ErrorObject, "error", .{});
+    }
+
+    /// `-[NSURLSessionTask priority]`
+    pub fn priority(self: Self) f32 {
+        return self.object.msgSend(f32, "priority", .{});
+    }
+
+    /// `-[NSURLSessionTask setPriority:]`
+    pub fn setPriority(self: Self, priority_: f32) void {
+        return self.object.msgSend(void, "setPriority:", .{priority_});
+    }
+
+    /// `-[NSURLSessionTask prefersIncrementalDelivery]`
+    pub fn prefersIncrementalDelivery(self: Self) bool {
+        return self.object.msgSend(bool, "prefersIncrementalDelivery", .{});
+    }
+
+    /// `-[NSURLSessionTask setPrefersIncrementalDelivery:]`
+    pub fn setPrefersIncrementalDelivery(self: Self, prefers_incremental_delivery: bool) void {
+        return self.object.msgSend(void, "setPrefersIncrementalDelivery:", .{prefers_incremental_delivery});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-init" = fn () URLSessionDataTask;
+        pub const @"+new" = fn () URLSessionDataTask;
+    };
+};
+
+/// `NSURLSessionDownloadTask`, a subclass of `NSURLSessionTask`.
+pub const URLSessionDownloadTask = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLSessionTask;
+    pub const class_name = "NSURLSessionDownloadTask";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSessionDownloadTask alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSessionDownloadTask`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionDownloadTask cancelByProducingResumeData:]`
+    pub fn cancelByProducingResumeData(self: Self, completion_handler: objc.BlockRef(fn (?foundation.Data) void)) void {
+        return self.object.msgSend(void, "cancelByProducingResumeData:", .{completion_handler});
+    }
+
+    /// `-[NSURLSessionDownloadTask init]`
+    pub fn init(self: Self) URLSessionDownloadTask {
+        return self.object.msgSend(URLSessionDownloadTask, "init", .{});
+    }
+
+    /// `+[NSURLSessionDownloadTask new]`
+    pub fn classNew() URLSessionDownloadTask {
+        return class().msgSend(URLSessionDownloadTask, "new", .{});
+    }
+
+    /// `-[NSURLSessionTask cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSURLSessionTask suspend]`
+    pub fn @"suspend"(self: Self) void {
+        return self.object.msgSend(void, "suspend", .{});
+    }
+
+    /// `-[NSURLSessionTask resume]`
+    pub fn @"resume"(self: Self) void {
+        return self.object.msgSend(void, "resume", .{});
+    }
+
+    /// `-[NSURLSessionTask taskIdentifier]`
+    pub fn taskIdentifier(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "taskIdentifier", .{});
+    }
+
+    /// `-[NSURLSessionTask originalRequest]`
+    pub fn originalRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "originalRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask currentRequest]`
+    pub fn currentRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "currentRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask response]`
+    pub fn response(self: Self) ?URLResponse {
+        return self.object.msgSend(?URLResponse, "response", .{});
+    }
+
+    /// `-[NSURLSessionTask delegate]`
+    pub fn delegate(self: Self) ?URLSessionTaskDelegate {
+        return self.object.msgSend(?URLSessionTaskDelegate, "delegate", .{});
+    }
+
+    /// `-[NSURLSessionTask setDelegate:]`
+    pub fn setDelegate(self: Self, delegate_: ?URLSessionTaskDelegate) void {
+        return self.object.msgSend(void, "setDelegate:", .{delegate_});
+    }
+
+    /// `-[NSURLSessionTask progress]`
+    pub fn progress(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "progress", .{});
+    }
+
+    /// `-[NSURLSessionTask earliestBeginDate]`
+    pub fn earliestBeginDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "earliestBeginDate", .{});
+    }
+
+    /// `-[NSURLSessionTask setEarliestBeginDate:]`
+    pub fn setEarliestBeginDate(self: Self, earliest_begin_date: ?Date) void {
+        return self.object.msgSend(void, "setEarliestBeginDate:", .{earliest_begin_date});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToSend]`
+    pub fn countOfBytesClientExpectsToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToSend:]`
+    pub fn setCountOfBytesClientExpectsToSend(self: Self, count_of_bytes_client_expects_to_send: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToSend:", .{count_of_bytes_client_expects_to_send});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToReceive]`
+    pub fn countOfBytesClientExpectsToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToReceive:]`
+    pub fn setCountOfBytesClientExpectsToReceive(self: Self, count_of_bytes_client_expects_to_receive: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToReceive:", .{count_of_bytes_client_expects_to_receive});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesSent]`
+    pub fn countOfBytesSent(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesSent", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesReceived]`
+    pub fn countOfBytesReceived(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesReceived", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToSend]`
+    pub fn countOfBytesExpectedToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToReceive]`
+    pub fn countOfBytesExpectedToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask taskDescription]`
+    pub fn taskDescription(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "taskDescription", .{});
+    }
+
+    /// `-[NSURLSessionTask setTaskDescription:]`
+    pub fn setTaskDescription(self: Self, task_description: ?foundation.String) void {
+        return self.object.msgSend(void, "setTaskDescription:", .{task_description});
+    }
+
+    /// `-[NSURLSessionTask state]`
+    pub fn state(self: Self) URLSessionTaskState {
+        return self.object.msgSend(URLSessionTaskState, "state", .{});
+    }
+
+    /// `-[NSURLSessionTask error]`
+    pub fn @"error"(self: Self) ?foundation.ErrorObject {
+        return self.object.msgSend(?foundation.ErrorObject, "error", .{});
+    }
+
+    /// `-[NSURLSessionTask priority]`
+    pub fn priority(self: Self) f32 {
+        return self.object.msgSend(f32, "priority", .{});
+    }
+
+    /// `-[NSURLSessionTask setPriority:]`
+    pub fn setPriority(self: Self, priority_: f32) void {
+        return self.object.msgSend(void, "setPriority:", .{priority_});
+    }
+
+    /// `-[NSURLSessionTask prefersIncrementalDelivery]`
+    pub fn prefersIncrementalDelivery(self: Self) bool {
+        return self.object.msgSend(bool, "prefersIncrementalDelivery", .{});
+    }
+
+    /// `-[NSURLSessionTask setPrefersIncrementalDelivery:]`
+    pub fn setPrefersIncrementalDelivery(self: Self, prefers_incremental_delivery: bool) void {
+        return self.object.msgSend(void, "setPrefersIncrementalDelivery:", .{prefers_incremental_delivery});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-cancelByProducingResumeData:" = fn (objc.BlockRef(fn (?foundation.Data) void)) void;
+        pub const @"-init" = fn () URLSessionDownloadTask;
+        pub const @"+new" = fn () URLSessionDownloadTask;
+    };
+};
+
+/// `NSURLSessionUploadTask`, a subclass of `NSURLSessionDataTask`.
+pub const URLSessionUploadTask = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLSessionDataTask;
+    pub const class_name = "NSURLSessionUploadTask";
+
+    pub fn class() objc.Class {
+        return lookUp(class_name);
+    }
+
+    /// An uninitialised instance, for an `init...` method. Yours.
+    pub fn alloc() Self {
+        return class().msgSend(Self, "alloc", .{});
+    }
+
+    /// `[[NSURLSessionUploadTask alloc] init]`. Yours.
+    pub fn new() Self {
+        return class().msgSend(Self, "new", .{});
+    }
+
+    /// An object that came from elsewhere, taken to be a `NSURLSessionUploadTask`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a superclass's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(class_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionUploadTask init]`
+    pub fn init(self: Self) URLSessionUploadTask {
+        return self.object.msgSend(URLSessionUploadTask, "init", .{});
+    }
+
+    /// `+[NSURLSessionUploadTask new]`
+    pub fn classNew() URLSessionUploadTask {
+        return class().msgSend(URLSessionUploadTask, "new", .{});
+    }
+
+    /// `-[NSURLSessionUploadTask cancelByProducingResumeData:]`
+    pub fn cancelByProducingResumeData(self: Self, completion_handler: objc.BlockRef(fn (?foundation.Data) void)) void {
+        return self.object.msgSend(void, "cancelByProducingResumeData:", .{completion_handler});
+    }
+
+    /// `-[NSURLSessionTask cancel]`
+    pub fn cancel(self: Self) void {
+        return self.object.msgSend(void, "cancel", .{});
+    }
+
+    /// `-[NSURLSessionTask suspend]`
+    pub fn @"suspend"(self: Self) void {
+        return self.object.msgSend(void, "suspend", .{});
+    }
+
+    /// `-[NSURLSessionTask resume]`
+    pub fn @"resume"(self: Self) void {
+        return self.object.msgSend(void, "resume", .{});
+    }
+
+    /// `-[NSURLSessionTask taskIdentifier]`
+    pub fn taskIdentifier(self: Self) objc.UInteger {
+        return self.object.msgSend(objc.UInteger, "taskIdentifier", .{});
+    }
+
+    /// `-[NSURLSessionTask originalRequest]`
+    pub fn originalRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "originalRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask currentRequest]`
+    pub fn currentRequest(self: Self) ?URLRequest {
+        return self.object.msgSend(?URLRequest, "currentRequest", .{});
+    }
+
+    /// `-[NSURLSessionTask response]`
+    pub fn response(self: Self) ?URLResponse {
+        return self.object.msgSend(?URLResponse, "response", .{});
+    }
+
+    /// `-[NSURLSessionTask delegate]`
+    pub fn delegate(self: Self) ?URLSessionTaskDelegate {
+        return self.object.msgSend(?URLSessionTaskDelegate, "delegate", .{});
+    }
+
+    /// `-[NSURLSessionTask setDelegate:]`
+    pub fn setDelegate(self: Self, delegate_: ?URLSessionTaskDelegate) void {
+        return self.object.msgSend(void, "setDelegate:", .{delegate_});
+    }
+
+    /// `-[NSURLSessionTask progress]`
+    pub fn progress(self: Self) objc.Object {
+        return self.object.msgSend(objc.Object, "progress", .{});
+    }
+
+    /// `-[NSURLSessionTask earliestBeginDate]`
+    pub fn earliestBeginDate(self: Self) ?Date {
+        return self.object.msgSend(?Date, "earliestBeginDate", .{});
+    }
+
+    /// `-[NSURLSessionTask setEarliestBeginDate:]`
+    pub fn setEarliestBeginDate(self: Self, earliest_begin_date: ?Date) void {
+        return self.object.msgSend(void, "setEarliestBeginDate:", .{earliest_begin_date});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToSend]`
+    pub fn countOfBytesClientExpectsToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToSend:]`
+    pub fn setCountOfBytesClientExpectsToSend(self: Self, count_of_bytes_client_expects_to_send: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToSend:", .{count_of_bytes_client_expects_to_send});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesClientExpectsToReceive]`
+    pub fn countOfBytesClientExpectsToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesClientExpectsToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask setCountOfBytesClientExpectsToReceive:]`
+    pub fn setCountOfBytesClientExpectsToReceive(self: Self, count_of_bytes_client_expects_to_receive: i64) void {
+        return self.object.msgSend(void, "setCountOfBytesClientExpectsToReceive:", .{count_of_bytes_client_expects_to_receive});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesSent]`
+    pub fn countOfBytesSent(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesSent", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesReceived]`
+    pub fn countOfBytesReceived(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesReceived", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToSend]`
+    pub fn countOfBytesExpectedToSend(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToSend", .{});
+    }
+
+    /// `-[NSURLSessionTask countOfBytesExpectedToReceive]`
+    pub fn countOfBytesExpectedToReceive(self: Self) i64 {
+        return self.object.msgSend(i64, "countOfBytesExpectedToReceive", .{});
+    }
+
+    /// `-[NSURLSessionTask taskDescription]`
+    pub fn taskDescription(self: Self) ?foundation.String {
+        return self.object.msgSend(?foundation.String, "taskDescription", .{});
+    }
+
+    /// `-[NSURLSessionTask setTaskDescription:]`
+    pub fn setTaskDescription(self: Self, task_description: ?foundation.String) void {
+        return self.object.msgSend(void, "setTaskDescription:", .{task_description});
+    }
+
+    /// `-[NSURLSessionTask state]`
+    pub fn state(self: Self) URLSessionTaskState {
+        return self.object.msgSend(URLSessionTaskState, "state", .{});
+    }
+
+    /// `-[NSURLSessionTask error]`
+    pub fn @"error"(self: Self) ?foundation.ErrorObject {
+        return self.object.msgSend(?foundation.ErrorObject, "error", .{});
+    }
+
+    /// `-[NSURLSessionTask priority]`
+    pub fn priority(self: Self) f32 {
+        return self.object.msgSend(f32, "priority", .{});
+    }
+
+    /// `-[NSURLSessionTask setPriority:]`
+    pub fn setPriority(self: Self, priority_: f32) void {
+        return self.object.msgSend(void, "setPriority:", .{priority_});
+    }
+
+    /// `-[NSURLSessionTask prefersIncrementalDelivery]`
+    pub fn prefersIncrementalDelivery(self: Self) bool {
+        return self.object.msgSend(bool, "prefersIncrementalDelivery", .{});
+    }
+
+    /// `-[NSURLSessionTask setPrefersIncrementalDelivery:]`
+    pub fn setPrefersIncrementalDelivery(self: Self, prefers_incremental_delivery: bool) void {
+        return self.object.msgSend(void, "setPrefersIncrementalDelivery:", .{prefers_incremental_delivery});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-init" = fn () URLSessionUploadTask;
+        pub const @"+new" = fn () URLSessionUploadTask;
+        pub const @"-cancelByProducingResumeData:" = fn (objc.BlockRef(fn (?foundation.Data) void)) void;
+    };
+};
+
+/// An object conforming to `NSFileManagerDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const FileManagerDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const protocol_name = "NSFileManagerDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSFileManagerDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldCopyItemAtPath:toPath:]`
+    pub fn fileManagerShouldCopyItemAtPathToPath(self: Self, file_manager: FileManager, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldCopyItemAtPath:toPath:", .{ file_manager, src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldCopyItemAtURL:toURL:]`
+    pub fn fileManagerShouldCopyItemAtURLToURL(self: Self, file_manager: FileManager, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldCopyItemAtURL:toURL:", .{ file_manager, src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:copyingItemAtPath:toPath:]`
+    pub fn fileManagerShouldProceedAfterErrorCopyingItemAtPathToPath(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:copyingItemAtPath:toPath:", .{ file_manager, @"error", src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:copyingItemAtURL:toURL:]`
+    pub fn fileManagerShouldProceedAfterErrorCopyingItemAtURLToURL(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:copyingItemAtURL:toURL:", .{ file_manager, @"error", src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldMoveItemAtPath:toPath:]`
+    pub fn fileManagerShouldMoveItemAtPathToPath(self: Self, file_manager: FileManager, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldMoveItemAtPath:toPath:", .{ file_manager, src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldMoveItemAtURL:toURL:]`
+    pub fn fileManagerShouldMoveItemAtURLToURL(self: Self, file_manager: FileManager, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldMoveItemAtURL:toURL:", .{ file_manager, src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:movingItemAtPath:toPath:]`
+    pub fn fileManagerShouldProceedAfterErrorMovingItemAtPathToPath(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:movingItemAtPath:toPath:", .{ file_manager, @"error", src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:movingItemAtURL:toURL:]`
+    pub fn fileManagerShouldProceedAfterErrorMovingItemAtURLToURL(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:movingItemAtURL:toURL:", .{ file_manager, @"error", src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldLinkItemAtPath:toPath:]`
+    pub fn fileManagerShouldLinkItemAtPathToPath(self: Self, file_manager: FileManager, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldLinkItemAtPath:toPath:", .{ file_manager, src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldLinkItemAtURL:toURL:]`
+    pub fn fileManagerShouldLinkItemAtURLToURL(self: Self, file_manager: FileManager, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldLinkItemAtURL:toURL:", .{ file_manager, src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:linkingItemAtPath:toPath:]`
+    pub fn fileManagerShouldProceedAfterErrorLinkingItemAtPathToPath(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_path: foundation.String, dst_path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:linkingItemAtPath:toPath:", .{ file_manager, @"error", src_path, dst_path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:linkingItemAtURL:toURL:]`
+    pub fn fileManagerShouldProceedAfterErrorLinkingItemAtURLToURL(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, src_url: foundation.Url, dst_url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:linkingItemAtURL:toURL:", .{ file_manager, @"error", src_url, dst_url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldRemoveItemAtPath:]`
+    pub fn fileManagerShouldRemoveItemAtPath(self: Self, file_manager: FileManager, path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldRemoveItemAtPath:", .{ file_manager, path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldRemoveItemAtURL:]`
+    pub fn fileManagerShouldRemoveItemAtURL(self: Self, file_manager: FileManager, url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldRemoveItemAtURL:", .{ file_manager, url });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:removingItemAtPath:]`
+    pub fn fileManagerShouldProceedAfterErrorRemovingItemAtPath(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, path: foundation.String) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:removingItemAtPath:", .{ file_manager, @"error", path });
+    }
+
+    /// `-[NSFileManagerDelegate fileManager:shouldProceedAfterError:removingItemAtURL:]`
+    pub fn fileManagerShouldProceedAfterErrorRemovingItemAtURL(self: Self, file_manager: FileManager, @"error": foundation.ErrorObject, url: foundation.Url) bool {
+        return self.object.msgSend(bool, "fileManager:shouldProceedAfterError:removingItemAtURL:", .{ file_manager, @"error", url });
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-fileManager:shouldCopyItemAtPath:toPath:" = fn (FileManager, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldCopyItemAtURL:toURL:" = fn (FileManager, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldProceedAfterError:copyingItemAtPath:toPath:" = fn (FileManager, foundation.ErrorObject, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldProceedAfterError:copyingItemAtURL:toURL:" = fn (FileManager, foundation.ErrorObject, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldMoveItemAtPath:toPath:" = fn (FileManager, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldMoveItemAtURL:toURL:" = fn (FileManager, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldProceedAfterError:movingItemAtPath:toPath:" = fn (FileManager, foundation.ErrorObject, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldProceedAfterError:movingItemAtURL:toURL:" = fn (FileManager, foundation.ErrorObject, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldLinkItemAtPath:toPath:" = fn (FileManager, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldLinkItemAtURL:toURL:" = fn (FileManager, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldProceedAfterError:linkingItemAtPath:toPath:" = fn (FileManager, foundation.ErrorObject, foundation.String, foundation.String) bool;
+        pub const @"-fileManager:shouldProceedAfterError:linkingItemAtURL:toURL:" = fn (FileManager, foundation.ErrorObject, foundation.Url, foundation.Url) bool;
+        pub const @"-fileManager:shouldRemoveItemAtPath:" = fn (FileManager, foundation.String) bool;
+        pub const @"-fileManager:shouldRemoveItemAtURL:" = fn (FileManager, foundation.Url) bool;
+        pub const @"-fileManager:shouldProceedAfterError:removingItemAtPath:" = fn (FileManager, foundation.ErrorObject, foundation.String) bool;
+        pub const @"-fileManager:shouldProceedAfterError:removingItemAtURL:" = fn (FileManager, foundation.ErrorObject, foundation.Url) bool;
+    };
+};
+
+/// An object conforming to `NSURLSessionDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const URLSessionDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = objc.Object;
+    pub const protocol_name = "NSURLSessionDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSURLSessionDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didBecomeInvalidWithError:]`
+    pub fn urlSessionDidBecomeInvalidWithError(self: Self, session: URLSession, @"error": ?foundation.ErrorObject) void {
+        return self.object.msgSend(void, "URLSession:didBecomeInvalidWithError:", .{ session, @"error" });
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didReceiveChallenge:completionHandler:]`
+    pub fn urlSessionDidReceiveChallengeCompletionHandler(self: Self, session: URLSession, challenge: objc.Object, completion_handler: objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:didReceiveChallenge:completionHandler:", .{ session, challenge, completion_handler });
+    }
+
+    /// `-[NSURLSessionDelegate URLSessionDidFinishEventsForBackgroundURLSession:]`
+    pub fn urlSessionDidFinishEventsForBackgroundURLSession(self: Self, session: URLSession) void {
+        return self.object.msgSend(void, "URLSessionDidFinishEventsForBackgroundURLSession:", .{session});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-URLSession:didBecomeInvalidWithError:" = fn (URLSession, ?foundation.ErrorObject) void;
+        pub const @"-URLSession:didReceiveChallenge:completionHandler:" = fn (URLSession, objc.Object, objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void;
+        pub const @"-URLSessionDidFinishEventsForBackgroundURLSession:" = fn (URLSession) void;
+    };
+};
+
+/// An object conforming to `NSURLSessionTaskDelegate`, which extends `NSURLSessionDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const URLSessionTaskDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLSessionDelegate;
+    pub const protocol_name = "NSURLSessionTaskDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSURLSessionTaskDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:didCreateTask:]`
+    pub fn urlSessionDidCreateTask(self: Self, session: URLSession, task: URLSessionTask) void {
+        return self.object.msgSend(void, "URLSession:didCreateTask:", .{ session, task });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:willBeginDelayedRequest:completionHandler:]`
+    pub fn urlSessionTaskWillBeginDelayedRequestCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, request: URLRequest, completion_handler: objc.BlockRef(fn (URLSessionDelayedRequestDisposition, ?URLRequest) void)) void {
+        return self.object.msgSend(void, "URLSession:task:willBeginDelayedRequest:completionHandler:", .{ session, task, request, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:taskIsWaitingForConnectivity:]`
+    pub fn urlSessionTaskIsWaitingForConnectivity(self: Self, session: URLSession, task: URLSessionTask) void {
+        return self.object.msgSend(void, "URLSession:taskIsWaitingForConnectivity:", .{ session, task });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:]`
+    pub fn urlSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, response: HTTPURLResponse, request: URLRequest, completion_handler: objc.BlockRef(fn (?URLRequest) void)) void {
+        return self.object.msgSend(void, "URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:", .{ session, task, response, request, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didReceiveChallenge:completionHandler:]`
+    pub fn urlSessionTaskDidReceiveChallengeCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, challenge: objc.Object, completion_handler: objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:didReceiveChallenge:completionHandler:", .{ session, task, challenge, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:needNewBodyStream:]`
+    pub fn urlSessionTaskNeedNewBodyStream(self: Self, session: URLSession, task: URLSessionTask, completion_handler: objc.BlockRef(fn (?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:needNewBodyStream:", .{ session, task, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:needNewBodyStreamFromOffset:completionHandler:]`
+    pub fn urlSessionTaskNeedNewBodyStreamFromOffsetCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, offset: i64, completion_handler: objc.BlockRef(fn (?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:needNewBodyStreamFromOffset:completionHandler:", .{ session, task, offset, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:]`
+    pub fn urlSessionTaskDidSendBodyDataTotalBytesSentTotalBytesExpectedToSend(self: Self, session: URLSession, task: URLSessionTask, bytes_sent: i64, total_bytes_sent: i64, total_bytes_expected_to_send: i64) void {
+        return self.object.msgSend(void, "URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:", .{ session, task, bytes_sent, total_bytes_sent, total_bytes_expected_to_send });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didReceiveInformationalResponse:]`
+    pub fn urlSessionTaskDidReceiveInformationalResponse(self: Self, session: URLSession, task: URLSessionTask, response: HTTPURLResponse) void {
+        return self.object.msgSend(void, "URLSession:task:didReceiveInformationalResponse:", .{ session, task, response });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didFinishCollectingMetrics:]`
+    pub fn urlSessionTaskDidFinishCollectingMetrics(self: Self, session: URLSession, task: URLSessionTask, metrics: objc.Object) void {
+        return self.object.msgSend(void, "URLSession:task:didFinishCollectingMetrics:", .{ session, task, metrics });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didCompleteWithError:]`
+    pub fn urlSessionTaskDidCompleteWithError(self: Self, session: URLSession, task: URLSessionTask, @"error": ?foundation.ErrorObject) void {
+        return self.object.msgSend(void, "URLSession:task:didCompleteWithError:", .{ session, task, @"error" });
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didBecomeInvalidWithError:]`
+    pub fn urlSessionDidBecomeInvalidWithError(self: Self, session: URLSession, @"error": ?foundation.ErrorObject) void {
+        return self.object.msgSend(void, "URLSession:didBecomeInvalidWithError:", .{ session, @"error" });
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didReceiveChallenge:completionHandler:]`
+    pub fn urlSessionDidReceiveChallengeCompletionHandler(self: Self, session: URLSession, challenge: objc.Object, completion_handler: objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:didReceiveChallenge:completionHandler:", .{ session, challenge, completion_handler });
+    }
+
+    /// `-[NSURLSessionDelegate URLSessionDidFinishEventsForBackgroundURLSession:]`
+    pub fn urlSessionDidFinishEventsForBackgroundURLSession(self: Self, session: URLSession) void {
+        return self.object.msgSend(void, "URLSessionDidFinishEventsForBackgroundURLSession:", .{session});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-URLSession:didCreateTask:" = fn (URLSession, URLSessionTask) void;
+        pub const @"-URLSession:task:willBeginDelayedRequest:completionHandler:" = fn (URLSession, URLSessionTask, URLRequest, objc.BlockRef(fn (URLSessionDelayedRequestDisposition, ?URLRequest) void)) void;
+        pub const @"-URLSession:taskIsWaitingForConnectivity:" = fn (URLSession, URLSessionTask) void;
+        pub const @"-URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:" = fn (URLSession, URLSessionTask, HTTPURLResponse, URLRequest, objc.BlockRef(fn (?URLRequest) void)) void;
+        pub const @"-URLSession:task:didReceiveChallenge:completionHandler:" = fn (URLSession, URLSessionTask, objc.Object, objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void;
+        pub const @"-URLSession:task:needNewBodyStream:" = fn (URLSession, URLSessionTask, objc.BlockRef(fn (?objc.Object) void)) void;
+        pub const @"-URLSession:task:needNewBodyStreamFromOffset:completionHandler:" = fn (URLSession, URLSessionTask, i64, objc.BlockRef(fn (?objc.Object) void)) void;
+        pub const @"-URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:" = fn (URLSession, URLSessionTask, i64, i64, i64) void;
+        pub const @"-URLSession:task:didReceiveInformationalResponse:" = fn (URLSession, URLSessionTask, HTTPURLResponse) void;
+        pub const @"-URLSession:task:didFinishCollectingMetrics:" = fn (URLSession, URLSessionTask, objc.Object) void;
+        pub const @"-URLSession:task:didCompleteWithError:" = fn (URLSession, URLSessionTask, ?foundation.ErrorObject) void;
+    };
+};
+
+/// An object conforming to `NSURLSessionDataDelegate`, which extends `NSURLSessionTaskDelegate`. As an `objc.Subclass`
+/// protocol, each method the class implements is checked against it.
+pub const URLSessionDataDelegate = extern struct {
+    object: objc.Object,
+
+    const Self = @This();
+    pub const Super = URLSessionTaskDelegate;
+    pub const protocol_name = "NSURLSessionDataDelegate";
+
+    /// An object that came from elsewhere, taken to conform to `NSURLSessionDataDelegate`.
+    pub fn from(object: objc.Object) Self {
+        return .{ .object = object };
+    }
+
+    /// This object as a parent protocol's wrapper, or `objc.Object`.
+    pub fn into(self: Self, comptime T: type) T {
+        if (!comptime inherits(Self, T)) @compileError(protocol_name ++ " does not inherit from " ++ @typeName(T));
+        return objc.abi.wrap(T, self.object);
+    }
+
+    pub fn retain(self: Self) Self {
+        return .{ .object = self.object.retain() };
+    }
+
+    pub fn release(self: Self) void {
+        self.object.release();
+    }
+
+    pub fn autorelease(self: Self) Self {
+        return .{ .object = self.object.autorelease() };
+    }
+
+    /// `-[NSURLSessionDataDelegate URLSession:dataTask:didReceiveResponse:completionHandler:]`
+    pub fn urlSessionDataTaskDidReceiveResponseCompletionHandler(self: Self, session: URLSession, data_task: URLSessionDataTask, response: URLResponse, completion_handler: objc.BlockRef(fn (URLSessionResponseDisposition) void)) void {
+        return self.object.msgSend(void, "URLSession:dataTask:didReceiveResponse:completionHandler:", .{ session, data_task, response, completion_handler });
+    }
+
+    /// `-[NSURLSessionDataDelegate URLSession:dataTask:didBecomeDownloadTask:]`
+    pub fn urlSessionDataTaskDidBecomeDownloadTask(self: Self, session: URLSession, data_task: URLSessionDataTask, download_task: URLSessionDownloadTask) void {
+        return self.object.msgSend(void, "URLSession:dataTask:didBecomeDownloadTask:", .{ session, data_task, download_task });
+    }
+
+    /// `-[NSURLSessionDataDelegate URLSession:dataTask:didBecomeStreamTask:]`
+    pub fn urlSessionDataTaskDidBecomeStreamTask(self: Self, session: URLSession, data_task: URLSessionDataTask, stream_task: objc.Object) void {
+        return self.object.msgSend(void, "URLSession:dataTask:didBecomeStreamTask:", .{ session, data_task, stream_task });
+    }
+
+    /// `-[NSURLSessionDataDelegate URLSession:dataTask:didReceiveData:]`
+    pub fn urlSessionDataTaskDidReceiveData(self: Self, session: URLSession, data_task: URLSessionDataTask, data: foundation.Data) void {
+        return self.object.msgSend(void, "URLSession:dataTask:didReceiveData:", .{ session, data_task, data });
+    }
+
+    /// `-[NSURLSessionDataDelegate URLSession:dataTask:willCacheResponse:completionHandler:]`
+    pub fn urlSessionDataTaskWillCacheResponseCompletionHandler(self: Self, session: URLSession, data_task: URLSessionDataTask, proposed_response: objc.Object, completion_handler: objc.BlockRef(fn (?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:dataTask:willCacheResponse:completionHandler:", .{ session, data_task, proposed_response, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:didCreateTask:]`
+    pub fn urlSessionDidCreateTask(self: Self, session: URLSession, task: URLSessionTask) void {
+        return self.object.msgSend(void, "URLSession:didCreateTask:", .{ session, task });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:willBeginDelayedRequest:completionHandler:]`
+    pub fn urlSessionTaskWillBeginDelayedRequestCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, request: URLRequest, completion_handler: objc.BlockRef(fn (URLSessionDelayedRequestDisposition, ?URLRequest) void)) void {
+        return self.object.msgSend(void, "URLSession:task:willBeginDelayedRequest:completionHandler:", .{ session, task, request, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:taskIsWaitingForConnectivity:]`
+    pub fn urlSessionTaskIsWaitingForConnectivity(self: Self, session: URLSession, task: URLSessionTask) void {
+        return self.object.msgSend(void, "URLSession:taskIsWaitingForConnectivity:", .{ session, task });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:]`
+    pub fn urlSessionTaskWillPerformHTTPRedirectionNewRequestCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, response: HTTPURLResponse, request: URLRequest, completion_handler: objc.BlockRef(fn (?URLRequest) void)) void {
+        return self.object.msgSend(void, "URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:", .{ session, task, response, request, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didReceiveChallenge:completionHandler:]`
+    pub fn urlSessionTaskDidReceiveChallengeCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, challenge: objc.Object, completion_handler: objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:didReceiveChallenge:completionHandler:", .{ session, task, challenge, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:needNewBodyStream:]`
+    pub fn urlSessionTaskNeedNewBodyStream(self: Self, session: URLSession, task: URLSessionTask, completion_handler: objc.BlockRef(fn (?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:needNewBodyStream:", .{ session, task, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:needNewBodyStreamFromOffset:completionHandler:]`
+    pub fn urlSessionTaskNeedNewBodyStreamFromOffsetCompletionHandler(self: Self, session: URLSession, task: URLSessionTask, offset: i64, completion_handler: objc.BlockRef(fn (?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:task:needNewBodyStreamFromOffset:completionHandler:", .{ session, task, offset, completion_handler });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:]`
+    pub fn urlSessionTaskDidSendBodyDataTotalBytesSentTotalBytesExpectedToSend(self: Self, session: URLSession, task: URLSessionTask, bytes_sent: i64, total_bytes_sent: i64, total_bytes_expected_to_send: i64) void {
+        return self.object.msgSend(void, "URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:", .{ session, task, bytes_sent, total_bytes_sent, total_bytes_expected_to_send });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didReceiveInformationalResponse:]`
+    pub fn urlSessionTaskDidReceiveInformationalResponse(self: Self, session: URLSession, task: URLSessionTask, response: HTTPURLResponse) void {
+        return self.object.msgSend(void, "URLSession:task:didReceiveInformationalResponse:", .{ session, task, response });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didFinishCollectingMetrics:]`
+    pub fn urlSessionTaskDidFinishCollectingMetrics(self: Self, session: URLSession, task: URLSessionTask, metrics: objc.Object) void {
+        return self.object.msgSend(void, "URLSession:task:didFinishCollectingMetrics:", .{ session, task, metrics });
+    }
+
+    /// `-[NSURLSessionTaskDelegate URLSession:task:didCompleteWithError:]`
+    pub fn urlSessionTaskDidCompleteWithError(self: Self, session: URLSession, task: URLSessionTask, @"error": ?foundation.ErrorObject) void {
+        return self.object.msgSend(void, "URLSession:task:didCompleteWithError:", .{ session, task, @"error" });
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didBecomeInvalidWithError:]`
+    pub fn urlSessionDidBecomeInvalidWithError(self: Self, session: URLSession, @"error": ?foundation.ErrorObject) void {
+        return self.object.msgSend(void, "URLSession:didBecomeInvalidWithError:", .{ session, @"error" });
+    }
+
+    /// `-[NSURLSessionDelegate URLSession:didReceiveChallenge:completionHandler:]`
+    pub fn urlSessionDidReceiveChallengeCompletionHandler(self: Self, session: URLSession, challenge: objc.Object, completion_handler: objc.BlockRef(fn (URLSessionAuthChallengeDisposition, ?objc.Object) void)) void {
+        return self.object.msgSend(void, "URLSession:didReceiveChallenge:completionHandler:", .{ session, challenge, completion_handler });
+    }
+
+    /// `-[NSURLSessionDelegate URLSessionDidFinishEventsForBackgroundURLSession:]`
+    pub fn urlSessionDidFinishEventsForBackgroundURLSession(self: Self, session: URLSession) void {
+        return self.object.msgSend(void, "URLSessionDidFinishEventsForBackgroundURLSession:", .{session});
+    }
+
+    /// Each method's signature, for `objc.Subclass` to check overrides against.
+    pub const signatures = struct {
+        pub const @"-URLSession:dataTask:didReceiveResponse:completionHandler:" = fn (URLSession, URLSessionDataTask, URLResponse, objc.BlockRef(fn (URLSessionResponseDisposition) void)) void;
+        pub const @"-URLSession:dataTask:didBecomeDownloadTask:" = fn (URLSession, URLSessionDataTask, URLSessionDownloadTask) void;
+        pub const @"-URLSession:dataTask:didBecomeStreamTask:" = fn (URLSession, URLSessionDataTask, objc.Object) void;
+        pub const @"-URLSession:dataTask:didReceiveData:" = fn (URLSession, URLSessionDataTask, foundation.Data) void;
+        pub const @"-URLSession:dataTask:willCacheResponse:completionHandler:" = fn (URLSession, URLSessionDataTask, objc.Object, objc.BlockRef(fn (?objc.Object) void)) void;
+    };
 };
 
 // -- constants and functions -----------------------------------------------
@@ -2981,6 +18010,12 @@ pub fn zeroRect() cg.Rect {
     return objc.abi.fromAbi(cg.Rect, symbol.*);
 }
 
+/// `NSEdgeInsetsZero`.
+pub fn edgeInsetsZero() EdgeInsets {
+    const symbol = @extern(?*const objc.abi.Abi(EdgeInsets), .{ .name = "NSEdgeInsetsZero", .linkage = .weak }) orelse missing("NSEdgeInsetsZero");
+    return objc.abi.fromAbi(EdgeInsets, symbol.*);
+}
+
 /// `NSEqualPoints`.
 pub fn equalPoints(a_point: cg.Point, b_point: cg.Point) bool {
     const function = @extern(?*const fn (objc.abi.Abi(cg.Point), objc.abi.Abi(cg.Point)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSEqualPoints", .linkage = .weak }) orelse missing("NSEqualPoints");
@@ -3003,6 +18038,12 @@ pub fn equalRects(a_rect: cg.Rect, b_rect: cg.Rect) bool {
 pub fn isEmptyRect(a_rect: cg.Rect) bool {
     const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSIsEmptyRect", .linkage = .weak }) orelse missing("NSIsEmptyRect");
     return objc.abi.fromAbi(bool, function(objc.abi.toAbi(cg.Rect, a_rect)));
+}
+
+/// `NSEdgeInsetsEqual`.
+pub fn edgeInsetsEqual(a_insets: EdgeInsets, b_insets: EdgeInsets) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(EdgeInsets), objc.abi.Abi(EdgeInsets)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSEdgeInsetsEqual", .linkage = .weak }) orelse missing("NSEdgeInsetsEqual");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(EdgeInsets, a_insets), objc.abi.toAbi(EdgeInsets, b_insets)));
 }
 
 /// `NSInsetRect`.
@@ -5539,8 +20580,6 @@ pub fn userNotificationDefaultSoundName() foundation.String {
 //   NSOwnedPointerHashCallBacks: const NSHashTableCallBacks
 //   NSPointerToStructHashCallBacks: const NSHashTableCallBacks
 //   NSIntHashCallBacks: const NSHashTableCallBacks
-//   NSEdgeInsetsZero: const NSEdgeInsets
-//   NSEdgeInsetsEqual()
 //   NSIntegralRectWithOptions()
 //   NSDivideRect()
 //   NSMapMember()

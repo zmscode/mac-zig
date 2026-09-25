@@ -414,6 +414,26 @@ _ = foundation.Data.initContentsOfFile(path, &details) catch { defer details.dei
   an `objc.Object` — every wrapper here, and every `Subclass`, is.
 - `{f}` prints a `String` or an `ErrorObject`. `.utf8()` borrows; `.toOwnedSlice(a)` copies.
 
+Beyond the hand-written types, `foundation.all` is generated: `text.all().lowercaseString()`
+reaches every NSString method; `foundation.all.FileManager.defaultManager()`,
+`UserDefaults`, `NotificationCenter`, `ProcessInfo`, `Bundle`, `JSONSerialization`, `Task`,
+`URLSession`... Generated methods take and return the hand-written types.
+
+## Completion handlers
+
+```zig
+var done = try objc.Completion(fn (?metal.Library, ?foundation.ErrorObject) void).init(gpa, io);
+defer done.deinit();
+device.newLibraryWithSourceOptionsCompletionHandler(src, null, done.handler());
+const library = try foundation.valueOrError(try done.wait(), &details);   // Io wait: cancelable
+```
+
+- `gpa` must be thread-safe (`std.heap.smp_allocator`): the handler may free the shared state
+  on its own thread. **Not** `std.testing.allocator`.
+- `wait()` returns the handler's args (tuple if several); objects in it live until `deinit`.
+- `waitTimeout(timeout)` / cancel are safe: the handler may still run later, and state is
+  reference-counted. The handler must be called once.
+
 ## AppKit
 
 ```zig

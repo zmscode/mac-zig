@@ -1315,82 +1315,82 @@ pub const Responder = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const init = fn () Responder;
-        pub const @"initWithCoder:" = fn (objc.Object) ?Responder;
-        pub const @"tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
-        pub const @"performKeyEquivalent:" = fn (Event) bool;
-        pub const @"validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
-        pub const @"mouseDown:" = fn (Event) void;
-        pub const @"rightMouseDown:" = fn (Event) void;
-        pub const @"otherMouseDown:" = fn (Event) void;
-        pub const @"mouseUp:" = fn (Event) void;
-        pub const @"rightMouseUp:" = fn (Event) void;
-        pub const @"otherMouseUp:" = fn (Event) void;
-        pub const @"mouseMoved:" = fn (Event) void;
-        pub const @"mouseDragged:" = fn (Event) void;
-        pub const @"mouseCancelled:" = fn (Event) void;
-        pub const @"scrollWheel:" = fn (Event) void;
-        pub const @"rightMouseDragged:" = fn (Event) void;
-        pub const @"otherMouseDragged:" = fn (Event) void;
-        pub const @"mouseEntered:" = fn (Event) void;
-        pub const @"mouseExited:" = fn (Event) void;
-        pub const @"keyDown:" = fn (Event) void;
-        pub const @"keyUp:" = fn (Event) void;
-        pub const @"flagsChanged:" = fn (Event) void;
-        pub const @"tabletPoint:" = fn (Event) void;
-        pub const @"tabletProximity:" = fn (Event) void;
-        pub const @"cursorUpdate:" = fn (Event) void;
-        pub const @"magnifyWithEvent:" = fn (Event) void;
-        pub const @"rotateWithEvent:" = fn (Event) void;
-        pub const @"swipeWithEvent:" = fn (Event) void;
-        pub const @"beginGestureWithEvent:" = fn (Event) void;
-        pub const @"endGestureWithEvent:" = fn (Event) void;
-        pub const @"smartMagnifyWithEvent:" = fn (Event) void;
-        pub const @"changeModeWithEvent:" = fn (Event) void;
-        pub const @"touchesBeganWithEvent:" = fn (Event) void;
-        pub const @"touchesMovedWithEvent:" = fn (Event) void;
-        pub const @"touchesEndedWithEvent:" = fn (Event) void;
-        pub const @"touchesCancelledWithEvent:" = fn (Event) void;
-        pub const @"quickLookWithEvent:" = fn (Event) void;
-        pub const @"pressureChangeWithEvent:" = fn (Event) void;
-        pub const @"contextMenuKeyDown:" = fn (Event) void;
-        pub const @"noResponderFor:" = fn (objc.Sel) void;
-        pub const becomeFirstResponder = fn () bool;
-        pub const resignFirstResponder = fn () bool;
-        pub const @"interpretKeyEvents:" = fn (foundation.Array(Event)) void;
-        pub const flushBufferedKeyEvents = fn () void;
-        pub const @"showContextHelp:" = fn (?objc.Object) void;
-        pub const @"helpRequested:" = fn (Event) void;
-        pub const @"shouldBeTreatedAsInkEvent:" = fn (Event) bool;
-        pub const @"wantsScrollEventsForSwipeTrackingOnAxis:" = fn (EventGestureAxis) bool;
-        pub const @"wantsForwardedScrollEventsForAxis:" = fn (EventGestureAxis) bool;
-        pub const @"supplementalTargetForAction:sender:" = fn (objc.Sel, ?objc.Object) ?objc.Object;
-        pub const nextResponder = fn () ?Responder;
-        pub const @"setNextResponder:" = fn (?Responder) void;
-        pub const acceptsFirstResponder = fn () bool;
-        pub const menu = fn () ?Menu;
-        pub const @"setMenu:" = fn (?Menu) void;
-        pub const undoManager = fn () ?objc.Object;
-        pub const @"validateProposedFirstResponder:forEvent:" = fn (Responder, ?Event) bool;
-        pub const @"presentError:modalForWindow:delegate:didPresentSelector:contextInfo:" = fn (foundation.ErrorObject, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
-        pub const @"presentError:" = fn (foundation.ErrorObject) bool;
-        pub const @"willPresentError:" = fn (foundation.ErrorObject) foundation.ErrorObject;
-        pub const @"performTextFinderAction:" = fn (?objc.Object) void;
-        pub const @"newWindowForTab:" = fn (?objc.Object) void;
-        pub const @"showWritingTools:" = fn (?objc.Object) void;
-        pub const @"performMnemonic:" = fn (foundation.String) bool;
-        pub const @"updateUserActivityState:" = fn (objc.Object) void;
-        pub const userActivity = fn () ?objc.Object;
-        pub const @"setUserActivity:" = fn (?objc.Object) void;
-        pub const makeTouchBar = fn () ?objc.Object;
-        pub const touchBar = fn () ?objc.Object;
-        pub const @"setTouchBar:" = fn (?objc.Object) void;
-        pub const interfaceStyle = fn () objc.UInteger;
-        pub const @"setInterfaceStyle:" = fn (objc.UInteger) void;
-        pub const @"encodeRestorableStateWithCoder:" = fn (objc.Object) void;
-        pub const @"encodeRestorableStateWithCoder:backgroundQueue:" = fn (objc.Object, objc.Object) void;
-        pub const @"restoreStateWithCoder:" = fn (objc.Object) void;
-        pub const invalidateRestorableState = fn () void;
+        pub const @"-init" = fn () Responder;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Responder;
+        pub const @"-tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
+        pub const @"-performKeyEquivalent:" = fn (Event) bool;
+        pub const @"-validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
+        pub const @"-mouseDown:" = fn (Event) void;
+        pub const @"-rightMouseDown:" = fn (Event) void;
+        pub const @"-otherMouseDown:" = fn (Event) void;
+        pub const @"-mouseUp:" = fn (Event) void;
+        pub const @"-rightMouseUp:" = fn (Event) void;
+        pub const @"-otherMouseUp:" = fn (Event) void;
+        pub const @"-mouseMoved:" = fn (Event) void;
+        pub const @"-mouseDragged:" = fn (Event) void;
+        pub const @"-mouseCancelled:" = fn (Event) void;
+        pub const @"-scrollWheel:" = fn (Event) void;
+        pub const @"-rightMouseDragged:" = fn (Event) void;
+        pub const @"-otherMouseDragged:" = fn (Event) void;
+        pub const @"-mouseEntered:" = fn (Event) void;
+        pub const @"-mouseExited:" = fn (Event) void;
+        pub const @"-keyDown:" = fn (Event) void;
+        pub const @"-keyUp:" = fn (Event) void;
+        pub const @"-flagsChanged:" = fn (Event) void;
+        pub const @"-tabletPoint:" = fn (Event) void;
+        pub const @"-tabletProximity:" = fn (Event) void;
+        pub const @"-cursorUpdate:" = fn (Event) void;
+        pub const @"-magnifyWithEvent:" = fn (Event) void;
+        pub const @"-rotateWithEvent:" = fn (Event) void;
+        pub const @"-swipeWithEvent:" = fn (Event) void;
+        pub const @"-beginGestureWithEvent:" = fn (Event) void;
+        pub const @"-endGestureWithEvent:" = fn (Event) void;
+        pub const @"-smartMagnifyWithEvent:" = fn (Event) void;
+        pub const @"-changeModeWithEvent:" = fn (Event) void;
+        pub const @"-touchesBeganWithEvent:" = fn (Event) void;
+        pub const @"-touchesMovedWithEvent:" = fn (Event) void;
+        pub const @"-touchesEndedWithEvent:" = fn (Event) void;
+        pub const @"-touchesCancelledWithEvent:" = fn (Event) void;
+        pub const @"-quickLookWithEvent:" = fn (Event) void;
+        pub const @"-pressureChangeWithEvent:" = fn (Event) void;
+        pub const @"-contextMenuKeyDown:" = fn (Event) void;
+        pub const @"-noResponderFor:" = fn (objc.Sel) void;
+        pub const @"-becomeFirstResponder" = fn () bool;
+        pub const @"-resignFirstResponder" = fn () bool;
+        pub const @"-interpretKeyEvents:" = fn (foundation.Array(Event)) void;
+        pub const @"-flushBufferedKeyEvents" = fn () void;
+        pub const @"-showContextHelp:" = fn (?objc.Object) void;
+        pub const @"-helpRequested:" = fn (Event) void;
+        pub const @"-shouldBeTreatedAsInkEvent:" = fn (Event) bool;
+        pub const @"-wantsScrollEventsForSwipeTrackingOnAxis:" = fn (EventGestureAxis) bool;
+        pub const @"-wantsForwardedScrollEventsForAxis:" = fn (EventGestureAxis) bool;
+        pub const @"-supplementalTargetForAction:sender:" = fn (objc.Sel, ?objc.Object) ?objc.Object;
+        pub const @"-nextResponder" = fn () ?Responder;
+        pub const @"-setNextResponder:" = fn (?Responder) void;
+        pub const @"-acceptsFirstResponder" = fn () bool;
+        pub const @"-menu" = fn () ?Menu;
+        pub const @"-setMenu:" = fn (?Menu) void;
+        pub const @"-undoManager" = fn () ?objc.Object;
+        pub const @"-validateProposedFirstResponder:forEvent:" = fn (Responder, ?Event) bool;
+        pub const @"-presentError:modalForWindow:delegate:didPresentSelector:contextInfo:" = fn (foundation.ErrorObject, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
+        pub const @"-presentError:" = fn (foundation.ErrorObject) bool;
+        pub const @"-willPresentError:" = fn (foundation.ErrorObject) foundation.ErrorObject;
+        pub const @"-performTextFinderAction:" = fn (?objc.Object) void;
+        pub const @"-newWindowForTab:" = fn (?objc.Object) void;
+        pub const @"-showWritingTools:" = fn (?objc.Object) void;
+        pub const @"-performMnemonic:" = fn (foundation.String) bool;
+        pub const @"-updateUserActivityState:" = fn (objc.Object) void;
+        pub const @"-userActivity" = fn () ?objc.Object;
+        pub const @"-setUserActivity:" = fn (?objc.Object) void;
+        pub const @"-makeTouchBar" = fn () ?objc.Object;
+        pub const @"-touchBar" = fn () ?objc.Object;
+        pub const @"-setTouchBar:" = fn (?objc.Object) void;
+        pub const @"-interfaceStyle" = fn () objc.UInteger;
+        pub const @"-setInterfaceStyle:" = fn (objc.UInteger) void;
+        pub const @"-encodeRestorableStateWithCoder:" = fn (objc.Object) void;
+        pub const @"-encodeRestorableStateWithCoder:backgroundQueue:" = fn (objc.Object, objc.Object) void;
+        pub const @"-restoreStateWithCoder:" = fn (objc.Object) void;
+        pub const @"-invalidateRestorableState" = fn () void;
         pub const @"+allowedClassesForRestorableStateKeyPath:" = fn (foundation.String) foundation.Array(objc.Object);
         pub const @"+restorableStateKeyPaths" = fn () foundation.Array(foundation.String);
     };
@@ -1757,7 +1757,7 @@ pub const Application = extern struct {
     }
 
     /// `-[NSApplication nextEventMatchingMask:untilDate:inMode:dequeue:]`
-    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: ?foundation.String, deq_flag: bool) ?Event {
+    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: foundation.String, deq_flag: bool) ?Event {
         return self.object.msgSend(?Event, "nextEventMatchingMask:untilDate:inMode:dequeue:", .{ mask, expiration, mode, deq_flag });
     }
 
@@ -2017,7 +2017,7 @@ pub const Application = extern struct {
     }
 
     /// `-[NSApplication restoreWindowWithIdentifier:state:completionHandler:]`
-    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: ?foundation.String, state: objc.Object, completion_handler: objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool {
+    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: foundation.String, state: objc.Object, completion_handler: objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool {
         return self.object.msgSend(bool, "restoreWindowWithIdentifier:state:completionHandler:", .{ identifier, state, completion_handler });
     }
 
@@ -2413,124 +2413,124 @@ pub const Application = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"hide:" = fn (?objc.Object) void;
-        pub const @"unhide:" = fn (?objc.Object) void;
-        pub const unhideWithoutActivation = fn () void;
-        pub const @"windowWithWindowNumber:" = fn (objc.Integer) ?Window;
-        pub const deactivate = fn () void;
-        pub const @"activateIgnoringOtherApps:" = fn (bool) void;
-        pub const activate = fn () void;
-        pub const @"yieldActivationToApplication:" = fn (RunningApplication) void;
-        pub const @"yieldActivationToApplicationWithBundleIdentifier:" = fn (foundation.String) void;
-        pub const @"hideOtherApplications:" = fn (?objc.Object) void;
-        pub const @"unhideAllApplications:" = fn (?objc.Object) void;
-        pub const finishLaunching = fn () void;
-        pub const run = fn () void;
-        pub const @"runModalForWindow:" = fn (Window) objc.Integer;
-        pub const @"stop:" = fn (?objc.Object) void;
-        pub const stopModal = fn () void;
-        pub const @"stopModalWithCode:" = fn (objc.Integer) void;
-        pub const abortModal = fn () void;
-        pub const @"beginModalSessionForWindow:" = fn (Window) ?*anyopaque;
-        pub const @"runModalSession:" = fn (?*anyopaque) objc.Integer;
-        pub const @"endModalSession:" = fn (?*anyopaque) void;
-        pub const @"terminate:" = fn (?objc.Object) void;
-        pub const @"requestUserAttention:" = fn (RequestUserAttentionType) objc.Integer;
-        pub const @"cancelUserAttentionRequest:" = fn (objc.Integer) void;
-        pub const @"enumerateWindowsWithOptions:usingBlock:" = fn (WindowListOptions, objc.BlockRef(fn (Window, ?*bool) void)) void;
-        pub const preventWindowOrdering = fn () void;
-        pub const @"setWindowsNeedUpdate:" = fn (bool) void;
-        pub const updateWindows = fn () void;
-        pub const activationPolicy = fn () ApplicationActivationPolicy;
-        pub const @"setActivationPolicy:" = fn (ApplicationActivationPolicy) bool;
-        pub const @"reportException:" = fn (objc.Object) void;
+        pub const @"-hide:" = fn (?objc.Object) void;
+        pub const @"-unhide:" = fn (?objc.Object) void;
+        pub const @"-unhideWithoutActivation" = fn () void;
+        pub const @"-windowWithWindowNumber:" = fn (objc.Integer) ?Window;
+        pub const @"-deactivate" = fn () void;
+        pub const @"-activateIgnoringOtherApps:" = fn (bool) void;
+        pub const @"-activate" = fn () void;
+        pub const @"-yieldActivationToApplication:" = fn (RunningApplication) void;
+        pub const @"-yieldActivationToApplicationWithBundleIdentifier:" = fn (foundation.String) void;
+        pub const @"-hideOtherApplications:" = fn (?objc.Object) void;
+        pub const @"-unhideAllApplications:" = fn (?objc.Object) void;
+        pub const @"-finishLaunching" = fn () void;
+        pub const @"-run" = fn () void;
+        pub const @"-runModalForWindow:" = fn (Window) objc.Integer;
+        pub const @"-stop:" = fn (?objc.Object) void;
+        pub const @"-stopModal" = fn () void;
+        pub const @"-stopModalWithCode:" = fn (objc.Integer) void;
+        pub const @"-abortModal" = fn () void;
+        pub const @"-beginModalSessionForWindow:" = fn (Window) ?*anyopaque;
+        pub const @"-runModalSession:" = fn (?*anyopaque) objc.Integer;
+        pub const @"-endModalSession:" = fn (?*anyopaque) void;
+        pub const @"-terminate:" = fn (?objc.Object) void;
+        pub const @"-requestUserAttention:" = fn (RequestUserAttentionType) objc.Integer;
+        pub const @"-cancelUserAttentionRequest:" = fn (objc.Integer) void;
+        pub const @"-enumerateWindowsWithOptions:usingBlock:" = fn (WindowListOptions, objc.BlockRef(fn (Window, ?*bool) void)) void;
+        pub const @"-preventWindowOrdering" = fn () void;
+        pub const @"-setWindowsNeedUpdate:" = fn (bool) void;
+        pub const @"-updateWindows" = fn () void;
+        pub const @"-activationPolicy" = fn () ApplicationActivationPolicy;
+        pub const @"-setActivationPolicy:" = fn (ApplicationActivationPolicy) bool;
+        pub const @"-reportException:" = fn (objc.Object) void;
         pub const @"+detachDrawingThread:toTarget:withObject:" = fn (objc.Sel, objc.Object, ?objc.Object) void;
-        pub const @"replyToApplicationShouldTerminate:" = fn (bool) void;
-        pub const @"replyToOpenOrPrint:" = fn (ApplicationDelegateReply) void;
-        pub const @"orderFrontCharacterPalette:" = fn (?objc.Object) void;
+        pub const @"-replyToApplicationShouldTerminate:" = fn (bool) void;
+        pub const @"-replyToOpenOrPrint:" = fn (ApplicationDelegateReply) void;
+        pub const @"-orderFrontCharacterPalette:" = fn (?objc.Object) void;
         pub const @"+sharedApplication" = fn () Application;
-        pub const delegate = fn () ?ApplicationDelegate;
-        pub const @"setDelegate:" = fn (?ApplicationDelegate) void;
-        pub const mainWindow = fn () ?Window;
-        pub const keyWindow = fn () ?Window;
-        pub const isActive = fn () bool;
-        pub const isHidden = fn () bool;
-        pub const isRunning = fn () bool;
-        pub const applicationShouldSuppressHighDynamicRangeContent = fn () bool;
-        pub const modalWindow = fn () ?Window;
-        pub const windows = fn () foundation.Array(Window);
-        pub const mainMenu = fn () ?Menu;
-        pub const @"setMainMenu:" = fn (?Menu) void;
-        pub const helpMenu = fn () ?Menu;
-        pub const @"setHelpMenu:" = fn (?Menu) void;
-        pub const applicationIconImage = fn () Image;
-        pub const @"setApplicationIconImage:" = fn (?Image) void;
-        pub const dockTile = fn () objc.Object;
-        pub const presentationOptions = fn () ApplicationPresentationOptions;
-        pub const @"setPresentationOptions:" = fn (ApplicationPresentationOptions) void;
-        pub const currentSystemPresentationOptions = fn () ApplicationPresentationOptions;
-        pub const occlusionState = fn () ApplicationOcclusionState;
-        pub const isProtectedDataAvailable = fn () bool;
-        pub const appearance = fn () ?objc.Object;
-        pub const @"setAppearance:" = fn (?objc.Object) void;
-        pub const effectiveAppearance = fn () objc.Object;
-        pub const @"sendEvent:" = fn (Event) void;
-        pub const @"postEvent:atStart:" = fn (Event, bool) void;
-        pub const @"nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, ?foundation.String, bool) ?Event;
-        pub const @"discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
-        pub const currentEvent = fn () ?Event;
-        pub const @"sendAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) bool;
-        pub const @"targetForAction:" = fn (objc.Sel) ?objc.Object;
-        pub const @"targetForAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) ?objc.Object;
-        pub const @"tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
-        pub const @"validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
-        pub const @"arrangeInFront:" = fn (?objc.Object) void;
-        pub const @"removeWindowsItem:" = fn (Window) void;
-        pub const @"addWindowsItem:title:filename:" = fn (Window, foundation.String, bool) void;
-        pub const @"changeWindowsItem:title:filename:" = fn (Window, foundation.String, bool) void;
-        pub const @"updateWindowsItem:" = fn (Window) void;
-        pub const @"miniaturizeAll:" = fn (?objc.Object) void;
-        pub const windowsMenu = fn () ?Menu;
-        pub const @"setWindowsMenu:" = fn (?Menu) void;
-        pub const isFullKeyboardAccessEnabled = fn () bool;
-        pub const @"registerServicesMenuSendTypes:returnTypes:" = fn (foundation.Array(objc.Object), foundation.Array(objc.Object)) void;
-        pub const servicesMenu = fn () ?Menu;
-        pub const @"setServicesMenu:" = fn (?Menu) void;
-        pub const servicesProvider = fn () ?objc.Object;
-        pub const @"setServicesProvider:" = fn (?objc.Object) void;
-        pub const @"orderFrontStandardAboutPanel:" = fn (?objc.Object) void;
-        pub const @"orderFrontStandardAboutPanelWithOptions:" = fn (foundation.Dictionary(objc.Object, objc.Object)) void;
-        pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
-        pub const disableRelaunchOnLogin = fn () void;
-        pub const enableRelaunchOnLogin = fn () void;
-        pub const registerForRemoteNotifications = fn () void;
-        pub const unregisterForRemoteNotifications = fn () void;
-        pub const @"registerForRemoteNotificationTypes:" = fn (RemoteNotificationType) void;
-        pub const isRegisteredForRemoteNotifications = fn () bool;
-        pub const enabledRemoteNotificationTypes = fn () RemoteNotificationType;
-        pub const @"runModalForWindow:relativeToWindow:" = fn (?Window, ?Window) objc.Integer;
-        pub const @"beginModalSessionForWindow:relativeToWindow:" = fn (?Window, ?Window) ?*anyopaque;
-        pub const @"application:printFiles:" = fn (?Application, ?foundation.Array(foundation.String)) void;
-        pub const @"beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:" = fn (Window, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
-        pub const @"endSheet:" = fn (Window) void;
-        pub const @"endSheet:returnCode:" = fn (Window, objc.Integer) void;
-        pub const @"makeWindowsPerform:inOrder:" = fn (objc.Sel, bool) ?Window;
-        pub const context = fn () ?GraphicsContext;
-        pub const @"activateContextHelpMode:" = fn (?objc.Object) void;
-        pub const @"showHelp:" = fn (?objc.Object) void;
-        pub const @"toggleTouchBarCustomizationPalette:" = fn (?objc.Object) void;
-        pub const isAutomaticCustomizeTouchBarMenuItemEnabled = fn () bool;
-        pub const @"setAutomaticCustomizeTouchBarMenuItemEnabled:" = fn (bool) void;
-        pub const @"orderFrontColorPanel:" = fn (?objc.Object) void;
-        pub const @"runPageLayout:" = fn (?objc.Object) void;
-        pub const orderedDocuments = fn () foundation.Array(objc.Object);
-        pub const orderedWindows = fn () foundation.Array(Window);
-        pub const @"registerUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
-        pub const @"unregisterUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
-        pub const @"searchString:inUserInterfaceItemString:searchRange:foundRange:" = fn (foundation.String, foundation.String, objc.Range, ?*objc.Range) bool;
-        pub const @"restoreWindowWithIdentifier:state:completionHandler:" = fn (?foundation.String, objc.Object, objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool;
-        pub const extendStateRestoration = fn () void;
-        pub const completeStateRestoration = fn () void;
+        pub const @"-delegate" = fn () ?ApplicationDelegate;
+        pub const @"-setDelegate:" = fn (?ApplicationDelegate) void;
+        pub const @"-mainWindow" = fn () ?Window;
+        pub const @"-keyWindow" = fn () ?Window;
+        pub const @"-isActive" = fn () bool;
+        pub const @"-isHidden" = fn () bool;
+        pub const @"-isRunning" = fn () bool;
+        pub const @"-applicationShouldSuppressHighDynamicRangeContent" = fn () bool;
+        pub const @"-modalWindow" = fn () ?Window;
+        pub const @"-windows" = fn () foundation.Array(Window);
+        pub const @"-mainMenu" = fn () ?Menu;
+        pub const @"-setMainMenu:" = fn (?Menu) void;
+        pub const @"-helpMenu" = fn () ?Menu;
+        pub const @"-setHelpMenu:" = fn (?Menu) void;
+        pub const @"-applicationIconImage" = fn () Image;
+        pub const @"-setApplicationIconImage:" = fn (?Image) void;
+        pub const @"-dockTile" = fn () objc.Object;
+        pub const @"-presentationOptions" = fn () ApplicationPresentationOptions;
+        pub const @"-setPresentationOptions:" = fn (ApplicationPresentationOptions) void;
+        pub const @"-currentSystemPresentationOptions" = fn () ApplicationPresentationOptions;
+        pub const @"-occlusionState" = fn () ApplicationOcclusionState;
+        pub const @"-isProtectedDataAvailable" = fn () bool;
+        pub const @"-appearance" = fn () ?objc.Object;
+        pub const @"-setAppearance:" = fn (?objc.Object) void;
+        pub const @"-effectiveAppearance" = fn () objc.Object;
+        pub const @"-sendEvent:" = fn (Event) void;
+        pub const @"-postEvent:atStart:" = fn (Event, bool) void;
+        pub const @"-nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, foundation.String, bool) ?Event;
+        pub const @"-discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
+        pub const @"-currentEvent" = fn () ?Event;
+        pub const @"-sendAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) bool;
+        pub const @"-targetForAction:" = fn (objc.Sel) ?objc.Object;
+        pub const @"-targetForAction:to:from:" = fn (objc.Sel, ?objc.Object, ?objc.Object) ?objc.Object;
+        pub const @"-tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
+        pub const @"-validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
+        pub const @"-arrangeInFront:" = fn (?objc.Object) void;
+        pub const @"-removeWindowsItem:" = fn (Window) void;
+        pub const @"-addWindowsItem:title:filename:" = fn (Window, foundation.String, bool) void;
+        pub const @"-changeWindowsItem:title:filename:" = fn (Window, foundation.String, bool) void;
+        pub const @"-updateWindowsItem:" = fn (Window) void;
+        pub const @"-miniaturizeAll:" = fn (?objc.Object) void;
+        pub const @"-windowsMenu" = fn () ?Menu;
+        pub const @"-setWindowsMenu:" = fn (?Menu) void;
+        pub const @"-isFullKeyboardAccessEnabled" = fn () bool;
+        pub const @"-registerServicesMenuSendTypes:returnTypes:" = fn (foundation.Array(objc.Object), foundation.Array(objc.Object)) void;
+        pub const @"-servicesMenu" = fn () ?Menu;
+        pub const @"-setServicesMenu:" = fn (?Menu) void;
+        pub const @"-servicesProvider" = fn () ?objc.Object;
+        pub const @"-setServicesProvider:" = fn (?objc.Object) void;
+        pub const @"-orderFrontStandardAboutPanel:" = fn (?objc.Object) void;
+        pub const @"-orderFrontStandardAboutPanelWithOptions:" = fn (foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-userInterfaceLayoutDirection" = fn () UserInterfaceLayoutDirection;
+        pub const @"-disableRelaunchOnLogin" = fn () void;
+        pub const @"-enableRelaunchOnLogin" = fn () void;
+        pub const @"-registerForRemoteNotifications" = fn () void;
+        pub const @"-unregisterForRemoteNotifications" = fn () void;
+        pub const @"-registerForRemoteNotificationTypes:" = fn (RemoteNotificationType) void;
+        pub const @"-isRegisteredForRemoteNotifications" = fn () bool;
+        pub const @"-enabledRemoteNotificationTypes" = fn () RemoteNotificationType;
+        pub const @"-runModalForWindow:relativeToWindow:" = fn (?Window, ?Window) objc.Integer;
+        pub const @"-beginModalSessionForWindow:relativeToWindow:" = fn (?Window, ?Window) ?*anyopaque;
+        pub const @"-application:printFiles:" = fn (?Application, ?foundation.Array(foundation.String)) void;
+        pub const @"-beginSheet:modalForWindow:modalDelegate:didEndSelector:contextInfo:" = fn (Window, Window, ?objc.Object, ?objc.Sel, ?*anyopaque) void;
+        pub const @"-endSheet:" = fn (Window) void;
+        pub const @"-endSheet:returnCode:" = fn (Window, objc.Integer) void;
+        pub const @"-makeWindowsPerform:inOrder:" = fn (objc.Sel, bool) ?Window;
+        pub const @"-context" = fn () ?GraphicsContext;
+        pub const @"-activateContextHelpMode:" = fn (?objc.Object) void;
+        pub const @"-showHelp:" = fn (?objc.Object) void;
+        pub const @"-toggleTouchBarCustomizationPalette:" = fn (?objc.Object) void;
+        pub const @"-isAutomaticCustomizeTouchBarMenuItemEnabled" = fn () bool;
+        pub const @"-setAutomaticCustomizeTouchBarMenuItemEnabled:" = fn (bool) void;
+        pub const @"-orderFrontColorPanel:" = fn (?objc.Object) void;
+        pub const @"-runPageLayout:" = fn (?objc.Object) void;
+        pub const @"-orderedDocuments" = fn () foundation.Array(objc.Object);
+        pub const @"-orderedWindows" = fn () foundation.Array(Window);
+        pub const @"-registerUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
+        pub const @"-unregisterUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
+        pub const @"-searchString:inUserInterfaceItemString:searchRange:foundRange:" = fn (foundation.String, foundation.String, objc.Range, ?*objc.Range) bool;
+        pub const @"-restoreWindowWithIdentifier:state:completionHandler:" = fn (foundation.String, objc.Object, objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool;
+        pub const @"-extendStateRestoration" = fn () void;
+        pub const @"-completeStateRestoration" = fn () void;
     };
 };
 
@@ -2701,29 +2701,29 @@ pub const RunningApplication = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const hide = fn () bool;
-        pub const unhide = fn () bool;
-        pub const @"activateFromApplication:options:" = fn (RunningApplication, ApplicationActivationOptions) bool;
-        pub const @"activateWithOptions:" = fn (ApplicationActivationOptions) bool;
-        pub const terminate = fn () bool;
-        pub const forceTerminate = fn () bool;
+        pub const @"-hide" = fn () bool;
+        pub const @"-unhide" = fn () bool;
+        pub const @"-activateFromApplication:options:" = fn (RunningApplication, ApplicationActivationOptions) bool;
+        pub const @"-activateWithOptions:" = fn (ApplicationActivationOptions) bool;
+        pub const @"-terminate" = fn () bool;
+        pub const @"-forceTerminate" = fn () bool;
         pub const @"+runningApplicationsWithBundleIdentifier:" = fn (foundation.String) foundation.Array(RunningApplication);
         pub const @"+runningApplicationWithProcessIdentifier:" = fn (c_int) ?RunningApplication;
         pub const @"+terminateAutomaticallyTerminableApplications" = fn () void;
-        pub const isTerminated = fn () bool;
-        pub const isFinishedLaunching = fn () bool;
-        pub const isHidden = fn () bool;
-        pub const isActive = fn () bool;
-        pub const ownsMenuBar = fn () bool;
-        pub const activationPolicy = fn () ApplicationActivationPolicy;
-        pub const localizedName = fn () ?foundation.String;
-        pub const bundleIdentifier = fn () ?foundation.String;
-        pub const bundleURL = fn () ?foundation.Url;
-        pub const executableURL = fn () ?foundation.Url;
-        pub const processIdentifier = fn () c_int;
-        pub const launchDate = fn () ?objc.Object;
-        pub const icon = fn () ?Image;
-        pub const executableArchitecture = fn () objc.Integer;
+        pub const @"-isTerminated" = fn () bool;
+        pub const @"-isFinishedLaunching" = fn () bool;
+        pub const @"-isHidden" = fn () bool;
+        pub const @"-isActive" = fn () bool;
+        pub const @"-ownsMenuBar" = fn () bool;
+        pub const @"-activationPolicy" = fn () ApplicationActivationPolicy;
+        pub const @"-localizedName" = fn () ?foundation.String;
+        pub const @"-bundleIdentifier" = fn () ?foundation.String;
+        pub const @"-bundleURL" = fn () ?foundation.Url;
+        pub const @"-executableURL" = fn () ?foundation.Url;
+        pub const @"-processIdentifier" = fn () c_int;
+        pub const @"-launchDate" = fn () ?objc.Object;
+        pub const @"-icon" = fn () ?Image;
+        pub const @"-executableArchitecture" = fn () objc.Integer;
         pub const @"+currentApplication" = fn () RunningApplication;
     };
 };
@@ -3104,32 +3104,32 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow setFrameFromString:]`
-    pub fn setFrameFromString(self: Self, string: ?foundation.String) void {
+    pub fn setFrameFromString(self: Self, string: foundation.String) void {
         return self.object.msgSend(void, "setFrameFromString:", .{string});
     }
 
     /// `-[NSWindow saveFrameUsingName:]`
-    pub fn saveFrameUsingName(self: Self, name: ?foundation.String) void {
+    pub fn saveFrameUsingName(self: Self, name: foundation.String) void {
         return self.object.msgSend(void, "saveFrameUsingName:", .{name});
     }
 
     /// `-[NSWindow setFrameUsingName:force:]`
-    pub fn setFrameUsingNameForce(self: Self, name: ?foundation.String, force: bool) bool {
+    pub fn setFrameUsingNameForce(self: Self, name: foundation.String, force: bool) bool {
         return self.object.msgSend(bool, "setFrameUsingName:force:", .{ name, force });
     }
 
     /// `-[NSWindow setFrameUsingName:]`
-    pub fn setFrameUsingName(self: Self, name: ?foundation.String) bool {
+    pub fn setFrameUsingName(self: Self, name: foundation.String) bool {
         return self.object.msgSend(bool, "setFrameUsingName:", .{name});
     }
 
     /// `-[NSWindow setFrameAutosaveName:]`
-    pub fn setFrameAutosaveName(self: Self, name: ?foundation.String) bool {
+    pub fn setFrameAutosaveName(self: Self, name: foundation.String) bool {
         return self.object.msgSend(bool, "setFrameAutosaveName:", .{name});
     }
 
     /// `+[NSWindow removeFrameUsingName:]`
-    pub fn removeFrameUsingName(name: ?foundation.String) void {
+    pub fn removeFrameUsingName(name: foundation.String) void {
         return class().msgSend(void, "removeFrameUsingName:", .{name});
     }
 
@@ -3819,13 +3819,13 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow stringWithSavedFrame]`
-    pub fn stringWithSavedFrame(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "stringWithSavedFrame", .{});
+    pub fn stringWithSavedFrame(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "stringWithSavedFrame", .{});
     }
 
     /// `-[NSWindow frameAutosaveName]`
-    pub fn frameAutosaveName(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "frameAutosaveName", .{});
+    pub fn frameAutosaveName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "frameAutosaveName", .{});
     }
 
     /// `-[NSWindow minSize]`
@@ -4064,12 +4064,12 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow tabbingIdentifier]`
-    pub fn tabbingIdentifier(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "tabbingIdentifier", .{});
+    pub fn tabbingIdentifier(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "tabbingIdentifier", .{});
     }
 
     /// `-[NSWindow setTabbingIdentifier:]`
-    pub fn setTabbingIdentifier(self: Self, tabbing_identifier: ?foundation.String) void {
+    pub fn setTabbingIdentifier(self: Self, tabbing_identifier: foundation.String) void {
         return self.object.msgSend(void, "setTabbingIdentifier:", .{tabbing_identifier});
     }
 
@@ -4099,7 +4099,7 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow trackEventsMatchingMask:timeout:mode:handler:]`
-    pub fn trackEventsMatchingMaskTimeoutModeHandler(self: Self, mask: EventMask, timeout: f64, mode: ?foundation.String, tracking_handler: objc.BlockRef(fn (?Event, ?*bool) void)) void {
+    pub fn trackEventsMatchingMaskTimeoutModeHandler(self: Self, mask: EventMask, timeout: f64, mode: foundation.String, tracking_handler: objc.BlockRef(fn (?Event, ?*bool) void)) void {
         return self.object.msgSend(void, "trackEventsMatchingMask:timeout:mode:handler:", .{ mask, timeout, mode, tracking_handler });
     }
 
@@ -4109,7 +4109,7 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow nextEventMatchingMask:untilDate:inMode:dequeue:]`
-    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: ?foundation.String, deq_flag: bool) ?Event {
+    pub fn nextEventMatchingMaskUntilDateInModeDequeue(self: Self, mask: EventMask, expiration: ?objc.Object, mode: foundation.String, deq_flag: bool) ?Event {
         return self.object.msgSend(?Event, "nextEventMatchingMask:untilDate:inMode:dequeue:", .{ mask, expiration, mode, deq_flag });
     }
 
@@ -4873,346 +4873,346 @@ pub const Window = extern struct {
         pub const @"+frameRectForContentRect:styleMask:" = fn (cg.Rect, WindowStyleMask) cg.Rect;
         pub const @"+contentRectForFrameRect:styleMask:" = fn (cg.Rect, WindowStyleMask) cg.Rect;
         pub const @"+minFrameWidthWithTitle:styleMask:" = fn (foundation.String, WindowStyleMask) cg.Float;
-        pub const @"frameRectForContentRect:" = fn (cg.Rect) cg.Rect;
-        pub const @"contentRectForFrameRect:" = fn (cg.Rect) cg.Rect;
-        pub const @"initWithContentRect:styleMask:backing:defer:" = fn (cg.Rect, WindowStyleMask, BackingStoreType, bool) Window;
-        pub const @"initWithContentRect:styleMask:backing:defer:screen:" = fn (cg.Rect, WindowStyleMask, BackingStoreType, bool, ?Screen) Window;
-        pub const @"addTitlebarAccessoryViewController:" = fn (objc.Object) void;
-        pub const @"insertTitlebarAccessoryViewController:atIndex:" = fn (objc.Object, objc.Integer) void;
-        pub const @"removeTitlebarAccessoryViewControllerAtIndex:" = fn (objc.Integer) void;
-        pub const @"setTitleWithRepresentedFilename:" = fn (foundation.String) void;
-        pub const @"fieldEditor:forObject:" = fn (bool, ?objc.Object) ?objc.Object;
-        pub const @"endEditingFor:" = fn (?objc.Object) void;
-        pub const @"constrainFrameRect:toScreen:" = fn (cg.Rect, ?Screen) cg.Rect;
-        pub const @"setFrame:display:" = fn (cg.Rect, bool) void;
-        pub const @"setContentSize:" = fn (cg.Size) void;
-        pub const @"setFrameOrigin:" = fn (cg.Point) void;
-        pub const @"setFrameTopLeftPoint:" = fn (cg.Point) void;
-        pub const @"cascadeTopLeftFromPoint:" = fn (cg.Point) cg.Point;
-        pub const @"animationResizeTime:" = fn (cg.Rect) f64;
-        pub const @"setFrame:display:animate:" = fn (cg.Rect, bool, bool) void;
-        pub const displayIfNeeded = fn () void;
-        pub const display = fn () void;
-        pub const update = fn () void;
-        pub const @"makeFirstResponder:" = fn (?Responder) bool;
-        pub const close = fn () void;
-        pub const @"miniaturize:" = fn (?objc.Object) void;
-        pub const @"deminiaturize:" = fn (?objc.Object) void;
-        pub const @"zoom:" = fn (?objc.Object) void;
-        pub const @"tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
-        pub const @"validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
-        pub const @"setContentBorderThickness:forEdge:" = fn (cg.Float, RectEdge) void;
-        pub const @"contentBorderThicknessForEdge:" = fn (RectEdge) cg.Float;
-        pub const @"setAutorecalculatesContentBorderThickness:forEdge:" = fn (bool, RectEdge) void;
-        pub const @"autorecalculatesContentBorderThicknessForEdge:" = fn (RectEdge) bool;
-        pub const center = fn () void;
-        pub const @"makeKeyAndOrderFront:" = fn (?objc.Object) void;
-        pub const @"orderFront:" = fn (?objc.Object) void;
-        pub const @"orderBack:" = fn (?objc.Object) void;
-        pub const @"orderOut:" = fn (?objc.Object) void;
-        pub const @"orderWindow:relativeTo:" = fn (WindowOrderingMode, objc.Integer) void;
-        pub const orderFrontRegardless = fn () void;
-        pub const makeKeyWindow = fn () void;
-        pub const makeMainWindow = fn () void;
-        pub const becomeKeyWindow = fn () void;
-        pub const resignKeyWindow = fn () void;
-        pub const becomeMainWindow = fn () void;
-        pub const resignMainWindow = fn () void;
-        pub const @"convertRectToScreen:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromScreen:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertPointToScreen:" = fn (cg.Point) cg.Point;
-        pub const @"convertPointFromScreen:" = fn (cg.Point) cg.Point;
-        pub const @"convertRectToBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertPointToBacking:" = fn (cg.Point) cg.Point;
-        pub const @"convertPointFromBacking:" = fn (cg.Point) cg.Point;
-        pub const @"backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
-        pub const @"performClose:" = fn (?objc.Object) void;
-        pub const @"performMiniaturize:" = fn (?objc.Object) void;
-        pub const @"performZoom:" = fn (?objc.Object) void;
-        pub const @"dataWithEPSInsideRect:" = fn (cg.Rect) foundation.Data;
-        pub const @"dataWithPDFInsideRect:" = fn (cg.Rect) foundation.Data;
-        pub const @"print:" = fn (?objc.Object) void;
-        pub const @"setDynamicDepthLimit:" = fn (bool) void;
-        pub const invalidateShadow = fn () void;
-        pub const @"toggleFullScreen:" = fn (?objc.Object) void;
-        pub const @"setFrameFromString:" = fn (?foundation.String) void;
-        pub const @"saveFrameUsingName:" = fn (?foundation.String) void;
-        pub const @"setFrameUsingName:force:" = fn (?foundation.String, bool) bool;
-        pub const @"setFrameUsingName:" = fn (?foundation.String) bool;
-        pub const @"setFrameAutosaveName:" = fn (?foundation.String) bool;
-        pub const @"+removeFrameUsingName:" = fn (?foundation.String) void;
-        pub const @"beginSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
-        pub const @"beginCriticalSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
-        pub const @"endSheet:" = fn (Window) void;
-        pub const @"endSheet:returnCode:" = fn (Window, objc.Integer) void;
+        pub const @"-frameRectForContentRect:" = fn (cg.Rect) cg.Rect;
+        pub const @"-contentRectForFrameRect:" = fn (cg.Rect) cg.Rect;
+        pub const @"-initWithContentRect:styleMask:backing:defer:" = fn (cg.Rect, WindowStyleMask, BackingStoreType, bool) Window;
+        pub const @"-initWithContentRect:styleMask:backing:defer:screen:" = fn (cg.Rect, WindowStyleMask, BackingStoreType, bool, ?Screen) Window;
+        pub const @"-addTitlebarAccessoryViewController:" = fn (objc.Object) void;
+        pub const @"-insertTitlebarAccessoryViewController:atIndex:" = fn (objc.Object, objc.Integer) void;
+        pub const @"-removeTitlebarAccessoryViewControllerAtIndex:" = fn (objc.Integer) void;
+        pub const @"-setTitleWithRepresentedFilename:" = fn (foundation.String) void;
+        pub const @"-fieldEditor:forObject:" = fn (bool, ?objc.Object) ?objc.Object;
+        pub const @"-endEditingFor:" = fn (?objc.Object) void;
+        pub const @"-constrainFrameRect:toScreen:" = fn (cg.Rect, ?Screen) cg.Rect;
+        pub const @"-setFrame:display:" = fn (cg.Rect, bool) void;
+        pub const @"-setContentSize:" = fn (cg.Size) void;
+        pub const @"-setFrameOrigin:" = fn (cg.Point) void;
+        pub const @"-setFrameTopLeftPoint:" = fn (cg.Point) void;
+        pub const @"-cascadeTopLeftFromPoint:" = fn (cg.Point) cg.Point;
+        pub const @"-animationResizeTime:" = fn (cg.Rect) f64;
+        pub const @"-setFrame:display:animate:" = fn (cg.Rect, bool, bool) void;
+        pub const @"-displayIfNeeded" = fn () void;
+        pub const @"-display" = fn () void;
+        pub const @"-update" = fn () void;
+        pub const @"-makeFirstResponder:" = fn (?Responder) bool;
+        pub const @"-close" = fn () void;
+        pub const @"-miniaturize:" = fn (?objc.Object) void;
+        pub const @"-deminiaturize:" = fn (?objc.Object) void;
+        pub const @"-zoom:" = fn (?objc.Object) void;
+        pub const @"-tryToPerform:with:" = fn (objc.Sel, ?objc.Object) bool;
+        pub const @"-validRequestorForSendType:returnType:" = fn (?foundation.String, ?foundation.String) ?objc.Object;
+        pub const @"-setContentBorderThickness:forEdge:" = fn (cg.Float, RectEdge) void;
+        pub const @"-contentBorderThicknessForEdge:" = fn (RectEdge) cg.Float;
+        pub const @"-setAutorecalculatesContentBorderThickness:forEdge:" = fn (bool, RectEdge) void;
+        pub const @"-autorecalculatesContentBorderThicknessForEdge:" = fn (RectEdge) bool;
+        pub const @"-center" = fn () void;
+        pub const @"-makeKeyAndOrderFront:" = fn (?objc.Object) void;
+        pub const @"-orderFront:" = fn (?objc.Object) void;
+        pub const @"-orderBack:" = fn (?objc.Object) void;
+        pub const @"-orderOut:" = fn (?objc.Object) void;
+        pub const @"-orderWindow:relativeTo:" = fn (WindowOrderingMode, objc.Integer) void;
+        pub const @"-orderFrontRegardless" = fn () void;
+        pub const @"-makeKeyWindow" = fn () void;
+        pub const @"-makeMainWindow" = fn () void;
+        pub const @"-becomeKeyWindow" = fn () void;
+        pub const @"-resignKeyWindow" = fn () void;
+        pub const @"-becomeMainWindow" = fn () void;
+        pub const @"-resignMainWindow" = fn () void;
+        pub const @"-convertRectToScreen:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromScreen:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertPointToScreen:" = fn (cg.Point) cg.Point;
+        pub const @"-convertPointFromScreen:" = fn (cg.Point) cg.Point;
+        pub const @"-convertRectToBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertPointToBacking:" = fn (cg.Point) cg.Point;
+        pub const @"-convertPointFromBacking:" = fn (cg.Point) cg.Point;
+        pub const @"-backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
+        pub const @"-performClose:" = fn (?objc.Object) void;
+        pub const @"-performMiniaturize:" = fn (?objc.Object) void;
+        pub const @"-performZoom:" = fn (?objc.Object) void;
+        pub const @"-dataWithEPSInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"-dataWithPDFInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"-print:" = fn (?objc.Object) void;
+        pub const @"-setDynamicDepthLimit:" = fn (bool) void;
+        pub const @"-invalidateShadow" = fn () void;
+        pub const @"-toggleFullScreen:" = fn (?objc.Object) void;
+        pub const @"-setFrameFromString:" = fn (foundation.String) void;
+        pub const @"-saveFrameUsingName:" = fn (foundation.String) void;
+        pub const @"-setFrameUsingName:force:" = fn (foundation.String, bool) bool;
+        pub const @"-setFrameUsingName:" = fn (foundation.String) bool;
+        pub const @"-setFrameAutosaveName:" = fn (foundation.String) bool;
+        pub const @"+removeFrameUsingName:" = fn (foundation.String) void;
+        pub const @"-beginSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
+        pub const @"-beginCriticalSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
+        pub const @"-endSheet:" = fn (Window) void;
+        pub const @"-endSheet:returnCode:" = fn (Window, objc.Integer) void;
         pub const @"+standardWindowButton:forStyleMask:" = fn (WindowButton, WindowStyleMask) ?objc.Object;
-        pub const @"standardWindowButton:" = fn (WindowButton) ?objc.Object;
-        pub const @"addChildWindow:ordered:" = fn (Window, WindowOrderingMode) void;
-        pub const @"removeChildWindow:" = fn (Window) void;
-        pub const @"canRepresentDisplayGamut:" = fn (DisplayGamut) bool;
+        pub const @"-standardWindowButton:" = fn (WindowButton) ?objc.Object;
+        pub const @"-addChildWindow:ordered:" = fn (Window, WindowOrderingMode) void;
+        pub const @"-removeChildWindow:" = fn (Window) void;
+        pub const @"-canRepresentDisplayGamut:" = fn (DisplayGamut) bool;
         pub const @"+windowNumbersWithOptions:" = fn (WindowNumberListOptions) ?foundation.Array(foundation.Number);
         pub const @"+windowNumberAtPoint:belowWindowWithWindowNumber:" = fn (cg.Point, objc.Integer) objc.Integer;
         pub const @"+windowWithContentViewController:" = fn (objc.Object) Window;
-        pub const @"performWindowDragWithEvent:" = fn (Event) void;
-        pub const @"selectNextKeyView:" = fn (?objc.Object) void;
-        pub const @"selectPreviousKeyView:" = fn (?objc.Object) void;
-        pub const @"selectKeyViewFollowingView:" = fn (View) void;
-        pub const @"selectKeyViewPrecedingView:" = fn (View) void;
-        pub const disableKeyEquivalentForDefaultButtonCell = fn () void;
-        pub const enableKeyEquivalentForDefaultButtonCell = fn () void;
-        pub const recalculateKeyViewLoop = fn () void;
-        pub const @"toggleToolbarShown:" = fn (?objc.Object) void;
-        pub const @"runToolbarCustomizationPalette:" = fn (?objc.Object) void;
-        pub const @"selectNextTab:" = fn (?objc.Object) void;
-        pub const @"selectPreviousTab:" = fn (?objc.Object) void;
-        pub const @"moveTabToNewWindow:" = fn (?objc.Object) void;
-        pub const @"mergeAllWindows:" = fn (?objc.Object) void;
-        pub const @"toggleTabBar:" = fn (?objc.Object) void;
-        pub const @"toggleTabOverview:" = fn (?objc.Object) void;
-        pub const @"addTabbedWindow:ordered:" = fn (Window, WindowOrderingMode) void;
-        pub const @"transferWindowSharingToWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
-        pub const @"requestSharingOfWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
-        pub const @"requestSharingOfWindowUsingPreview:title:completionHandler:" = fn (Image, foundation.String, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-performWindowDragWithEvent:" = fn (Event) void;
+        pub const @"-selectNextKeyView:" = fn (?objc.Object) void;
+        pub const @"-selectPreviousKeyView:" = fn (?objc.Object) void;
+        pub const @"-selectKeyViewFollowingView:" = fn (View) void;
+        pub const @"-selectKeyViewPrecedingView:" = fn (View) void;
+        pub const @"-disableKeyEquivalentForDefaultButtonCell" = fn () void;
+        pub const @"-enableKeyEquivalentForDefaultButtonCell" = fn () void;
+        pub const @"-recalculateKeyViewLoop" = fn () void;
+        pub const @"-toggleToolbarShown:" = fn (?objc.Object) void;
+        pub const @"-runToolbarCustomizationPalette:" = fn (?objc.Object) void;
+        pub const @"-selectNextTab:" = fn (?objc.Object) void;
+        pub const @"-selectPreviousTab:" = fn (?objc.Object) void;
+        pub const @"-moveTabToNewWindow:" = fn (?objc.Object) void;
+        pub const @"-mergeAllWindows:" = fn (?objc.Object) void;
+        pub const @"-toggleTabBar:" = fn (?objc.Object) void;
+        pub const @"-toggleTabOverview:" = fn (?objc.Object) void;
+        pub const @"-addTabbedWindow:ordered:" = fn (Window, WindowOrderingMode) void;
+        pub const @"-transferWindowSharingToWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-requestSharingOfWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"-requestSharingOfWindowUsingPreview:title:completionHandler:" = fn (Image, foundation.String, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
         pub const @"+defaultDepthLimit" = fn () WindowDepth;
-        pub const title = fn () foundation.String;
-        pub const @"setTitle:" = fn (foundation.String) void;
-        pub const subtitle = fn () foundation.String;
-        pub const @"setSubtitle:" = fn (foundation.String) void;
-        pub const titleVisibility = fn () WindowTitleVisibility;
-        pub const @"setTitleVisibility:" = fn (WindowTitleVisibility) void;
-        pub const titlebarAppearsTransparent = fn () bool;
-        pub const @"setTitlebarAppearsTransparent:" = fn (bool) void;
-        pub const toolbarStyle = fn () WindowToolbarStyle;
-        pub const @"setToolbarStyle:" = fn (WindowToolbarStyle) void;
-        pub const contentLayoutRect = fn () cg.Rect;
-        pub const contentLayoutGuide = fn () ?objc.Object;
-        pub const titlebarAccessoryViewControllers = fn () foundation.Array(objc.Object);
-        pub const @"setTitlebarAccessoryViewControllers:" = fn (foundation.Array(objc.Object)) void;
-        pub const representedURL = fn () ?foundation.Url;
-        pub const @"setRepresentedURL:" = fn (?foundation.Url) void;
-        pub const representedFilename = fn () foundation.String;
-        pub const @"setRepresentedFilename:" = fn (foundation.String) void;
-        pub const isExcludedFromWindowsMenu = fn () bool;
-        pub const @"setExcludedFromWindowsMenu:" = fn (bool) void;
-        pub const contentView = fn () ?View;
-        pub const @"setContentView:" = fn (?View) void;
-        pub const delegate = fn () ?WindowDelegate;
-        pub const @"setDelegate:" = fn (?WindowDelegate) void;
-        pub const windowNumber = fn () objc.Integer;
-        pub const styleMask = fn () WindowStyleMask;
-        pub const @"setStyleMask:" = fn (WindowStyleMask) void;
-        pub const cascadingReferenceFrame = fn () cg.Rect;
-        pub const frame = fn () cg.Rect;
-        pub const inLiveResize = fn () bool;
-        pub const resizeIncrements = fn () cg.Size;
-        pub const @"setResizeIncrements:" = fn (cg.Size) void;
-        pub const aspectRatio = fn () cg.Size;
-        pub const @"setAspectRatio:" = fn (cg.Size) void;
-        pub const contentResizeIncrements = fn () cg.Size;
-        pub const @"setContentResizeIncrements:" = fn (cg.Size) void;
-        pub const contentAspectRatio = fn () cg.Size;
-        pub const @"setContentAspectRatio:" = fn (cg.Size) void;
-        pub const viewsNeedDisplay = fn () bool;
-        pub const @"setViewsNeedDisplay:" = fn (bool) void;
-        pub const preservesContentDuringLiveResize = fn () bool;
-        pub const @"setPreservesContentDuringLiveResize:" = fn (bool) void;
-        pub const firstResponder = fn () ?Responder;
-        pub const resizeFlags = fn () EventModifierFlags;
-        pub const isReleasedWhenClosed = fn () bool;
-        pub const @"setReleasedWhenClosed:" = fn (bool) void;
-        pub const isZoomed = fn () bool;
-        pub const isMiniaturized = fn () bool;
-        pub const backgroundColor = fn () Color;
-        pub const @"setBackgroundColor:" = fn (?Color) void;
-        pub const isMovable = fn () bool;
-        pub const @"setMovable:" = fn (bool) void;
-        pub const isMovableByWindowBackground = fn () bool;
-        pub const @"setMovableByWindowBackground:" = fn (bool) void;
-        pub const hidesOnDeactivate = fn () bool;
-        pub const @"setHidesOnDeactivate:" = fn (bool) void;
-        pub const canHide = fn () bool;
-        pub const @"setCanHide:" = fn (bool) void;
-        pub const miniwindowImage = fn () ?Image;
-        pub const @"setMiniwindowImage:" = fn (?Image) void;
-        pub const miniwindowTitle = fn () foundation.String;
-        pub const @"setMiniwindowTitle:" = fn (?foundation.String) void;
-        pub const dockTile = fn () objc.Object;
-        pub const isDocumentEdited = fn () bool;
-        pub const @"setDocumentEdited:" = fn (bool) void;
-        pub const isVisible = fn () bool;
-        pub const isKeyWindow = fn () bool;
-        pub const isMainWindow = fn () bool;
-        pub const canBecomeKeyWindow = fn () bool;
-        pub const canBecomeMainWindow = fn () bool;
-        pub const worksWhenModal = fn () bool;
-        pub const preventsApplicationTerminationWhenModal = fn () bool;
-        pub const @"setPreventsApplicationTerminationWhenModal:" = fn (bool) void;
-        pub const backingScaleFactor = fn () cg.Float;
-        pub const allowsToolTipsWhenApplicationIsInactive = fn () bool;
-        pub const @"setAllowsToolTipsWhenApplicationIsInactive:" = fn (bool) void;
-        pub const backingType = fn () BackingStoreType;
-        pub const @"setBackingType:" = fn (BackingStoreType) void;
-        pub const level = fn () objc.Integer;
-        pub const @"setLevel:" = fn (objc.Integer) void;
-        pub const depthLimit = fn () WindowDepth;
-        pub const @"setDepthLimit:" = fn (WindowDepth) void;
-        pub const hasDynamicDepthLimit = fn () bool;
-        pub const screen = fn () ?Screen;
-        pub const deepestScreen = fn () ?Screen;
-        pub const hasShadow = fn () bool;
-        pub const @"setHasShadow:" = fn (bool) void;
-        pub const alphaValue = fn () cg.Float;
-        pub const @"setAlphaValue:" = fn (cg.Float) void;
-        pub const isOpaque = fn () bool;
-        pub const @"setOpaque:" = fn (bool) void;
-        pub const sharingType = fn () WindowSharingType;
-        pub const @"setSharingType:" = fn (WindowSharingType) void;
-        pub const allowsConcurrentViewDrawing = fn () bool;
-        pub const @"setAllowsConcurrentViewDrawing:" = fn (bool) void;
-        pub const displaysWhenScreenProfileChanges = fn () bool;
-        pub const @"setDisplaysWhenScreenProfileChanges:" = fn (bool) void;
-        pub const canBecomeVisibleWithoutLogin = fn () bool;
-        pub const @"setCanBecomeVisibleWithoutLogin:" = fn (bool) void;
-        pub const collectionBehavior = fn () WindowCollectionBehavior;
-        pub const @"setCollectionBehavior:" = fn (WindowCollectionBehavior) void;
-        pub const animationBehavior = fn () WindowAnimationBehavior;
-        pub const @"setAnimationBehavior:" = fn (WindowAnimationBehavior) void;
-        pub const isOnActiveSpace = fn () bool;
-        pub const stringWithSavedFrame = fn () ?foundation.String;
-        pub const frameAutosaveName = fn () ?foundation.String;
-        pub const minSize = fn () cg.Size;
-        pub const @"setMinSize:" = fn (cg.Size) void;
-        pub const maxSize = fn () cg.Size;
-        pub const @"setMaxSize:" = fn (cg.Size) void;
-        pub const contentMinSize = fn () cg.Size;
-        pub const @"setContentMinSize:" = fn (cg.Size) void;
-        pub const contentMaxSize = fn () cg.Size;
-        pub const @"setContentMaxSize:" = fn (cg.Size) void;
-        pub const minFullScreenContentSize = fn () cg.Size;
-        pub const @"setMinFullScreenContentSize:" = fn (cg.Size) void;
-        pub const maxFullScreenContentSize = fn () cg.Size;
-        pub const @"setMaxFullScreenContentSize:" = fn (cg.Size) void;
-        pub const deviceDescription = fn () foundation.Dictionary(objc.Object, objc.Object);
-        pub const windowController = fn () ?objc.Object;
-        pub const @"setWindowController:" = fn (?objc.Object) void;
-        pub const sheets = fn () foundation.Array(Window);
-        pub const attachedSheet = fn () ?Window;
-        pub const isSheet = fn () bool;
-        pub const sheetParent = fn () ?Window;
-        pub const childWindows = fn () ?foundation.Array(Window);
-        pub const parentWindow = fn () ?Window;
-        pub const @"setParentWindow:" = fn (?Window) void;
-        pub const appearanceSource = fn () objc.Object;
-        pub const @"setAppearanceSource:" = fn (?objc.Object) void;
-        pub const colorSpace = fn () ?objc.Object;
-        pub const @"setColorSpace:" = fn (?objc.Object) void;
-        pub const occlusionState = fn () WindowOcclusionState;
-        pub const titlebarSeparatorStyle = fn () TitlebarSeparatorStyle;
-        pub const @"setTitlebarSeparatorStyle:" = fn (TitlebarSeparatorStyle) void;
-        pub const contentViewController = fn () ?objc.Object;
-        pub const @"setContentViewController:" = fn (?objc.Object) void;
-        pub const initialFirstResponder = fn () ?View;
-        pub const @"setInitialFirstResponder:" = fn (?View) void;
-        pub const keyViewSelectionDirection = fn () SelectionDirection;
-        pub const defaultButtonCell = fn () ?objc.Object;
-        pub const @"setDefaultButtonCell:" = fn (?objc.Object) void;
-        pub const autorecalculatesKeyViewLoop = fn () bool;
-        pub const @"setAutorecalculatesKeyViewLoop:" = fn (bool) void;
-        pub const toolbar = fn () ?objc.Object;
-        pub const @"setToolbar:" = fn (?objc.Object) void;
-        pub const showsToolbarButton = fn () bool;
-        pub const @"setShowsToolbarButton:" = fn (bool) void;
+        pub const @"-title" = fn () foundation.String;
+        pub const @"-setTitle:" = fn (foundation.String) void;
+        pub const @"-subtitle" = fn () foundation.String;
+        pub const @"-setSubtitle:" = fn (foundation.String) void;
+        pub const @"-titleVisibility" = fn () WindowTitleVisibility;
+        pub const @"-setTitleVisibility:" = fn (WindowTitleVisibility) void;
+        pub const @"-titlebarAppearsTransparent" = fn () bool;
+        pub const @"-setTitlebarAppearsTransparent:" = fn (bool) void;
+        pub const @"-toolbarStyle" = fn () WindowToolbarStyle;
+        pub const @"-setToolbarStyle:" = fn (WindowToolbarStyle) void;
+        pub const @"-contentLayoutRect" = fn () cg.Rect;
+        pub const @"-contentLayoutGuide" = fn () ?objc.Object;
+        pub const @"-titlebarAccessoryViewControllers" = fn () foundation.Array(objc.Object);
+        pub const @"-setTitlebarAccessoryViewControllers:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-representedURL" = fn () ?foundation.Url;
+        pub const @"-setRepresentedURL:" = fn (?foundation.Url) void;
+        pub const @"-representedFilename" = fn () foundation.String;
+        pub const @"-setRepresentedFilename:" = fn (foundation.String) void;
+        pub const @"-isExcludedFromWindowsMenu" = fn () bool;
+        pub const @"-setExcludedFromWindowsMenu:" = fn (bool) void;
+        pub const @"-contentView" = fn () ?View;
+        pub const @"-setContentView:" = fn (?View) void;
+        pub const @"-delegate" = fn () ?WindowDelegate;
+        pub const @"-setDelegate:" = fn (?WindowDelegate) void;
+        pub const @"-windowNumber" = fn () objc.Integer;
+        pub const @"-styleMask" = fn () WindowStyleMask;
+        pub const @"-setStyleMask:" = fn (WindowStyleMask) void;
+        pub const @"-cascadingReferenceFrame" = fn () cg.Rect;
+        pub const @"-frame" = fn () cg.Rect;
+        pub const @"-inLiveResize" = fn () bool;
+        pub const @"-resizeIncrements" = fn () cg.Size;
+        pub const @"-setResizeIncrements:" = fn (cg.Size) void;
+        pub const @"-aspectRatio" = fn () cg.Size;
+        pub const @"-setAspectRatio:" = fn (cg.Size) void;
+        pub const @"-contentResizeIncrements" = fn () cg.Size;
+        pub const @"-setContentResizeIncrements:" = fn (cg.Size) void;
+        pub const @"-contentAspectRatio" = fn () cg.Size;
+        pub const @"-setContentAspectRatio:" = fn (cg.Size) void;
+        pub const @"-viewsNeedDisplay" = fn () bool;
+        pub const @"-setViewsNeedDisplay:" = fn (bool) void;
+        pub const @"-preservesContentDuringLiveResize" = fn () bool;
+        pub const @"-setPreservesContentDuringLiveResize:" = fn (bool) void;
+        pub const @"-firstResponder" = fn () ?Responder;
+        pub const @"-resizeFlags" = fn () EventModifierFlags;
+        pub const @"-isReleasedWhenClosed" = fn () bool;
+        pub const @"-setReleasedWhenClosed:" = fn (bool) void;
+        pub const @"-isZoomed" = fn () bool;
+        pub const @"-isMiniaturized" = fn () bool;
+        pub const @"-backgroundColor" = fn () Color;
+        pub const @"-setBackgroundColor:" = fn (?Color) void;
+        pub const @"-isMovable" = fn () bool;
+        pub const @"-setMovable:" = fn (bool) void;
+        pub const @"-isMovableByWindowBackground" = fn () bool;
+        pub const @"-setMovableByWindowBackground:" = fn (bool) void;
+        pub const @"-hidesOnDeactivate" = fn () bool;
+        pub const @"-setHidesOnDeactivate:" = fn (bool) void;
+        pub const @"-canHide" = fn () bool;
+        pub const @"-setCanHide:" = fn (bool) void;
+        pub const @"-miniwindowImage" = fn () ?Image;
+        pub const @"-setMiniwindowImage:" = fn (?Image) void;
+        pub const @"-miniwindowTitle" = fn () foundation.String;
+        pub const @"-setMiniwindowTitle:" = fn (?foundation.String) void;
+        pub const @"-dockTile" = fn () objc.Object;
+        pub const @"-isDocumentEdited" = fn () bool;
+        pub const @"-setDocumentEdited:" = fn (bool) void;
+        pub const @"-isVisible" = fn () bool;
+        pub const @"-isKeyWindow" = fn () bool;
+        pub const @"-isMainWindow" = fn () bool;
+        pub const @"-canBecomeKeyWindow" = fn () bool;
+        pub const @"-canBecomeMainWindow" = fn () bool;
+        pub const @"-worksWhenModal" = fn () bool;
+        pub const @"-preventsApplicationTerminationWhenModal" = fn () bool;
+        pub const @"-setPreventsApplicationTerminationWhenModal:" = fn (bool) void;
+        pub const @"-backingScaleFactor" = fn () cg.Float;
+        pub const @"-allowsToolTipsWhenApplicationIsInactive" = fn () bool;
+        pub const @"-setAllowsToolTipsWhenApplicationIsInactive:" = fn (bool) void;
+        pub const @"-backingType" = fn () BackingStoreType;
+        pub const @"-setBackingType:" = fn (BackingStoreType) void;
+        pub const @"-level" = fn () objc.Integer;
+        pub const @"-setLevel:" = fn (objc.Integer) void;
+        pub const @"-depthLimit" = fn () WindowDepth;
+        pub const @"-setDepthLimit:" = fn (WindowDepth) void;
+        pub const @"-hasDynamicDepthLimit" = fn () bool;
+        pub const @"-screen" = fn () ?Screen;
+        pub const @"-deepestScreen" = fn () ?Screen;
+        pub const @"-hasShadow" = fn () bool;
+        pub const @"-setHasShadow:" = fn (bool) void;
+        pub const @"-alphaValue" = fn () cg.Float;
+        pub const @"-setAlphaValue:" = fn (cg.Float) void;
+        pub const @"-isOpaque" = fn () bool;
+        pub const @"-setOpaque:" = fn (bool) void;
+        pub const @"-sharingType" = fn () WindowSharingType;
+        pub const @"-setSharingType:" = fn (WindowSharingType) void;
+        pub const @"-allowsConcurrentViewDrawing" = fn () bool;
+        pub const @"-setAllowsConcurrentViewDrawing:" = fn (bool) void;
+        pub const @"-displaysWhenScreenProfileChanges" = fn () bool;
+        pub const @"-setDisplaysWhenScreenProfileChanges:" = fn (bool) void;
+        pub const @"-canBecomeVisibleWithoutLogin" = fn () bool;
+        pub const @"-setCanBecomeVisibleWithoutLogin:" = fn (bool) void;
+        pub const @"-collectionBehavior" = fn () WindowCollectionBehavior;
+        pub const @"-setCollectionBehavior:" = fn (WindowCollectionBehavior) void;
+        pub const @"-animationBehavior" = fn () WindowAnimationBehavior;
+        pub const @"-setAnimationBehavior:" = fn (WindowAnimationBehavior) void;
+        pub const @"-isOnActiveSpace" = fn () bool;
+        pub const @"-stringWithSavedFrame" = fn () foundation.String;
+        pub const @"-frameAutosaveName" = fn () foundation.String;
+        pub const @"-minSize" = fn () cg.Size;
+        pub const @"-setMinSize:" = fn (cg.Size) void;
+        pub const @"-maxSize" = fn () cg.Size;
+        pub const @"-setMaxSize:" = fn (cg.Size) void;
+        pub const @"-contentMinSize" = fn () cg.Size;
+        pub const @"-setContentMinSize:" = fn (cg.Size) void;
+        pub const @"-contentMaxSize" = fn () cg.Size;
+        pub const @"-setContentMaxSize:" = fn (cg.Size) void;
+        pub const @"-minFullScreenContentSize" = fn () cg.Size;
+        pub const @"-setMinFullScreenContentSize:" = fn (cg.Size) void;
+        pub const @"-maxFullScreenContentSize" = fn () cg.Size;
+        pub const @"-setMaxFullScreenContentSize:" = fn (cg.Size) void;
+        pub const @"-deviceDescription" = fn () foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-windowController" = fn () ?objc.Object;
+        pub const @"-setWindowController:" = fn (?objc.Object) void;
+        pub const @"-sheets" = fn () foundation.Array(Window);
+        pub const @"-attachedSheet" = fn () ?Window;
+        pub const @"-isSheet" = fn () bool;
+        pub const @"-sheetParent" = fn () ?Window;
+        pub const @"-childWindows" = fn () ?foundation.Array(Window);
+        pub const @"-parentWindow" = fn () ?Window;
+        pub const @"-setParentWindow:" = fn (?Window) void;
+        pub const @"-appearanceSource" = fn () objc.Object;
+        pub const @"-setAppearanceSource:" = fn (?objc.Object) void;
+        pub const @"-colorSpace" = fn () ?objc.Object;
+        pub const @"-setColorSpace:" = fn (?objc.Object) void;
+        pub const @"-occlusionState" = fn () WindowOcclusionState;
+        pub const @"-titlebarSeparatorStyle" = fn () TitlebarSeparatorStyle;
+        pub const @"-setTitlebarSeparatorStyle:" = fn (TitlebarSeparatorStyle) void;
+        pub const @"-contentViewController" = fn () ?objc.Object;
+        pub const @"-setContentViewController:" = fn (?objc.Object) void;
+        pub const @"-initialFirstResponder" = fn () ?View;
+        pub const @"-setInitialFirstResponder:" = fn (?View) void;
+        pub const @"-keyViewSelectionDirection" = fn () SelectionDirection;
+        pub const @"-defaultButtonCell" = fn () ?objc.Object;
+        pub const @"-setDefaultButtonCell:" = fn (?objc.Object) void;
+        pub const @"-autorecalculatesKeyViewLoop" = fn () bool;
+        pub const @"-setAutorecalculatesKeyViewLoop:" = fn (bool) void;
+        pub const @"-toolbar" = fn () ?objc.Object;
+        pub const @"-setToolbar:" = fn (?objc.Object) void;
+        pub const @"-showsToolbarButton" = fn () bool;
+        pub const @"-setShowsToolbarButton:" = fn (bool) void;
         pub const @"+allowsAutomaticWindowTabbing" = fn () bool;
         pub const @"+setAllowsAutomaticWindowTabbing:" = fn (bool) void;
         pub const @"+userTabbingPreference" = fn () WindowUserTabbingPreference;
-        pub const tabbingMode = fn () WindowTabbingMode;
-        pub const @"setTabbingMode:" = fn (WindowTabbingMode) void;
-        pub const tabbingIdentifier = fn () ?foundation.String;
-        pub const @"setTabbingIdentifier:" = fn (?foundation.String) void;
-        pub const tabbedWindows = fn () ?foundation.Array(Window);
-        pub const tab = fn () objc.Object;
-        pub const tabGroup = fn () objc.Object;
-        pub const hasActiveWindowSharingSession = fn () bool;
-        pub const windowTitlebarLayoutDirection = fn () UserInterfaceLayoutDirection;
-        pub const @"trackEventsMatchingMask:timeout:mode:handler:" = fn (EventMask, f64, ?foundation.String, objc.BlockRef(fn (?Event, ?*bool) void)) void;
-        pub const @"nextEventMatchingMask:" = fn (EventMask) ?Event;
-        pub const @"nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, ?foundation.String, bool) ?Event;
-        pub const @"discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
-        pub const @"postEvent:atStart:" = fn (Event, bool) void;
-        pub const @"sendEvent:" = fn (Event) void;
-        pub const currentEvent = fn () ?Event;
-        pub const acceptsMouseMovedEvents = fn () bool;
-        pub const @"setAcceptsMouseMovedEvents:" = fn (bool) void;
-        pub const ignoresMouseEvents = fn () bool;
-        pub const @"setIgnoresMouseEvents:" = fn (bool) void;
-        pub const mouseLocationOutsideOfEventStream = fn () cg.Point;
-        pub const disableCursorRects = fn () void;
-        pub const enableCursorRects = fn () void;
-        pub const discardCursorRects = fn () void;
-        pub const @"invalidateCursorRectsForView:" = fn (View) void;
-        pub const resetCursorRects = fn () void;
-        pub const areCursorRectsEnabled = fn () bool;
-        pub const @"beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
-        pub const @"dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
-        pub const @"registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
-        pub const unregisterDraggedTypes = fn () void;
-        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
-        pub const @"cacheImageInRect:" = fn (cg.Rect) void;
-        pub const restoreCachedImage = fn () void;
-        pub const discardCachedImage = fn () void;
+        pub const @"-tabbingMode" = fn () WindowTabbingMode;
+        pub const @"-setTabbingMode:" = fn (WindowTabbingMode) void;
+        pub const @"-tabbingIdentifier" = fn () foundation.String;
+        pub const @"-setTabbingIdentifier:" = fn (foundation.String) void;
+        pub const @"-tabbedWindows" = fn () ?foundation.Array(Window);
+        pub const @"-tab" = fn () objc.Object;
+        pub const @"-tabGroup" = fn () objc.Object;
+        pub const @"-hasActiveWindowSharingSession" = fn () bool;
+        pub const @"-windowTitlebarLayoutDirection" = fn () UserInterfaceLayoutDirection;
+        pub const @"-trackEventsMatchingMask:timeout:mode:handler:" = fn (EventMask, f64, foundation.String, objc.BlockRef(fn (?Event, ?*bool) void)) void;
+        pub const @"-nextEventMatchingMask:" = fn (EventMask) ?Event;
+        pub const @"-nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, foundation.String, bool) ?Event;
+        pub const @"-discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
+        pub const @"-postEvent:atStart:" = fn (Event, bool) void;
+        pub const @"-sendEvent:" = fn (Event) void;
+        pub const @"-currentEvent" = fn () ?Event;
+        pub const @"-acceptsMouseMovedEvents" = fn () bool;
+        pub const @"-setAcceptsMouseMovedEvents:" = fn (bool) void;
+        pub const @"-ignoresMouseEvents" = fn () bool;
+        pub const @"-setIgnoresMouseEvents:" = fn (bool) void;
+        pub const @"-mouseLocationOutsideOfEventStream" = fn () cg.Point;
+        pub const @"-disableCursorRects" = fn () void;
+        pub const @"-enableCursorRects" = fn () void;
+        pub const @"-discardCursorRects" = fn () void;
+        pub const @"-invalidateCursorRectsForView:" = fn (View) void;
+        pub const @"-resetCursorRects" = fn () void;
+        pub const @"-areCursorRectsEnabled" = fn () bool;
+        pub const @"-beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
+        pub const @"-dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
+        pub const @"-registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-unregisterDraggedTypes" = fn () void;
+        pub const @"-displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const @"-cacheImageInRect:" = fn (cg.Rect) void;
+        pub const @"-restoreCachedImage" = fn () void;
+        pub const @"-discardCachedImage" = fn () void;
         pub const @"+menuChanged:" = fn (Menu) void;
-        pub const gState = fn () objc.Integer;
-        pub const @"convertBaseToScreen:" = fn (cg.Point) cg.Point;
-        pub const @"convertScreenToBase:" = fn (cg.Point) cg.Point;
-        pub const userSpaceScaleFactor = fn () cg.Float;
-        pub const @"useOptimizedDrawing:" = fn (bool) void;
-        pub const canStoreColor = fn () bool;
-        pub const disableFlushWindow = fn () void;
-        pub const enableFlushWindow = fn () void;
-        pub const flushWindow = fn () void;
-        pub const flushWindowIfNeeded = fn () void;
-        pub const @"initWithWindowRef:" = fn (?*anyopaque) ?Window;
-        pub const disableScreenUpdatesUntilFlush = fn () void;
-        pub const isFlushWindowDisabled = fn () bool;
-        pub const isAutodisplay = fn () bool;
-        pub const @"setAutodisplay:" = fn (bool) void;
-        pub const graphicsContext = fn () ?GraphicsContext;
-        pub const isOneShot = fn () bool;
-        pub const @"setOneShot:" = fn (bool) void;
-        pub const preferredBackingLocation = fn () WindowBackingLocation;
-        pub const @"setPreferredBackingLocation:" = fn (WindowBackingLocation) void;
-        pub const backingLocation = fn () WindowBackingLocation;
-        pub const showsResizeIndicator = fn () bool;
-        pub const @"setShowsResizeIndicator:" = fn (bool) void;
-        pub const windowRef = fn () ?*anyopaque;
-        pub const updateConstraintsIfNeeded = fn () void;
-        pub const layoutIfNeeded = fn () void;
-        pub const @"anchorAttributeForOrientation:" = fn (LayoutConstraintOrientation) LayoutAttribute;
-        pub const @"setAnchorAttribute:forOrientation:" = fn (LayoutAttribute, LayoutConstraintOrientation) void;
-        pub const @"visualizeConstraints:" = fn (?foundation.Array(objc.Object)) void;
-        pub const drawers = fn () ?foundation.Array(objc.Object);
-        pub const @"setIsMiniaturized:" = fn (bool) void;
-        pub const @"setIsVisible:" = fn (bool) void;
-        pub const @"setIsZoomed:" = fn (bool) void;
-        pub const @"handleCloseScriptCommand:" = fn (objc.Object) ?objc.Object;
-        pub const @"handlePrintScriptCommand:" = fn (objc.Object) ?objc.Object;
-        pub const @"handleSaveScriptCommand:" = fn (objc.Object) ?objc.Object;
-        pub const hasCloseBox = fn () bool;
-        pub const hasTitleBar = fn () bool;
-        pub const isFloatingPanel = fn () bool;
-        pub const isMiniaturizable = fn () bool;
-        pub const isModalPanel = fn () bool;
-        pub const isResizable = fn () bool;
-        pub const isZoomable = fn () bool;
-        pub const orderedIndex = fn () objc.Integer;
-        pub const @"setOrderedIndex:" = fn (objc.Integer) void;
-        pub const disableSnapshotRestoration = fn () void;
-        pub const enableSnapshotRestoration = fn () void;
-        pub const isRestorable = fn () bool;
-        pub const @"setRestorable:" = fn (bool) void;
-        pub const restorationClass = fn () ?objc.Class;
-        pub const @"setRestorationClass:" = fn (?objc.Class) void;
+        pub const @"-gState" = fn () objc.Integer;
+        pub const @"-convertBaseToScreen:" = fn (cg.Point) cg.Point;
+        pub const @"-convertScreenToBase:" = fn (cg.Point) cg.Point;
+        pub const @"-userSpaceScaleFactor" = fn () cg.Float;
+        pub const @"-useOptimizedDrawing:" = fn (bool) void;
+        pub const @"-canStoreColor" = fn () bool;
+        pub const @"-disableFlushWindow" = fn () void;
+        pub const @"-enableFlushWindow" = fn () void;
+        pub const @"-flushWindow" = fn () void;
+        pub const @"-flushWindowIfNeeded" = fn () void;
+        pub const @"-initWithWindowRef:" = fn (?*anyopaque) ?Window;
+        pub const @"-disableScreenUpdatesUntilFlush" = fn () void;
+        pub const @"-isFlushWindowDisabled" = fn () bool;
+        pub const @"-isAutodisplay" = fn () bool;
+        pub const @"-setAutodisplay:" = fn (bool) void;
+        pub const @"-graphicsContext" = fn () ?GraphicsContext;
+        pub const @"-isOneShot" = fn () bool;
+        pub const @"-setOneShot:" = fn (bool) void;
+        pub const @"-preferredBackingLocation" = fn () WindowBackingLocation;
+        pub const @"-setPreferredBackingLocation:" = fn (WindowBackingLocation) void;
+        pub const @"-backingLocation" = fn () WindowBackingLocation;
+        pub const @"-showsResizeIndicator" = fn () bool;
+        pub const @"-setShowsResizeIndicator:" = fn (bool) void;
+        pub const @"-windowRef" = fn () ?*anyopaque;
+        pub const @"-updateConstraintsIfNeeded" = fn () void;
+        pub const @"-layoutIfNeeded" = fn () void;
+        pub const @"-anchorAttributeForOrientation:" = fn (LayoutConstraintOrientation) LayoutAttribute;
+        pub const @"-setAnchorAttribute:forOrientation:" = fn (LayoutAttribute, LayoutConstraintOrientation) void;
+        pub const @"-visualizeConstraints:" = fn (?foundation.Array(objc.Object)) void;
+        pub const @"-drawers" = fn () ?foundation.Array(objc.Object);
+        pub const @"-setIsMiniaturized:" = fn (bool) void;
+        pub const @"-setIsVisible:" = fn (bool) void;
+        pub const @"-setIsZoomed:" = fn (bool) void;
+        pub const @"-handleCloseScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const @"-handlePrintScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const @"-handleSaveScriptCommand:" = fn (objc.Object) ?objc.Object;
+        pub const @"-hasCloseBox" = fn () bool;
+        pub const @"-hasTitleBar" = fn () bool;
+        pub const @"-isFloatingPanel" = fn () bool;
+        pub const @"-isMiniaturizable" = fn () bool;
+        pub const @"-isModalPanel" = fn () bool;
+        pub const @"-isResizable" = fn () bool;
+        pub const @"-isZoomable" = fn () bool;
+        pub const @"-orderedIndex" = fn () objc.Integer;
+        pub const @"-setOrderedIndex:" = fn (objc.Integer) void;
+        pub const @"-disableSnapshotRestoration" = fn () void;
+        pub const @"-enableSnapshotRestoration" = fn () void;
+        pub const @"-isRestorable" = fn () bool;
+        pub const @"-setRestorable:" = fn (bool) void;
+        pub const @"-restorationClass" = fn () ?objc.Class;
+        pub const @"-setRestorationClass:" = fn (?objc.Class) void;
     };
 };
 
@@ -7363,351 +7363,351 @@ pub const View = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"initWithFrame:" = fn (cg.Rect) View;
-        pub const @"initWithCoder:" = fn (objc.Object) ?View;
-        pub const @"isDescendantOf:" = fn (View) bool;
-        pub const @"ancestorSharedWithView:" = fn (View) ?View;
-        pub const @"getRectsBeingDrawn:count:" = fn (?*objc.abi.Id, ?*objc.Integer) void;
-        pub const @"needsToDrawRect:" = fn (cg.Rect) bool;
-        pub const viewDidHide = fn () void;
-        pub const viewDidUnhide = fn () void;
-        pub const @"addSubview:" = fn (View) void;
-        pub const @"addSubview:positioned:relativeTo:" = fn (View, WindowOrderingMode, ?View) void;
-        pub const @"sortSubviewsUsingFunction:context:" = fn (*const fn (View, View, ?*anyopaque) callconv(.c) ComparisonResult, ?*anyopaque) void;
-        pub const @"viewWillMoveToWindow:" = fn (?Window) void;
-        pub const viewDidMoveToWindow = fn () void;
-        pub const @"viewWillMoveToSuperview:" = fn (?View) void;
-        pub const viewDidMoveToSuperview = fn () void;
-        pub const @"didAddSubview:" = fn (View) void;
-        pub const @"willRemoveSubview:" = fn (View) void;
-        pub const removeFromSuperview = fn () void;
-        pub const @"replaceSubview:with:" = fn (View, View) void;
-        pub const removeFromSuperviewWithoutNeedingDisplay = fn () void;
-        pub const viewDidChangeBackingProperties = fn () void;
-        pub const @"resizeSubviewsWithOldSize:" = fn (cg.Size) void;
-        pub const @"resizeWithOldSuperviewSize:" = fn (cg.Size) void;
-        pub const @"setFrameOrigin:" = fn (cg.Point) void;
-        pub const @"setFrameSize:" = fn (cg.Size) void;
-        pub const @"setBoundsOrigin:" = fn (cg.Point) void;
-        pub const @"setBoundsSize:" = fn (cg.Size) void;
-        pub const @"translateOriginToPoint:" = fn (cg.Point) void;
-        pub const @"scaleUnitSquareToSize:" = fn (cg.Size) void;
-        pub const @"rotateByAngle:" = fn (cg.Float) void;
-        pub const @"convertPoint:fromView:" = fn (cg.Point, ?View) cg.Point;
-        pub const @"convertPoint:toView:" = fn (cg.Point, ?View) cg.Point;
-        pub const @"convertSize:fromView:" = fn (cg.Size, ?View) cg.Size;
-        pub const @"convertSize:toView:" = fn (cg.Size, ?View) cg.Size;
-        pub const @"convertRect:fromView:" = fn (cg.Rect, ?View) cg.Rect;
-        pub const @"convertRect:toView:" = fn (cg.Rect, ?View) cg.Rect;
-        pub const @"backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
-        pub const @"centerScanRect:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertPointToBacking:" = fn (cg.Point) cg.Point;
-        pub const @"convertPointFromBacking:" = fn (cg.Point) cg.Point;
-        pub const @"convertSizeToBacking:" = fn (cg.Size) cg.Size;
-        pub const @"convertSizeFromBacking:" = fn (cg.Size) cg.Size;
-        pub const @"convertRectToBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertPointToLayer:" = fn (cg.Point) cg.Point;
-        pub const @"convertPointFromLayer:" = fn (cg.Point) cg.Point;
-        pub const @"convertSizeToLayer:" = fn (cg.Size) cg.Size;
-        pub const @"convertSizeFromLayer:" = fn (cg.Size) cg.Size;
-        pub const @"convertRectToLayer:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromLayer:" = fn (cg.Rect) cg.Rect;
-        pub const @"setNeedsDisplayInRect:" = fn (cg.Rect) void;
-        pub const lockFocus = fn () void;
-        pub const unlockFocus = fn () void;
-        pub const lockFocusIfCanDraw = fn () bool;
-        pub const @"lockFocusIfCanDrawInContext:" = fn (GraphicsContext) bool;
-        pub const display = fn () void;
-        pub const displayIfNeeded = fn () void;
-        pub const displayIfNeededIgnoringOpacity = fn () void;
-        pub const @"displayRect:" = fn (cg.Rect) void;
-        pub const @"displayIfNeededInRect:" = fn (cg.Rect) void;
-        pub const @"displayRectIgnoringOpacity:" = fn (cg.Rect) void;
-        pub const @"displayIfNeededInRectIgnoringOpacity:" = fn (cg.Rect) void;
-        pub const @"drawRect:" = fn (cg.Rect) void;
-        pub const @"displayRectIgnoringOpacity:inContext:" = fn (cg.Rect, GraphicsContext) void;
-        pub const @"bitmapImageRepForCachingDisplayInRect:" = fn (cg.Rect) ?BitmapImageRep;
-        pub const @"cacheDisplayInRect:toBitmapImageRep:" = fn (cg.Rect, BitmapImageRep) void;
-        pub const viewWillDraw = fn () void;
-        pub const @"scrollPoint:" = fn (cg.Point) void;
-        pub const @"scrollRectToVisible:" = fn (cg.Rect) bool;
-        pub const @"autoscroll:" = fn (Event) bool;
-        pub const @"adjustScroll:" = fn (cg.Rect) cg.Rect;
-        pub const @"scrollRect:by:" = fn (cg.Rect, cg.Size) void;
-        pub const @"translateRectsNeedingDisplayInRect:by:" = fn (cg.Rect, cg.Size) void;
-        pub const @"hitTest:" = fn (cg.Point) ?View;
-        pub const @"mouse:inRect:" = fn (cg.Point, cg.Rect) bool;
-        pub const @"viewWithTag:" = fn (objc.Integer) ?View;
-        pub const @"performKeyEquivalent:" = fn (Event) bool;
-        pub const @"acceptsFirstMouse:" = fn (?Event) bool;
-        pub const @"shouldDelayWindowOrderingForEvent:" = fn (Event) bool;
-        pub const makeBackingLayer = fn () objc.Object;
-        pub const updateLayer = fn () void;
-        pub const layoutSubtreeIfNeeded = fn () void;
-        pub const layout = fn () void;
-        pub const @"menuForEvent:" = fn (Event) ?Menu;
-        pub const @"willOpenMenu:withEvent:" = fn (Menu, Event) void;
-        pub const @"didCloseMenu:withEvent:" = fn (Menu, ?Event) void;
-        pub const @"addToolTipRect:owner:userData:" = fn (cg.Rect, objc.Object, ?*anyopaque) objc.Integer;
-        pub const @"removeToolTip:" = fn (objc.Integer) void;
-        pub const removeAllToolTips = fn () void;
-        pub const viewWillStartLiveResize = fn () void;
-        pub const viewDidEndLiveResize = fn () void;
-        pub const @"getRectsExposedDuringLiveResize:count:" = fn (?*cg.Rect, ?*objc.Integer) void;
-        pub const @"rectForSmartMagnificationAtPoint:inRect:" = fn (cg.Point, cg.Rect) cg.Rect;
-        pub const prepareForReuse = fn () void;
-        pub const @"prepareContentInRect:" = fn (cg.Rect) void;
-        pub const viewDidChangeEffectiveAppearance = fn () void;
-        pub const window = fn () ?Window;
-        pub const superview = fn () ?View;
-        pub const subviews = fn () foundation.Array(View);
-        pub const @"setSubviews:" = fn (foundation.Array(View)) void;
-        pub const opaqueAncestor = fn () ?View;
-        pub const isHidden = fn () bool;
-        pub const @"setHidden:" = fn (bool) void;
-        pub const isHiddenOrHasHiddenAncestor = fn () bool;
-        pub const wantsDefaultClipping = fn () bool;
-        pub const postsFrameChangedNotifications = fn () bool;
-        pub const @"setPostsFrameChangedNotifications:" = fn (bool) void;
-        pub const autoresizesSubviews = fn () bool;
-        pub const @"setAutoresizesSubviews:" = fn (bool) void;
-        pub const autoresizingMask = fn () AutoresizingMaskOptions;
-        pub const @"setAutoresizingMask:" = fn (AutoresizingMaskOptions) void;
-        pub const frame = fn () cg.Rect;
-        pub const @"setFrame:" = fn (cg.Rect) void;
-        pub const frameRotation = fn () cg.Float;
-        pub const @"setFrameRotation:" = fn (cg.Float) void;
-        pub const frameCenterRotation = fn () cg.Float;
-        pub const @"setFrameCenterRotation:" = fn (cg.Float) void;
-        pub const boundsRotation = fn () cg.Float;
-        pub const @"setBoundsRotation:" = fn (cg.Float) void;
-        pub const bounds = fn () cg.Rect;
-        pub const @"setBounds:" = fn (cg.Rect) void;
-        pub const isFlipped = fn () bool;
-        pub const isRotatedFromBase = fn () bool;
-        pub const isRotatedOrScaledFromBase = fn () bool;
-        pub const isOpaque = fn () bool;
-        pub const canDrawConcurrently = fn () bool;
-        pub const @"setCanDrawConcurrently:" = fn (bool) void;
-        pub const canDraw = fn () bool;
-        pub const needsDisplay = fn () bool;
-        pub const @"setNeedsDisplay:" = fn (bool) void;
+        pub const @"-initWithFrame:" = fn (cg.Rect) View;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?View;
+        pub const @"-isDescendantOf:" = fn (View) bool;
+        pub const @"-ancestorSharedWithView:" = fn (View) ?View;
+        pub const @"-getRectsBeingDrawn:count:" = fn (?*objc.abi.Id, ?*objc.Integer) void;
+        pub const @"-needsToDrawRect:" = fn (cg.Rect) bool;
+        pub const @"-viewDidHide" = fn () void;
+        pub const @"-viewDidUnhide" = fn () void;
+        pub const @"-addSubview:" = fn (View) void;
+        pub const @"-addSubview:positioned:relativeTo:" = fn (View, WindowOrderingMode, ?View) void;
+        pub const @"-sortSubviewsUsingFunction:context:" = fn (*const fn (View, View, ?*anyopaque) callconv(.c) ComparisonResult, ?*anyopaque) void;
+        pub const @"-viewWillMoveToWindow:" = fn (?Window) void;
+        pub const @"-viewDidMoveToWindow" = fn () void;
+        pub const @"-viewWillMoveToSuperview:" = fn (?View) void;
+        pub const @"-viewDidMoveToSuperview" = fn () void;
+        pub const @"-didAddSubview:" = fn (View) void;
+        pub const @"-willRemoveSubview:" = fn (View) void;
+        pub const @"-removeFromSuperview" = fn () void;
+        pub const @"-replaceSubview:with:" = fn (View, View) void;
+        pub const @"-removeFromSuperviewWithoutNeedingDisplay" = fn () void;
+        pub const @"-viewDidChangeBackingProperties" = fn () void;
+        pub const @"-resizeSubviewsWithOldSize:" = fn (cg.Size) void;
+        pub const @"-resizeWithOldSuperviewSize:" = fn (cg.Size) void;
+        pub const @"-setFrameOrigin:" = fn (cg.Point) void;
+        pub const @"-setFrameSize:" = fn (cg.Size) void;
+        pub const @"-setBoundsOrigin:" = fn (cg.Point) void;
+        pub const @"-setBoundsSize:" = fn (cg.Size) void;
+        pub const @"-translateOriginToPoint:" = fn (cg.Point) void;
+        pub const @"-scaleUnitSquareToSize:" = fn (cg.Size) void;
+        pub const @"-rotateByAngle:" = fn (cg.Float) void;
+        pub const @"-convertPoint:fromView:" = fn (cg.Point, ?View) cg.Point;
+        pub const @"-convertPoint:toView:" = fn (cg.Point, ?View) cg.Point;
+        pub const @"-convertSize:fromView:" = fn (cg.Size, ?View) cg.Size;
+        pub const @"-convertSize:toView:" = fn (cg.Size, ?View) cg.Size;
+        pub const @"-convertRect:fromView:" = fn (cg.Rect, ?View) cg.Rect;
+        pub const @"-convertRect:toView:" = fn (cg.Rect, ?View) cg.Rect;
+        pub const @"-backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
+        pub const @"-centerScanRect:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertPointToBacking:" = fn (cg.Point) cg.Point;
+        pub const @"-convertPointFromBacking:" = fn (cg.Point) cg.Point;
+        pub const @"-convertSizeToBacking:" = fn (cg.Size) cg.Size;
+        pub const @"-convertSizeFromBacking:" = fn (cg.Size) cg.Size;
+        pub const @"-convertRectToBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertPointToLayer:" = fn (cg.Point) cg.Point;
+        pub const @"-convertPointFromLayer:" = fn (cg.Point) cg.Point;
+        pub const @"-convertSizeToLayer:" = fn (cg.Size) cg.Size;
+        pub const @"-convertSizeFromLayer:" = fn (cg.Size) cg.Size;
+        pub const @"-convertRectToLayer:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromLayer:" = fn (cg.Rect) cg.Rect;
+        pub const @"-setNeedsDisplayInRect:" = fn (cg.Rect) void;
+        pub const @"-lockFocus" = fn () void;
+        pub const @"-unlockFocus" = fn () void;
+        pub const @"-lockFocusIfCanDraw" = fn () bool;
+        pub const @"-lockFocusIfCanDrawInContext:" = fn (GraphicsContext) bool;
+        pub const @"-display" = fn () void;
+        pub const @"-displayIfNeeded" = fn () void;
+        pub const @"-displayIfNeededIgnoringOpacity" = fn () void;
+        pub const @"-displayRect:" = fn (cg.Rect) void;
+        pub const @"-displayIfNeededInRect:" = fn (cg.Rect) void;
+        pub const @"-displayRectIgnoringOpacity:" = fn (cg.Rect) void;
+        pub const @"-displayIfNeededInRectIgnoringOpacity:" = fn (cg.Rect) void;
+        pub const @"-drawRect:" = fn (cg.Rect) void;
+        pub const @"-displayRectIgnoringOpacity:inContext:" = fn (cg.Rect, GraphicsContext) void;
+        pub const @"-bitmapImageRepForCachingDisplayInRect:" = fn (cg.Rect) ?BitmapImageRep;
+        pub const @"-cacheDisplayInRect:toBitmapImageRep:" = fn (cg.Rect, BitmapImageRep) void;
+        pub const @"-viewWillDraw" = fn () void;
+        pub const @"-scrollPoint:" = fn (cg.Point) void;
+        pub const @"-scrollRectToVisible:" = fn (cg.Rect) bool;
+        pub const @"-autoscroll:" = fn (Event) bool;
+        pub const @"-adjustScroll:" = fn (cg.Rect) cg.Rect;
+        pub const @"-scrollRect:by:" = fn (cg.Rect, cg.Size) void;
+        pub const @"-translateRectsNeedingDisplayInRect:by:" = fn (cg.Rect, cg.Size) void;
+        pub const @"-hitTest:" = fn (cg.Point) ?View;
+        pub const @"-mouse:inRect:" = fn (cg.Point, cg.Rect) bool;
+        pub const @"-viewWithTag:" = fn (objc.Integer) ?View;
+        pub const @"-performKeyEquivalent:" = fn (Event) bool;
+        pub const @"-acceptsFirstMouse:" = fn (?Event) bool;
+        pub const @"-shouldDelayWindowOrderingForEvent:" = fn (Event) bool;
+        pub const @"-makeBackingLayer" = fn () objc.Object;
+        pub const @"-updateLayer" = fn () void;
+        pub const @"-layoutSubtreeIfNeeded" = fn () void;
+        pub const @"-layout" = fn () void;
+        pub const @"-menuForEvent:" = fn (Event) ?Menu;
+        pub const @"-willOpenMenu:withEvent:" = fn (Menu, Event) void;
+        pub const @"-didCloseMenu:withEvent:" = fn (Menu, ?Event) void;
+        pub const @"-addToolTipRect:owner:userData:" = fn (cg.Rect, objc.Object, ?*anyopaque) objc.Integer;
+        pub const @"-removeToolTip:" = fn (objc.Integer) void;
+        pub const @"-removeAllToolTips" = fn () void;
+        pub const @"-viewWillStartLiveResize" = fn () void;
+        pub const @"-viewDidEndLiveResize" = fn () void;
+        pub const @"-getRectsExposedDuringLiveResize:count:" = fn (?*cg.Rect, ?*objc.Integer) void;
+        pub const @"-rectForSmartMagnificationAtPoint:inRect:" = fn (cg.Point, cg.Rect) cg.Rect;
+        pub const @"-prepareForReuse" = fn () void;
+        pub const @"-prepareContentInRect:" = fn (cg.Rect) void;
+        pub const @"-viewDidChangeEffectiveAppearance" = fn () void;
+        pub const @"-window" = fn () ?Window;
+        pub const @"-superview" = fn () ?View;
+        pub const @"-subviews" = fn () foundation.Array(View);
+        pub const @"-setSubviews:" = fn (foundation.Array(View)) void;
+        pub const @"-opaqueAncestor" = fn () ?View;
+        pub const @"-isHidden" = fn () bool;
+        pub const @"-setHidden:" = fn (bool) void;
+        pub const @"-isHiddenOrHasHiddenAncestor" = fn () bool;
+        pub const @"-wantsDefaultClipping" = fn () bool;
+        pub const @"-postsFrameChangedNotifications" = fn () bool;
+        pub const @"-setPostsFrameChangedNotifications:" = fn (bool) void;
+        pub const @"-autoresizesSubviews" = fn () bool;
+        pub const @"-setAutoresizesSubviews:" = fn (bool) void;
+        pub const @"-autoresizingMask" = fn () AutoresizingMaskOptions;
+        pub const @"-setAutoresizingMask:" = fn (AutoresizingMaskOptions) void;
+        pub const @"-frame" = fn () cg.Rect;
+        pub const @"-setFrame:" = fn (cg.Rect) void;
+        pub const @"-frameRotation" = fn () cg.Float;
+        pub const @"-setFrameRotation:" = fn (cg.Float) void;
+        pub const @"-frameCenterRotation" = fn () cg.Float;
+        pub const @"-setFrameCenterRotation:" = fn (cg.Float) void;
+        pub const @"-boundsRotation" = fn () cg.Float;
+        pub const @"-setBoundsRotation:" = fn (cg.Float) void;
+        pub const @"-bounds" = fn () cg.Rect;
+        pub const @"-setBounds:" = fn (cg.Rect) void;
+        pub const @"-isFlipped" = fn () bool;
+        pub const @"-isRotatedFromBase" = fn () bool;
+        pub const @"-isRotatedOrScaledFromBase" = fn () bool;
+        pub const @"-isOpaque" = fn () bool;
+        pub const @"-canDrawConcurrently" = fn () bool;
+        pub const @"-setCanDrawConcurrently:" = fn (bool) void;
+        pub const @"-canDraw" = fn () bool;
+        pub const @"-needsDisplay" = fn () bool;
+        pub const @"-setNeedsDisplay:" = fn (bool) void;
         pub const @"+focusView" = fn () ?View;
-        pub const visibleRect = fn () cg.Rect;
-        pub const tag = fn () objc.Integer;
-        pub const needsPanelToBecomeKey = fn () bool;
-        pub const mouseDownCanMoveWindow = fn () bool;
-        pub const acceptsTouchEvents = fn () bool;
-        pub const @"setAcceptsTouchEvents:" = fn (bool) void;
-        pub const wantsRestingTouches = fn () bool;
-        pub const @"setWantsRestingTouches:" = fn (bool) void;
-        pub const layerContentsRedrawPolicy = fn () ViewLayerContentsRedrawPolicy;
-        pub const @"setLayerContentsRedrawPolicy:" = fn (ViewLayerContentsRedrawPolicy) void;
-        pub const layerContentsPlacement = fn () ViewLayerContentsPlacement;
-        pub const @"setLayerContentsPlacement:" = fn (ViewLayerContentsPlacement) void;
-        pub const wantsLayer = fn () bool;
-        pub const @"setWantsLayer:" = fn (bool) void;
-        pub const layer = fn () ?objc.Object;
-        pub const @"setLayer:" = fn (?objc.Object) void;
-        pub const wantsUpdateLayer = fn () bool;
-        pub const canDrawSubviewsIntoLayer = fn () bool;
-        pub const @"setCanDrawSubviewsIntoLayer:" = fn (bool) void;
-        pub const needsLayout = fn () bool;
-        pub const @"setNeedsLayout:" = fn (bool) void;
-        pub const alphaValue = fn () cg.Float;
-        pub const @"setAlphaValue:" = fn (cg.Float) void;
-        pub const layerUsesCoreImageFilters = fn () bool;
-        pub const @"setLayerUsesCoreImageFilters:" = fn (bool) void;
-        pub const backgroundFilters = fn () foundation.Array(objc.Object);
-        pub const @"setBackgroundFilters:" = fn (foundation.Array(objc.Object)) void;
-        pub const compositingFilter = fn () ?objc.Object;
-        pub const @"setCompositingFilter:" = fn (?objc.Object) void;
-        pub const contentFilters = fn () foundation.Array(objc.Object);
-        pub const @"setContentFilters:" = fn (foundation.Array(objc.Object)) void;
-        pub const shadow = fn () ?objc.Object;
-        pub const @"setShadow:" = fn (?objc.Object) void;
-        pub const clipsToBounds = fn () bool;
-        pub const @"setClipsToBounds:" = fn (bool) void;
-        pub const postsBoundsChangedNotifications = fn () bool;
-        pub const @"setPostsBoundsChangedNotifications:" = fn (bool) void;
-        pub const enclosingScrollView = fn () ?objc.Object;
+        pub const @"-visibleRect" = fn () cg.Rect;
+        pub const @"-tag" = fn () objc.Integer;
+        pub const @"-needsPanelToBecomeKey" = fn () bool;
+        pub const @"-mouseDownCanMoveWindow" = fn () bool;
+        pub const @"-acceptsTouchEvents" = fn () bool;
+        pub const @"-setAcceptsTouchEvents:" = fn (bool) void;
+        pub const @"-wantsRestingTouches" = fn () bool;
+        pub const @"-setWantsRestingTouches:" = fn (bool) void;
+        pub const @"-layerContentsRedrawPolicy" = fn () ViewLayerContentsRedrawPolicy;
+        pub const @"-setLayerContentsRedrawPolicy:" = fn (ViewLayerContentsRedrawPolicy) void;
+        pub const @"-layerContentsPlacement" = fn () ViewLayerContentsPlacement;
+        pub const @"-setLayerContentsPlacement:" = fn (ViewLayerContentsPlacement) void;
+        pub const @"-wantsLayer" = fn () bool;
+        pub const @"-setWantsLayer:" = fn (bool) void;
+        pub const @"-layer" = fn () ?objc.Object;
+        pub const @"-setLayer:" = fn (?objc.Object) void;
+        pub const @"-wantsUpdateLayer" = fn () bool;
+        pub const @"-canDrawSubviewsIntoLayer" = fn () bool;
+        pub const @"-setCanDrawSubviewsIntoLayer:" = fn (bool) void;
+        pub const @"-needsLayout" = fn () bool;
+        pub const @"-setNeedsLayout:" = fn (bool) void;
+        pub const @"-alphaValue" = fn () cg.Float;
+        pub const @"-setAlphaValue:" = fn (cg.Float) void;
+        pub const @"-layerUsesCoreImageFilters" = fn () bool;
+        pub const @"-setLayerUsesCoreImageFilters:" = fn (bool) void;
+        pub const @"-backgroundFilters" = fn () foundation.Array(objc.Object);
+        pub const @"-setBackgroundFilters:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-compositingFilter" = fn () ?objc.Object;
+        pub const @"-setCompositingFilter:" = fn (?objc.Object) void;
+        pub const @"-contentFilters" = fn () foundation.Array(objc.Object);
+        pub const @"-setContentFilters:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-shadow" = fn () ?objc.Object;
+        pub const @"-setShadow:" = fn (?objc.Object) void;
+        pub const @"-clipsToBounds" = fn () bool;
+        pub const @"-setClipsToBounds:" = fn (bool) void;
+        pub const @"-postsBoundsChangedNotifications" = fn () bool;
+        pub const @"-setPostsBoundsChangedNotifications:" = fn (bool) void;
+        pub const @"-enclosingScrollView" = fn () ?objc.Object;
         pub const @"+defaultMenu" = fn () ?Menu;
-        pub const toolTip = fn () ?foundation.String;
-        pub const @"setToolTip:" = fn (?foundation.String) void;
-        pub const inLiveResize = fn () bool;
-        pub const preservesContentDuringLiveResize = fn () bool;
-        pub const rectPreservedDuringLiveResize = fn () cg.Rect;
-        pub const inputContext = fn () ?objc.Object;
-        pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
-        pub const @"setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
+        pub const @"-toolTip" = fn () ?foundation.String;
+        pub const @"-setToolTip:" = fn (?foundation.String) void;
+        pub const @"-inLiveResize" = fn () bool;
+        pub const @"-preservesContentDuringLiveResize" = fn () bool;
+        pub const @"-rectPreservedDuringLiveResize" = fn () cg.Rect;
+        pub const @"-inputContext" = fn () ?objc.Object;
+        pub const @"-userInterfaceLayoutDirection" = fn () UserInterfaceLayoutDirection;
+        pub const @"-setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
         pub const @"+isCompatibleWithResponsiveScrolling" = fn () bool;
-        pub const preparedContentRect = fn () cg.Rect;
-        pub const @"setPreparedContentRect:" = fn (cg.Rect) void;
-        pub const allowsVibrancy = fn () bool;
-        pub const @"setKeyboardFocusRingNeedsDisplayInRect:" = fn (cg.Rect) void;
-        pub const drawFocusRingMask = fn () void;
-        pub const noteFocusRingMaskChanged = fn () void;
-        pub const nextKeyView = fn () ?View;
-        pub const @"setNextKeyView:" = fn (?View) void;
-        pub const previousKeyView = fn () ?View;
-        pub const nextValidKeyView = fn () ?View;
-        pub const previousValidKeyView = fn () ?View;
-        pub const canBecomeKeyView = fn () bool;
-        pub const focusRingType = fn () FocusRingType;
-        pub const @"setFocusRingType:" = fn (FocusRingType) void;
+        pub const @"-preparedContentRect" = fn () cg.Rect;
+        pub const @"-setPreparedContentRect:" = fn (cg.Rect) void;
+        pub const @"-allowsVibrancy" = fn () bool;
+        pub const @"-setKeyboardFocusRingNeedsDisplayInRect:" = fn (cg.Rect) void;
+        pub const @"-drawFocusRingMask" = fn () void;
+        pub const @"-noteFocusRingMaskChanged" = fn () void;
+        pub const @"-nextKeyView" = fn () ?View;
+        pub const @"-setNextKeyView:" = fn (?View) void;
+        pub const @"-previousKeyView" = fn () ?View;
+        pub const @"-nextValidKeyView" = fn () ?View;
+        pub const @"-previousValidKeyView" = fn () ?View;
+        pub const @"-canBecomeKeyView" = fn () bool;
+        pub const @"-focusRingType" = fn () FocusRingType;
+        pub const @"-setFocusRingType:" = fn (FocusRingType) void;
         pub const @"+defaultFocusRingType" = fn () FocusRingType;
-        pub const focusRingMaskBounds = fn () cg.Rect;
-        pub const @"writeEPSInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
-        pub const @"dataWithEPSInsideRect:" = fn (cg.Rect) foundation.Data;
-        pub const @"writePDFInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
-        pub const @"dataWithPDFInsideRect:" = fn (cg.Rect) foundation.Data;
-        pub const @"print:" = fn (?objc.Object) void;
-        pub const @"knowsPageRange:" = fn (?*objc.Range) bool;
-        pub const @"adjustPageWidthNew:left:right:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
-        pub const @"adjustPageHeightNew:top:bottom:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
-        pub const @"rectForPage:" = fn (objc.Integer) cg.Rect;
-        pub const @"locationOfPrintRect:" = fn (cg.Rect) cg.Point;
-        pub const @"drawPageBorderWithSize:" = fn (cg.Size) void;
-        pub const @"drawSheetBorderWithSize:" = fn (cg.Size) void;
-        pub const beginDocument = fn () void;
-        pub const endDocument = fn () void;
-        pub const @"beginPageInRect:atPlacement:" = fn (cg.Rect, cg.Point) void;
-        pub const endPage = fn () void;
-        pub const heightAdjustLimit = fn () cg.Float;
-        pub const widthAdjustLimit = fn () cg.Float;
-        pub const pageHeader = fn () objc.Object;
-        pub const pageFooter = fn () objc.Object;
-        pub const printJobTitle = fn () foundation.String;
-        pub const @"beginDraggingSessionWithItems:gesture:source:" = fn (foundation.Array(objc.Object), objc.Object, objc.Object) ?objc.Object;
-        pub const @"beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
-        pub const @"registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
-        pub const unregisterDraggedTypes = fn () void;
-        pub const registeredDraggedTypes = fn () foundation.Array(objc.Object);
-        pub const @"enterFullScreenMode:withOptions:" = fn (Screen, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
-        pub const @"exitFullScreenModeWithOptions:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
-        pub const isInFullScreenMode = fn () bool;
-        pub const @"showDefinitionForAttributedString:atPoint:" = fn (?objc.Object, cg.Point) void;
-        pub const @"showDefinitionForAttributedString:range:options:baselineOriginProvider:" = fn (?objc.Object, objc.Range, ?foundation.Dictionary(objc.Object, objc.Object), ?objc.BlockRef(fn (objc.Range) cg.Point)) void;
-        pub const isDrawingFindIndicator = fn () bool;
-        pub const @"addGestureRecognizer:" = fn (objc.Object) void;
-        pub const @"removeGestureRecognizer:" = fn (objc.Object) void;
-        pub const gestureRecognizers = fn () foundation.Array(objc.Object);
-        pub const @"setGestureRecognizers:" = fn (foundation.Array(objc.Object)) void;
-        pub const exclusiveGestureBehavior = fn () ViewExclusiveGestureBehavior;
-        pub const @"setExclusiveGestureBehavior:" = fn (ViewExclusiveGestureBehavior) void;
-        pub const allowedTouchTypes = fn () TouchTypeMask;
-        pub const @"setAllowedTouchTypes:" = fn (TouchTypeMask) void;
-        pub const safeAreaInsets = fn () EdgeInsets;
-        pub const additionalSafeAreaInsets = fn () EdgeInsets;
-        pub const @"setAdditionalSafeAreaInsets:" = fn (EdgeInsets) void;
-        pub const safeAreaLayoutGuide = fn () objc.Object;
-        pub const safeAreaRect = fn () cg.Rect;
-        pub const layoutMarginsGuide = fn () objc.Object;
-        pub const viewDidChangeEffectiveCornerRadii = fn () void;
-        pub const invalidateCornerConfiguration = fn () void;
-        pub const cornerConfiguration = fn () ?objc.Object;
-        pub const effectiveCornerRadii = fn () ?objc.Object;
-        pub const prefersCompactControlSizeMetrics = fn () bool;
-        pub const @"setPrefersCompactControlSizeMetrics:" = fn (bool) void;
-        pub const @"addTrackingArea:" = fn (objc.Object) void;
-        pub const @"removeTrackingArea:" = fn (objc.Object) void;
-        pub const updateTrackingAreas = fn () void;
-        pub const @"addCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
-        pub const @"removeCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
-        pub const discardCursorRects = fn () void;
-        pub const resetCursorRects = fn () void;
-        pub const @"addTrackingRect:owner:userData:assumeInside:" = fn (cg.Rect, objc.Object, ?*anyopaque, bool) objc.Integer;
-        pub const @"removeTrackingRect:" = fn (objc.Integer) void;
-        pub const trackingAreas = fn () foundation.Array(objc.Object);
-        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
-        pub const @"dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
-        pub const @"dragFile:fromRect:slideBack:event:" = fn (foundation.String, cg.Rect, bool, Event) bool;
-        pub const @"dragPromisedFilesOfTypes:fromRect:source:slideBack:event:" = fn (foundation.Array(foundation.String), cg.Rect, objc.Object, bool, Event) bool;
-        pub const @"convertPointToBase:" = fn (cg.Point) cg.Point;
-        pub const @"convertPointFromBase:" = fn (cg.Point) cg.Point;
-        pub const @"convertSizeToBase:" = fn (cg.Size) cg.Size;
-        pub const @"convertSizeFromBase:" = fn (cg.Size) cg.Size;
-        pub const @"convertRectToBase:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromBase:" = fn (cg.Rect) cg.Rect;
-        pub const @"performMnemonic:" = fn (foundation.String) bool;
-        pub const shouldDrawColor = fn () bool;
-        pub const gState = fn () objc.Integer;
-        pub const allocateGState = fn () void;
-        pub const releaseGState = fn () void;
-        pub const setUpGState = fn () void;
-        pub const renewGState = fn () void;
-        pub const writingToolsCoordinator = fn () ?objc.Object;
-        pub const @"setWritingToolsCoordinator:" = fn (?objc.Object) void;
-        pub const enclosingMenuItem = fn () ?MenuItem;
-        pub const candidateListTouchBarItem = fn () ?objc.Object;
-        pub const @"reflectScrolledClipView:" = fn (objc.Object) void;
-        pub const @"scrollClipView:toPoint:" = fn (objc.Object, cg.Point) void;
-        pub const @"addConstraint:" = fn (objc.Object) void;
-        pub const @"addConstraints:" = fn (foundation.Array(objc.Object)) void;
-        pub const @"removeConstraint:" = fn (objc.Object) void;
-        pub const @"removeConstraints:" = fn (foundation.Array(objc.Object)) void;
-        pub const leadingAnchor = fn () objc.Object;
-        pub const trailingAnchor = fn () objc.Object;
-        pub const leftAnchor = fn () objc.Object;
-        pub const rightAnchor = fn () objc.Object;
-        pub const topAnchor = fn () objc.Object;
-        pub const bottomAnchor = fn () objc.Object;
-        pub const widthAnchor = fn () objc.Object;
-        pub const heightAnchor = fn () objc.Object;
-        pub const centerXAnchor = fn () objc.Object;
-        pub const centerYAnchor = fn () objc.Object;
-        pub const firstBaselineAnchor = fn () objc.Object;
-        pub const lastBaselineAnchor = fn () objc.Object;
-        pub const constraints = fn () foundation.Array(objc.Object);
-        pub const updateConstraintsForSubtreeIfNeeded = fn () void;
-        pub const updateConstraints = fn () void;
-        pub const needsUpdateConstraints = fn () bool;
-        pub const @"setNeedsUpdateConstraints:" = fn (bool) void;
-        pub const translatesAutoresizingMaskIntoConstraints = fn () bool;
-        pub const @"setTranslatesAutoresizingMaskIntoConstraints:" = fn (bool) void;
+        pub const @"-focusRingMaskBounds" = fn () cg.Rect;
+        pub const @"-writeEPSInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
+        pub const @"-dataWithEPSInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"-writePDFInsideRect:toPasteboard:" = fn (cg.Rect, objc.Object) void;
+        pub const @"-dataWithPDFInsideRect:" = fn (cg.Rect) foundation.Data;
+        pub const @"-print:" = fn (?objc.Object) void;
+        pub const @"-knowsPageRange:" = fn (?*objc.Range) bool;
+        pub const @"-adjustPageWidthNew:left:right:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
+        pub const @"-adjustPageHeightNew:top:bottom:limit:" = fn (?*cg.Float, cg.Float, cg.Float, cg.Float) void;
+        pub const @"-rectForPage:" = fn (objc.Integer) cg.Rect;
+        pub const @"-locationOfPrintRect:" = fn (cg.Rect) cg.Point;
+        pub const @"-drawPageBorderWithSize:" = fn (cg.Size) void;
+        pub const @"-drawSheetBorderWithSize:" = fn (cg.Size) void;
+        pub const @"-beginDocument" = fn () void;
+        pub const @"-endDocument" = fn () void;
+        pub const @"-beginPageInRect:atPlacement:" = fn (cg.Rect, cg.Point) void;
+        pub const @"-endPage" = fn () void;
+        pub const @"-heightAdjustLimit" = fn () cg.Float;
+        pub const @"-widthAdjustLimit" = fn () cg.Float;
+        pub const @"-pageHeader" = fn () objc.Object;
+        pub const @"-pageFooter" = fn () objc.Object;
+        pub const @"-printJobTitle" = fn () foundation.String;
+        pub const @"-beginDraggingSessionWithItems:gesture:source:" = fn (foundation.Array(objc.Object), objc.Object, objc.Object) ?objc.Object;
+        pub const @"-beginDraggingSessionWithItems:event:source:" = fn (foundation.Array(objc.Object), Event, objc.Object) objc.Object;
+        pub const @"-registerForDraggedTypes:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-unregisterDraggedTypes" = fn () void;
+        pub const @"-registeredDraggedTypes" = fn () foundation.Array(objc.Object);
+        pub const @"-enterFullScreenMode:withOptions:" = fn (Screen, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"-exitFullScreenModeWithOptions:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-isInFullScreenMode" = fn () bool;
+        pub const @"-showDefinitionForAttributedString:atPoint:" = fn (?objc.Object, cg.Point) void;
+        pub const @"-showDefinitionForAttributedString:range:options:baselineOriginProvider:" = fn (?objc.Object, objc.Range, ?foundation.Dictionary(objc.Object, objc.Object), ?objc.BlockRef(fn (objc.Range) cg.Point)) void;
+        pub const @"-isDrawingFindIndicator" = fn () bool;
+        pub const @"-addGestureRecognizer:" = fn (objc.Object) void;
+        pub const @"-removeGestureRecognizer:" = fn (objc.Object) void;
+        pub const @"-gestureRecognizers" = fn () foundation.Array(objc.Object);
+        pub const @"-setGestureRecognizers:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-exclusiveGestureBehavior" = fn () ViewExclusiveGestureBehavior;
+        pub const @"-setExclusiveGestureBehavior:" = fn (ViewExclusiveGestureBehavior) void;
+        pub const @"-allowedTouchTypes" = fn () TouchTypeMask;
+        pub const @"-setAllowedTouchTypes:" = fn (TouchTypeMask) void;
+        pub const @"-safeAreaInsets" = fn () EdgeInsets;
+        pub const @"-additionalSafeAreaInsets" = fn () EdgeInsets;
+        pub const @"-setAdditionalSafeAreaInsets:" = fn (EdgeInsets) void;
+        pub const @"-safeAreaLayoutGuide" = fn () objc.Object;
+        pub const @"-safeAreaRect" = fn () cg.Rect;
+        pub const @"-layoutMarginsGuide" = fn () objc.Object;
+        pub const @"-viewDidChangeEffectiveCornerRadii" = fn () void;
+        pub const @"-invalidateCornerConfiguration" = fn () void;
+        pub const @"-cornerConfiguration" = fn () ?objc.Object;
+        pub const @"-effectiveCornerRadii" = fn () ?objc.Object;
+        pub const @"-prefersCompactControlSizeMetrics" = fn () bool;
+        pub const @"-setPrefersCompactControlSizeMetrics:" = fn (bool) void;
+        pub const @"-addTrackingArea:" = fn (objc.Object) void;
+        pub const @"-removeTrackingArea:" = fn (objc.Object) void;
+        pub const @"-updateTrackingAreas" = fn () void;
+        pub const @"-addCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
+        pub const @"-removeCursorRect:cursor:" = fn (cg.Rect, Cursor) void;
+        pub const @"-discardCursorRects" = fn () void;
+        pub const @"-resetCursorRects" = fn () void;
+        pub const @"-addTrackingRect:owner:userData:assumeInside:" = fn (cg.Rect, objc.Object, ?*anyopaque, bool) objc.Integer;
+        pub const @"-removeTrackingRect:" = fn (objc.Integer) void;
+        pub const @"-trackingAreas" = fn () foundation.Array(objc.Object);
+        pub const @"-displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const @"-dragImage:at:offset:event:pasteboard:source:slideBack:" = fn (Image, cg.Point, cg.Size, Event, objc.Object, objc.Object, bool) void;
+        pub const @"-dragFile:fromRect:slideBack:event:" = fn (foundation.String, cg.Rect, bool, Event) bool;
+        pub const @"-dragPromisedFilesOfTypes:fromRect:source:slideBack:event:" = fn (foundation.Array(foundation.String), cg.Rect, objc.Object, bool, Event) bool;
+        pub const @"-convertPointToBase:" = fn (cg.Point) cg.Point;
+        pub const @"-convertPointFromBase:" = fn (cg.Point) cg.Point;
+        pub const @"-convertSizeToBase:" = fn (cg.Size) cg.Size;
+        pub const @"-convertSizeFromBase:" = fn (cg.Size) cg.Size;
+        pub const @"-convertRectToBase:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromBase:" = fn (cg.Rect) cg.Rect;
+        pub const @"-performMnemonic:" = fn (foundation.String) bool;
+        pub const @"-shouldDrawColor" = fn () bool;
+        pub const @"-gState" = fn () objc.Integer;
+        pub const @"-allocateGState" = fn () void;
+        pub const @"-releaseGState" = fn () void;
+        pub const @"-setUpGState" = fn () void;
+        pub const @"-renewGState" = fn () void;
+        pub const @"-writingToolsCoordinator" = fn () ?objc.Object;
+        pub const @"-setWritingToolsCoordinator:" = fn (?objc.Object) void;
+        pub const @"-enclosingMenuItem" = fn () ?MenuItem;
+        pub const @"-candidateListTouchBarItem" = fn () ?objc.Object;
+        pub const @"-reflectScrolledClipView:" = fn (objc.Object) void;
+        pub const @"-scrollClipView:toPoint:" = fn (objc.Object, cg.Point) void;
+        pub const @"-addConstraint:" = fn (objc.Object) void;
+        pub const @"-addConstraints:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-removeConstraint:" = fn (objc.Object) void;
+        pub const @"-removeConstraints:" = fn (foundation.Array(objc.Object)) void;
+        pub const @"-leadingAnchor" = fn () objc.Object;
+        pub const @"-trailingAnchor" = fn () objc.Object;
+        pub const @"-leftAnchor" = fn () objc.Object;
+        pub const @"-rightAnchor" = fn () objc.Object;
+        pub const @"-topAnchor" = fn () objc.Object;
+        pub const @"-bottomAnchor" = fn () objc.Object;
+        pub const @"-widthAnchor" = fn () objc.Object;
+        pub const @"-heightAnchor" = fn () objc.Object;
+        pub const @"-centerXAnchor" = fn () objc.Object;
+        pub const @"-centerYAnchor" = fn () objc.Object;
+        pub const @"-firstBaselineAnchor" = fn () objc.Object;
+        pub const @"-lastBaselineAnchor" = fn () objc.Object;
+        pub const @"-constraints" = fn () foundation.Array(objc.Object);
+        pub const @"-updateConstraintsForSubtreeIfNeeded" = fn () void;
+        pub const @"-updateConstraints" = fn () void;
+        pub const @"-needsUpdateConstraints" = fn () bool;
+        pub const @"-setNeedsUpdateConstraints:" = fn (bool) void;
+        pub const @"-translatesAutoresizingMaskIntoConstraints" = fn () bool;
+        pub const @"-setTranslatesAutoresizingMaskIntoConstraints:" = fn (bool) void;
         pub const @"+requiresConstraintBasedLayout" = fn () bool;
-        pub const @"alignmentRectForFrame:" = fn (cg.Rect) cg.Rect;
-        pub const @"frameForAlignmentRect:" = fn (cg.Rect) cg.Rect;
-        pub const invalidateIntrinsicContentSize = fn () void;
-        pub const @"contentHuggingPriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
-        pub const @"setContentHuggingPriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
-        pub const @"contentCompressionResistancePriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
-        pub const @"setContentCompressionResistancePriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
-        pub const alignmentRectInsets = fn () EdgeInsets;
-        pub const firstBaselineOffsetFromTop = fn () cg.Float;
-        pub const lastBaselineOffsetFromBottom = fn () cg.Float;
-        pub const baselineOffsetFromBottom = fn () cg.Float;
-        pub const intrinsicContentSize = fn () cg.Size;
-        pub const isHorizontalContentSizeConstraintActive = fn () bool;
-        pub const @"setHorizontalContentSizeConstraintActive:" = fn (bool) void;
-        pub const isVerticalContentSizeConstraintActive = fn () bool;
-        pub const @"setVerticalContentSizeConstraintActive:" = fn (bool) void;
-        pub const fittingSize = fn () cg.Size;
-        pub const @"constraintsAffectingLayoutForOrientation:" = fn (LayoutConstraintOrientation) foundation.Array(objc.Object);
-        pub const exerciseAmbiguityInLayout = fn () void;
-        pub const hasAmbiguousLayout = fn () bool;
-        pub const @"addLayoutGuide:" = fn (objc.Object) void;
-        pub const @"removeLayoutGuide:" = fn (objc.Object) void;
-        pub const layoutGuides = fn () foundation.Array(objc.Object);
-        pub const @"rulerView:shouldMoveMarker:" = fn (objc.Object, objc.Object) bool;
-        pub const @"rulerView:willMoveMarker:toLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
-        pub const @"rulerView:didMoveMarker:" = fn (objc.Object, objc.Object) void;
-        pub const @"rulerView:shouldRemoveMarker:" = fn (objc.Object, objc.Object) bool;
-        pub const @"rulerView:didRemoveMarker:" = fn (objc.Object, objc.Object) void;
-        pub const @"rulerView:shouldAddMarker:" = fn (objc.Object, objc.Object) bool;
-        pub const @"rulerView:willAddMarker:atLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
-        pub const @"rulerView:didAddMarker:" = fn (objc.Object, objc.Object) void;
-        pub const @"rulerView:handleMouseDown:" = fn (objc.Object, Event) void;
-        pub const @"rulerView:willSetClientView:" = fn (objc.Object, View) void;
-        pub const @"rulerView:locationForPoint:" = fn (objc.Object, cg.Point) cg.Float;
-        pub const @"rulerView:pointForLocation:" = fn (objc.Object, cg.Float) cg.Point;
-        pub const wantsBestResolutionOpenGLSurface = fn () bool;
-        pub const @"setWantsBestResolutionOpenGLSurface:" = fn (bool) void;
-        pub const wantsExtendedDynamicRangeOpenGLSurface = fn () bool;
-        pub const @"setWantsExtendedDynamicRangeOpenGLSurface:" = fn (bool) void;
-        pub const pressureConfiguration = fn () ?objc.Object;
-        pub const @"setPressureConfiguration:" = fn (?objc.Object) void;
+        pub const @"-alignmentRectForFrame:" = fn (cg.Rect) cg.Rect;
+        pub const @"-frameForAlignmentRect:" = fn (cg.Rect) cg.Rect;
+        pub const @"-invalidateIntrinsicContentSize" = fn () void;
+        pub const @"-contentHuggingPriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
+        pub const @"-setContentHuggingPriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
+        pub const @"-contentCompressionResistancePriorityForOrientation:" = fn (LayoutConstraintOrientation) f32;
+        pub const @"-setContentCompressionResistancePriority:forOrientation:" = fn (f32, LayoutConstraintOrientation) void;
+        pub const @"-alignmentRectInsets" = fn () EdgeInsets;
+        pub const @"-firstBaselineOffsetFromTop" = fn () cg.Float;
+        pub const @"-lastBaselineOffsetFromBottom" = fn () cg.Float;
+        pub const @"-baselineOffsetFromBottom" = fn () cg.Float;
+        pub const @"-intrinsicContentSize" = fn () cg.Size;
+        pub const @"-isHorizontalContentSizeConstraintActive" = fn () bool;
+        pub const @"-setHorizontalContentSizeConstraintActive:" = fn (bool) void;
+        pub const @"-isVerticalContentSizeConstraintActive" = fn () bool;
+        pub const @"-setVerticalContentSizeConstraintActive:" = fn (bool) void;
+        pub const @"-fittingSize" = fn () cg.Size;
+        pub const @"-constraintsAffectingLayoutForOrientation:" = fn (LayoutConstraintOrientation) foundation.Array(objc.Object);
+        pub const @"-exerciseAmbiguityInLayout" = fn () void;
+        pub const @"-hasAmbiguousLayout" = fn () bool;
+        pub const @"-addLayoutGuide:" = fn (objc.Object) void;
+        pub const @"-removeLayoutGuide:" = fn (objc.Object) void;
+        pub const @"-layoutGuides" = fn () foundation.Array(objc.Object);
+        pub const @"-rulerView:shouldMoveMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"-rulerView:willMoveMarker:toLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
+        pub const @"-rulerView:didMoveMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"-rulerView:shouldRemoveMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"-rulerView:didRemoveMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"-rulerView:shouldAddMarker:" = fn (objc.Object, objc.Object) bool;
+        pub const @"-rulerView:willAddMarker:atLocation:" = fn (objc.Object, objc.Object, cg.Float) cg.Float;
+        pub const @"-rulerView:didAddMarker:" = fn (objc.Object, objc.Object) void;
+        pub const @"-rulerView:handleMouseDown:" = fn (objc.Object, Event) void;
+        pub const @"-rulerView:willSetClientView:" = fn (objc.Object, View) void;
+        pub const @"-rulerView:locationForPoint:" = fn (objc.Object, cg.Point) cg.Float;
+        pub const @"-rulerView:pointForLocation:" = fn (objc.Object, cg.Float) cg.Point;
+        pub const @"-wantsBestResolutionOpenGLSurface" = fn () bool;
+        pub const @"-setWantsBestResolutionOpenGLSurface:" = fn (bool) void;
+        pub const @"-wantsExtendedDynamicRangeOpenGLSurface" = fn () bool;
+        pub const @"-setWantsExtendedDynamicRangeOpenGLSurface:" = fn (bool) void;
+        pub const @"-pressureConfiguration" = fn () ?objc.Object;
+        pub const @"-setPressureConfiguration:" = fn (?objc.Object) void;
     };
 };
 
@@ -7852,7 +7852,7 @@ pub const Screen = extern struct {
     }
 
     /// `-[NSScreen CGDirectDisplayID]`
-    pub fn CGDirectDisplayID(self: Self) u32 {
+    pub fn cgDirectDisplayID(self: Self) u32 {
         return self.object.msgSend(u32, "CGDirectDisplayID", .{});
     }
 
@@ -7873,29 +7873,29 @@ pub const Screen = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"canRepresentDisplayGamut:" = fn (DisplayGamut) bool;
-        pub const @"convertRectToBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
-        pub const @"backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
+        pub const @"-canRepresentDisplayGamut:" = fn (DisplayGamut) bool;
+        pub const @"-convertRectToBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-convertRectFromBacking:" = fn (cg.Rect) cg.Rect;
+        pub const @"-backingAlignedRect:options:" = fn (cg.Rect, AlignmentOptions) cg.Rect;
         pub const @"+screens" = fn () foundation.Array(Screen);
         pub const @"+mainScreen" = fn () ?Screen;
         pub const @"+deepestScreen" = fn () ?Screen;
         pub const @"+screensHaveSeparateSpaces" = fn () bool;
-        pub const depth = fn () WindowDepth;
-        pub const frame = fn () cg.Rect;
-        pub const visibleFrame = fn () cg.Rect;
-        pub const deviceDescription = fn () foundation.Dictionary(objc.Object, objc.Object);
-        pub const colorSpace = fn () ?objc.Object;
-        pub const supportedWindowDepths = fn () objc.Object;
-        pub const backingScaleFactor = fn () cg.Float;
-        pub const localizedName = fn () foundation.String;
-        pub const safeAreaInsets = fn () EdgeInsets;
-        pub const auxiliaryTopLeftArea = fn () cg.Rect;
-        pub const auxiliaryTopRightArea = fn () cg.Rect;
-        pub const CGDirectDisplayID = fn () u32;
-        pub const touchCapabilities = fn () ScreenTouchCapabilities;
-        pub const @"displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
-        pub const userSpaceScaleFactor = fn () cg.Float;
+        pub const @"-depth" = fn () WindowDepth;
+        pub const @"-frame" = fn () cg.Rect;
+        pub const @"-visibleFrame" = fn () cg.Rect;
+        pub const @"-deviceDescription" = fn () foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-colorSpace" = fn () ?objc.Object;
+        pub const @"-supportedWindowDepths" = fn () objc.Object;
+        pub const @"-backingScaleFactor" = fn () cg.Float;
+        pub const @"-localizedName" = fn () foundation.String;
+        pub const @"-safeAreaInsets" = fn () EdgeInsets;
+        pub const @"-auxiliaryTopLeftArea" = fn () cg.Rect;
+        pub const @"-auxiliaryTopRightArea" = fn () cg.Rect;
+        pub const @"-CGDirectDisplayID" = fn () u32;
+        pub const @"-touchCapabilities" = fn () ScreenTouchCapabilities;
+        pub const @"-displayLinkWithTarget:selector:" = fn (objc.Object, objc.Sel) objc.Object;
+        pub const @"-userSpaceScaleFactor" = fn () cg.Float;
     };
 };
 
@@ -7995,17 +7995,17 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithCatalogName:colorName:]`
-    pub fn colorWithCatalogNameColorName(list_name: ?foundation.String, color_name: ?foundation.String) ?Color {
+    pub fn colorWithCatalogNameColorName(list_name: foundation.String, color_name: foundation.String) ?Color {
         return class().msgSend(?Color, "colorWithCatalogName:colorName:", .{ list_name, color_name });
     }
 
     /// `+[NSColor colorNamed:bundle:]`
-    pub fn colorNamedBundle(name: ?foundation.String, bundle: ?objc.Object) ?Color {
+    pub fn colorNamedBundle(name: foundation.String, bundle: ?objc.Object) ?Color {
         return class().msgSend(?Color, "colorNamed:bundle:", .{ name, bundle });
     }
 
     /// `+[NSColor colorNamed:]`
-    pub fn colorNamed(name: ?foundation.String) ?Color {
+    pub fn colorNamed(name: foundation.String) ?Color {
         return class().msgSend(?Color, "colorNamed:", .{name});
     }
 
@@ -8535,13 +8535,13 @@ pub const Color = extern struct {
     }
 
     /// `-[NSColor catalogNameComponent]`
-    pub fn catalogNameComponent(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "catalogNameComponent", .{});
+    pub fn catalogNameComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "catalogNameComponent", .{});
     }
 
     /// `-[NSColor colorNameComponent]`
-    pub fn colorNameComponent(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "colorNameComponent", .{});
+    pub fn colorNameComponent(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "colorNameComponent", .{});
     }
 
     /// `-[NSColor localizedCatalogNameComponent]`
@@ -8635,7 +8635,7 @@ pub const Color = extern struct {
     }
 
     /// `-[NSColor CGColor]`
-    pub fn CGColor(self: Self) cg.Color {
+    pub fn cgColor(self: Self) cg.Color {
         return self.object.msgSend(cg.Color, "CGColor", .{});
     }
 
@@ -8655,7 +8655,7 @@ pub const Color = extern struct {
     }
 
     /// `-[NSColor colorUsingColorSpaceName:]`
-    pub fn colorUsingColorSpaceName(self: Self, name: ?foundation.String) ?Color {
+    pub fn colorUsingColorSpaceName(self: Self, name: foundation.String) ?Color {
         return self.object.msgSend(?Color, "colorUsingColorSpaceName:", .{name});
     }
 
@@ -8725,8 +8725,8 @@ pub const Color = extern struct {
     }
 
     /// `-[NSColor colorSpaceName]`
-    pub fn colorSpaceName(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "colorSpaceName", .{});
+    pub fn colorSpaceName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "colorSpaceName", .{});
     }
 
     /// `+[NSColor colorWithCIColor:]`
@@ -8736,8 +8736,8 @@ pub const Color = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const init = fn () Color;
-        pub const @"initWithCoder:" = fn (objc.Object) ?Color;
+        pub const @"-init" = fn () Color;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?Color;
         pub const @"+colorWithColorSpace:components:count:" = fn (objc.Object, ?[*]const cg.Float, objc.Integer) Color;
         pub const @"+colorWithSRGBRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithGenericGamma22White:alpha:" = fn (cg.Float, cg.Float) Color;
@@ -8746,9 +8746,9 @@ pub const Color = extern struct {
         pub const @"+colorWithRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithHue:saturation:brightness:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithColorSpace:hue:saturation:brightness:alpha:" = fn (objc.Object, cg.Float, cg.Float, cg.Float, cg.Float) Color;
-        pub const @"+colorWithCatalogName:colorName:" = fn (?foundation.String, ?foundation.String) ?Color;
-        pub const @"+colorNamed:bundle:" = fn (?foundation.String, ?objc.Object) ?Color;
-        pub const @"+colorNamed:" = fn (?foundation.String) ?Color;
+        pub const @"+colorWithCatalogName:colorName:" = fn (foundation.String, foundation.String) ?Color;
+        pub const @"+colorNamed:bundle:" = fn (foundation.String, ?objc.Object) ?Color;
+        pub const @"+colorNamed:" = fn (foundation.String) ?Color;
         pub const @"+colorWithName:dynamicProvider:" = fn (?foundation.String, objc.BlockRef(fn (objc.Object) Color)) Color;
         pub const @"+colorWithDeviceWhite:alpha:" = fn (cg.Float, cg.Float) Color;
         pub const @"+colorWithDeviceRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
@@ -8758,31 +8758,31 @@ pub const Color = extern struct {
         pub const @"+colorWithCalibratedRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithCalibratedHue:saturation:brightness:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithPatternImage:" = fn (Image) Color;
-        pub const @"colorUsingType:" = fn (ColorType) ?Color;
-        pub const @"colorUsingColorSpace:" = fn (objc.Object) ?Color;
+        pub const @"-colorUsingType:" = fn (ColorType) ?Color;
+        pub const @"-colorUsingColorSpace:" = fn (objc.Object) ?Color;
         pub const @"+colorWithRed:green:blue:alpha:exposure:" = fn (cg.Float, cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithRed:green:blue:alpha:linearExposure:" = fn (cg.Float, cg.Float, cg.Float, cg.Float, cg.Float) Color;
-        pub const @"colorByApplyingContentHeadroom:" = fn (cg.Float) Color;
+        pub const @"-colorByApplyingContentHeadroom:" = fn (cg.Float) Color;
         pub const @"+colorForControlTint:" = fn (ControlTint) Color;
-        pub const @"highlightWithLevel:" = fn (cg.Float) ?Color;
-        pub const @"shadowWithLevel:" = fn (cg.Float) ?Color;
-        pub const @"colorWithSystemEffect:" = fn (ColorSystemEffect) Color;
-        pub const set = fn () void;
-        pub const setFill = fn () void;
-        pub const setStroke = fn () void;
-        pub const @"blendedColorWithFraction:ofColor:" = fn (cg.Float, Color) ?Color;
-        pub const @"colorWithAlphaComponent:" = fn (cg.Float) Color;
-        pub const @"getRed:green:blue:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
-        pub const @"getHue:saturation:brightness:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
-        pub const @"getWhite:alpha:" = fn (?*cg.Float, ?*cg.Float) void;
-        pub const @"getCyan:magenta:yellow:black:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
-        pub const @"getComponents:" = fn (?*cg.Float) void;
+        pub const @"-highlightWithLevel:" = fn (cg.Float) ?Color;
+        pub const @"-shadowWithLevel:" = fn (cg.Float) ?Color;
+        pub const @"-colorWithSystemEffect:" = fn (ColorSystemEffect) Color;
+        pub const @"-set" = fn () void;
+        pub const @"-setFill" = fn () void;
+        pub const @"-setStroke" = fn () void;
+        pub const @"-blendedColorWithFraction:ofColor:" = fn (cg.Float, Color) ?Color;
+        pub const @"-colorWithAlphaComponent:" = fn (cg.Float) Color;
+        pub const @"-getRed:green:blue:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
+        pub const @"-getHue:saturation:brightness:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
+        pub const @"-getWhite:alpha:" = fn (?*cg.Float, ?*cg.Float) void;
+        pub const @"-getCyan:magenta:yellow:black:alpha:" = fn (?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float, ?*cg.Float) void;
+        pub const @"-getComponents:" = fn (?*cg.Float) void;
         pub const @"+colorFromPasteboard:" = fn (objc.Object) ?Color;
-        pub const @"writeToPasteboard:" = fn (objc.Object) void;
-        pub const @"drawSwatchInRect:" = fn (cg.Rect) void;
+        pub const @"-writeToPasteboard:" = fn (objc.Object) void;
+        pub const @"-drawSwatchInRect:" = fn (cg.Rect) void;
         pub const @"+colorWithCGColor:" = fn (cg.Color) ?Color;
-        pub const @"type" = fn () ColorType;
-        pub const standardDynamicRangeColor = fn () Color;
+        pub const @"-type" = fn () ColorType;
+        pub const @"-standardDynamicRangeColor" = fn () Color;
         pub const @"+blackColor" = fn () Color;
         pub const @"+darkGrayColor" = fn () Color;
         pub const @"+lightGrayColor" = fn () Color;
@@ -8854,31 +8854,31 @@ pub const Color = extern struct {
         pub const @"+currentControlTint" = fn () ControlTint;
         pub const @"+highlightColor" = fn () Color;
         pub const @"+shadowColor" = fn () Color;
-        pub const catalogNameComponent = fn () ?foundation.String;
-        pub const colorNameComponent = fn () ?foundation.String;
-        pub const localizedCatalogNameComponent = fn () foundation.String;
-        pub const localizedColorNameComponent = fn () foundation.String;
-        pub const redComponent = fn () cg.Float;
-        pub const greenComponent = fn () cg.Float;
-        pub const blueComponent = fn () cg.Float;
-        pub const hueComponent = fn () cg.Float;
-        pub const saturationComponent = fn () cg.Float;
-        pub const brightnessComponent = fn () cg.Float;
-        pub const whiteComponent = fn () cg.Float;
-        pub const cyanComponent = fn () cg.Float;
-        pub const magentaComponent = fn () cg.Float;
-        pub const yellowComponent = fn () cg.Float;
-        pub const blackComponent = fn () cg.Float;
-        pub const colorSpace = fn () objc.Object;
-        pub const numberOfComponents = fn () objc.Integer;
-        pub const patternImage = fn () Image;
-        pub const alphaComponent = fn () cg.Float;
-        pub const linearExposure = fn () cg.Float;
-        pub const CGColor = fn () cg.Color;
+        pub const @"-catalogNameComponent" = fn () foundation.String;
+        pub const @"-colorNameComponent" = fn () foundation.String;
+        pub const @"-localizedCatalogNameComponent" = fn () foundation.String;
+        pub const @"-localizedColorNameComponent" = fn () foundation.String;
+        pub const @"-redComponent" = fn () cg.Float;
+        pub const @"-greenComponent" = fn () cg.Float;
+        pub const @"-blueComponent" = fn () cg.Float;
+        pub const @"-hueComponent" = fn () cg.Float;
+        pub const @"-saturationComponent" = fn () cg.Float;
+        pub const @"-brightnessComponent" = fn () cg.Float;
+        pub const @"-whiteComponent" = fn () cg.Float;
+        pub const @"-cyanComponent" = fn () cg.Float;
+        pub const @"-magentaComponent" = fn () cg.Float;
+        pub const @"-yellowComponent" = fn () cg.Float;
+        pub const @"-blackComponent" = fn () cg.Float;
+        pub const @"-colorSpace" = fn () objc.Object;
+        pub const @"-numberOfComponents" = fn () objc.Integer;
+        pub const @"-patternImage" = fn () Image;
+        pub const @"-alphaComponent" = fn () cg.Float;
+        pub const @"-linearExposure" = fn () cg.Float;
+        pub const @"-CGColor" = fn () cg.Color;
         pub const @"+ignoresAlpha" = fn () bool;
         pub const @"+setIgnoresAlpha:" = fn (bool) void;
-        pub const @"colorUsingColorSpaceName:device:" = fn (?foundation.String, ?foundation.Dictionary(objc.Object, objc.Object)) ?Color;
-        pub const @"colorUsingColorSpaceName:" = fn (?foundation.String) ?Color;
+        pub const @"-colorUsingColorSpaceName:device:" = fn (?foundation.String, ?foundation.Dictionary(objc.Object, objc.Object)) ?Color;
+        pub const @"-colorUsingColorSpaceName:" = fn (foundation.String) ?Color;
         pub const @"+controlHighlightColor" = fn () Color;
         pub const @"+controlLightHighlightColor" = fn () Color;
         pub const @"+controlShadowColor" = fn () Color;
@@ -8892,7 +8892,7 @@ pub const Color = extern struct {
         pub const @"+secondarySelectedControlColor" = fn () Color;
         pub const @"+alternateSelectedControlColor" = fn () Color;
         pub const @"+controlAlternatingRowBackgroundColors" = fn () foundation.Array(Color);
-        pub const colorSpaceName = fn () ?foundation.String;
+        pub const @"-colorSpaceName" = fn () foundation.String;
         pub const @"+colorWithCIColor:" = fn (objc.Object) Color;
     };
 };
@@ -9178,7 +9178,7 @@ pub const Event = extern struct {
     }
 
     /// `-[NSEvent CGEvent]`
-    pub fn CGEvent(self: Self) ?*anyopaque {
+    pub fn cgEvent(self: Self) ?*anyopaque {
         return self.object.msgSend(?*anyopaque, "CGEvent", .{});
     }
 
@@ -9359,14 +9359,14 @@ pub const Event = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"charactersByApplyingModifiers:" = fn (EventModifierFlags) ?foundation.String;
+        pub const @"-charactersByApplyingModifiers:" = fn (EventModifierFlags) ?foundation.String;
         pub const @"+eventWithEventRef:" = fn (?*const anyopaque) ?Event;
         pub const @"+eventWithCGEvent:" = fn (?*anyopaque) ?Event;
-        pub const @"touchesMatchingPhase:inView:" = fn (TouchPhase, ?View) objc.Object;
-        pub const allTouches = fn () objc.Object;
-        pub const @"touchesForView:" = fn (View) objc.Object;
-        pub const @"coalescedTouchesForTouch:" = fn (objc.Object) foundation.Array(objc.Object);
-        pub const @"trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:" = fn (EventSwipeTrackingOptions, cg.Float, cg.Float, objc.BlockRef(fn (cg.Float, EventPhase, bool, ?*bool) void)) void;
+        pub const @"-touchesMatchingPhase:inView:" = fn (TouchPhase, ?View) objc.Object;
+        pub const @"-allTouches" = fn () objc.Object;
+        pub const @"-touchesForView:" = fn (View) objc.Object;
+        pub const @"-coalescedTouchesForTouch:" = fn (objc.Object) foundation.Array(objc.Object);
+        pub const @"-trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:" = fn (EventSwipeTrackingOptions, cg.Float, cg.Float, objc.BlockRef(fn (cg.Float, EventPhase, bool, ?*bool) void)) void;
         pub const @"+startPeriodicEventsAfterDelay:withPeriod:" = fn (f64, f64) void;
         pub const @"+stopPeriodicEvents" = fn () void;
         pub const @"+mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure:" = fn (EventType, cg.Point, EventModifierFlags, f64, objc.Integer, ?GraphicsContext, objc.Integer, objc.Integer, f32) ?Event;
@@ -9376,64 +9376,64 @@ pub const Event = extern struct {
         pub const @"+addGlobalMonitorForEventsMatchingMask:handler:" = fn (EventMask, objc.BlockRef(fn (Event) void)) ?objc.Object;
         pub const @"+addLocalMonitorForEventsMatchingMask:handler:" = fn (EventMask, objc.BlockRef(fn (Event) ?Event)) ?objc.Object;
         pub const @"+removeMonitor:" = fn (objc.Object) void;
-        pub const @"type" = fn () EventType;
-        pub const modifierFlags = fn () EventModifierFlags;
-        pub const timestamp = fn () f64;
-        pub const window = fn () ?Window;
-        pub const windowNumber = fn () objc.Integer;
-        pub const context = fn () ?GraphicsContext;
-        pub const clickCount = fn () objc.Integer;
-        pub const buttonNumber = fn () objc.Integer;
-        pub const eventNumber = fn () objc.Integer;
-        pub const pressure = fn () f32;
-        pub const locationInWindow = fn () cg.Point;
-        pub const deltaX = fn () cg.Float;
-        pub const deltaY = fn () cg.Float;
-        pub const deltaZ = fn () cg.Float;
-        pub const hasPreciseScrollingDeltas = fn () bool;
-        pub const scrollingDeltaX = fn () cg.Float;
-        pub const scrollingDeltaY = fn () cg.Float;
-        pub const momentumPhase = fn () EventPhase;
-        pub const isDirectionInvertedFromDevice = fn () bool;
-        pub const characters = fn () ?foundation.String;
-        pub const charactersIgnoringModifiers = fn () ?foundation.String;
-        pub const isARepeat = fn () bool;
-        pub const keyCode = fn () c_ushort;
-        pub const trackingNumber = fn () objc.Integer;
-        pub const userData = fn () ?*anyopaque;
-        pub const trackingArea = fn () ?objc.Object;
-        pub const subtype = fn () EventSubtype;
-        pub const data1 = fn () objc.Integer;
-        pub const data2 = fn () objc.Integer;
-        pub const eventRef = fn () ?*const anyopaque;
-        pub const CGEvent = fn () ?*anyopaque;
+        pub const @"-type" = fn () EventType;
+        pub const @"-modifierFlags" = fn () EventModifierFlags;
+        pub const @"-timestamp" = fn () f64;
+        pub const @"-window" = fn () ?Window;
+        pub const @"-windowNumber" = fn () objc.Integer;
+        pub const @"-context" = fn () ?GraphicsContext;
+        pub const @"-clickCount" = fn () objc.Integer;
+        pub const @"-buttonNumber" = fn () objc.Integer;
+        pub const @"-eventNumber" = fn () objc.Integer;
+        pub const @"-pressure" = fn () f32;
+        pub const @"-locationInWindow" = fn () cg.Point;
+        pub const @"-deltaX" = fn () cg.Float;
+        pub const @"-deltaY" = fn () cg.Float;
+        pub const @"-deltaZ" = fn () cg.Float;
+        pub const @"-hasPreciseScrollingDeltas" = fn () bool;
+        pub const @"-scrollingDeltaX" = fn () cg.Float;
+        pub const @"-scrollingDeltaY" = fn () cg.Float;
+        pub const @"-momentumPhase" = fn () EventPhase;
+        pub const @"-isDirectionInvertedFromDevice" = fn () bool;
+        pub const @"-characters" = fn () ?foundation.String;
+        pub const @"-charactersIgnoringModifiers" = fn () ?foundation.String;
+        pub const @"-isARepeat" = fn () bool;
+        pub const @"-keyCode" = fn () c_ushort;
+        pub const @"-trackingNumber" = fn () objc.Integer;
+        pub const @"-userData" = fn () ?*anyopaque;
+        pub const @"-trackingArea" = fn () ?objc.Object;
+        pub const @"-subtype" = fn () EventSubtype;
+        pub const @"-data1" = fn () objc.Integer;
+        pub const @"-data2" = fn () objc.Integer;
+        pub const @"-eventRef" = fn () ?*const anyopaque;
+        pub const @"-CGEvent" = fn () ?*anyopaque;
         pub const @"+isMouseCoalescingEnabled" = fn () bool;
         pub const @"+setMouseCoalescingEnabled:" = fn (bool) void;
-        pub const magnification = fn () cg.Float;
-        pub const deviceID = fn () objc.UInteger;
-        pub const rotation = fn () f32;
-        pub const absoluteX = fn () objc.Integer;
-        pub const absoluteY = fn () objc.Integer;
-        pub const absoluteZ = fn () objc.Integer;
-        pub const buttonMask = fn () EventButtonMask;
-        pub const tilt = fn () cg.Point;
-        pub const tangentialPressure = fn () f32;
-        pub const vendorDefined = fn () objc.Object;
-        pub const vendorID = fn () objc.UInteger;
-        pub const tabletID = fn () objc.UInteger;
-        pub const pointingDeviceID = fn () objc.UInteger;
-        pub const systemTabletID = fn () objc.UInteger;
-        pub const vendorPointingDeviceType = fn () objc.UInteger;
-        pub const pointingDeviceSerialNumber = fn () objc.UInteger;
-        pub const uniqueID = fn () c_ulonglong;
-        pub const capabilityMask = fn () objc.UInteger;
-        pub const pointingDeviceType = fn () PointingDeviceType;
-        pub const isEnteringProximity = fn () bool;
-        pub const phase = fn () EventPhase;
-        pub const stage = fn () objc.Integer;
-        pub const stageTransition = fn () cg.Float;
-        pub const associatedEventsMask = fn () EventMask;
-        pub const pressureBehavior = fn () PressureBehavior;
+        pub const @"-magnification" = fn () cg.Float;
+        pub const @"-deviceID" = fn () objc.UInteger;
+        pub const @"-rotation" = fn () f32;
+        pub const @"-absoluteX" = fn () objc.Integer;
+        pub const @"-absoluteY" = fn () objc.Integer;
+        pub const @"-absoluteZ" = fn () objc.Integer;
+        pub const @"-buttonMask" = fn () EventButtonMask;
+        pub const @"-tilt" = fn () cg.Point;
+        pub const @"-tangentialPressure" = fn () f32;
+        pub const @"-vendorDefined" = fn () objc.Object;
+        pub const @"-vendorID" = fn () objc.UInteger;
+        pub const @"-tabletID" = fn () objc.UInteger;
+        pub const @"-pointingDeviceID" = fn () objc.UInteger;
+        pub const @"-systemTabletID" = fn () objc.UInteger;
+        pub const @"-vendorPointingDeviceType" = fn () objc.UInteger;
+        pub const @"-pointingDeviceSerialNumber" = fn () objc.UInteger;
+        pub const @"-uniqueID" = fn () c_ulonglong;
+        pub const @"-capabilityMask" = fn () objc.UInteger;
+        pub const @"-pointingDeviceType" = fn () PointingDeviceType;
+        pub const @"-isEnteringProximity" = fn () bool;
+        pub const @"-phase" = fn () EventPhase;
+        pub const @"-stage" = fn () objc.Integer;
+        pub const @"-stageTransition" = fn () cg.Float;
+        pub const @"-associatedEventsMask" = fn () EventMask;
+        pub const @"-pressureBehavior" = fn () PressureBehavior;
         pub const @"+isTouchSwipeNavigationEnabled" = fn () bool;
         pub const @"+isSwipeTrackingFromScrollEventsEnabled" = fn () bool;
         pub const @"+mouseLocation" = fn () cg.Point;
@@ -9902,88 +9902,88 @@ pub const Menu = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"initWithTitle:" = fn (foundation.String) Menu;
-        pub const @"initWithCoder:" = fn (objc.Object) Menu;
+        pub const @"-initWithTitle:" = fn (foundation.String) Menu;
+        pub const @"-initWithCoder:" = fn (objc.Object) Menu;
         pub const @"+popUpContextMenu:withEvent:forView:" = fn (Menu, Event, View) void;
         pub const @"+popUpContextMenu:withEvent:forView:withFont:" = fn (Menu, Event, View, ?objc.Object) void;
-        pub const @"popUpMenuPositioningItem:atLocation:inView:" = fn (?MenuItem, cg.Point, ?View) bool;
+        pub const @"-popUpMenuPositioningItem:atLocation:inView:" = fn (?MenuItem, cg.Point, ?View) bool;
         pub const @"+setMenuBarVisible:" = fn (bool) void;
         pub const @"+menuBarVisible" = fn () bool;
-        pub const @"insertItem:atIndex:" = fn (MenuItem, objc.Integer) void;
-        pub const @"addItem:" = fn (MenuItem) void;
-        pub const @"insertItemWithTitle:action:keyEquivalent:atIndex:" = fn (foundation.String, ?objc.Sel, foundation.String, objc.Integer) MenuItem;
-        pub const @"addItemWithTitle:action:keyEquivalent:" = fn (foundation.String, ?objc.Sel, foundation.String) MenuItem;
-        pub const @"removeItemAtIndex:" = fn (objc.Integer) void;
-        pub const @"removeItem:" = fn (MenuItem) void;
-        pub const @"setSubmenu:forItem:" = fn (?Menu, MenuItem) void;
-        pub const removeAllItems = fn () void;
-        pub const @"itemAtIndex:" = fn (objc.Integer) ?MenuItem;
-        pub const @"indexOfItem:" = fn (MenuItem) objc.Integer;
-        pub const @"indexOfItemWithTitle:" = fn (foundation.String) objc.Integer;
-        pub const @"indexOfItemWithTag:" = fn (objc.Integer) objc.Integer;
-        pub const @"indexOfItemWithRepresentedObject:" = fn (?objc.Object) objc.Integer;
-        pub const @"indexOfItemWithSubmenu:" = fn (?Menu) objc.Integer;
-        pub const @"indexOfItemWithTarget:andAction:" = fn (?objc.Object, ?objc.Sel) objc.Integer;
-        pub const @"itemWithTitle:" = fn (foundation.String) ?MenuItem;
-        pub const @"itemWithTag:" = fn (objc.Integer) ?MenuItem;
-        pub const update = fn () void;
-        pub const @"performKeyEquivalent:" = fn (Event) bool;
-        pub const @"itemChanged:" = fn (MenuItem) void;
-        pub const @"performActionForItemAtIndex:" = fn (objc.Integer) void;
-        pub const cancelTracking = fn () void;
-        pub const cancelTrackingWithoutAnimation = fn () void;
-        pub const title = fn () foundation.String;
-        pub const @"setTitle:" = fn (foundation.String) void;
-        pub const supermenu = fn () ?Menu;
-        pub const @"setSupermenu:" = fn (?Menu) void;
-        pub const itemArray = fn () foundation.Array(MenuItem);
-        pub const @"setItemArray:" = fn (foundation.Array(MenuItem)) void;
-        pub const numberOfItems = fn () objc.Integer;
-        pub const autoenablesItems = fn () bool;
-        pub const @"setAutoenablesItems:" = fn (bool) void;
-        pub const delegate = fn () ?MenuDelegate;
-        pub const @"setDelegate:" = fn (?MenuDelegate) void;
-        pub const menuBarHeight = fn () cg.Float;
-        pub const highlightedItem = fn () ?MenuItem;
-        pub const minimumWidth = fn () cg.Float;
-        pub const @"setMinimumWidth:" = fn (cg.Float) void;
-        pub const size = fn () cg.Size;
-        pub const font = fn () objc.Object;
-        pub const @"setFont:" = fn (?objc.Object) void;
-        pub const allowsContextMenuPlugIns = fn () bool;
-        pub const @"setAllowsContextMenuPlugIns:" = fn (bool) void;
-        pub const automaticallyInsertsWritingToolsItems = fn () bool;
-        pub const @"setAutomaticallyInsertsWritingToolsItems:" = fn (bool) void;
-        pub const showsStateColumn = fn () bool;
-        pub const @"setShowsStateColumn:" = fn (bool) void;
-        pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
-        pub const @"setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
+        pub const @"-insertItem:atIndex:" = fn (MenuItem, objc.Integer) void;
+        pub const @"-addItem:" = fn (MenuItem) void;
+        pub const @"-insertItemWithTitle:action:keyEquivalent:atIndex:" = fn (foundation.String, ?objc.Sel, foundation.String, objc.Integer) MenuItem;
+        pub const @"-addItemWithTitle:action:keyEquivalent:" = fn (foundation.String, ?objc.Sel, foundation.String) MenuItem;
+        pub const @"-removeItemAtIndex:" = fn (objc.Integer) void;
+        pub const @"-removeItem:" = fn (MenuItem) void;
+        pub const @"-setSubmenu:forItem:" = fn (?Menu, MenuItem) void;
+        pub const @"-removeAllItems" = fn () void;
+        pub const @"-itemAtIndex:" = fn (objc.Integer) ?MenuItem;
+        pub const @"-indexOfItem:" = fn (MenuItem) objc.Integer;
+        pub const @"-indexOfItemWithTitle:" = fn (foundation.String) objc.Integer;
+        pub const @"-indexOfItemWithTag:" = fn (objc.Integer) objc.Integer;
+        pub const @"-indexOfItemWithRepresentedObject:" = fn (?objc.Object) objc.Integer;
+        pub const @"-indexOfItemWithSubmenu:" = fn (?Menu) objc.Integer;
+        pub const @"-indexOfItemWithTarget:andAction:" = fn (?objc.Object, ?objc.Sel) objc.Integer;
+        pub const @"-itemWithTitle:" = fn (foundation.String) ?MenuItem;
+        pub const @"-itemWithTag:" = fn (objc.Integer) ?MenuItem;
+        pub const @"-update" = fn () void;
+        pub const @"-performKeyEquivalent:" = fn (Event) bool;
+        pub const @"-itemChanged:" = fn (MenuItem) void;
+        pub const @"-performActionForItemAtIndex:" = fn (objc.Integer) void;
+        pub const @"-cancelTracking" = fn () void;
+        pub const @"-cancelTrackingWithoutAnimation" = fn () void;
+        pub const @"-title" = fn () foundation.String;
+        pub const @"-setTitle:" = fn (foundation.String) void;
+        pub const @"-supermenu" = fn () ?Menu;
+        pub const @"-setSupermenu:" = fn (?Menu) void;
+        pub const @"-itemArray" = fn () foundation.Array(MenuItem);
+        pub const @"-setItemArray:" = fn (foundation.Array(MenuItem)) void;
+        pub const @"-numberOfItems" = fn () objc.Integer;
+        pub const @"-autoenablesItems" = fn () bool;
+        pub const @"-setAutoenablesItems:" = fn (bool) void;
+        pub const @"-delegate" = fn () ?MenuDelegate;
+        pub const @"-setDelegate:" = fn (?MenuDelegate) void;
+        pub const @"-menuBarHeight" = fn () cg.Float;
+        pub const @"-highlightedItem" = fn () ?MenuItem;
+        pub const @"-minimumWidth" = fn () cg.Float;
+        pub const @"-setMinimumWidth:" = fn (cg.Float) void;
+        pub const @"-size" = fn () cg.Size;
+        pub const @"-font" = fn () objc.Object;
+        pub const @"-setFont:" = fn (?objc.Object) void;
+        pub const @"-allowsContextMenuPlugIns" = fn () bool;
+        pub const @"-setAllowsContextMenuPlugIns:" = fn (bool) void;
+        pub const @"-automaticallyInsertsWritingToolsItems" = fn () bool;
+        pub const @"-setAutomaticallyInsertsWritingToolsItems:" = fn (bool) void;
+        pub const @"-showsStateColumn" = fn () bool;
+        pub const @"-setShowsStateColumn:" = fn (bool) void;
+        pub const @"-userInterfaceLayoutDirection" = fn () UserInterfaceLayoutDirection;
+        pub const @"-setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
         pub const @"+paletteMenuWithColors:titles:selectionHandler:" = fn (foundation.Array(Color), foundation.Array(foundation.String), ?objc.BlockRef(fn (Menu) void)) Menu;
         pub const @"+paletteMenuWithColors:titles:templateImage:selectionHandler:" = fn (foundation.Array(Color), foundation.Array(foundation.String), Image, ?objc.BlockRef(fn (Menu) void)) Menu;
-        pub const presentationStyle = fn () MenuPresentationStyle;
-        pub const @"setPresentationStyle:" = fn (MenuPresentationStyle) void;
-        pub const selectionMode = fn () MenuSelectionMode;
-        pub const @"setSelectionMode:" = fn (MenuSelectionMode) void;
-        pub const selectedItems = fn () foundation.Array(MenuItem);
-        pub const @"setSelectedItems:" = fn (foundation.Array(MenuItem)) void;
-        pub const @"submenuAction:" = fn (?objc.Object) void;
-        pub const propertiesToUpdate = fn () MenuProperties;
-        pub const @"setMenuRepresentation:" = fn (?objc.Object) void;
-        pub const menuRepresentation = fn () ?objc.Object;
-        pub const @"setContextMenuRepresentation:" = fn (?objc.Object) void;
-        pub const contextMenuRepresentation = fn () ?objc.Object;
-        pub const @"setTearOffMenuRepresentation:" = fn (?objc.Object) void;
-        pub const tearOffMenuRepresentation = fn () ?objc.Object;
+        pub const @"-presentationStyle" = fn () MenuPresentationStyle;
+        pub const @"-setPresentationStyle:" = fn (MenuPresentationStyle) void;
+        pub const @"-selectionMode" = fn () MenuSelectionMode;
+        pub const @"-setSelectionMode:" = fn (MenuSelectionMode) void;
+        pub const @"-selectedItems" = fn () foundation.Array(MenuItem);
+        pub const @"-setSelectedItems:" = fn (foundation.Array(MenuItem)) void;
+        pub const @"-submenuAction:" = fn (?objc.Object) void;
+        pub const @"-propertiesToUpdate" = fn () MenuProperties;
+        pub const @"-setMenuRepresentation:" = fn (?objc.Object) void;
+        pub const @"-menuRepresentation" = fn () ?objc.Object;
+        pub const @"-setContextMenuRepresentation:" = fn (?objc.Object) void;
+        pub const @"-contextMenuRepresentation" = fn () ?objc.Object;
+        pub const @"-setTearOffMenuRepresentation:" = fn (?objc.Object) void;
+        pub const @"-tearOffMenuRepresentation" = fn () ?objc.Object;
         pub const @"+menuZone" = fn () ?objc.Object;
         pub const @"+setMenuZone:" = fn (?objc.Object) void;
-        pub const attachedMenu = fn () ?Menu;
-        pub const isAttached = fn () bool;
-        pub const sizeToFit = fn () void;
-        pub const @"locationForSubmenu:" = fn (?Menu) cg.Point;
-        pub const @"helpRequested:" = fn (Event) void;
-        pub const menuChangedMessagesEnabled = fn () bool;
-        pub const @"setMenuChangedMessagesEnabled:" = fn (bool) void;
-        pub const isTornOff = fn () bool;
+        pub const @"-attachedMenu" = fn () ?Menu;
+        pub const @"-isAttached" = fn () bool;
+        pub const @"-sizeToFit" = fn () void;
+        pub const @"-locationForSubmenu:" = fn (?Menu) cg.Point;
+        pub const @"-helpRequested:" = fn (Event) void;
+        pub const @"-menuChangedMessagesEnabled" = fn () bool;
+        pub const @"-setMenuChangedMessagesEnabled:" = fn (bool) void;
+        pub const @"-isTornOff" = fn () bool;
     };
 };
 
@@ -10396,76 +10396,76 @@ pub const MenuItem = extern struct {
     pub const signatures = struct {
         pub const @"+separatorItem" = fn () MenuItem;
         pub const @"+sectionHeaderWithTitle:" = fn (foundation.String) MenuItem;
-        pub const @"initWithTitle:action:keyEquivalent:" = fn (foundation.String, ?objc.Sel, foundation.String) MenuItem;
-        pub const @"initWithCoder:" = fn (objc.Object) MenuItem;
+        pub const @"-initWithTitle:action:keyEquivalent:" = fn (foundation.String, ?objc.Sel, foundation.String) MenuItem;
+        pub const @"-initWithCoder:" = fn (objc.Object) MenuItem;
         pub const @"+usesUserKeyEquivalents" = fn () bool;
         pub const @"+setUsesUserKeyEquivalents:" = fn (bool) void;
         pub const @"+writingToolsItems" = fn () foundation.Array(MenuItem);
-        pub const menu = fn () ?Menu;
-        pub const @"setMenu:" = fn (?Menu) void;
-        pub const hasSubmenu = fn () bool;
-        pub const submenu = fn () ?Menu;
-        pub const @"setSubmenu:" = fn (?Menu) void;
-        pub const parentItem = fn () ?MenuItem;
-        pub const title = fn () foundation.String;
-        pub const @"setTitle:" = fn (foundation.String) void;
-        pub const attributedTitle = fn () ?objc.Object;
-        pub const @"setAttributedTitle:" = fn (?objc.Object) void;
-        pub const subtitle = fn () ?foundation.String;
-        pub const @"setSubtitle:" = fn (?foundation.String) void;
-        pub const isSeparatorItem = fn () bool;
-        pub const isSectionHeader = fn () bool;
-        pub const keyEquivalent = fn () foundation.String;
-        pub const @"setKeyEquivalent:" = fn (foundation.String) void;
-        pub const keyEquivalentModifierMask = fn () EventModifierFlags;
-        pub const @"setKeyEquivalentModifierMask:" = fn (EventModifierFlags) void;
-        pub const userKeyEquivalent = fn () foundation.String;
-        pub const allowsKeyEquivalentWhenHidden = fn () bool;
-        pub const @"setAllowsKeyEquivalentWhenHidden:" = fn (bool) void;
-        pub const allowsAutomaticKeyEquivalentLocalization = fn () bool;
-        pub const @"setAllowsAutomaticKeyEquivalentLocalization:" = fn (bool) void;
-        pub const allowsAutomaticKeyEquivalentMirroring = fn () bool;
-        pub const @"setAllowsAutomaticKeyEquivalentMirroring:" = fn (bool) void;
-        pub const image = fn () ?Image;
-        pub const @"setImage:" = fn (?Image) void;
-        pub const preferredImageVisibility = fn () MenuItemImageVisibility;
-        pub const @"setPreferredImageVisibility:" = fn (MenuItemImageVisibility) void;
-        pub const state = fn () objc.Integer;
-        pub const @"setState:" = fn (objc.Integer) void;
-        pub const onStateImage = fn () Image;
-        pub const @"setOnStateImage:" = fn (?Image) void;
-        pub const offStateImage = fn () ?Image;
-        pub const @"setOffStateImage:" = fn (?Image) void;
-        pub const mixedStateImage = fn () Image;
-        pub const @"setMixedStateImage:" = fn (?Image) void;
-        pub const isEnabled = fn () bool;
-        pub const @"setEnabled:" = fn (bool) void;
-        pub const isAlternate = fn () bool;
-        pub const @"setAlternate:" = fn (bool) void;
-        pub const indentationLevel = fn () objc.Integer;
-        pub const @"setIndentationLevel:" = fn (objc.Integer) void;
-        pub const target = fn () ?objc.Object;
-        pub const @"setTarget:" = fn (?objc.Object) void;
-        pub const action = fn () ?objc.Sel;
-        pub const @"setAction:" = fn (?objc.Sel) void;
-        pub const tag = fn () objc.Integer;
-        pub const @"setTag:" = fn (objc.Integer) void;
-        pub const representedObject = fn () ?objc.Object;
-        pub const @"setRepresentedObject:" = fn (?objc.Object) void;
-        pub const view = fn () ?View;
-        pub const @"setView:" = fn (?View) void;
-        pub const isHighlighted = fn () bool;
-        pub const isHidden = fn () bool;
-        pub const @"setHidden:" = fn (bool) void;
-        pub const isHiddenOrHasHiddenAncestor = fn () bool;
-        pub const toolTip = fn () ?foundation.String;
-        pub const @"setToolTip:" = fn (?foundation.String) void;
-        pub const badge = fn () ?objc.Object;
-        pub const @"setBadge:" = fn (?objc.Object) void;
-        pub const @"setMnemonicLocation:" = fn (objc.UInteger) void;
-        pub const mnemonicLocation = fn () objc.UInteger;
-        pub const mnemonic = fn () ?foundation.String;
-        pub const @"setTitleWithMnemonic:" = fn (foundation.String) void;
+        pub const @"-menu" = fn () ?Menu;
+        pub const @"-setMenu:" = fn (?Menu) void;
+        pub const @"-hasSubmenu" = fn () bool;
+        pub const @"-submenu" = fn () ?Menu;
+        pub const @"-setSubmenu:" = fn (?Menu) void;
+        pub const @"-parentItem" = fn () ?MenuItem;
+        pub const @"-title" = fn () foundation.String;
+        pub const @"-setTitle:" = fn (foundation.String) void;
+        pub const @"-attributedTitle" = fn () ?objc.Object;
+        pub const @"-setAttributedTitle:" = fn (?objc.Object) void;
+        pub const @"-subtitle" = fn () ?foundation.String;
+        pub const @"-setSubtitle:" = fn (?foundation.String) void;
+        pub const @"-isSeparatorItem" = fn () bool;
+        pub const @"-isSectionHeader" = fn () bool;
+        pub const @"-keyEquivalent" = fn () foundation.String;
+        pub const @"-setKeyEquivalent:" = fn (foundation.String) void;
+        pub const @"-keyEquivalentModifierMask" = fn () EventModifierFlags;
+        pub const @"-setKeyEquivalentModifierMask:" = fn (EventModifierFlags) void;
+        pub const @"-userKeyEquivalent" = fn () foundation.String;
+        pub const @"-allowsKeyEquivalentWhenHidden" = fn () bool;
+        pub const @"-setAllowsKeyEquivalentWhenHidden:" = fn (bool) void;
+        pub const @"-allowsAutomaticKeyEquivalentLocalization" = fn () bool;
+        pub const @"-setAllowsAutomaticKeyEquivalentLocalization:" = fn (bool) void;
+        pub const @"-allowsAutomaticKeyEquivalentMirroring" = fn () bool;
+        pub const @"-setAllowsAutomaticKeyEquivalentMirroring:" = fn (bool) void;
+        pub const @"-image" = fn () ?Image;
+        pub const @"-setImage:" = fn (?Image) void;
+        pub const @"-preferredImageVisibility" = fn () MenuItemImageVisibility;
+        pub const @"-setPreferredImageVisibility:" = fn (MenuItemImageVisibility) void;
+        pub const @"-state" = fn () objc.Integer;
+        pub const @"-setState:" = fn (objc.Integer) void;
+        pub const @"-onStateImage" = fn () Image;
+        pub const @"-setOnStateImage:" = fn (?Image) void;
+        pub const @"-offStateImage" = fn () ?Image;
+        pub const @"-setOffStateImage:" = fn (?Image) void;
+        pub const @"-mixedStateImage" = fn () Image;
+        pub const @"-setMixedStateImage:" = fn (?Image) void;
+        pub const @"-isEnabled" = fn () bool;
+        pub const @"-setEnabled:" = fn (bool) void;
+        pub const @"-isAlternate" = fn () bool;
+        pub const @"-setAlternate:" = fn (bool) void;
+        pub const @"-indentationLevel" = fn () objc.Integer;
+        pub const @"-setIndentationLevel:" = fn (objc.Integer) void;
+        pub const @"-target" = fn () ?objc.Object;
+        pub const @"-setTarget:" = fn (?objc.Object) void;
+        pub const @"-action" = fn () ?objc.Sel;
+        pub const @"-setAction:" = fn (?objc.Sel) void;
+        pub const @"-tag" = fn () objc.Integer;
+        pub const @"-setTag:" = fn (objc.Integer) void;
+        pub const @"-representedObject" = fn () ?objc.Object;
+        pub const @"-setRepresentedObject:" = fn (?objc.Object) void;
+        pub const @"-view" = fn () ?View;
+        pub const @"-setView:" = fn (?View) void;
+        pub const @"-isHighlighted" = fn () bool;
+        pub const @"-isHidden" = fn () bool;
+        pub const @"-setHidden:" = fn (bool) void;
+        pub const @"-isHiddenOrHasHiddenAncestor" = fn () bool;
+        pub const @"-toolTip" = fn () ?foundation.String;
+        pub const @"-setToolTip:" = fn (?foundation.String) void;
+        pub const @"-badge" = fn () ?objc.Object;
+        pub const @"-setBadge:" = fn (?objc.Object) void;
+        pub const @"-setMnemonicLocation:" = fn (objc.UInteger) void;
+        pub const @"-mnemonicLocation" = fn () objc.UInteger;
+        pub const @"-mnemonic" = fn () ?foundation.String;
+        pub const @"-setTitleWithMnemonic:" = fn (foundation.String) void;
     };
 };
 
@@ -10515,7 +10515,7 @@ pub const Image = extern struct {
     }
 
     /// `+[NSImage imageNamed:]`
-    pub fn imageNamed(name_: ?foundation.String) ?Image {
+    pub fn imageNamed(name_: foundation.String) ?Image {
         return class().msgSend(?Image, "imageNamed:", .{name_});
     }
 
@@ -10630,7 +10630,7 @@ pub const Image = extern struct {
     }
 
     /// `-[NSImage TIFFRepresentationUsingCompression:factor:]`
-    pub fn TIFFRepresentationUsingCompressionFactor(self: Self, comp: TIFFCompression, factor: f32) ?foundation.Data {
+    pub fn tiffRepresentationUsingCompressionFactor(self: Self, comp: TIFFCompression, factor: f32) ?foundation.Data {
         return self.object.msgSend(?foundation.Data, "TIFFRepresentationUsingCompression:factor:", .{ comp, factor });
     }
 
@@ -10660,7 +10660,7 @@ pub const Image = extern struct {
     }
 
     /// `-[NSImage CGImageForProposedRect:context:hints:]`
-    pub fn CGImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, reference_context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
+    pub fn cgImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, reference_context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
         return self.object.msgSend(?cg.Image, "CGImageForProposedRect:context:hints:", .{ proposed_dest_rect, reference_context, hints });
     }
 
@@ -10755,7 +10755,7 @@ pub const Image = extern struct {
     }
 
     /// `-[NSImage TIFFRepresentation]`
-    pub fn TIFFRepresentation(self: Self) ?foundation.Data {
+    pub fn tiffRepresentation(self: Self) ?foundation.Data {
         return self.object.msgSend(?foundation.Data, "TIFFRepresentation", .{});
     }
 
@@ -10861,75 +10861,75 @@ pub const Image = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"+imageNamed:" = fn (?foundation.String) ?Image;
+        pub const @"+imageNamed:" = fn (foundation.String) ?Image;
         pub const @"+imageWithSystemSymbolName:accessibilityDescription:" = fn (foundation.String, ?foundation.String) ?Image;
         pub const @"+imageWithSystemSymbolName:variableValue:accessibilityDescription:" = fn (foundation.String, f64, ?foundation.String) ?Image;
         pub const @"+imageWithSymbolName:variableValue:" = fn (foundation.String, f64) ?Image;
         pub const @"+imageWithSymbolName:bundle:variableValue:" = fn (foundation.String, ?objc.Object, f64) ?Image;
-        pub const @"initWithSize:" = fn (cg.Size) Image;
-        pub const @"initWithCoder:" = fn (objc.Object) Image;
-        pub const @"initWithData:" = fn (foundation.Data) ?Image;
-        pub const @"initWithContentsOfFile:" = fn (foundation.String) ?Image;
-        pub const @"initWithContentsOfURL:" = fn (foundation.Url) ?Image;
-        pub const @"initByReferencingFile:" = fn (foundation.String) ?Image;
-        pub const @"initByReferencingURL:" = fn (foundation.Url) Image;
-        pub const @"initWithPasteboard:" = fn (objc.Object) ?Image;
-        pub const @"initWithDataIgnoringOrientation:" = fn (foundation.Data) ?Image;
+        pub const @"-initWithSize:" = fn (cg.Size) Image;
+        pub const @"-initWithCoder:" = fn (objc.Object) Image;
+        pub const @"-initWithData:" = fn (foundation.Data) ?Image;
+        pub const @"-initWithContentsOfFile:" = fn (foundation.String) ?Image;
+        pub const @"-initWithContentsOfURL:" = fn (foundation.Url) ?Image;
+        pub const @"-initByReferencingFile:" = fn (foundation.String) ?Image;
+        pub const @"-initByReferencingURL:" = fn (foundation.Url) Image;
+        pub const @"-initWithPasteboard:" = fn (objc.Object) ?Image;
+        pub const @"-initWithDataIgnoringOrientation:" = fn (foundation.Data) ?Image;
         pub const @"+imageWithSize:flipped:drawingHandler:" = fn (cg.Size, bool, objc.BlockRef(fn (cg.Rect) bool)) Image;
-        pub const @"setName:" = fn (?foundation.String) bool;
-        pub const name = fn () ?foundation.String;
-        pub const @"drawAtPoint:fromRect:operation:fraction:" = fn (cg.Point, cg.Rect, CompositingOperation, cg.Float) void;
-        pub const @"drawInRect:fromRect:operation:fraction:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float) void;
-        pub const @"drawInRect:fromRect:operation:fraction:respectFlipped:hints:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float, bool, ?foundation.Dictionary(objc.Object, objc.Object)) void;
-        pub const @"drawRepresentation:inRect:" = fn (ImageRep, cg.Rect) bool;
-        pub const @"drawInRect:" = fn (cg.Rect) void;
-        pub const recache = fn () void;
-        pub const @"TIFFRepresentationUsingCompression:factor:" = fn (TIFFCompression, f32) ?foundation.Data;
-        pub const @"addRepresentations:" = fn (foundation.Array(ImageRep)) void;
-        pub const @"addRepresentation:" = fn (ImageRep) void;
-        pub const @"removeRepresentation:" = fn (ImageRep) void;
+        pub const @"-setName:" = fn (?foundation.String) bool;
+        pub const @"-name" = fn () ?foundation.String;
+        pub const @"-drawAtPoint:fromRect:operation:fraction:" = fn (cg.Point, cg.Rect, CompositingOperation, cg.Float) void;
+        pub const @"-drawInRect:fromRect:operation:fraction:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float) void;
+        pub const @"-drawInRect:fromRect:operation:fraction:respectFlipped:hints:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float, bool, ?foundation.Dictionary(objc.Object, objc.Object)) void;
+        pub const @"-drawRepresentation:inRect:" = fn (ImageRep, cg.Rect) bool;
+        pub const @"-drawInRect:" = fn (cg.Rect) void;
+        pub const @"-recache" = fn () void;
+        pub const @"-TIFFRepresentationUsingCompression:factor:" = fn (TIFFCompression, f32) ?foundation.Data;
+        pub const @"-addRepresentations:" = fn (foundation.Array(ImageRep)) void;
+        pub const @"-addRepresentation:" = fn (ImageRep) void;
+        pub const @"-removeRepresentation:" = fn (ImageRep) void;
         pub const @"+canInitWithPasteboard:" = fn (objc.Object) bool;
-        pub const @"initWithCGImage:size:" = fn (cg.Image, cg.Size) Image;
-        pub const @"CGImageForProposedRect:context:hints:" = fn (?*cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image;
-        pub const @"bestRepresentationForRect:context:hints:" = fn (cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?ImageRep;
-        pub const @"hitTestRect:withImageDestinationRect:context:hints:flipped:" = fn (cg.Rect, cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object), bool) bool;
-        pub const @"recommendedLayerContentsScale:" = fn (cg.Float) cg.Float;
-        pub const @"layerContentsForContentsScale:" = fn (cg.Float) objc.Object;
-        pub const @"imageWithSymbolConfiguration:" = fn (objc.Object) ?Image;
-        pub const @"imageWithLocale:" = fn (?objc.Object) Image;
-        pub const size = fn () cg.Size;
-        pub const @"setSize:" = fn (cg.Size) void;
-        pub const backgroundColor = fn () Color;
-        pub const @"setBackgroundColor:" = fn (Color) void;
-        pub const usesEPSOnResolutionMismatch = fn () bool;
-        pub const @"setUsesEPSOnResolutionMismatch:" = fn (bool) void;
-        pub const prefersColorMatch = fn () bool;
-        pub const @"setPrefersColorMatch:" = fn (bool) void;
-        pub const matchesOnMultipleResolution = fn () bool;
-        pub const @"setMatchesOnMultipleResolution:" = fn (bool) void;
-        pub const matchesOnlyOnBestFittingAxis = fn () bool;
-        pub const @"setMatchesOnlyOnBestFittingAxis:" = fn (bool) void;
-        pub const TIFFRepresentation = fn () ?foundation.Data;
-        pub const representations = fn () foundation.Array(ImageRep);
-        pub const isValid = fn () bool;
-        pub const delegate = fn () ?objc.Object;
-        pub const @"setDelegate:" = fn (?objc.Object) void;
+        pub const @"-initWithCGImage:size:" = fn (cg.Image, cg.Size) Image;
+        pub const @"-CGImageForProposedRect:context:hints:" = fn (?*cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image;
+        pub const @"-bestRepresentationForRect:context:hints:" = fn (cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?ImageRep;
+        pub const @"-hitTestRect:withImageDestinationRect:context:hints:flipped:" = fn (cg.Rect, cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object), bool) bool;
+        pub const @"-recommendedLayerContentsScale:" = fn (cg.Float) cg.Float;
+        pub const @"-layerContentsForContentsScale:" = fn (cg.Float) objc.Object;
+        pub const @"-imageWithSymbolConfiguration:" = fn (objc.Object) ?Image;
+        pub const @"-imageWithLocale:" = fn (?objc.Object) Image;
+        pub const @"-size" = fn () cg.Size;
+        pub const @"-setSize:" = fn (cg.Size) void;
+        pub const @"-backgroundColor" = fn () Color;
+        pub const @"-setBackgroundColor:" = fn (Color) void;
+        pub const @"-usesEPSOnResolutionMismatch" = fn () bool;
+        pub const @"-setUsesEPSOnResolutionMismatch:" = fn (bool) void;
+        pub const @"-prefersColorMatch" = fn () bool;
+        pub const @"-setPrefersColorMatch:" = fn (bool) void;
+        pub const @"-matchesOnMultipleResolution" = fn () bool;
+        pub const @"-setMatchesOnMultipleResolution:" = fn (bool) void;
+        pub const @"-matchesOnlyOnBestFittingAxis" = fn () bool;
+        pub const @"-setMatchesOnlyOnBestFittingAxis:" = fn (bool) void;
+        pub const @"-TIFFRepresentation" = fn () ?foundation.Data;
+        pub const @"-representations" = fn () foundation.Array(ImageRep);
+        pub const @"-isValid" = fn () bool;
+        pub const @"-delegate" = fn () ?objc.Object;
+        pub const @"-setDelegate:" = fn (?objc.Object) void;
         pub const @"+imageTypes" = fn () foundation.Array(foundation.String);
         pub const @"+imageUnfilteredTypes" = fn () foundation.Array(foundation.String);
-        pub const cacheMode = fn () ImageCacheMode;
-        pub const @"setCacheMode:" = fn (ImageCacheMode) void;
-        pub const alignmentRect = fn () cg.Rect;
-        pub const @"setAlignmentRect:" = fn (cg.Rect) void;
-        pub const isTemplate = fn () bool;
-        pub const @"setTemplate:" = fn (bool) void;
-        pub const accessibilityDescription = fn () ?foundation.String;
-        pub const @"setAccessibilityDescription:" = fn (?foundation.String) void;
-        pub const capInsets = fn () EdgeInsets;
-        pub const @"setCapInsets:" = fn (EdgeInsets) void;
-        pub const resizingMode = fn () ImageResizingMode;
-        pub const @"setResizingMode:" = fn (ImageResizingMode) void;
-        pub const symbolConfiguration = fn () objc.Object;
-        pub const locale = fn () ?objc.Object;
+        pub const @"-cacheMode" = fn () ImageCacheMode;
+        pub const @"-setCacheMode:" = fn (ImageCacheMode) void;
+        pub const @"-alignmentRect" = fn () cg.Rect;
+        pub const @"-setAlignmentRect:" = fn (cg.Rect) void;
+        pub const @"-isTemplate" = fn () bool;
+        pub const @"-setTemplate:" = fn (bool) void;
+        pub const @"-accessibilityDescription" = fn () ?foundation.String;
+        pub const @"-setAccessibilityDescription:" = fn (?foundation.String) void;
+        pub const @"-capInsets" = fn () EdgeInsets;
+        pub const @"-setCapInsets:" = fn (EdgeInsets) void;
+        pub const @"-resizingMode" = fn () ImageResizingMode;
+        pub const @"-setResizingMode:" = fn (ImageResizingMode) void;
+        pub const @"-symbolConfiguration" = fn () objc.Object;
+        pub const @"-locale" = fn () ?objc.Object;
     };
 };
 
@@ -11104,12 +11104,12 @@ pub const Cursor = extern struct {
     }
 
     /// `+[NSCursor IBeamCursor]`
-    pub fn IBeamCursor() Cursor {
+    pub fn iBeamCursor() Cursor {
         return class().msgSend(Cursor, "IBeamCursor", .{});
     }
 
     /// `+[NSCursor IBeamCursorForVerticalLayout]`
-    pub fn IBeamCursorForVerticalLayout() Cursor {
+    pub fn iBeamCursorForVerticalLayout() Cursor {
         return class().msgSend(Cursor, "IBeamCursorForVerticalLayout", .{});
     }
 
@@ -11170,20 +11170,20 @@ pub const Cursor = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"initWithImage:hotSpot:" = fn (Image, cg.Point) Cursor;
-        pub const @"initWithCoder:" = fn (objc.Object) Cursor;
+        pub const @"-initWithImage:hotSpot:" = fn (Image, cg.Point) Cursor;
+        pub const @"-initWithCoder:" = fn (objc.Object) Cursor;
         pub const @"+hide" = fn () void;
         pub const @"+unhide" = fn () void;
         pub const @"+setHiddenUntilMouseMoves:" = fn (bool) void;
         pub const @"+pop" = fn () void;
-        pub const pop = fn () void;
-        pub const push = fn () void;
-        pub const set = fn () void;
+        pub const @"-pop" = fn () void;
+        pub const @"-push" = fn () void;
+        pub const @"-set" = fn () void;
         pub const @"+columnResizeCursorInDirections:" = fn (HorizontalDirections) Cursor;
         pub const @"+rowResizeCursorInDirections:" = fn (VerticalDirections) Cursor;
         pub const @"+frameResizeCursorFromPosition:inDirections:" = fn (CursorFrameResizePosition, CursorFrameResizeDirections) Cursor;
-        pub const image = fn () Image;
-        pub const hotSpot = fn () cg.Point;
+        pub const @"-image" = fn () Image;
+        pub const @"-hotSpot" = fn () cg.Point;
         pub const @"+currentCursor" = fn () Cursor;
         pub const @"+arrowCursor" = fn () Cursor;
         pub const @"+crosshairCursor" = fn () Cursor;
@@ -11201,13 +11201,13 @@ pub const Cursor = extern struct {
         pub const @"+zoomOutCursor" = fn () Cursor;
         pub const @"+columnResizeCursor" = fn () Cursor;
         pub const @"+rowResizeCursor" = fn () Cursor;
-        pub const @"initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:" = fn (Image, ?Color, ?Color, cg.Point) Cursor;
-        pub const @"setOnMouseExited:" = fn (bool) void;
-        pub const @"setOnMouseEntered:" = fn (bool) void;
-        pub const @"mouseEntered:" = fn (Event) void;
-        pub const @"mouseExited:" = fn (Event) void;
-        pub const isSetOnMouseExited = fn () bool;
-        pub const isSetOnMouseEntered = fn () bool;
+        pub const @"-initWithImage:foregroundColorHint:backgroundColorHint:hotSpot:" = fn (Image, ?Color, ?Color, cg.Point) Cursor;
+        pub const @"-setOnMouseExited:" = fn (bool) void;
+        pub const @"-setOnMouseEntered:" = fn (bool) void;
+        pub const @"-mouseEntered:" = fn (Event) void;
+        pub const @"-mouseExited:" = fn (Event) void;
+        pub const @"-isSetOnMouseExited" = fn () bool;
+        pub const @"-isSetOnMouseEntered" = fn () bool;
     };
 };
 
@@ -11322,7 +11322,7 @@ pub const GraphicsContext = extern struct {
     }
 
     /// `-[NSGraphicsContext CGContext]`
-    pub fn CGContext(self: Self) cg.Context {
+    pub fn cgContext(self: Self) cg.Context {
         return self.object.msgSend(cg.Context, "CGContext", .{});
     }
 
@@ -11382,7 +11382,7 @@ pub const GraphicsContext = extern struct {
     }
 
     /// `-[NSGraphicsContext CIContext]`
-    pub fn CIContext(self: Self) ?objc.Object {
+    pub fn ciContext(self: Self) ?objc.Object {
         return self.object.msgSend(?objc.Object, "CIContext", .{});
     }
 
@@ -11424,32 +11424,32 @@ pub const GraphicsContext = extern struct {
         pub const @"+currentContextDrawingToScreen" = fn () bool;
         pub const @"+saveGraphicsState" = fn () void;
         pub const @"+restoreGraphicsState" = fn () void;
-        pub const saveGraphicsState = fn () void;
-        pub const restoreGraphicsState = fn () void;
-        pub const flushGraphics = fn () void;
+        pub const @"-saveGraphicsState" = fn () void;
+        pub const @"-restoreGraphicsState" = fn () void;
+        pub const @"-flushGraphics" = fn () void;
         pub const @"+currentContext" = fn () ?GraphicsContext;
         pub const @"+setCurrentContext:" = fn (?GraphicsContext) void;
-        pub const attributes = fn () ?foundation.Dictionary(objc.Object, objc.Object);
-        pub const isDrawingToScreen = fn () bool;
-        pub const CGContext = fn () cg.Context;
-        pub const isFlipped = fn () bool;
-        pub const shouldAntialias = fn () bool;
-        pub const @"setShouldAntialias:" = fn (bool) void;
-        pub const imageInterpolation = fn () ImageInterpolation;
-        pub const @"setImageInterpolation:" = fn (ImageInterpolation) void;
-        pub const patternPhase = fn () cg.Point;
-        pub const @"setPatternPhase:" = fn (cg.Point) void;
-        pub const compositingOperation = fn () CompositingOperation;
-        pub const @"setCompositingOperation:" = fn (CompositingOperation) void;
-        pub const colorRenderingIntent = fn () ColorRenderingIntent;
-        pub const @"setColorRenderingIntent:" = fn (ColorRenderingIntent) void;
-        pub const CIContext = fn () ?objc.Object;
+        pub const @"-attributes" = fn () ?foundation.Dictionary(objc.Object, objc.Object);
+        pub const @"-isDrawingToScreen" = fn () bool;
+        pub const @"-CGContext" = fn () cg.Context;
+        pub const @"-isFlipped" = fn () bool;
+        pub const @"-shouldAntialias" = fn () bool;
+        pub const @"-setShouldAntialias:" = fn (bool) void;
+        pub const @"-imageInterpolation" = fn () ImageInterpolation;
+        pub const @"-setImageInterpolation:" = fn (ImageInterpolation) void;
+        pub const @"-patternPhase" = fn () cg.Point;
+        pub const @"-setPatternPhase:" = fn (cg.Point) void;
+        pub const @"-compositingOperation" = fn () CompositingOperation;
+        pub const @"-setCompositingOperation:" = fn (CompositingOperation) void;
+        pub const @"-colorRenderingIntent" = fn () ColorRenderingIntent;
+        pub const @"-setColorRenderingIntent:" = fn (ColorRenderingIntent) void;
+        pub const @"-CIContext" = fn () ?objc.Object;
         pub const @"+setGraphicsState:" = fn (objc.Integer) void;
-        pub const focusStack = fn () ?objc.Object;
-        pub const @"setFocusStack:" = fn (?objc.Object) void;
+        pub const @"-focusStack" = fn () ?objc.Object;
+        pub const @"-setFocusStack:" = fn (?objc.Object) void;
         pub const @"+graphicsContextWithGraphicsPort:flipped:" = fn (?*anyopaque, bool) GraphicsContext;
         pub const @"+graphicsContextWithWindow:" = fn (Window) GraphicsContext;
-        pub const graphicsPort = fn () ?*anyopaque;
+        pub const @"-graphicsPort" = fn () ?*anyopaque;
     };
 };
 
@@ -11544,7 +11544,7 @@ pub const ImageRep = extern struct {
     }
 
     /// `+[NSImageRep imageRepClassForPasteboardType:]`
-    pub fn imageRepClassForPasteboardType(@"type": ?foundation.String) ?objc.Class {
+    pub fn imageRepClassForPasteboardType(@"type": foundation.String) ?objc.Class {
         return class().msgSend(?objc.Class, "imageRepClassForPasteboardType:", .{@"type"});
     }
 
@@ -11619,7 +11619,7 @@ pub const ImageRep = extern struct {
     }
 
     /// `-[NSImageRep CGImageForProposedRect:context:hints:]`
-    pub fn CGImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
+    pub fn cgImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
         return self.object.msgSend(?cg.Image, "CGImageForProposedRect:context:hints:", .{ proposed_dest_rect, context, hints });
     }
 
@@ -11654,12 +11654,12 @@ pub const ImageRep = extern struct {
     }
 
     /// `-[NSImageRep colorSpaceName]`
-    pub fn colorSpaceName(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "colorSpaceName", .{});
+    pub fn colorSpaceName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "colorSpaceName", .{});
     }
 
     /// `-[NSImageRep setColorSpaceName:]`
-    pub fn setColorSpaceName(self: Self, color_space_name: ?foundation.String) void {
+    pub fn setColorSpaceName(self: Self, color_space_name: foundation.String) void {
         return self.object.msgSend(void, "setColorSpaceName:", .{color_space_name});
     }
 
@@ -11720,16 +11720,16 @@ pub const ImageRep = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const init = fn () ImageRep;
-        pub const @"initWithCoder:" = fn (objc.Object) ?ImageRep;
-        pub const draw = fn () bool;
-        pub const @"drawAtPoint:" = fn (cg.Point) bool;
-        pub const @"drawInRect:" = fn (cg.Rect) bool;
-        pub const @"drawInRect:fromRect:operation:fraction:respectFlipped:hints:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float, bool, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
+        pub const @"-init" = fn () ImageRep;
+        pub const @"-initWithCoder:" = fn (objc.Object) ?ImageRep;
+        pub const @"-draw" = fn () bool;
+        pub const @"-drawAtPoint:" = fn (cg.Point) bool;
+        pub const @"-drawInRect:" = fn (cg.Rect) bool;
+        pub const @"-drawInRect:fromRect:operation:fraction:respectFlipped:hints:" = fn (cg.Rect, cg.Rect, CompositingOperation, cg.Float, bool, ?foundation.Dictionary(objc.Object, objc.Object)) bool;
         pub const @"+registerImageRepClass:" = fn (objc.Class) void;
         pub const @"+unregisterImageRepClass:" = fn (objc.Class) void;
         pub const @"+imageRepClassForFileType:" = fn (foundation.String) ?objc.Class;
-        pub const @"+imageRepClassForPasteboardType:" = fn (?foundation.String) ?objc.Class;
+        pub const @"+imageRepClassForPasteboardType:" = fn (foundation.String) ?objc.Class;
         pub const @"+imageRepClassForType:" = fn (foundation.String) ?objc.Class;
         pub const @"+imageRepClassForData:" = fn (foundation.Data) ?objc.Class;
         pub const @"+canInitWithData:" = fn (foundation.Data) bool;
@@ -11744,23 +11744,23 @@ pub const ImageRep = extern struct {
         pub const @"+imageRepWithContentsOfURL:" = fn (foundation.Url) ?ImageRep;
         pub const @"+imageRepsWithPasteboard:" = fn (objc.Object) ?foundation.Array(ImageRep);
         pub const @"+imageRepWithPasteboard:" = fn (objc.Object) ?ImageRep;
-        pub const @"CGImageForProposedRect:context:hints:" = fn (?*cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image;
-        pub const size = fn () cg.Size;
-        pub const @"setSize:" = fn (cg.Size) void;
-        pub const hasAlpha = fn () bool;
-        pub const @"setAlpha:" = fn (bool) void;
-        pub const isOpaque = fn () bool;
-        pub const @"setOpaque:" = fn (bool) void;
-        pub const colorSpaceName = fn () ?foundation.String;
-        pub const @"setColorSpaceName:" = fn (?foundation.String) void;
-        pub const bitsPerSample = fn () objc.Integer;
-        pub const @"setBitsPerSample:" = fn (objc.Integer) void;
-        pub const pixelsWide = fn () objc.Integer;
-        pub const @"setPixelsWide:" = fn (objc.Integer) void;
-        pub const pixelsHigh = fn () objc.Integer;
-        pub const @"setPixelsHigh:" = fn (objc.Integer) void;
-        pub const layoutDirection = fn () ImageLayoutDirection;
-        pub const @"setLayoutDirection:" = fn (ImageLayoutDirection) void;
+        pub const @"-CGImageForProposedRect:context:hints:" = fn (?*cg.Rect, ?GraphicsContext, ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image;
+        pub const @"-size" = fn () cg.Size;
+        pub const @"-setSize:" = fn (cg.Size) void;
+        pub const @"-hasAlpha" = fn () bool;
+        pub const @"-setAlpha:" = fn (bool) void;
+        pub const @"-isOpaque" = fn () bool;
+        pub const @"-setOpaque:" = fn (bool) void;
+        pub const @"-colorSpaceName" = fn () foundation.String;
+        pub const @"-setColorSpaceName:" = fn (foundation.String) void;
+        pub const @"-bitsPerSample" = fn () objc.Integer;
+        pub const @"-setBitsPerSample:" = fn (objc.Integer) void;
+        pub const @"-pixelsWide" = fn () objc.Integer;
+        pub const @"-setPixelsWide:" = fn (objc.Integer) void;
+        pub const @"-pixelsHigh" = fn () objc.Integer;
+        pub const @"-setPixelsHigh:" = fn (objc.Integer) void;
+        pub const @"-layoutDirection" = fn () ImageLayoutDirection;
+        pub const @"-setLayoutDirection:" = fn (ImageLayoutDirection) void;
         pub const @"+registeredImageRepClasses" = fn () foundation.Array(objc.Object);
         pub const @"+imageUnfilteredTypes" = fn () foundation.Array(foundation.String);
         pub const @"+imageTypes" = fn () foundation.Array(foundation.String);
@@ -11818,12 +11818,12 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:]`
-    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: ?foundation.String, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
+    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: foundation.String, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
         return self.object.msgSend(?BitmapImageRep, "initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:", .{ planes, width, height, bps, spp, alpha, is_planar, color_space_name, r_bytes, p_bits });
     }
 
     /// `-[NSBitmapImageRep initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:]`
-    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBitmapFormatBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: ?foundation.String, bitmap_format: BitmapFormat, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
+    pub fn initWithBitmapDataPlanesPixelsWidePixelsHighBitsPerSampleSamplesPerPixelHasAlphaIsPlanarColorSpaceNameBitmapFormatBytesPerRowBitsPerPixel(self: Self, planes: ?[*]?[*]u8, width: objc.Integer, height: objc.Integer, bps: objc.Integer, spp: objc.Integer, alpha: bool, is_planar: bool, color_space_name: foundation.String, bitmap_format: BitmapFormat, r_bytes: objc.Integer, p_bits: objc.Integer) ?BitmapImageRep {
         return self.object.msgSend(?BitmapImageRep, "initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:", .{ planes, width, height, bps, spp, alpha, is_planar, color_space_name, bitmap_format, r_bytes, p_bits });
     }
 
@@ -11868,17 +11868,17 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSBitmapImageRep TIFFRepresentationUsingCompression:factor:]`
-    pub fn TIFFRepresentationUsingCompressionFactor(self: Self, comp: TIFFCompression, factor: f32) ?foundation.Data {
+    pub fn tiffRepresentationUsingCompressionFactor(self: Self, comp: TIFFCompression, factor: f32) ?foundation.Data {
         return self.object.msgSend(?foundation.Data, "TIFFRepresentationUsingCompression:factor:", .{ comp, factor });
     }
 
     /// `+[NSBitmapImageRep TIFFRepresentationOfImageRepsInArray:]`
-    pub fn TIFFRepresentationOfImageRepsInArray(array: foundation.Array(ImageRep)) ?foundation.Data {
+    pub fn tiffRepresentationOfImageRepsInArray(array: foundation.Array(ImageRep)) ?foundation.Data {
         return class().msgSend(?foundation.Data, "TIFFRepresentationOfImageRepsInArray:", .{array});
     }
 
     /// `+[NSBitmapImageRep TIFFRepresentationOfImageRepsInArray:usingCompression:factor:]`
-    pub fn TIFFRepresentationOfImageRepsInArrayUsingCompressionFactor(array: foundation.Array(ImageRep), comp: TIFFCompression, factor: f32) ?foundation.Data {
+    pub fn tiffRepresentationOfImageRepsInArrayUsingCompressionFactor(array: foundation.Array(ImageRep), comp: TIFFCompression, factor: f32) ?foundation.Data {
         return class().msgSend(?foundation.Data, "TIFFRepresentationOfImageRepsInArray:usingCompression:factor:", .{ array, comp, factor });
     }
 
@@ -11983,12 +11983,12 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSBitmapImageRep TIFFRepresentation]`
-    pub fn TIFFRepresentation(self: Self) ?foundation.Data {
+    pub fn tiffRepresentation(self: Self) ?foundation.Data {
         return self.object.msgSend(?foundation.Data, "TIFFRepresentation", .{});
     }
 
     /// `-[NSBitmapImageRep CGImage]`
-    pub fn CGImage(self: Self) ?cg.Image {
+    pub fn cgImage(self: Self) ?cg.Image {
         return self.object.msgSend(?cg.Image, "CGImage", .{});
     }
 
@@ -12008,12 +12008,12 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSBitmapImageRep setProperty:withValue:]`
-    pub fn setPropertyWithValue(self: Self, property: ?foundation.String, value: ?objc.Object) void {
+    pub fn setPropertyWithValue(self: Self, property: foundation.String, value: ?objc.Object) void {
         return self.object.msgSend(void, "setProperty:withValue:", .{ property, value });
     }
 
     /// `-[NSBitmapImageRep valueForProperty:]`
-    pub fn valueForProperty(self: Self, property: ?foundation.String) ?objc.Object {
+    pub fn valueForProperty(self: Self, property: foundation.String) ?objc.Object {
         return self.object.msgSend(?objc.Object, "valueForProperty:", .{property});
     }
 
@@ -12063,7 +12063,7 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `+[NSImageRep imageRepClassForPasteboardType:]`
-    pub fn imageRepClassForPasteboardType(@"type": ?foundation.String) ?objc.Class {
+    pub fn imageRepClassForPasteboardType(@"type": foundation.String) ?objc.Class {
         return class().msgSend(?objc.Class, "imageRepClassForPasteboardType:", .{@"type"});
     }
 
@@ -12138,7 +12138,7 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSImageRep CGImageForProposedRect:context:hints:]`
-    pub fn CGImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
+    pub fn cgImageForProposedRectContextHints(self: Self, proposed_dest_rect: ?*cg.Rect, context: ?GraphicsContext, hints: ?foundation.Dictionary(objc.Object, objc.Object)) ?cg.Image {
         return self.object.msgSend(?cg.Image, "CGImageForProposedRect:context:hints:", .{ proposed_dest_rect, context, hints });
     }
 
@@ -12173,12 +12173,12 @@ pub const BitmapImageRep = extern struct {
     }
 
     /// `-[NSImageRep colorSpaceName]`
-    pub fn colorSpaceName(self: Self) ?foundation.String {
-        return self.object.msgSend(?foundation.String, "colorSpaceName", .{});
+    pub fn colorSpaceName(self: Self) foundation.String {
+        return self.object.msgSend(foundation.String, "colorSpaceName", .{});
     }
 
     /// `-[NSImageRep setColorSpaceName:]`
-    pub fn setColorSpaceName(self: Self, color_space_name: ?foundation.String) void {
+    pub fn setColorSpaceName(self: Self, color_space_name: foundation.String) void {
         return self.object.msgSend(void, "setColorSpaceName:", .{color_space_name});
     }
 
@@ -12239,47 +12239,47 @@ pub const BitmapImageRep = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"initWithFocusedViewRect:" = fn (cg.Rect) ?BitmapImageRep;
-        pub const @"initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, ?foundation.String, objc.Integer, objc.Integer) ?BitmapImageRep;
-        pub const @"initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, ?foundation.String, BitmapFormat, objc.Integer, objc.Integer) ?BitmapImageRep;
-        pub const @"initWithCGImage:" = fn (cg.Image) BitmapImageRep;
-        pub const @"initWithCIImage:" = fn (objc.Object) BitmapImageRep;
+        pub const @"-initWithFocusedViewRect:" = fn (cg.Rect) ?BitmapImageRep;
+        pub const @"-initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, foundation.String, objc.Integer, objc.Integer) ?BitmapImageRep;
+        pub const @"-initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:" = fn (?[*]?[*]u8, objc.Integer, objc.Integer, objc.Integer, objc.Integer, bool, bool, foundation.String, BitmapFormat, objc.Integer, objc.Integer) ?BitmapImageRep;
+        pub const @"-initWithCGImage:" = fn (cg.Image) BitmapImageRep;
+        pub const @"-initWithCIImage:" = fn (objc.Object) BitmapImageRep;
         pub const @"+imageRepsWithData:" = fn (foundation.Data) foundation.Array(ImageRep);
         pub const @"+imageRepWithData:" = fn (foundation.Data) ?BitmapImageRep;
-        pub const @"initWithData:" = fn (foundation.Data) ?BitmapImageRep;
-        pub const @"getBitmapDataPlanes:" = fn (?[*]?[*]u8) void;
-        pub const @"getCompression:factor:" = fn (?objc.Object, ?*f32) void;
-        pub const @"setCompression:factor:" = fn (TIFFCompression, f32) void;
-        pub const @"TIFFRepresentationUsingCompression:factor:" = fn (TIFFCompression, f32) ?foundation.Data;
+        pub const @"-initWithData:" = fn (foundation.Data) ?BitmapImageRep;
+        pub const @"-getBitmapDataPlanes:" = fn (?[*]?[*]u8) void;
+        pub const @"-getCompression:factor:" = fn (?objc.Object, ?*f32) void;
+        pub const @"-setCompression:factor:" = fn (TIFFCompression, f32) void;
+        pub const @"-TIFFRepresentationUsingCompression:factor:" = fn (TIFFCompression, f32) ?foundation.Data;
         pub const @"+TIFFRepresentationOfImageRepsInArray:" = fn (foundation.Array(ImageRep)) ?foundation.Data;
         pub const @"+TIFFRepresentationOfImageRepsInArray:usingCompression:factor:" = fn (foundation.Array(ImageRep), TIFFCompression, f32) ?foundation.Data;
         pub const @"+getTIFFCompressionTypes:count:" = fn (?*objc.abi.Id, ?*objc.Integer) void;
         pub const @"+localizedNameForTIFFCompressionType:" = fn (TIFFCompression) ?foundation.String;
-        pub const @"canBeCompressedUsing:" = fn (TIFFCompression) bool;
-        pub const @"colorizeByMappingGray:toColor:blackMapping:whiteMapping:" = fn (cg.Float, ?Color, ?Color, ?Color) void;
-        pub const initForIncrementalLoad = fn () BitmapImageRep;
-        pub const @"incrementalLoadFromData:complete:" = fn (foundation.Data, bool) objc.Integer;
-        pub const @"setColor:atX:y:" = fn (Color, objc.Integer, objc.Integer) void;
-        pub const @"colorAtX:y:" = fn (objc.Integer, objc.Integer) ?Color;
-        pub const @"getPixel:atX:y:" = fn (?*objc.UInteger, objc.Integer, objc.Integer) void;
-        pub const @"setPixel:atX:y:" = fn (?*objc.UInteger, objc.Integer, objc.Integer) void;
-        pub const @"bitmapImageRepByConvertingToColorSpace:renderingIntent:" = fn (objc.Object, ColorRenderingIntent) ?BitmapImageRep;
-        pub const @"bitmapImageRepByRetaggingWithColorSpace:" = fn (objc.Object) ?BitmapImageRep;
-        pub const bitmapData = fn () ?[*]u8;
-        pub const isPlanar = fn () bool;
-        pub const samplesPerPixel = fn () objc.Integer;
-        pub const bitsPerPixel = fn () objc.Integer;
-        pub const bytesPerRow = fn () objc.Integer;
-        pub const bytesPerPlane = fn () objc.Integer;
-        pub const numberOfPlanes = fn () objc.Integer;
-        pub const bitmapFormat = fn () BitmapFormat;
-        pub const TIFFRepresentation = fn () ?foundation.Data;
-        pub const CGImage = fn () ?cg.Image;
-        pub const colorSpace = fn () objc.Object;
+        pub const @"-canBeCompressedUsing:" = fn (TIFFCompression) bool;
+        pub const @"-colorizeByMappingGray:toColor:blackMapping:whiteMapping:" = fn (cg.Float, ?Color, ?Color, ?Color) void;
+        pub const @"-initForIncrementalLoad" = fn () BitmapImageRep;
+        pub const @"-incrementalLoadFromData:complete:" = fn (foundation.Data, bool) objc.Integer;
+        pub const @"-setColor:atX:y:" = fn (Color, objc.Integer, objc.Integer) void;
+        pub const @"-colorAtX:y:" = fn (objc.Integer, objc.Integer) ?Color;
+        pub const @"-getPixel:atX:y:" = fn (?*objc.UInteger, objc.Integer, objc.Integer) void;
+        pub const @"-setPixel:atX:y:" = fn (?*objc.UInteger, objc.Integer, objc.Integer) void;
+        pub const @"-bitmapImageRepByConvertingToColorSpace:renderingIntent:" = fn (objc.Object, ColorRenderingIntent) ?BitmapImageRep;
+        pub const @"-bitmapImageRepByRetaggingWithColorSpace:" = fn (objc.Object) ?BitmapImageRep;
+        pub const @"-bitmapData" = fn () ?[*]u8;
+        pub const @"-isPlanar" = fn () bool;
+        pub const @"-samplesPerPixel" = fn () objc.Integer;
+        pub const @"-bitsPerPixel" = fn () objc.Integer;
+        pub const @"-bytesPerRow" = fn () objc.Integer;
+        pub const @"-bytesPerPlane" = fn () objc.Integer;
+        pub const @"-numberOfPlanes" = fn () objc.Integer;
+        pub const @"-bitmapFormat" = fn () BitmapFormat;
+        pub const @"-TIFFRepresentation" = fn () ?foundation.Data;
+        pub const @"-CGImage" = fn () ?cg.Image;
+        pub const @"-colorSpace" = fn () objc.Object;
         pub const @"+representationOfImageRepsInArray:usingType:properties:" = fn (foundation.Array(ImageRep), BitmapImageFileType, foundation.Dictionary(objc.Object, objc.Object)) ?foundation.Data;
-        pub const @"representationUsingType:properties:" = fn (BitmapImageFileType, foundation.Dictionary(objc.Object, objc.Object)) ?foundation.Data;
-        pub const @"setProperty:withValue:" = fn (?foundation.String, ?objc.Object) void;
-        pub const @"valueForProperty:" = fn (?foundation.String) ?objc.Object;
+        pub const @"-representationUsingType:properties:" = fn (BitmapImageFileType, foundation.Dictionary(objc.Object, objc.Object)) ?foundation.Data;
+        pub const @"-setProperty:withValue:" = fn (foundation.String, ?objc.Object) void;
+        pub const @"-valueForProperty:" = fn (foundation.String) ?objc.Object;
     };
 };
 
@@ -12542,51 +12542,51 @@ pub const ApplicationDelegate = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"applicationShouldTerminate:" = fn (Application) ApplicationTerminateReply;
-        pub const @"application:openURLs:" = fn (Application, foundation.Array(foundation.Url)) void;
-        pub const @"application:openFile:" = fn (Application, foundation.String) bool;
-        pub const @"application:openFiles:" = fn (Application, foundation.Array(foundation.String)) void;
-        pub const @"application:openTempFile:" = fn (Application, foundation.String) bool;
-        pub const @"applicationShouldOpenUntitledFile:" = fn (Application) bool;
-        pub const @"applicationOpenUntitledFile:" = fn (Application) bool;
-        pub const @"application:openFileWithoutUI:" = fn (objc.Object, foundation.String) bool;
-        pub const @"application:printFile:" = fn (Application, foundation.String) bool;
-        pub const @"application:printFiles:withSettings:showPrintPanels:" = fn (Application, foundation.Array(foundation.String), foundation.Dictionary(objc.Object, objc.Object), bool) ApplicationPrintReply;
-        pub const @"applicationShouldTerminateAfterLastWindowClosed:" = fn (Application) bool;
-        pub const @"applicationShouldHandleReopen:hasVisibleWindows:" = fn (Application, bool) bool;
-        pub const @"applicationDockMenu:" = fn (Application) ?Menu;
-        pub const @"application:willPresentError:" = fn (Application, foundation.ErrorObject) foundation.ErrorObject;
-        pub const @"application:didRegisterForRemoteNotificationsWithDeviceToken:" = fn (Application, foundation.Data) void;
-        pub const @"application:didFailToRegisterForRemoteNotificationsWithError:" = fn (Application, foundation.ErrorObject) void;
-        pub const @"application:didReceiveRemoteNotification:" = fn (Application, foundation.Dictionary(foundation.String, objc.Object)) void;
-        pub const @"applicationSupportsSecureRestorableState:" = fn (Application) bool;
-        pub const @"application:handlerForIntent:" = fn (Application, objc.Object) ?objc.Object;
-        pub const @"application:willEncodeRestorableState:" = fn (Application, objc.Object) void;
-        pub const @"application:didDecodeRestorableState:" = fn (Application, objc.Object) void;
-        pub const @"application:willContinueUserActivityWithType:" = fn (Application, foundation.String) bool;
-        pub const @"application:continueUserActivity:restorationHandler:" = fn (Application, objc.Object, objc.BlockRef(fn (foundation.Array(objc.Object)) void)) bool;
-        pub const @"application:didFailToContinueUserActivityWithType:error:" = fn (Application, foundation.String, foundation.ErrorObject) void;
-        pub const @"application:didUpdateUserActivity:" = fn (Application, objc.Object) void;
-        pub const @"application:userDidAcceptCloudKitShareWithMetadata:" = fn (Application, objc.Object) void;
-        pub const @"application:delegateHandlesKey:" = fn (Application, foundation.String) bool;
-        pub const @"applicationShouldAutomaticallyLocalizeKeyEquivalents:" = fn (Application) bool;
-        pub const @"applicationWillFinishLaunching:" = fn (objc.Object) void;
-        pub const @"applicationDidFinishLaunching:" = fn (objc.Object) void;
-        pub const @"applicationWillHide:" = fn (objc.Object) void;
-        pub const @"applicationDidHide:" = fn (objc.Object) void;
-        pub const @"applicationWillUnhide:" = fn (objc.Object) void;
-        pub const @"applicationDidUnhide:" = fn (objc.Object) void;
-        pub const @"applicationWillBecomeActive:" = fn (objc.Object) void;
-        pub const @"applicationDidBecomeActive:" = fn (objc.Object) void;
-        pub const @"applicationWillResignActive:" = fn (objc.Object) void;
-        pub const @"applicationDidResignActive:" = fn (objc.Object) void;
-        pub const @"applicationWillUpdate:" = fn (objc.Object) void;
-        pub const @"applicationDidUpdate:" = fn (objc.Object) void;
-        pub const @"applicationWillTerminate:" = fn (objc.Object) void;
-        pub const @"applicationDidChangeScreenParameters:" = fn (objc.Object) void;
-        pub const @"applicationDidChangeOcclusionState:" = fn (objc.Object) void;
-        pub const @"applicationProtectedDataWillBecomeUnavailable:" = fn (objc.Object) void;
-        pub const @"applicationProtectedDataDidBecomeAvailable:" = fn (objc.Object) void;
+        pub const @"-applicationShouldTerminate:" = fn (Application) ApplicationTerminateReply;
+        pub const @"-application:openURLs:" = fn (Application, foundation.Array(foundation.Url)) void;
+        pub const @"-application:openFile:" = fn (Application, foundation.String) bool;
+        pub const @"-application:openFiles:" = fn (Application, foundation.Array(foundation.String)) void;
+        pub const @"-application:openTempFile:" = fn (Application, foundation.String) bool;
+        pub const @"-applicationShouldOpenUntitledFile:" = fn (Application) bool;
+        pub const @"-applicationOpenUntitledFile:" = fn (Application) bool;
+        pub const @"-application:openFileWithoutUI:" = fn (objc.Object, foundation.String) bool;
+        pub const @"-application:printFile:" = fn (Application, foundation.String) bool;
+        pub const @"-application:printFiles:withSettings:showPrintPanels:" = fn (Application, foundation.Array(foundation.String), foundation.Dictionary(objc.Object, objc.Object), bool) ApplicationPrintReply;
+        pub const @"-applicationShouldTerminateAfterLastWindowClosed:" = fn (Application) bool;
+        pub const @"-applicationShouldHandleReopen:hasVisibleWindows:" = fn (Application, bool) bool;
+        pub const @"-applicationDockMenu:" = fn (Application) ?Menu;
+        pub const @"-application:willPresentError:" = fn (Application, foundation.ErrorObject) foundation.ErrorObject;
+        pub const @"-application:didRegisterForRemoteNotificationsWithDeviceToken:" = fn (Application, foundation.Data) void;
+        pub const @"-application:didFailToRegisterForRemoteNotificationsWithError:" = fn (Application, foundation.ErrorObject) void;
+        pub const @"-application:didReceiveRemoteNotification:" = fn (Application, foundation.Dictionary(foundation.String, objc.Object)) void;
+        pub const @"-applicationSupportsSecureRestorableState:" = fn (Application) bool;
+        pub const @"-application:handlerForIntent:" = fn (Application, objc.Object) ?objc.Object;
+        pub const @"-application:willEncodeRestorableState:" = fn (Application, objc.Object) void;
+        pub const @"-application:didDecodeRestorableState:" = fn (Application, objc.Object) void;
+        pub const @"-application:willContinueUserActivityWithType:" = fn (Application, foundation.String) bool;
+        pub const @"-application:continueUserActivity:restorationHandler:" = fn (Application, objc.Object, objc.BlockRef(fn (foundation.Array(objc.Object)) void)) bool;
+        pub const @"-application:didFailToContinueUserActivityWithType:error:" = fn (Application, foundation.String, foundation.ErrorObject) void;
+        pub const @"-application:didUpdateUserActivity:" = fn (Application, objc.Object) void;
+        pub const @"-application:userDidAcceptCloudKitShareWithMetadata:" = fn (Application, objc.Object) void;
+        pub const @"-application:delegateHandlesKey:" = fn (Application, foundation.String) bool;
+        pub const @"-applicationShouldAutomaticallyLocalizeKeyEquivalents:" = fn (Application) bool;
+        pub const @"-applicationWillFinishLaunching:" = fn (objc.Object) void;
+        pub const @"-applicationDidFinishLaunching:" = fn (objc.Object) void;
+        pub const @"-applicationWillHide:" = fn (objc.Object) void;
+        pub const @"-applicationDidHide:" = fn (objc.Object) void;
+        pub const @"-applicationWillUnhide:" = fn (objc.Object) void;
+        pub const @"-applicationDidUnhide:" = fn (objc.Object) void;
+        pub const @"-applicationWillBecomeActive:" = fn (objc.Object) void;
+        pub const @"-applicationDidBecomeActive:" = fn (objc.Object) void;
+        pub const @"-applicationWillResignActive:" = fn (objc.Object) void;
+        pub const @"-applicationDidResignActive:" = fn (objc.Object) void;
+        pub const @"-applicationWillUpdate:" = fn (objc.Object) void;
+        pub const @"-applicationDidUpdate:" = fn (objc.Object) void;
+        pub const @"-applicationWillTerminate:" = fn (objc.Object) void;
+        pub const @"-applicationDidChangeScreenParameters:" = fn (objc.Object) void;
+        pub const @"-applicationDidChangeOcclusionState:" = fn (objc.Object) void;
+        pub const @"-applicationProtectedDataWillBecomeUnavailable:" = fn (objc.Object) void;
+        pub const @"-applicationProtectedDataDidBecomeAvailable:" = fn (objc.Object) void;
     };
 };
 
@@ -12889,59 +12889,59 @@ pub const WindowDelegate = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"windowShouldClose:" = fn (Window) bool;
-        pub const @"windowWillReturnFieldEditor:toObject:" = fn (Window, ?objc.Object) ?objc.Object;
-        pub const @"windowWillResize:toSize:" = fn (Window, cg.Size) cg.Size;
-        pub const @"windowWillUseStandardFrame:defaultFrame:" = fn (Window, cg.Rect) cg.Rect;
-        pub const @"windowShouldZoom:toFrame:" = fn (Window, cg.Rect) bool;
-        pub const @"windowWillReturnUndoManager:" = fn (Window) ?objc.Object;
-        pub const @"window:willPositionSheet:usingRect:" = fn (Window, Window, cg.Rect) cg.Rect;
-        pub const @"window:shouldPopUpDocumentPathMenu:" = fn (Window, Menu) bool;
-        pub const @"window:shouldDragDocumentWithEvent:from:withPasteboard:" = fn (Window, Event, cg.Point, objc.Object) bool;
-        pub const @"window:willUseFullScreenContentSize:" = fn (Window, cg.Size) cg.Size;
-        pub const @"window:willUseFullScreenPresentationOptions:" = fn (Window, ApplicationPresentationOptions) ApplicationPresentationOptions;
-        pub const @"customWindowsToEnterFullScreenForWindow:" = fn (Window) ?foundation.Array(Window);
-        pub const @"window:startCustomAnimationToEnterFullScreenWithDuration:" = fn (Window, f64) void;
-        pub const @"windowDidFailToEnterFullScreen:" = fn (Window) void;
-        pub const @"customWindowsToExitFullScreenForWindow:" = fn (Window) ?foundation.Array(Window);
-        pub const @"window:startCustomAnimationToExitFullScreenWithDuration:" = fn (Window, f64) void;
-        pub const @"customWindowsToEnterFullScreenForWindow:onScreen:" = fn (Window, Screen) ?foundation.Array(Window);
-        pub const @"window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:" = fn (Window, Screen, f64) void;
-        pub const @"windowDidFailToExitFullScreen:" = fn (Window) void;
-        pub const @"window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:" = fn (Window, cg.Size, cg.Size) cg.Size;
-        pub const @"window:willEncodeRestorableState:" = fn (Window, objc.Object) void;
-        pub const @"window:didDecodeRestorableState:" = fn (Window, objc.Object) void;
-        pub const @"previewRepresentableActivityItemsForWindow:" = fn (Window) ?foundation.Array(objc.Object);
-        pub const @"windowForSharingRequestFromWindow:" = fn (Window) ?Window;
-        pub const @"windowDidResize:" = fn (objc.Object) void;
-        pub const @"windowDidExpose:" = fn (objc.Object) void;
-        pub const @"windowWillMove:" = fn (objc.Object) void;
-        pub const @"windowDidMove:" = fn (objc.Object) void;
-        pub const @"windowDidBecomeKey:" = fn (objc.Object) void;
-        pub const @"windowDidResignKey:" = fn (objc.Object) void;
-        pub const @"windowDidBecomeMain:" = fn (objc.Object) void;
-        pub const @"windowDidResignMain:" = fn (objc.Object) void;
-        pub const @"windowWillClose:" = fn (objc.Object) void;
-        pub const @"windowWillMiniaturize:" = fn (objc.Object) void;
-        pub const @"windowDidMiniaturize:" = fn (objc.Object) void;
-        pub const @"windowDidDeminiaturize:" = fn (objc.Object) void;
-        pub const @"windowDidUpdate:" = fn (objc.Object) void;
-        pub const @"windowDidChangeScreen:" = fn (objc.Object) void;
-        pub const @"windowDidChangeScreenProfile:" = fn (objc.Object) void;
-        pub const @"windowDidChangeBackingProperties:" = fn (objc.Object) void;
-        pub const @"windowWillBeginSheet:" = fn (objc.Object) void;
-        pub const @"windowDidEndSheet:" = fn (objc.Object) void;
-        pub const @"windowWillStartLiveResize:" = fn (objc.Object) void;
-        pub const @"windowDidEndLiveResize:" = fn (objc.Object) void;
-        pub const @"windowWillEnterFullScreen:" = fn (objc.Object) void;
-        pub const @"windowDidEnterFullScreen:" = fn (objc.Object) void;
-        pub const @"windowWillExitFullScreen:" = fn (objc.Object) void;
-        pub const @"windowDidExitFullScreen:" = fn (objc.Object) void;
-        pub const @"windowWillEnterVersionBrowser:" = fn (objc.Object) void;
-        pub const @"windowDidEnterVersionBrowser:" = fn (objc.Object) void;
-        pub const @"windowWillExitVersionBrowser:" = fn (objc.Object) void;
-        pub const @"windowDidExitVersionBrowser:" = fn (objc.Object) void;
-        pub const @"windowDidChangeOcclusionState:" = fn (objc.Object) void;
+        pub const @"-windowShouldClose:" = fn (Window) bool;
+        pub const @"-windowWillReturnFieldEditor:toObject:" = fn (Window, ?objc.Object) ?objc.Object;
+        pub const @"-windowWillResize:toSize:" = fn (Window, cg.Size) cg.Size;
+        pub const @"-windowWillUseStandardFrame:defaultFrame:" = fn (Window, cg.Rect) cg.Rect;
+        pub const @"-windowShouldZoom:toFrame:" = fn (Window, cg.Rect) bool;
+        pub const @"-windowWillReturnUndoManager:" = fn (Window) ?objc.Object;
+        pub const @"-window:willPositionSheet:usingRect:" = fn (Window, Window, cg.Rect) cg.Rect;
+        pub const @"-window:shouldPopUpDocumentPathMenu:" = fn (Window, Menu) bool;
+        pub const @"-window:shouldDragDocumentWithEvent:from:withPasteboard:" = fn (Window, Event, cg.Point, objc.Object) bool;
+        pub const @"-window:willUseFullScreenContentSize:" = fn (Window, cg.Size) cg.Size;
+        pub const @"-window:willUseFullScreenPresentationOptions:" = fn (Window, ApplicationPresentationOptions) ApplicationPresentationOptions;
+        pub const @"-customWindowsToEnterFullScreenForWindow:" = fn (Window) ?foundation.Array(Window);
+        pub const @"-window:startCustomAnimationToEnterFullScreenWithDuration:" = fn (Window, f64) void;
+        pub const @"-windowDidFailToEnterFullScreen:" = fn (Window) void;
+        pub const @"-customWindowsToExitFullScreenForWindow:" = fn (Window) ?foundation.Array(Window);
+        pub const @"-window:startCustomAnimationToExitFullScreenWithDuration:" = fn (Window, f64) void;
+        pub const @"-customWindowsToEnterFullScreenForWindow:onScreen:" = fn (Window, Screen) ?foundation.Array(Window);
+        pub const @"-window:startCustomAnimationToEnterFullScreenOnScreen:withDuration:" = fn (Window, Screen, f64) void;
+        pub const @"-windowDidFailToExitFullScreen:" = fn (Window) void;
+        pub const @"-window:willResizeForVersionBrowserWithMaxPreferredSize:maxAllowedSize:" = fn (Window, cg.Size, cg.Size) cg.Size;
+        pub const @"-window:willEncodeRestorableState:" = fn (Window, objc.Object) void;
+        pub const @"-window:didDecodeRestorableState:" = fn (Window, objc.Object) void;
+        pub const @"-previewRepresentableActivityItemsForWindow:" = fn (Window) ?foundation.Array(objc.Object);
+        pub const @"-windowForSharingRequestFromWindow:" = fn (Window) ?Window;
+        pub const @"-windowDidResize:" = fn (objc.Object) void;
+        pub const @"-windowDidExpose:" = fn (objc.Object) void;
+        pub const @"-windowWillMove:" = fn (objc.Object) void;
+        pub const @"-windowDidMove:" = fn (objc.Object) void;
+        pub const @"-windowDidBecomeKey:" = fn (objc.Object) void;
+        pub const @"-windowDidResignKey:" = fn (objc.Object) void;
+        pub const @"-windowDidBecomeMain:" = fn (objc.Object) void;
+        pub const @"-windowDidResignMain:" = fn (objc.Object) void;
+        pub const @"-windowWillClose:" = fn (objc.Object) void;
+        pub const @"-windowWillMiniaturize:" = fn (objc.Object) void;
+        pub const @"-windowDidMiniaturize:" = fn (objc.Object) void;
+        pub const @"-windowDidDeminiaturize:" = fn (objc.Object) void;
+        pub const @"-windowDidUpdate:" = fn (objc.Object) void;
+        pub const @"-windowDidChangeScreen:" = fn (objc.Object) void;
+        pub const @"-windowDidChangeScreenProfile:" = fn (objc.Object) void;
+        pub const @"-windowDidChangeBackingProperties:" = fn (objc.Object) void;
+        pub const @"-windowWillBeginSheet:" = fn (objc.Object) void;
+        pub const @"-windowDidEndSheet:" = fn (objc.Object) void;
+        pub const @"-windowWillStartLiveResize:" = fn (objc.Object) void;
+        pub const @"-windowDidEndLiveResize:" = fn (objc.Object) void;
+        pub const @"-windowWillEnterFullScreen:" = fn (objc.Object) void;
+        pub const @"-windowDidEnterFullScreen:" = fn (objc.Object) void;
+        pub const @"-windowWillExitFullScreen:" = fn (objc.Object) void;
+        pub const @"-windowDidExitFullScreen:" = fn (objc.Object) void;
+        pub const @"-windowWillEnterVersionBrowser:" = fn (objc.Object) void;
+        pub const @"-windowDidEnterVersionBrowser:" = fn (objc.Object) void;
+        pub const @"-windowWillExitVersionBrowser:" = fn (objc.Object) void;
+        pub const @"-windowDidExitVersionBrowser:" = fn (objc.Object) void;
+        pub const @"-windowDidChangeOcclusionState:" = fn (objc.Object) void;
     };
 };
 
@@ -13019,14 +13019,14 @@ pub const MenuDelegate = extern struct {
 
     /// Each method's signature, for `objc.Subclass` to check overrides against.
     pub const signatures = struct {
-        pub const @"menuNeedsUpdate:" = fn (Menu) void;
-        pub const @"numberOfItemsInMenu:" = fn (Menu) objc.Integer;
-        pub const @"menu:updateItem:atIndex:shouldCancel:" = fn (Menu, MenuItem, objc.Integer, bool) bool;
-        pub const @"menuHasKeyEquivalent:forEvent:target:action:" = fn (Menu, Event, [*]objc.Nullable(objc.Object), objc.Object) bool;
-        pub const @"menuWillOpen:" = fn (Menu) void;
-        pub const @"menuDidClose:" = fn (Menu) void;
-        pub const @"menu:willHighlightItem:" = fn (Menu, ?MenuItem) void;
-        pub const @"confinementRectForMenu:onScreen:" = fn (Menu, ?Screen) cg.Rect;
+        pub const @"-menuNeedsUpdate:" = fn (Menu) void;
+        pub const @"-numberOfItemsInMenu:" = fn (Menu) objc.Integer;
+        pub const @"-menu:updateItem:atIndex:shouldCancel:" = fn (Menu, MenuItem, objc.Integer, bool) bool;
+        pub const @"-menuHasKeyEquivalent:forEvent:target:action:" = fn (Menu, Event, [*]objc.Nullable(objc.Object), objc.Object) bool;
+        pub const @"-menuWillOpen:" = fn (Menu) void;
+        pub const @"-menuDidClose:" = fn (Menu) void;
+        pub const @"-menu:willHighlightItem:" = fn (Menu, ?MenuItem) void;
+        pub const @"-confinementRectForMenu:onScreen:" = fn (Menu, ?Screen) cg.Rect;
     };
 };
 
@@ -13093,15 +13093,21 @@ pub fn deviceBlackColorSpace() foundation.String {
 }
 
 /// `NSBestDepth`.
-pub fn bestDepth(color_space: ?foundation.String, bps: objc.Integer, bpp: objc.Integer, planar: bool, exact_match: ?*bool) WindowDepth {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String), objc.abi.Abi(objc.Integer), objc.abi.Abi(objc.Integer), objc.abi.Abi(bool), objc.abi.Abi(?*bool)) callconv(.c) objc.abi.Abi(WindowDepth), .{ .name = "NSBestDepth", .linkage = .weak }) orelse missing("NSBestDepth");
-    return objc.abi.fromAbi(WindowDepth, function(objc.abi.toAbi(?foundation.String, color_space), objc.abi.toAbi(objc.Integer, bps), objc.abi.toAbi(objc.Integer, bpp), objc.abi.toAbi(bool, planar), objc.abi.toAbi(?*bool, exact_match)));
+pub fn bestDepth(color_space: foundation.String, bps: objc.Integer, bpp: objc.Integer, planar: bool, exact_match: ?*bool) WindowDepth {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String), objc.abi.Abi(objc.Integer), objc.abi.Abi(objc.Integer), objc.abi.Abi(bool), objc.abi.Abi(?*bool)) callconv(.c) objc.abi.Abi(WindowDepth), .{ .name = "NSBestDepth", .linkage = .weak }) orelse missing("NSBestDepth");
+    return objc.abi.fromAbi(WindowDepth, function(objc.abi.toAbi(foundation.String, color_space), objc.abi.toAbi(objc.Integer, bps), objc.abi.toAbi(objc.Integer, bpp), objc.abi.toAbi(bool, planar), objc.abi.toAbi(?*bool, exact_match)));
 }
 
 /// `NSPlanarFromDepth`.
 pub fn planarFromDepth(depth: WindowDepth) bool {
     const function = @extern(?*const fn (objc.abi.Abi(WindowDepth)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSPlanarFromDepth", .linkage = .weak }) orelse missing("NSPlanarFromDepth");
     return objc.abi.fromAbi(bool, function(objc.abi.toAbi(WindowDepth, depth)));
+}
+
+/// `NSColorSpaceFromDepth`.
+pub fn colorSpaceFromDepth(depth: WindowDepth) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(WindowDepth)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSColorSpaceFromDepth", .linkage = .weak }) orelse missing("NSColorSpaceFromDepth");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(WindowDepth, depth)));
 }
 
 /// `NSBitsPerSampleFromDepth`.
@@ -13117,9 +13123,9 @@ pub fn bitsPerPixelFromDepth(depth: WindowDepth) objc.Integer {
 }
 
 /// `NSNumberOfColorComponents`.
-pub fn numberOfColorComponents(color_space_name: ?foundation.String) objc.Integer {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSNumberOfColorComponents", .linkage = .weak }) orelse missing("NSNumberOfColorComponents");
-    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(?foundation.String, color_space_name)));
+pub fn numberOfColorComponents(color_space_name: foundation.String) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSNumberOfColorComponents", .linkage = .weak }) orelse missing("NSNumberOfColorComponents");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(foundation.String, color_space_name)));
 }
 
 /// `NSAvailableWindowDepths`.
@@ -15709,9 +15715,9 @@ pub fn accessibilityAnnouncementKey() foundation.String {
 }
 
 /// `NSAccessibilityPostNotificationWithUserInfo`.
-pub fn accessibilityPostNotificationWithUserInfo(element: objc.Object, notification: ?foundation.String, user_info: ?foundation.Dictionary(objc.Object, objc.Object)) void {
-    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(?foundation.String), objc.abi.Abi(?foundation.Dictionary(objc.Object, objc.Object))) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotificationWithUserInfo", .linkage = .weak }) orelse missing("NSAccessibilityPostNotificationWithUserInfo");
-    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(?foundation.String, notification), objc.abi.toAbi(?foundation.Dictionary(objc.Object, objc.Object), user_info)));
+pub fn accessibilityPostNotificationWithUserInfo(element: objc.Object, notification: foundation.String, user_info: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(foundation.String), objc.abi.Abi(?foundation.Dictionary(objc.Object, objc.Object))) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotificationWithUserInfo", .linkage = .weak }) orelse missing("NSAccessibilityPostNotificationWithUserInfo");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(foundation.String, notification), objc.abi.toAbi(?foundation.Dictionary(objc.Object, objc.Object), user_info)));
 }
 
 /// `NSAccessibilityUIElementsForSearchPredicateParameterizedAttribute`.
@@ -16369,9 +16375,9 @@ pub fn accessibilitySetMayContainProtectedContent(flag: bool) bool {
 }
 
 /// `NSAccessibilityRoleDescription`.
-pub fn accessibilityRoleDescription(role: ?foundation.String, subrole: ?foundation.String) ?foundation.String {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityRoleDescription", .linkage = .weak }) orelse missing("NSAccessibilityRoleDescription");
-    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, role), objc.abi.toAbi(?foundation.String, subrole)));
+pub fn accessibilityRoleDescription(role: foundation.String, subrole: ?foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityRoleDescription", .linkage = .weak }) orelse missing("NSAccessibilityRoleDescription");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(foundation.String, role), objc.abi.toAbi(?foundation.String, subrole)));
 }
 
 /// `NSAccessibilityRoleDescriptionForUIElement`.
@@ -16381,9 +16387,9 @@ pub fn accessibilityRoleDescriptionForUIElement(element: objc.Object) ?foundatio
 }
 
 /// `NSAccessibilityActionDescription`.
-pub fn accessibilityActionDescription(action: ?foundation.String) ?foundation.String {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityActionDescription", .linkage = .weak }) orelse missing("NSAccessibilityActionDescription");
-    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, action)));
+pub fn accessibilityActionDescription(action: foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityActionDescription", .linkage = .weak }) orelse missing("NSAccessibilityActionDescription");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(foundation.String, action)));
 }
 
 /// `NSAccessibilityRaiseBadArgumentException`.
@@ -16417,9 +16423,9 @@ pub fn accessibilityUnignoredChildrenForOnlyChild(original_child: objc.Object) f
 }
 
 /// `NSAccessibilityPostNotification`.
-pub fn accessibilityPostNotification(element: objc.Object, notification: ?foundation.String) void {
-    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotification", .linkage = .weak }) orelse missing("NSAccessibilityPostNotification");
-    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(?foundation.String, notification)));
+pub fn accessibilityPostNotification(element: objc.Object, notification: foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotification", .linkage = .weak }) orelse missing("NSAccessibilityPostNotification");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(foundation.String, notification)));
 }
 
 /// `NSPasteboardTypeString`.
@@ -16638,10 +16644,22 @@ pub fn fileContentsPboardType() foundation.String {
     return objc.abi.fromAbi(foundation.String, symbol.*);
 }
 
+/// `NSCreateFilenamePboardType`. What it returns is yours to release.
+pub fn createFilenamePboardType(file_type: foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSCreateFilenamePboardType", .linkage = .weak }) orelse missing("NSCreateFilenamePboardType");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(foundation.String, file_type)));
+}
+
+/// `NSCreateFileContentsPboardType`. What it returns is yours to release.
+pub fn createFileContentsPboardType(file_type: foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSCreateFileContentsPboardType", .linkage = .weak }) orelse missing("NSCreateFileContentsPboardType");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(foundation.String, file_type)));
+}
+
 /// `NSGetFileType`.
-pub fn getFileType(pboard_type: ?foundation.String) ?foundation.String {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSGetFileType", .linkage = .weak }) orelse missing("NSGetFileType");
-    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, pboard_type)));
+pub fn getFileType(pboard_type: foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSGetFileType", .linkage = .weak }) orelse missing("NSGetFileType");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(foundation.String, pboard_type)));
 }
 
 /// `NSGetFileTypes`.
@@ -18097,15 +18115,15 @@ pub fn performService(item_name: foundation.String, pboard: ?objc.Object) bool {
 }
 
 /// `NSRegisterServicesProvider`.
-pub fn registerServicesProvider(provider: ?objc.Object, name: ?foundation.String) void {
-    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRegisterServicesProvider", .linkage = .weak }) orelse missing("NSRegisterServicesProvider");
-    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, provider), objc.abi.toAbi(?foundation.String, name)));
+pub fn registerServicesProvider(provider: ?objc.Object, name: foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object), objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRegisterServicesProvider", .linkage = .weak }) orelse missing("NSRegisterServicesProvider");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, provider), objc.abi.toAbi(foundation.String, name)));
 }
 
 /// `NSUnregisterServicesProvider`.
-pub fn unregisterServicesProvider(name: ?foundation.String) void {
-    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSUnregisterServicesProvider", .linkage = .weak }) orelse missing("NSUnregisterServicesProvider");
-    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?foundation.String, name)));
+pub fn unregisterServicesProvider(name: foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSUnregisterServicesProvider", .linkage = .weak }) orelse missing("NSUnregisterServicesProvider");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(foundation.String, name)));
 }
 
 /// `NSApplicationDidBecomeActiveNotification`.
@@ -22201,14 +22219,11 @@ pub fn textContentStorageUnsupportedAttributeAddedNotification() foundation.Stri
 }
 
 // Not generated:
-//   NSColorSpaceFromDepth: NSColorSpaceName  _Nullable
 //   NSRectFillListWithColors()
 //   NSRectFillListWithColorsUsingOperation()
 //   NSDrawBitmap()
 //   NSSetFocusRingStyle()
 //   NSShowAnimationEffect()
-//   NSCreateFilenamePboardType: NSPasteboardType  _Nullable
-//   NSCreateFileContentsPboardType: NSPasteboardType  _Nullable
 //   NSDirectionalEdgeInsetsZero: const NSDirectionalEdgeInsets
 //   NSConvertGlyphsToPackedGlyphs()
 //   NSOpenGLSetOption()

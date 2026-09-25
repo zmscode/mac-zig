@@ -302,7 +302,7 @@ pub fn Subclass(comptime options_: anytype, comptime State_: type) type {
             for (@typeInfo(State).@"struct".decl_names) |decl| {
                 const Receiver = receiverOf(decl);
                 if (Receiver == void) continue;
-                const key = (if (Receiver == Class) "+" else "") ++ decl;
+                const key = (if (Receiver == Class) "+" else "-") ++ decl;
                 const found = findSignature(key) orelse continue;
                 checkSignature(decl, found.owner, found.Signature, @TypeOf(@field(State, decl)));
             }

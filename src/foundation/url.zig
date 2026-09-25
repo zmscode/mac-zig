@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 const cf = @import("../cf.zig");
 const errors = @import("../errors.zig");
 const String = @import("string.zig").String;
@@ -29,6 +30,12 @@ pub const Url = extern struct {
         const string = try String.init(text);
         defer string.deinit();
         return class().msgSend(Object, "alloc", .{}).msgSend(?Url, "initWithString:", .{string}) orelse Error.Failed;
+    }
+
+    /// Every method `NSURL` has -- this is the everyday part -- as the
+    /// generated wrapper for the same object.
+    pub fn all(self: Url) generated.URL {
+        return .from(self.object);
     }
 
     pub fn deinit(self: Url) void {

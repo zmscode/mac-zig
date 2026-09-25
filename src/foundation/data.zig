@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const objc = @import("../objc/objc.zig");
+const generated = @import("generated.zig");
 const cf = @import("../cf.zig");
 const errors = @import("../errors.zig");
 const error_object = @import("error_object.zig");
@@ -51,6 +52,12 @@ pub const Data = extern struct {
         // NSDataWritingAtomic
         const ok = self.object.msgSend(bool, "writeToFile:options:error:", .{ path_string, @as(objc.UInteger, 1), &slot.id });
         try slot.finish(ok, details);
+    }
+
+    /// Every method `NSData` has -- this is the everyday part -- as the
+    /// generated wrapper for the same object.
+    pub fn all(self: Data) generated.Data {
+        return .from(self.object);
     }
 
     pub fn deinit(self: Data) void {
