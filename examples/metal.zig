@@ -192,6 +192,7 @@ fn snapshot(renderer: *Renderer, device: metal.Device, path: []const u8) !void {
         .provider = provider,
     });
     defer image.deinit();
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{path});
     try cg.imageio.writeImage(image, path, .png, .{});
     print("wrote {s} ({d}x{d}) on {f}\n", .{ path, width, height, device.name() });
 }

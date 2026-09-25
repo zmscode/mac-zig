@@ -491,6 +491,8 @@ const pipeline = try metal.newRenderPipelineState(device, desc, null);        //
 - On screen: `appkit.MetalView.init(.{ .frame = rect }, &renderer, Renderer)` with
   `pub fn draw(*Renderer, appkit.MetalView.Frame) void` (and optional `resized`). In `draw`:
   `frame.queue.commandBuffer()`, `frame.renderPass(clear)`, encode, `frame.present(commands)`.
+  Timed by the view's display link (macOS 14+), else `CVDisplayLink` (with `-Dcorevideo`), else a
+  60 Hz timer; force one with `.timing = .core_video` / `.timer`. `draw` is always on main.
 - To wrap more of Metal, edit `tools/objc_gen/metal.zig` and `zig build generate`.
 
 IOSurface — one buffer for the CPU, the GPU, a layer and other processes:

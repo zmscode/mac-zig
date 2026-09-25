@@ -169,6 +169,7 @@ fn saveSnapshot(view: appkit.View, path: []const u8) !void {
     const rep = view.bitmapImageRepForCachingDisplayInRect(bounds) orelse return error.Failed;
     view.cacheDisplayInRectToBitmapImageRep(bounds, rep);
     const image = rep.cgImage() orelse return error.Failed; // borrowed from the rep
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{path});
     try cg.imageio.writeImage(image, path, .png, .{});
     print("wrote {s} ({d}x{d})\n", .{ path, image.width(), image.height() });
 }

@@ -75,6 +75,7 @@ pub fn main() !void {
     ctx.setFillColor(.hex(0xFF00FF)); // deliberately not what gets used
     try cg.text.draw(ctx, "zig build run-text", mono_font, .init(40, 215), accent);
 
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{"text.png"});
     try cg.imageio.writeContext(ctx, "text.png", .png, .{});
     std.debug.print("wrote text.png ({d}x{d})\n", .{ width, height });
 }

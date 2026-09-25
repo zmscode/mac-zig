@@ -750,7 +750,10 @@ window.setContentView(view.asView());
 
 The loop starts when the view goes into a window and stops when it leaves one, skips frames
 while the window is hidden, and gives each frame its own autorelease pool. Before macOS 14,
-which has no display link for a view, a 60 Hz timer stands in.
+which has no display link for a view, CoreVideo's `CVDisplayLink` stands in — at the display's
+real rate, its ticks forwarded to the main thread and dropped while one is still waiting there —
+or, without `-Dcorevideo`, a 60 Hz timer. `.timing = .core_video` or `.timer` picks one on any
+macOS; the tests run all three.
 
 ```sh
 zig build run-metal                              # a spinning triangle
@@ -810,7 +813,8 @@ encoder.setFragmentTextureAtIndex(texture.texture(), 0);
 
 `DisplayLink` calls a Zig function once per refresh, on CoreVideo's own thread, with the time
 the frame will reach the screen. Apple deprecated it in macOS 15 in favour of AppKit's per-view
-display links (which `MetalView` uses); it remains the one that needs no view.
+display links (which `MetalView` uses, falling back to this one before macOS 14); it remains
+the one that needs no view.
 
 ```zig
 const link = try corevideo.DisplayLink.init();

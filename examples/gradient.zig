@@ -96,6 +96,7 @@ pub fn main() !void {
         ctx.drawConicGradient(wheel, .init(210, 210), 0);
     }
 
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{"gradient.png"});
     try cg.imageio.writeContext(ctx, "gradient.png", .png, .{});
     std.debug.print("wrote gradient.png ({d}x{d})\n", .{ width, height });
 }

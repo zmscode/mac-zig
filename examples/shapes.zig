@@ -110,6 +110,7 @@ pub fn main() !void {
         ctx.fillEllipseInRect(.init(395, 70, 70, 70));
     }
 
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{"shapes.png"});
     try cg.imageio.writeContext(ctx, "shapes.png", .png, .{});
     std.debug.print("wrote shapes.png ({d}x{d})\n", .{ width, height });
 }

@@ -116,6 +116,7 @@ fn readBack(path: []const u8) !void {
     ctx.concat(page.drawingTransform(.media, box, 0, true));
     ctx.drawPdfPage(page);
 
+    if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{"page-2.png"});
     try cg.imageio.writeContext(ctx, "page-2.png", .png, .{});
     std.debug.print("wrote page-2.png ({d}x{d})\n", .{
         ctx.bitmapWidth(),

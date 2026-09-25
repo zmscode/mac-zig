@@ -289,6 +289,50 @@ const build_options = @import("mac_build_options");
 const raw = @import("mac_raw");
 
 test "a MetalView draws frames from its display link" {
+    try drawsFrames(.automatic);
+}
+
+test "a MetalView draws frames from CoreVideo's display link" {
+    // Without -Dcorevideo this falls back to the timer, which is still worth running.
+    try drawsFrames(.core_video);
+}
+
+test "a MetalView draws frames from a timer" {
+    try drawsFrames(.timer);
+}
+
+test "a MetalView freed with a CoreVideo tick still on its way is left alone by it" {
+    if (!build_options.metal or !build_options.corevideo) return error.SkipZigTest;
+    const metal = @import("../metal/metal.zig");
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+    _ = appkit.Application.sharedApplication();
+    if (metal.createSystemDefaultDevice()) |device| device.release() else return error.SkipZigTest;
+
+    const Nothing = struct {
+        pub fn draw(_: *@This(), _: appkit.MetalView.Frame) void {}
+    };
+    var nothing: Nothing = .{};
+    for (0..5) |_| {
+        const view = try appkit.MetalView.init(.{ .frame = .init(0, 0, 16, 16), .timing = .core_video }, &nothing, Nothing);
+        const window = appkit.Window.alloc().initWithContentRectStyleMaskBackingDefer(.init(0, 0, 16, 16), .borderless, .buffered, false);
+        window.setReleasedWhenClosed(false);
+        window.setContentView(view.asView());
+        window.setAlphaValue(0);
+        window.orderFront(null);
+        // Long enough for CoreVideo to tick and post to the main queue, but
+        // the main queue is not run before the view goes.
+        std.Io.sleep(std.testing.io, .fromMilliseconds(40), .awake) catch {};
+        window.orderOut(null);
+        window.setContentView(null);
+        window.release();
+        view.deinit();
+    }
+    // Now deliver whatever was posted: it must find the views gone.
+    _ = raw.CFRunLoopRunInMode(raw.kCFRunLoopDefaultMode, 0.1, 0);
+}
+
+fn drawsFrames(timing: anytype) !void {
     if (!build_options.metal) return error.SkipZigTest;
     const metal = @import("../metal/metal.zig");
 
@@ -321,7 +365,7 @@ test "a MetalView draws frames from its display link" {
     };
     var counter: Counter = .{};
 
-    const view = try appkit.MetalView.init(.{ .frame = .init(0, 0, 64, 32) }, &counter, Counter);
+    const view = try appkit.MetalView.init(.{ .frame = .init(0, 0, 64, 32), .timing = timing }, &counter, Counter);
     defer view.deinit();
     try std.testing.expect(counter.resizes >= 1);
 

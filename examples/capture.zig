@@ -127,6 +127,7 @@ pub fn main(init: std.process.Init) !void {
             return err;
         };
         defer image.deinit();
+        if (!mac.features.imageio) return std.debug.print("built without -Dimageio: not writing {s}\n", .{path});
         try cg.imageio.writeImage(image, path, .png, .{});
         print("wrote {s}: {d}x{d}\n", .{ path, image.width(), image.height() });
         return;

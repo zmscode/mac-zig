@@ -27,9 +27,11 @@
 //! Drawing is driven by a display link -- a callback timed to the screen
 //! the view is on, at its refresh rate, ProMotion included -- which starts
 //! when the view goes into a window and stops when it leaves one. Before
-//! macOS 14, which has no display link for a view, a 60 Hz timer stands
-//! in. Everything runs on the main thread, and each frame has its own
-//! autorelease pool.
+//! macOS 14, which has no display link for a view, CoreVideo's display
+//! link stands in (under `-Dcorevideo`; a 60 Hz timer without it), its
+//! ticks forwarded to the main thread. `Options.timing` picks one
+//! explicitly. Drawing always runs on the main thread, and each frame has
+//! its own autorelease pool.
 //!
 //! A frame is skipped while the window is hidden or minimised, and when no
 //! drawable is free -- which is how a frame that runs long shows up.
@@ -41,6 +43,9 @@ const cg = @import("../cg/cg.zig");
 const metal = @import("../metal/metal.zig");
 const errors = @import("../errors.zig");
 const generated = @import("generated.zig");
+const dispatch = @import("../dispatch/dispatch.zig");
+const has_corevideo = @import("mac_build_options").corevideo;
+const corevideo = if (has_corevideo) @import("../corevideo/corevideo.zig") else struct {};
 
 const Error = errors.Error;
 
@@ -58,6 +63,20 @@ pub const MetalView = struct {
         /// Leave false unless the drawable's texture must be sampled or
         /// read back; true lets Metal keep it in a faster, write-only form.
         readable: bool = false,
+        /// What times the frames.
+        timing: Timing = .automatic,
+    };
+
+    pub const Timing = enum {
+        /// The view's own display link on macOS 14 and later; before that,
+        /// `core_video` if the package has it, else `timer`.
+        automatic,
+        /// `CVDisplayLink`, on CoreVideo's thread, forwarded to the main
+        /// thread -- a tick that arrives while the last is still waiting
+        /// there is dropped. Needs `-Dcorevideo`; falls back to `timer`.
+        core_video,
+        /// A 60 Hz `NSTimer`, whatever the display's rate.
+        timer,
     };
 
     /// One frame's worth of what `draw` needs.
@@ -133,6 +152,7 @@ pub const MetalView = struct {
             .device = gpu,
             .queue = queue,
             .layer = metal_layer,
+            .timing = options.timing,
         };
 
         // Layer-hosting: the view shows exactly this layer.
@@ -176,7 +196,9 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
     device: ?metal.Device = null,
     queue: ?metal.CommandQueue = null,
     layer: ?metal.MetalLayer = null,
+    timing: MetalView.Timing = .automatic,
     ticker: ?objc.Object = null,
+    forwarder: ?*Forwarder = null,
     pixels: cg.Size = .zero,
     started: f64 = 0,
     last: f64 = 0,
@@ -238,13 +260,21 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
     }
 
     fn start(self: *Self, instance: Instance) void {
-        if (self.ticker != null) return;
+        if (self.ticker != null or self.forwarder != null) return;
         self.started = metal.all.currentMediaTime();
         self.last = self.started;
         const main_loop = objc.getClass("NSRunLoop").?.msgSend(objc.Object, "mainRunLoop", .{});
         const modes = foundation.all.runLoopCommonModes();
 
-        if (instance.object.respondsTo("displayLinkWithTarget:selector:")) {
+        const has_view_link = instance.object.respondsTo("displayLinkWithTarget:selector:");
+        if (has_corevideo and (self.timing == .core_video or (self.timing == .automatic and !has_view_link))) {
+            if (Forwarder.start(instance)) |forwarder| {
+                self.forwarder = forwarder;
+                return;
+            }
+            // No display to follow: the timer below.
+        }
+        if (self.timing == .automatic and has_view_link) {
             // macOS 14: timed to whichever display the view is on.
             const view = instance.into(generated.View);
             const link = metal.DisplayLink.from(view.displayLinkWithTargetSelector(instance.object, objc.Sel.cached("step:")));
@@ -262,6 +292,10 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
     /// Both a display link and a timer keep their target alive; stopping
     /// is what lets the view go.
     fn stop(self: *Self) void {
+        if (self.forwarder) |forwarder| {
+            forwarder.stop();
+            self.forwarder = null;
+        }
         const ticker = self.ticker orelse return;
         ticker.msgSend(void, "invalidate", .{});
         ticker.release();
@@ -280,6 +314,70 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
         self.pixels = pixels;
         self.resized(self.context, pixels);
     }
+
+    /// Ticks from a `CVDisplayLink`, on CoreVideo's thread, forwarded to
+    /// the main thread as `step:`. It never touches the view from
+    /// CoreVideo's thread: the view is reached only on the main thread,
+    /// through `target`, which `stop` clears there.
+    const Forwarder = struct {
+        link: if (has_corevideo) corevideo.DisplayLink else void,
+        /// Main thread only. Null once stopped.
+        target: ?Instance,
+        /// A tick is on its way to the main thread; further ones are dropped.
+        pending: std.atomic.Value(bool) = .init(false),
+
+        const allocator = std.heap.smp_allocator;
+
+        fn start(instance: Instance) ?*Forwarder {
+            if (!has_corevideo) return null;
+            const link = corevideo.DisplayLink.init() catch return null;
+            const forwarder = allocator.create(Forwarder) catch {
+                link.deinit();
+                return null;
+            };
+            forwarder.* = .{ .link = link, .target = instance };
+            link.setCallback(forwarder, tick) catch {
+                forwarder.destroy();
+                return null;
+            };
+            link.start() catch {
+                forwarder.destroy();
+                return null;
+            };
+            return forwarder;
+        }
+
+        /// CoreVideo's thread.
+        fn tick(forwarder: *Forwarder, _: if (has_corevideo) corevideo.Tick else void) void {
+            if (forwarder.pending.swap(true, .acq_rel)) return;
+            dispatch.Queue.main().async(forwarder, deliver);
+        }
+
+        /// The main thread.
+        fn deliver(forwarder: *Forwarder) void {
+            forwarder.pending.store(false, .release);
+            if (forwarder.target) |instance| {
+                instance.state().@"step:"(instance.object);
+            } else {
+                // Stopped while this was on its way; the last reference.
+                allocator.destroy(forwarder);
+            }
+        }
+
+        /// The main thread. Stopping the link waits for a callback that is
+        /// running, so none follows; one already sent to the main queue
+        /// frees the forwarder when it arrives.
+        fn stop(forwarder: *Forwarder) void {
+            if (has_corevideo) forwarder.link.deinit();
+            forwarder.target = null;
+            if (!forwarder.pending.load(.acquire)) allocator.destroy(forwarder);
+        }
+
+        fn destroy(forwarder: *Forwarder) void {
+            if (has_corevideo) forwarder.link.deinit();
+            allocator.destroy(forwarder);
+        }
+    };
 
     pub fn deinit(self: *Self) void {
         self.stop();
