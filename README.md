@@ -367,11 +367,11 @@ const window = app.msgSend(Window, "mainWindow", .{});
 
 ### Blocks
 
-`objc.Block(Captures, Args, Return)` lays a block out by hand, following the Block ABI, around
-an ordinary Zig function. It goes to any API that takes one:
+`objc.Block(Captures, fn (...) R)` lays a block out by hand, following the Block ABI, around
+an ordinary Zig function. Its signature is a Zig function type:
 
 ```zig
-const Visit = objc.Block(struct { total: *i64 }, &.{ objc.Object, objc.UInteger, *bool }, void);
+const Visit = objc.Block(struct { total: *i64 }, fn (objc.Object, objc.UInteger, *bool) void);
 
 var total: i64 = 0;
 var block = Visit.init(.{ .total = &total }, struct {
@@ -382,10 +382,19 @@ var block = Visit.init(.{ .total = &total }, struct {
 array.msgSend(void, "enumerateObjectsUsingBlock:", .{&block});
 ```
 
+A generated method that takes a block takes an `objc.BlockRef` of the SDK's signature, and
+`block.ref()` passes one — so a block of any other signature does not compile:
+
+```zig
+const Done = objc.Block(struct { done: *dispatch.Semaphore }, fn (metal.CommandBuffer) void);
+var handler = Done.init(.{ .done = &semaphore }, onCompleted);
+commands.addCompletedHandler(handler.ref());   // takes ?objc.BlockRef(fn (CommandBuffer) void)
+```
+
 `init` makes a stack block that lives as long as the variable. An API that keeps the block —
 a completion handler, an observer — copies it to the heap itself, and the copy retains any
-`Object` among the captures, as a C compiler's would. `objc.BlockRef(Args, Return)` is the other
-direction: a block handed *to* a method you implemented, which you call with `.call(.{...})`.
+`Object` among the captures, as a C compiler's would. `objc.BlockRef(fn (...) R)` is also the
+other direction: a block handed *to* a method you implemented, which you call with `.call(.{...})`.
 
 ### Classes
 
@@ -626,10 +635,20 @@ iterators, `details` out-parameters. AppKit is generated: it is thousands of met
 wrapper that is a straight transcription is what is wanted. Hand-made conveniences go beside
 `generated.zig`, never in it.
 
+Constants and C functions come through too, from the frameworks each manifest names, in lower
+camel case under `all`: `foundation.all.runLoopCommonModes()`, `foundation.all.homeDirectory()`,
+`appkit.all.windowWillCloseNotification()`, `metal.all.currentMediaTime()`,
+`metal.all.createSystemDefaultDevice()` — about 900, 1,500 and 170 of them. A constant is a
+function returning it. Each is linked *weakly*: built against a newer SDK than the macOS it runs
+on, a program still starts, and only calling something that macOS lacks panics, by name.
+`static inline` functions (`NSMakeRect`) have no symbol and are left out; so is anything marked
+unavailable on macOS.
+
 C types map through as far as they go: a C array of objects, `id<MTLTexture> const *`, is a
 `[*]const Texture`, or `[*]const objc.Nullable(Texture)` where an element may be nil — a `?T` is
 not pointer-sized, `Nullable` is; a `const T *` input is a `[*]const T`; a C function pointer is
-a Zig one over the same mapped types. Anything the generator still cannot type safely is left out
+a Zig one over the same mapped types; a block is `objc.BlockRef(fn (...) R)`. Anything the
+generator still cannot type safely is left out
 and listed in a comment at the end of the struct — at present nothing is, across about 2,000
 AppKit and 1,500 Metal methods. A test takes the address of every generated method, so each
 one is compiled, and each selector checked against its arguments, on every `zig build test`.

@@ -44,9 +44,6 @@ const generated = @import("generated.zig");
 
 const Error = errors.Error;
 
-extern fn CACurrentMediaTime() f64;
-extern var NSRunLoopCommonModes: objc.abi.Id;
-
 pub const MetalView = struct {
     instance: Instance,
 
@@ -224,7 +221,7 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
         if (self.pixels.width < 1 or self.pixels.height < 1) return;
 
         const drawable = self.layer.?.nextDrawable() orelse return;
-        const now = CACurrentMediaTime();
+        const now = metal.all.currentMediaTime();
         const frame: MetalView.Frame = .{
             .drawable = drawable,
             .texture = drawable.texture(),
@@ -242,16 +239,16 @@ const Instance = objc.Subclass(.{ .name = "MacZigMetalView", .superclass = gener
 
     fn start(self: *Self, instance: Instance) void {
         if (self.ticker != null) return;
-        self.started = CACurrentMediaTime();
+        self.started = metal.all.currentMediaTime();
         self.last = self.started;
         const main_loop = objc.getClass("NSRunLoop").?.msgSend(objc.Object, "mainRunLoop", .{});
-        const modes: objc.Object = .{ .value = NSRunLoopCommonModes.? };
+        const modes = foundation.all.runLoopCommonModes();
 
         if (instance.object.respondsTo("displayLinkWithTarget:selector:")) {
             // macOS 14: timed to whichever display the view is on.
             const view = instance.into(generated.View);
             const link = metal.DisplayLink.from(view.displayLinkWithTargetSelector(instance.object, objc.Sel.cached("step:")));
-            link.addToRunLoopForMode(main_loop, .{ .object = modes });
+            link.addToRunLoopForMode(main_loop, modes);
             self.ticker = link.object.retain();
         } else {
             const timer = objc.getClass("NSTimer").?.msgSend(objc.Object, "timerWithTimeInterval:target:selector:userInfo:repeats:", .{

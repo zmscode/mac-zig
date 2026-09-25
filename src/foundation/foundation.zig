@@ -42,6 +42,11 @@ pub const Data = @import("data.zig").Data;
 pub const Url = @import("url.zig").Url;
 pub const ErrorObject = @import("error_object.zig").ErrorObject;
 
+/// Foundation's constants and C functions, generated from its headers:
+/// `foundation.all.runLoopCommonModes()`, `foundation.all.homeDirectory()`,
+/// `foundation.all.stringFromSelector(sel)`.
+pub const all = @import("generated.zig");
+
 const collections = @import("collections.zig");
 pub const Array = collections.Array;
 pub const MutableArray = collections.MutableArray;
@@ -58,4 +63,5 @@ test {
     _ = @import("url.zig");
     _ = @import("error_object.zig");
     _ = collections;
+    _ = @import("generated_tests.zig");
 }

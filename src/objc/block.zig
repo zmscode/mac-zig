@@ -31,11 +31,12 @@ const block_has_copy_dispose: c_int = 1 << 25;
 const block_has_stret: c_int = 1 << 29;
 const block_has_signature: c_int = 1 << 30;
 
-/// A block taking `Args` and returning `Return`, which carries a
+/// A block with the signature `Signature` -- a function type, like
+/// `fn (objc.Object, objc.UInteger, *bool) void` -- which carries a
 /// `Captures` along with it.
 ///
 /// ```zig
-/// const Sum = objc.Block(struct { total: *i64 }, &.{ objc.Object, objc.UInteger, *bool }, void);
+/// const Sum = objc.Block(struct { total: *i64 }, fn (objc.Object, objc.UInteger, *bool) void);
 ///
 /// var total: i64 = 0;
 /// var block = Sum.init(.{ .total = &total }, struct {
@@ -45,6 +46,14 @@ const block_has_signature: c_int = 1 << 30;
 /// }.body);
 ///
 /// array.msgSend(void, "enumerateObjectsUsingBlock:", .{&block});
+/// ```
+///
+/// A generated method that takes a block takes a `BlockRef` of the SDK's
+/// signature; `ref()` is how a block goes to one, and only a block of that
+/// exact signature fits:
+///
+/// ```zig
+/// commands.addCompletedHandler(done.ref());   // done: objc.Block(..., fn (metal.CommandBuffer) void)
 /// ```
 ///
 /// `init` makes a *stack* block: it lives exactly as long as the Zig
@@ -59,7 +68,9 @@ const block_has_signature: c_int = 1 << 30;
 /// the copy and released when the copy is freed -- as a C compiler does.
 /// A pointer captured to Zig memory is just a pointer: it had better
 /// outlive every copy of the block.
-pub fn Block(comptime Captures_: type, comptime Args: []const type, comptime Return: type) type {
+pub fn Block(comptime Captures_: type, comptime Signature_: type) type {
+    const Args = paramsOf(Signature_);
+    const Return = returnOf(Signature_);
     return extern struct {
         isa: ?*anyopaque,
         flags: c_int,
@@ -71,6 +82,9 @@ pub fn Block(comptime Captures_: type, comptime Args: []const type, comptime Ret
         const Self = @This();
 
         pub const Captures = Captures_;
+        pub const Signature = Signature_;
+        /// What a method taking this block takes.
+        pub const Ref = BlockRef(Signature_);
 
         /// Marks this type for the encoder, which spells a block `@?`.
         pub const is_objc_block = {};
@@ -113,6 +127,12 @@ pub fn Block(comptime Captures_: type, comptime Args: []const type, comptime Ret
             };
             self.captures().* = captures_value;
             return self;
+        }
+
+        /// This block, for a method that takes a `BlockRef` of its
+        /// signature. A stack block is copied by the method if it keeps it.
+        pub fn ref(self: *const Self) Ref {
+            return .{ .object = .{ .value = @ptrCast(@constCast(self)) } };
         }
 
         pub fn captures(self: *Self) *Captures {
@@ -169,14 +189,13 @@ pub fn Block(comptime Captures_: type, comptime Args: []const type, comptime Ret
     };
 }
 
-/// A block that came from Objective-C -- the completion handler passed to
-/// a method you implemented, say -- known to take `Args` and return
-/// `Return`. Nothing checks that; the signature has to be right.
-///
-/// It is an object, so it goes in a method's parameter list as itself:
+/// A reference to a block with the signature `Signature`, a function type.
+/// It is what a generated method takes for a block parameter -- so a block
+/// of any other signature does not compile -- and what a method you
+/// implement receives: the completion handler handed to it, say.
 ///
 /// ```zig
-/// const Handler = objc.BlockRef(&.{objc.Object}, void);
+/// const Handler = objc.BlockRef(fn (objc.Object) void);
 ///
 /// fn load(self: objc.Object, _: objc.Sel, done: Handler) void {
 ///     done.call(.{result});
@@ -185,13 +204,16 @@ pub fn Block(comptime Captures_: type, comptime Args: []const type, comptime Ret
 ///
 /// A block kept past the method's return has to be copied with `copy`
 /// and later released, as in C.
-pub fn BlockRef(comptime Args: []const type, comptime Return: type) type {
+pub fn BlockRef(comptime Signature_: type) type {
+    const Args = paramsOf(Signature_);
+    const Return = returnOf(Signature_);
     return extern struct {
         object: Object,
 
         const Self = @This();
 
         pub const is_objc_block = {};
+        pub const Signature = Signature_;
 
         const Invoke = abi.CFn(invokeParams(*anyopaque, Args), abi.Abi(Return));
 
@@ -219,6 +241,21 @@ pub fn BlockRef(comptime Args: []const type, comptime Return: type) type {
             raw._Block_release(self.object.value);
         }
     };
+}
+
+fn paramsOf(comptime Signature: type) []const type {
+    const info = switch (@typeInfo(Signature)) {
+        .@"fn" => |f| f,
+        else => @compileError("a block's signature is a function type, like fn (objc.Object) void; found " ++ @typeName(Signature)),
+    };
+    var params: [info.param_types.len]type = undefined;
+    for (info.param_types, &params) |P, *slot| slot.* = P orelse @compileError("a block cannot take anytype");
+    const final = params;
+    return &final;
+}
+
+fn returnOf(comptime Signature: type) type {
+    return @typeInfo(Signature).@"fn".return_type.?;
 }
 
 fn invokeParams(comptime Receiver: type, comptime Args: []const type) []const type {
@@ -276,7 +313,7 @@ fn forEachObject(captures: anytype, comptime action: anytype) void {
 }
 
 test "a block calls its body with its captures" {
-    const Add = Block(struct { offset: i32 }, &.{ i32, i32 }, i32);
+    const Add = Block(struct { offset: i32 }, fn (i32, i32) i32);
     var block = Add.init(.{ .offset = 100 }, struct {
         fn body(captures: *const Add.Captures, a: i32, b: i32) i32 {
             return captures.offset + a + b;
@@ -286,7 +323,7 @@ test "a block calls its body with its captures" {
 }
 
 test "a heap copy is independent of the stack block" {
-    const Get = Block(struct { value: f64 }, &.{}, f64);
+    const Get = Block(struct { value: f64 }, fn () f64);
     var stack = Get.init(.{ .value = 2.5 }, struct {
         fn body(captures: *const Get.Captures) f64 {
             return captures.value;
@@ -302,7 +339,7 @@ test "a heap copy is independent of the stack block" {
 }
 
 test "a block can change what it captured" {
-    const Count = Block(struct { hits: u32 }, &.{}, void);
+    const Count = Block(struct { hits: u32 }, fn () void);
     var block = Count.init(.{ .hits = 0 }, struct {
         fn body(captures: *Count.Captures) void {
             captures.hits += 1;
@@ -314,7 +351,19 @@ test "a block can change what it captured" {
 }
 
 test "a block's signature is its type encoding" {
-    const B = Block(struct {}, &.{ Object, bool }, void);
+    const B = Block(struct {}, fn (Object, bool) void);
     const expected = if (raw.BOOL == bool) "v@?@B" else "v@?@c";
     try std.testing.expectEqualStrings(expected, std.mem.span(B.block_descriptor.signature));
+}
+
+test "a block's ref is the BlockRef of its signature" {
+    const Add = Block(struct {}, fn (i32, i32) i32);
+    var block = Add.init(.{}, struct {
+        fn body(_: *const Add.Captures, a: i32, b: i32) i32 {
+            return a + b;
+        }
+    }.body);
+    // The same function type, written anywhere, is the same BlockRef.
+    const ref: BlockRef(fn (i32, i32) i32) = block.ref();
+    try std.testing.expectEqual(@as(i32, 5), ref.call(.{ 2, 3 }));
 }

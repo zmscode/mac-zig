@@ -174,7 +174,7 @@ pub fn build(b: *std.Build) void {
     const generate_step = b.step("generate", "Regenerate the Objective-C wrappers from the SDK's headers");
     // Each manifest, and where its wrappers go. The generator is built once
     // per manifest, since the manifest is compiled into it.
-    for ([_][2][]const u8{ .{ "appkit", "src/appkit" }, .{ "metal", "src/metal" } }) |job| {
+    for ([_][2][]const u8{ .{ "appkit", "src/appkit" }, .{ "metal", "src/metal" }, .{ "foundation", "src/foundation" } }) |job| {
         const generator = b.addExecutable(.{
             .name = b.fmt("objc_gen_{s}", .{job[0]}),
             .root_module = b.createModule(.{

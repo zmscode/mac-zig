@@ -12,6 +12,8 @@
 pub const framework = "AppKit";
 pub const imports = [_][]const u8{"AppKit/AppKit.h"};
 pub const prefixes = [_][]const u8{"NS"};
+/// The frameworks whose `extern` constants and C functions are generated.
+pub const frameworks = [_][]const u8{"AppKit"};
 
 pub const classes = [_][]const u8{
     "NSResponder",

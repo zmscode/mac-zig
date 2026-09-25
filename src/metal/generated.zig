@@ -26,6 +26,13 @@ fn lookUp(comptime name: [:0]const u8) objc.Class {
 
 const framework = "Metal";
 
+/// Every constant and C function is linked weakly: one that a newer SDK
+/// declares and the running macOS lacks leaves the program able to start,
+/// and panics only if it is used.
+fn missing(comptime name: []const u8) noreturn {
+    @panic(name ++ " is not in this version of macOS");
+}
+
 /// `MTLClearColor`.
 pub const ClearColor = extern struct {
     red: f64,
@@ -6568,7 +6575,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newBufferWithBytesNoCopy:length:options:deallocator:]`
-    pub fn newBufferWithBytesNoCopyLengthOptionsDeallocator(self: Self, pointer: ?*anyopaque, length: objc.UInteger, options: ResourceOptions, deallocator: anytype) ?Buffer {
+    pub fn newBufferWithBytesNoCopyLengthOptionsDeallocator(self: Self, pointer: ?*anyopaque, length: objc.UInteger, options: ResourceOptions, deallocator: ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?Buffer {
         return self.object.msgSend(?Buffer, "newBufferWithBytesNoCopy:length:options:deallocator:", .{ pointer, length, options, deallocator });
     }
 
@@ -6633,7 +6640,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newLibraryWithSource:options:completionHandler:]`
-    pub fn newLibraryWithSourceOptionsCompletionHandler(self: Self, source: foundation.String, options: ?CompileOptions, completion_handler: anytype) void {
+    pub fn newLibraryWithSourceOptionsCompletionHandler(self: Self, source: foundation.String, options: ?CompileOptions, completion_handler: ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newLibraryWithSource:options:completionHandler:", .{ source, options, completion_handler });
     }
 
@@ -6643,7 +6650,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newLibraryWithStitchedDescriptor:completionHandler:]`
-    pub fn newLibraryWithStitchedDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: anytype) void {
+    pub fn newLibraryWithStitchedDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newLibraryWithStitchedDescriptor:completionHandler:", .{ descriptor, completion_handler });
     }
 
@@ -6658,12 +6665,12 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newRenderPipelineStateWithDescriptor:completionHandler:]`
-    pub fn newRenderPipelineStateWithDescriptorCompletionHandler(self: Self, descriptor: RenderPipelineDescriptor, completion_handler: anytype) void {
+    pub fn newRenderPipelineStateWithDescriptorCompletionHandler(self: Self, descriptor: RenderPipelineDescriptor, completion_handler: ?objc.BlockRef(fn (?RenderPipelineState, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newRenderPipelineStateWithDescriptor:completionHandler:", .{ descriptor, completion_handler });
     }
 
     /// `-[MTLDevice newRenderPipelineStateWithDescriptor:options:completionHandler:]`
-    pub fn newRenderPipelineStateWithDescriptorOptionsCompletionHandler(self: Self, descriptor: RenderPipelineDescriptor, options: PipelineOption, completion_handler: anytype) void {
+    pub fn newRenderPipelineStateWithDescriptorOptionsCompletionHandler(self: Self, descriptor: RenderPipelineDescriptor, options: PipelineOption, completion_handler: ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newRenderPipelineStateWithDescriptor:options:completionHandler:", .{ descriptor, options, completion_handler });
     }
 
@@ -6678,12 +6685,12 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newComputePipelineStateWithFunction:completionHandler:]`
-    pub fn newComputePipelineStateWithFunctionCompletionHandler(self: Self, compute_function: Function, completion_handler: anytype) void {
+    pub fn newComputePipelineStateWithFunctionCompletionHandler(self: Self, compute_function: Function, completion_handler: ?objc.BlockRef(fn (?ComputePipelineState, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newComputePipelineStateWithFunction:completionHandler:", .{ compute_function, completion_handler });
     }
 
     /// `-[MTLDevice newComputePipelineStateWithFunction:options:completionHandler:]`
-    pub fn newComputePipelineStateWithFunctionOptionsCompletionHandler(self: Self, compute_function: Function, options: PipelineOption, completion_handler: anytype) void {
+    pub fn newComputePipelineStateWithFunctionOptionsCompletionHandler(self: Self, compute_function: Function, options: PipelineOption, completion_handler: ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newComputePipelineStateWithFunction:options:completionHandler:", .{ compute_function, options, completion_handler });
     }
 
@@ -6693,7 +6700,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newComputePipelineStateWithDescriptor:options:completionHandler:]`
-    pub fn newComputePipelineStateWithDescriptorOptionsCompletionHandler(self: Self, descriptor: ComputePipelineDescriptor, options: PipelineOption, completion_handler: anytype) void {
+    pub fn newComputePipelineStateWithDescriptorOptionsCompletionHandler(self: Self, descriptor: ComputePipelineDescriptor, options: PipelineOption, completion_handler: ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newComputePipelineStateWithDescriptor:options:completionHandler:", .{ descriptor, options, completion_handler });
     }
 
@@ -6733,7 +6740,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newRenderPipelineStateWithTileDescriptor:options:completionHandler:]`
-    pub fn newRenderPipelineStateWithTileDescriptorOptionsCompletionHandler(self: Self, descriptor: objc.Object, options: PipelineOption, completion_handler: anytype) void {
+    pub fn newRenderPipelineStateWithTileDescriptorOptionsCompletionHandler(self: Self, descriptor: objc.Object, options: PipelineOption, completion_handler: ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newRenderPipelineStateWithTileDescriptor:options:completionHandler:", .{ descriptor, options, completion_handler });
     }
 
@@ -6743,7 +6750,7 @@ pub const Device = extern struct {
     }
 
     /// `-[MTLDevice newRenderPipelineStateWithMeshDescriptor:options:completionHandler:]`
-    pub fn newRenderPipelineStateWithMeshDescriptorOptionsCompletionHandler(self: Self, descriptor: objc.Object, options: PipelineOption, completion_handler: anytype) void {
+    pub fn newRenderPipelineStateWithMeshDescriptorOptionsCompletionHandler(self: Self, descriptor: objc.Object, options: PipelineOption, completion_handler: ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newRenderPipelineStateWithMeshDescriptor:options:completionHandler:", .{ descriptor, options, completion_handler });
     }
 
@@ -7233,6 +7240,7 @@ pub const Device = extern struct {
         pub const @"newHeapWithDescriptor:" = fn (objc.Object) ?objc.Object;
         pub const @"newBufferWithLength:options:" = fn (objc.UInteger, ResourceOptions) ?Buffer;
         pub const @"newBufferWithBytes:length:options:" = fn (?*const anyopaque, objc.UInteger, ResourceOptions) ?Buffer;
+        pub const @"newBufferWithBytesNoCopy:length:options:deallocator:" = fn (?*anyopaque, objc.UInteger, ResourceOptions, ?objc.BlockRef(fn (?*anyopaque, objc.UInteger) void)) ?Buffer;
         pub const @"newDepthStencilStateWithDescriptor:" = fn (DepthStencilDescriptor) ?DepthStencilState;
         pub const @"newTextureWithDescriptor:" = fn (TextureDescriptor) ?Texture;
         pub const @"newTextureWithDescriptor:iosurface:plane:" = fn (TextureDescriptor, io_surface.Surface, objc.UInteger) ?Texture;
@@ -7245,12 +7253,19 @@ pub const Device = extern struct {
         pub const @"newLibraryWithURL:error:" = fn (foundation.Url, ?*objc.abi.Id) ?Library;
         pub const @"newLibraryWithData:error:" = fn (?objc.Object, ?*objc.abi.Id) ?Library;
         pub const @"newLibraryWithSource:options:error:" = fn (foundation.String, ?CompileOptions, ?*objc.abi.Id) ?Library;
+        pub const @"newLibraryWithSource:options:completionHandler:" = fn (foundation.String, ?CompileOptions, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
         pub const @"newLibraryWithStitchedDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Library;
+        pub const @"newLibraryWithStitchedDescriptor:completionHandler:" = fn (objc.Object, ?objc.BlockRef(fn (?Library, ?foundation.ErrorObject) void)) void;
         pub const @"newRenderPipelineStateWithDescriptor:error:" = fn (RenderPipelineDescriptor, ?*objc.abi.Id) ?RenderPipelineState;
         pub const @"newRenderPipelineStateWithDescriptor:options:reflection:error:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"newRenderPipelineStateWithDescriptor:completionHandler:" = fn (RenderPipelineDescriptor, ?objc.BlockRef(fn (?RenderPipelineState, ?foundation.ErrorObject) void)) void;
+        pub const @"newRenderPipelineStateWithDescriptor:options:completionHandler:" = fn (RenderPipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
         pub const @"newComputePipelineStateWithFunction:error:" = fn (Function, ?*objc.abi.Id) ?ComputePipelineState;
         pub const @"newComputePipelineStateWithFunction:options:reflection:error:" = fn (Function, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"newComputePipelineStateWithFunction:completionHandler:" = fn (Function, ?objc.BlockRef(fn (?ComputePipelineState, ?foundation.ErrorObject) void)) void;
+        pub const @"newComputePipelineStateWithFunction:options:completionHandler:" = fn (Function, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
         pub const @"newComputePipelineStateWithDescriptor:options:reflection:error:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"newComputePipelineStateWithDescriptor:options:completionHandler:" = fn (ComputePipelineDescriptor, PipelineOption, ?objc.BlockRef(fn (?ComputePipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
         pub const newFence = fn () ?objc.Object;
         pub const @"supportsFeatureSet:" = fn (FeatureSet) bool;
         pub const @"supportsFamily:" = fn (GPUFamily) bool;
@@ -7258,7 +7273,9 @@ pub const Device = extern struct {
         pub const @"minimumLinearTextureAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
         pub const @"minimumTextureBufferAlignmentForPixelFormat:" = fn (PixelFormat) objc.UInteger;
         pub const @"newRenderPipelineStateWithTileDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"newRenderPipelineStateWithTileDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
         pub const @"newRenderPipelineStateWithMeshDescriptor:options:reflection:error:" = fn (objc.Object, PipelineOption, ?objc.Object, ?*objc.abi.Id) ?RenderPipelineState;
+        pub const @"newRenderPipelineStateWithMeshDescriptor:options:completionHandler:" = fn (objc.Object, PipelineOption, ?objc.BlockRef(fn (?RenderPipelineState, ?objc.Object, ?foundation.ErrorObject) void)) void;
         pub const @"getDefaultSamplePositions:count:" = fn (objc.Object, objc.UInteger) void;
         pub const @"newArgumentEncoderWithArguments:" = fn (foundation.Array(objc.Object)) ?objc.Object;
         pub const @"supportsRasterizationRateMapWithLayerCount:" = fn (objc.UInteger) bool;
@@ -7503,7 +7520,7 @@ pub const CommandBuffer = extern struct {
     }
 
     /// `-[MTLCommandBuffer addScheduledHandler:]`
-    pub fn addScheduledHandler(self: Self, block: anytype) void {
+    pub fn addScheduledHandler(self: Self, block: ?objc.BlockRef(fn (CommandBuffer) void)) void {
         return self.object.msgSend(void, "addScheduledHandler:", .{block});
     }
 
@@ -7528,7 +7545,7 @@ pub const CommandBuffer = extern struct {
     }
 
     /// `-[MTLCommandBuffer addCompletedHandler:]`
-    pub fn addCompletedHandler(self: Self, block: anytype) void {
+    pub fn addCompletedHandler(self: Self, block: ?objc.BlockRef(fn (CommandBuffer) void)) void {
         return self.object.msgSend(void, "addCompletedHandler:", .{block});
     }
 
@@ -7691,10 +7708,12 @@ pub const CommandBuffer = extern struct {
     pub const signatures = struct {
         pub const enqueue = fn () void;
         pub const commit = fn () void;
+        pub const @"addScheduledHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
         pub const @"presentDrawable:" = fn (Drawable) void;
         pub const @"presentDrawable:atTime:" = fn (Drawable, f64) void;
         pub const @"presentDrawable:afterMinimumDuration:" = fn (Drawable, f64) void;
         pub const waitUntilScheduled = fn () void;
+        pub const @"addCompletedHandler:" = fn (?objc.BlockRef(fn (CommandBuffer) void)) void;
         pub const waitUntilCompleted = fn () void;
         pub const blitCommandEncoder = fn () ?BlitCommandEncoder;
         pub const @"renderCommandEncoderWithDescriptor:" = fn (RenderPassDescriptor) ?RenderCommandEncoder;
@@ -9911,7 +9930,7 @@ pub const Library = extern struct {
     }
 
     /// `-[MTLLibrary newFunctionWithName:constantValues:completionHandler:]`
-    pub fn newFunctionWithNameConstantValuesCompletionHandler(self: Self, name: foundation.String, constant_values: objc.Object, completion_handler: anytype) void {
+    pub fn newFunctionWithNameConstantValuesCompletionHandler(self: Self, name: foundation.String, constant_values: objc.Object, completion_handler: objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newFunctionWithName:constantValues:completionHandler:", .{ name, constant_values, completion_handler });
     }
 
@@ -9921,7 +9940,7 @@ pub const Library = extern struct {
     }
 
     /// `-[MTLLibrary newFunctionWithDescriptor:completionHandler:]`
-    pub fn newFunctionWithDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: anytype) void {
+    pub fn newFunctionWithDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newFunctionWithDescriptor:completionHandler:", .{ descriptor, completion_handler });
     }
 
@@ -9931,7 +9950,7 @@ pub const Library = extern struct {
     }
 
     /// `-[MTLLibrary newIntersectionFunctionWithDescriptor:completionHandler:]`
-    pub fn newIntersectionFunctionWithDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: anytype) void {
+    pub fn newIntersectionFunctionWithDescriptorCompletionHandler(self: Self, descriptor: objc.Object, completion_handler: objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "newIntersectionFunctionWithDescriptor:completionHandler:", .{ descriptor, completion_handler });
     }
 
@@ -9974,8 +9993,11 @@ pub const Library = extern struct {
     pub const signatures = struct {
         pub const @"newFunctionWithName:" = fn (foundation.String) ?Function;
         pub const @"newFunctionWithName:constantValues:error:" = fn (foundation.String, objc.Object, ?*objc.abi.Id) ?Function;
+        pub const @"newFunctionWithName:constantValues:completionHandler:" = fn (foundation.String, objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
         pub const @"reflectionForFunctionWithName:" = fn (foundation.String) ?objc.Object;
+        pub const @"newFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
         pub const @"newFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
+        pub const @"newIntersectionFunctionWithDescriptor:completionHandler:" = fn (objc.Object, objc.BlockRef(fn (?Function, ?foundation.ErrorObject) void)) void;
         pub const @"newIntersectionFunctionWithDescriptor:error:" = fn (objc.Object, ?*objc.abi.Id) ?Function;
         pub const label = fn () ?foundation.String;
         pub const @"setLabel:" = fn (?foundation.String) void;
@@ -10352,7 +10374,7 @@ pub const ComputePipelineState = extern struct {
     }
 
     /// `-[MTLComputePipelineState newComputePipelineStateWithAdditionalBinaryFunctions:error:]`
-    pub fn newComputePipelineStateWithAdditionalBinaryFunctionsError(self: Self, functions: foundation.Array(objc.Object), @"error": ?*objc.abi.Id) ?ComputePipelineState {
+    pub fn newComputePipelineStateWithAdditionalBinaryFunctionsError(self: Self, functions: foundation.Array(Function), @"error": ?*objc.abi.Id) ?ComputePipelineState {
         return self.object.msgSend(?ComputePipelineState, "newComputePipelineStateWithAdditionalBinaryFunctions:error:", .{ functions, @"error" });
     }
 
@@ -10433,7 +10455,7 @@ pub const ComputePipelineState = extern struct {
         pub const @"newComputePipelineStateWithBinaryFunctions:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?ComputePipelineState;
         pub const @"imageblockMemoryLengthForDimensions:" = fn (Size) objc.UInteger;
         pub const @"functionHandleWithFunction:" = fn (Function) ?objc.Object;
-        pub const @"newComputePipelineStateWithAdditionalBinaryFunctions:error:" = fn (foundation.Array(objc.Object), ?*objc.abi.Id) ?ComputePipelineState;
+        pub const @"newComputePipelineStateWithAdditionalBinaryFunctions:error:" = fn (foundation.Array(Function), ?*objc.abi.Id) ?ComputePipelineState;
         pub const @"newVisibleFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
         pub const @"newIntersectionFunctionTableWithDescriptor:" = fn (objc.Object) ?objc.Object;
         pub const @"recommendedPersistentThreadgroupsPerGridForThreadsPerThreadgroup:" = fn (Size) objc.UInteger;
@@ -10609,7 +10631,7 @@ pub const Drawable = extern struct {
     }
 
     /// `-[MTLDrawable addPresentedHandler:]`
-    pub fn addPresentedHandler(self: Self, block: anytype) void {
+    pub fn addPresentedHandler(self: Self, block: ?objc.BlockRef(fn (Drawable) void)) void {
         return self.object.msgSend(void, "addPresentedHandler:", .{block});
     }
 
@@ -10628,6 +10650,7 @@ pub const Drawable = extern struct {
         pub const present = fn () void;
         pub const @"presentAtTime:" = fn (f64) void;
         pub const @"presentAfterMinimumDuration:" = fn (f64) void;
+        pub const @"addPresentedHandler:" = fn (?objc.BlockRef(fn (Drawable) void)) void;
         pub const presentedTime = fn () f64;
         pub const drawableID = fn () objc.UInteger;
     };
@@ -10691,7 +10714,7 @@ pub const MetalDrawable = extern struct {
     }
 
     /// `-[MTLDrawable addPresentedHandler:]`
-    pub fn addPresentedHandler(self: Self, block: anytype) void {
+    pub fn addPresentedHandler(self: Self, block: ?objc.BlockRef(fn (Drawable) void)) void {
         return self.object.msgSend(void, "addPresentedHandler:", .{block});
     }
 
@@ -10711,3 +10734,1012 @@ pub const MetalDrawable = extern struct {
         pub const layer = fn () MetalLayer;
     };
 };
+
+// -- constants and functions -----------------------------------------------
+
+/// `MTLTensorDomain`.
+pub fn tensorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLTensorDomain", .linkage = .weak }) orelse missing("MTLTensorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLLibraryErrorDomain`.
+pub fn libraryErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLLibraryErrorDomain", .linkage = .weak }) orelse missing("MTLLibraryErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterTimestamp`.
+pub fn commonCounterTimestamp() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterTimestamp", .linkage = .weak }) orelse missing("MTLCommonCounterTimestamp");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterTessellationInputPatches`.
+pub fn commonCounterTessellationInputPatches() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterTessellationInputPatches", .linkage = .weak }) orelse missing("MTLCommonCounterTessellationInputPatches");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterVertexInvocations`.
+pub fn commonCounterVertexInvocations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterVertexInvocations", .linkage = .weak }) orelse missing("MTLCommonCounterVertexInvocations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterPostTessellationVertexInvocations`.
+pub fn commonCounterPostTessellationVertexInvocations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterPostTessellationVertexInvocations", .linkage = .weak }) orelse missing("MTLCommonCounterPostTessellationVertexInvocations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterClipperInvocations`.
+pub fn commonCounterClipperInvocations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterClipperInvocations", .linkage = .weak }) orelse missing("MTLCommonCounterClipperInvocations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterClipperPrimitivesOut`.
+pub fn commonCounterClipperPrimitivesOut() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterClipperPrimitivesOut", .linkage = .weak }) orelse missing("MTLCommonCounterClipperPrimitivesOut");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterFragmentInvocations`.
+pub fn commonCounterFragmentInvocations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterFragmentInvocations", .linkage = .weak }) orelse missing("MTLCommonCounterFragmentInvocations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterFragmentsPassed`.
+pub fn commonCounterFragmentsPassed() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterFragmentsPassed", .linkage = .weak }) orelse missing("MTLCommonCounterFragmentsPassed");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterComputeKernelInvocations`.
+pub fn commonCounterComputeKernelInvocations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterComputeKernelInvocations", .linkage = .weak }) orelse missing("MTLCommonCounterComputeKernelInvocations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterTotalCycles`.
+pub fn commonCounterTotalCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterTotalCycles", .linkage = .weak }) orelse missing("MTLCommonCounterTotalCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterVertexCycles`.
+pub fn commonCounterVertexCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterVertexCycles", .linkage = .weak }) orelse missing("MTLCommonCounterVertexCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterTessellationCycles`.
+pub fn commonCounterTessellationCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterTessellationCycles", .linkage = .weak }) orelse missing("MTLCommonCounterTessellationCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterPostTessellationVertexCycles`.
+pub fn commonCounterPostTessellationVertexCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterPostTessellationVertexCycles", .linkage = .weak }) orelse missing("MTLCommonCounterPostTessellationVertexCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterFragmentCycles`.
+pub fn commonCounterFragmentCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterFragmentCycles", .linkage = .weak }) orelse missing("MTLCommonCounterFragmentCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterRenderTargetWriteCycles`.
+pub fn commonCounterRenderTargetWriteCycles() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterRenderTargetWriteCycles", .linkage = .weak }) orelse missing("MTLCommonCounterRenderTargetWriteCycles");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterSetTimestamp`.
+pub fn commonCounterSetTimestamp() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterSetTimestamp", .linkage = .weak }) orelse missing("MTLCommonCounterSetTimestamp");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterSetStageUtilization`.
+pub fn commonCounterSetStageUtilization() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterSetStageUtilization", .linkage = .weak }) orelse missing("MTLCommonCounterSetStageUtilization");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommonCounterSetStatistic`.
+pub fn commonCounterSetStatistic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommonCounterSetStatistic", .linkage = .weak }) orelse missing("MTLCommonCounterSetStatistic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCounterErrorDomain`.
+pub fn counterErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCounterErrorDomain", .linkage = .weak }) orelse missing("MTLCounterErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCreateSystemDefaultDevice`. What it returns is yours to release.
+pub fn createSystemDefaultDevice() ?Device {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(?Device), .{ .name = "MTLCreateSystemDefaultDevice", .linkage = .weak }) orelse missing("MTLCreateSystemDefaultDevice");
+    return objc.abi.fromAbi(?Device, function());
+}
+
+/// `MTLCopyAllDevices`. What it returns is yours to release.
+pub fn copyAllDevices() foundation.Array(Device) {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(foundation.Array(Device)), .{ .name = "MTLCopyAllDevices", .linkage = .weak }) orelse missing("MTLCopyAllDevices");
+    return objc.abi.fromAbi(foundation.Array(Device), function());
+}
+
+/// `MTLDeviceWasAddedNotification`.
+pub fn deviceWasAddedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLDeviceWasAddedNotification", .linkage = .weak }) orelse missing("MTLDeviceWasAddedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLDeviceRemovalRequestedNotification`.
+pub fn deviceRemovalRequestedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLDeviceRemovalRequestedNotification", .linkage = .weak }) orelse missing("MTLDeviceRemovalRequestedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLDeviceWasRemovedNotification`.
+pub fn deviceWasRemovedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLDeviceWasRemovedNotification", .linkage = .weak }) orelse missing("MTLDeviceWasRemovedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLRemoveDeviceObserver`.
+pub fn removeDeviceObserver(observer: objc.Object) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(void), .{ .name = "MTLRemoveDeviceObserver", .linkage = .weak }) orelse missing("MTLRemoveDeviceObserver");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, observer)));
+}
+
+/// `MTLDeviceErrorDomain`.
+pub fn deviceErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLDeviceErrorDomain", .linkage = .weak }) orelse missing("MTLDeviceErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommandBufferErrorDomain`.
+pub fn commandBufferErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommandBufferErrorDomain", .linkage = .weak }) orelse missing("MTLCommandBufferErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCommandBufferEncoderInfoErrorKey`.
+pub fn commandBufferEncoderInfoErrorKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCommandBufferEncoderInfoErrorKey", .linkage = .weak }) orelse missing("MTLCommandBufferEncoderInfoErrorKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTL4CommandQueueErrorDomain`.
+pub fn mtl4CommandQueueErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTL4CommandQueueErrorDomain", .linkage = .weak }) orelse missing("MTL4CommandQueueErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLCaptureErrorDomain`.
+pub fn captureErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLCaptureErrorDomain", .linkage = .weak }) orelse missing("MTLCaptureErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLDynamicLibraryDomain`.
+pub fn dynamicLibraryDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLDynamicLibraryDomain", .linkage = .weak }) orelse missing("MTLDynamicLibraryDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLLogStateErrorDomain`.
+pub fn logStateErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLLogStateErrorDomain", .linkage = .weak }) orelse missing("MTLLogStateErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLBinaryArchiveDomain`.
+pub fn binaryArchiveDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLBinaryArchiveDomain", .linkage = .weak }) orelse missing("MTLBinaryArchiveDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLIOErrorDomain`.
+pub fn ioErrorDomain() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "MTLIOErrorDomain", .linkage = .weak }) orelse missing("MTLIOErrorDomain");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `MTLIOCompressionContextDefaultChunkSize`.
+pub fn ioCompressionContextDefaultChunkSize() usize {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(usize), .{ .name = "MTLIOCompressionContextDefaultChunkSize", .linkage = .weak }) orelse missing("MTLIOCompressionContextDefaultChunkSize");
+    return objc.abi.fromAbi(usize, function());
+}
+
+/// `MTLIOCompressionContextAppendData`.
+pub fn ioCompressionContextAppendData(context: ?*anyopaque, data: ?*const anyopaque, size: usize) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?*anyopaque), objc.abi.Abi(?*const anyopaque), objc.abi.Abi(usize)) callconv(.c) objc.abi.Abi(void), .{ .name = "MTLIOCompressionContextAppendData", .linkage = .weak }) orelse missing("MTLIOCompressionContextAppendData");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?*anyopaque, context), objc.abi.toAbi(?*const anyopaque, data), objc.abi.toAbi(usize, size)));
+}
+
+/// `CACurrentMediaTime`.
+pub fn currentMediaTime() f64 {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(f64), .{ .name = "CACurrentMediaTime", .linkage = .weak }) orelse missing("CACurrentMediaTime");
+    return objc.abi.fromAbi(f64, function());
+}
+
+/// `CATransform3DIdentity`.
+pub fn transform3DIdentity() Transform3D {
+    const symbol = @extern(?*const objc.abi.Abi(Transform3D), .{ .name = "CATransform3DIdentity", .linkage = .weak }) orelse missing("CATransform3DIdentity");
+    return objc.abi.fromAbi(Transform3D, symbol.*);
+}
+
+/// `CATransform3DIsIdentity`.
+pub fn transform3DIsIdentity(t: Transform3D) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(bool), .{ .name = "CATransform3DIsIdentity", .linkage = .weak }) orelse missing("CATransform3DIsIdentity");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(Transform3D, t)));
+}
+
+/// `CATransform3DEqualToTransform`.
+pub fn transform3DEqualToTransform(a: Transform3D, b: Transform3D) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D), objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(bool), .{ .name = "CATransform3DEqualToTransform", .linkage = .weak }) orelse missing("CATransform3DEqualToTransform");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(Transform3D, a), objc.abi.toAbi(Transform3D, b)));
+}
+
+/// `CATransform3DMakeTranslation`.
+pub fn transform3DMakeTranslation(tx: cg.Float, ty: cg.Float, tz: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DMakeTranslation", .linkage = .weak }) orelse missing("CATransform3DMakeTranslation");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(cg.Float, tx), objc.abi.toAbi(cg.Float, ty), objc.abi.toAbi(cg.Float, tz)));
+}
+
+/// `CATransform3DMakeScale`.
+pub fn transform3DMakeScale(sx: cg.Float, sy: cg.Float, sz: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DMakeScale", .linkage = .weak }) orelse missing("CATransform3DMakeScale");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(cg.Float, sx), objc.abi.toAbi(cg.Float, sy), objc.abi.toAbi(cg.Float, sz)));
+}
+
+/// `CATransform3DMakeRotation`.
+pub fn transform3DMakeRotation(angle: cg.Float, x: cg.Float, y: cg.Float, z: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DMakeRotation", .linkage = .weak }) orelse missing("CATransform3DMakeRotation");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(cg.Float, angle), objc.abi.toAbi(cg.Float, x), objc.abi.toAbi(cg.Float, y), objc.abi.toAbi(cg.Float, z)));
+}
+
+/// `CATransform3DTranslate`.
+pub fn transform3DTranslate(t: Transform3D, tx: cg.Float, ty: cg.Float, tz: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DTranslate", .linkage = .weak }) orelse missing("CATransform3DTranslate");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(Transform3D, t), objc.abi.toAbi(cg.Float, tx), objc.abi.toAbi(cg.Float, ty), objc.abi.toAbi(cg.Float, tz)));
+}
+
+/// `CATransform3DScale`.
+pub fn transform3DScale(t: Transform3D, sx: cg.Float, sy: cg.Float, sz: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DScale", .linkage = .weak }) orelse missing("CATransform3DScale");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(Transform3D, t), objc.abi.toAbi(cg.Float, sx), objc.abi.toAbi(cg.Float, sy), objc.abi.toAbi(cg.Float, sz)));
+}
+
+/// `CATransform3DRotate`.
+pub fn transform3DRotate(t: Transform3D, angle: cg.Float, x: cg.Float, y: cg.Float, z: cg.Float) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DRotate", .linkage = .weak }) orelse missing("CATransform3DRotate");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(Transform3D, t), objc.abi.toAbi(cg.Float, angle), objc.abi.toAbi(cg.Float, x), objc.abi.toAbi(cg.Float, y), objc.abi.toAbi(cg.Float, z)));
+}
+
+/// `CATransform3DConcat`.
+pub fn transform3DConcat(a: Transform3D, b: Transform3D) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D), objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DConcat", .linkage = .weak }) orelse missing("CATransform3DConcat");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(Transform3D, a), objc.abi.toAbi(Transform3D, b)));
+}
+
+/// `CATransform3DInvert`.
+pub fn transform3DInvert(t: Transform3D) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DInvert", .linkage = .weak }) orelse missing("CATransform3DInvert");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(Transform3D, t)));
+}
+
+/// `CATransform3DMakeAffineTransform`.
+pub fn transform3DMakeAffineTransform(m: cg.AffineTransform) Transform3D {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.AffineTransform)) callconv(.c) objc.abi.Abi(Transform3D), .{ .name = "CATransform3DMakeAffineTransform", .linkage = .weak }) orelse missing("CATransform3DMakeAffineTransform");
+    return objc.abi.fromAbi(Transform3D, function(objc.abi.toAbi(cg.AffineTransform, m)));
+}
+
+/// `CATransform3DIsAffine`.
+pub fn transform3DIsAffine(t: Transform3D) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(bool), .{ .name = "CATransform3DIsAffine", .linkage = .weak }) orelse missing("CATransform3DIsAffine");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(Transform3D, t)));
+}
+
+/// `CATransform3DGetAffineTransform`.
+pub fn transform3DGetAffineTransform(t: Transform3D) cg.AffineTransform {
+    const function = @extern(?*const fn (objc.abi.Abi(Transform3D)) callconv(.c) objc.abi.Abi(cg.AffineTransform), .{ .name = "CATransform3DGetAffineTransform", .linkage = .weak }) orelse missing("CATransform3DGetAffineTransform");
+    return objc.abi.fromAbi(cg.AffineTransform, function(objc.abi.toAbi(Transform3D, t)));
+}
+
+/// `kCAFillModeForwards`.
+pub fn fillModeForwards() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillModeForwards", .linkage = .weak }) orelse missing("kCAFillModeForwards");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFillModeBackwards`.
+pub fn fillModeBackwards() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillModeBackwards", .linkage = .weak }) orelse missing("kCAFillModeBackwards");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFillModeBoth`.
+pub fn fillModeBoth() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillModeBoth", .linkage = .weak }) orelse missing("kCAFillModeBoth");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFillModeRemoved`.
+pub fn fillModeRemoved() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillModeRemoved", .linkage = .weak }) orelse missing("kCAFillModeRemoved");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CAToneMapModeAutomatic`.
+pub fn toneMapModeAutomatic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CAToneMapModeAutomatic", .linkage = .weak }) orelse missing("CAToneMapModeAutomatic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CAToneMapModeNever`.
+pub fn toneMapModeNever() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CAToneMapModeNever", .linkage = .weak }) orelse missing("CAToneMapModeNever");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CAToneMapModeIfSupported`.
+pub fn toneMapModeIfSupported() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CAToneMapModeIfSupported", .linkage = .weak }) orelse missing("CAToneMapModeIfSupported");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CADynamicRangeAutomatic`.
+pub fn dynamicRangeAutomatic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CADynamicRangeAutomatic", .linkage = .weak }) orelse missing("CADynamicRangeAutomatic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CADynamicRangeStandard`.
+pub fn dynamicRangeStandard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CADynamicRangeStandard", .linkage = .weak }) orelse missing("CADynamicRangeStandard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CADynamicRangeConstrainedHigh`.
+pub fn dynamicRangeConstrainedHigh() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CADynamicRangeConstrainedHigh", .linkage = .weak }) orelse missing("CADynamicRangeConstrainedHigh");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CADynamicRangeHigh`.
+pub fn dynamicRangeHigh() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "CADynamicRangeHigh", .linkage = .weak }) orelse missing("CADynamicRangeHigh");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityCenter`.
+pub fn gravityCenter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityCenter", .linkage = .weak }) orelse missing("kCAGravityCenter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityTop`.
+pub fn gravityTop() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityTop", .linkage = .weak }) orelse missing("kCAGravityTop");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityBottom`.
+pub fn gravityBottom() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityBottom", .linkage = .weak }) orelse missing("kCAGravityBottom");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityLeft`.
+pub fn gravityLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityLeft", .linkage = .weak }) orelse missing("kCAGravityLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityRight`.
+pub fn gravityRight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityRight", .linkage = .weak }) orelse missing("kCAGravityRight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityTopLeft`.
+pub fn gravityTopLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityTopLeft", .linkage = .weak }) orelse missing("kCAGravityTopLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityTopRight`.
+pub fn gravityTopRight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityTopRight", .linkage = .weak }) orelse missing("kCAGravityTopRight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityBottomLeft`.
+pub fn gravityBottomLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityBottomLeft", .linkage = .weak }) orelse missing("kCAGravityBottomLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityBottomRight`.
+pub fn gravityBottomRight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityBottomRight", .linkage = .weak }) orelse missing("kCAGravityBottomRight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityResize`.
+pub fn gravityResize() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityResize", .linkage = .weak }) orelse missing("kCAGravityResize");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityResizeAspect`.
+pub fn gravityResizeAspect() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityResizeAspect", .linkage = .weak }) orelse missing("kCAGravityResizeAspect");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGravityResizeAspectFill`.
+pub fn gravityResizeAspectFill() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGravityResizeAspectFill", .linkage = .weak }) orelse missing("kCAGravityResizeAspectFill");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAContentsFormatRGBA8Uint`.
+pub fn contentsFormatRGBA8Uint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAContentsFormatRGBA8Uint", .linkage = .weak }) orelse missing("kCAContentsFormatRGBA8Uint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAContentsFormatRGBA16Float`.
+pub fn contentsFormatRGBA16Float() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAContentsFormatRGBA16Float", .linkage = .weak }) orelse missing("kCAContentsFormatRGBA16Float");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAContentsFormatGray8Uint`.
+pub fn contentsFormatGray8Uint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAContentsFormatGray8Uint", .linkage = .weak }) orelse missing("kCAContentsFormatGray8Uint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAContentsFormatAutomatic`.
+pub fn contentsFormatAutomatic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAContentsFormatAutomatic", .linkage = .weak }) orelse missing("kCAContentsFormatAutomatic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFilterNearest`.
+pub fn filterNearest() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFilterNearest", .linkage = .weak }) orelse missing("kCAFilterNearest");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFilterLinear`.
+pub fn filterLinear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFilterLinear", .linkage = .weak }) orelse missing("kCAFilterLinear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFilterTrilinear`.
+pub fn filterTrilinear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFilterTrilinear", .linkage = .weak }) orelse missing("kCAFilterTrilinear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCACornerCurveCircular`.
+pub fn cornerCurveCircular() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCACornerCurveCircular", .linkage = .weak }) orelse missing("kCACornerCurveCircular");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCACornerCurveContinuous`.
+pub fn cornerCurveContinuous() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCACornerCurveContinuous", .linkage = .weak }) orelse missing("kCACornerCurveContinuous");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAOnOrderIn`.
+pub fn onOrderIn() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAOnOrderIn", .linkage = .weak }) orelse missing("kCAOnOrderIn");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAOnOrderOut`.
+pub fn onOrderOut() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAOnOrderOut", .linkage = .weak }) orelse missing("kCAOnOrderOut");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransition`.
+pub fn transition() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransition", .linkage = .weak }) orelse missing("kCATransition");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `CAFrameRateRangeDefault`.
+pub fn frameRateRangeDefault() FrameRateRange {
+    const symbol = @extern(?*const objc.abi.Abi(FrameRateRange), .{ .name = "CAFrameRateRangeDefault", .linkage = .weak }) orelse missing("CAFrameRateRangeDefault");
+    return objc.abi.fromAbi(FrameRateRange, symbol.*);
+}
+
+/// `CAFrameRateRangeMake`.
+pub fn frameRateRangeMake(minimum: f32, maximum: f32, preferred: f32) FrameRateRange {
+    const function = @extern(?*const fn (objc.abi.Abi(f32), objc.abi.Abi(f32), objc.abi.Abi(f32)) callconv(.c) objc.abi.Abi(FrameRateRange), .{ .name = "CAFrameRateRangeMake", .linkage = .weak }) orelse missing("CAFrameRateRangeMake");
+    return objc.abi.fromAbi(FrameRateRange, function(objc.abi.toAbi(f32, minimum), objc.abi.toAbi(f32, maximum), objc.abi.toAbi(f32, preferred)));
+}
+
+/// `CAFrameRateRangeIsEqualToRange`.
+pub fn frameRateRangeIsEqualToRange(range: FrameRateRange, other: FrameRateRange) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(FrameRateRange), objc.abi.Abi(FrameRateRange)) callconv(.c) objc.abi.Abi(bool), .{ .name = "CAFrameRateRangeIsEqualToRange", .linkage = .weak }) orelse missing("CAFrameRateRangeIsEqualToRange");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(FrameRateRange, range), objc.abi.toAbi(FrameRateRange, other)));
+}
+
+/// `kCAAnimationLinear`.
+pub fn animationLinear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationLinear", .linkage = .weak }) orelse missing("kCAAnimationLinear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationDiscrete`.
+pub fn animationDiscrete() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationDiscrete", .linkage = .weak }) orelse missing("kCAAnimationDiscrete");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationPaced`.
+pub fn animationPaced() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationPaced", .linkage = .weak }) orelse missing("kCAAnimationPaced");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationCubic`.
+pub fn animationCubic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationCubic", .linkage = .weak }) orelse missing("kCAAnimationCubic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationCubicPaced`.
+pub fn animationCubicPaced() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationCubicPaced", .linkage = .weak }) orelse missing("kCAAnimationCubicPaced");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationRotateAuto`.
+pub fn animationRotateAuto() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationRotateAuto", .linkage = .weak }) orelse missing("kCAAnimationRotateAuto");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAnimationRotateAutoReverse`.
+pub fn animationRotateAutoReverse() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAnimationRotateAutoReverse", .linkage = .weak }) orelse missing("kCAAnimationRotateAutoReverse");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionFade`.
+pub fn transitionFade() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionFade", .linkage = .weak }) orelse missing("kCATransitionFade");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionMoveIn`.
+pub fn transitionMoveIn() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionMoveIn", .linkage = .weak }) orelse missing("kCATransitionMoveIn");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionPush`.
+pub fn transitionPush() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionPush", .linkage = .weak }) orelse missing("kCATransitionPush");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionReveal`.
+pub fn transitionReveal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionReveal", .linkage = .weak }) orelse missing("kCATransitionReveal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionFromRight`.
+pub fn transitionFromRight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionFromRight", .linkage = .weak }) orelse missing("kCATransitionFromRight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionFromLeft`.
+pub fn transitionFromLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionFromLeft", .linkage = .weak }) orelse missing("kCATransitionFromLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionFromTop`.
+pub fn transitionFromTop() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionFromTop", .linkage = .weak }) orelse missing("kCATransitionFromTop");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransitionFromBottom`.
+pub fn transitionFromBottom() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransitionFromBottom", .linkage = .weak }) orelse missing("kCATransitionFromBottom");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerPoint`.
+pub fn emitterLayerPoint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerPoint", .linkage = .weak }) orelse missing("kCAEmitterLayerPoint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerLine`.
+pub fn emitterLayerLine() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerLine", .linkage = .weak }) orelse missing("kCAEmitterLayerLine");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerRectangle`.
+pub fn emitterLayerRectangle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerRectangle", .linkage = .weak }) orelse missing("kCAEmitterLayerRectangle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerCuboid`.
+pub fn emitterLayerCuboid() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerCuboid", .linkage = .weak }) orelse missing("kCAEmitterLayerCuboid");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerCircle`.
+pub fn emitterLayerCircle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerCircle", .linkage = .weak }) orelse missing("kCAEmitterLayerCircle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerSphere`.
+pub fn emitterLayerSphere() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerSphere", .linkage = .weak }) orelse missing("kCAEmitterLayerSphere");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerPoints`.
+pub fn emitterLayerPoints() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerPoints", .linkage = .weak }) orelse missing("kCAEmitterLayerPoints");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerOutline`.
+pub fn emitterLayerOutline() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerOutline", .linkage = .weak }) orelse missing("kCAEmitterLayerOutline");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerSurface`.
+pub fn emitterLayerSurface() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerSurface", .linkage = .weak }) orelse missing("kCAEmitterLayerSurface");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerVolume`.
+pub fn emitterLayerVolume() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerVolume", .linkage = .weak }) orelse missing("kCAEmitterLayerVolume");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerUnordered`.
+pub fn emitterLayerUnordered() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerUnordered", .linkage = .weak }) orelse missing("kCAEmitterLayerUnordered");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerOldestFirst`.
+pub fn emitterLayerOldestFirst() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerOldestFirst", .linkage = .weak }) orelse missing("kCAEmitterLayerOldestFirst");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerOldestLast`.
+pub fn emitterLayerOldestLast() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerOldestLast", .linkage = .weak }) orelse missing("kCAEmitterLayerOldestLast");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerBackToFront`.
+pub fn emitterLayerBackToFront() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerBackToFront", .linkage = .weak }) orelse missing("kCAEmitterLayerBackToFront");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAEmitterLayerAdditive`.
+pub fn emitterLayerAdditive() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAEmitterLayerAdditive", .linkage = .weak }) orelse missing("kCAEmitterLayerAdditive");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAMediaTimingFunctionLinear`.
+pub fn mediaTimingFunctionLinear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAMediaTimingFunctionLinear", .linkage = .weak }) orelse missing("kCAMediaTimingFunctionLinear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAMediaTimingFunctionEaseIn`.
+pub fn mediaTimingFunctionEaseIn() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAMediaTimingFunctionEaseIn", .linkage = .weak }) orelse missing("kCAMediaTimingFunctionEaseIn");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAMediaTimingFunctionEaseOut`.
+pub fn mediaTimingFunctionEaseOut() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAMediaTimingFunctionEaseOut", .linkage = .weak }) orelse missing("kCAMediaTimingFunctionEaseOut");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAMediaTimingFunctionEaseInEaseOut`.
+pub fn mediaTimingFunctionEaseInEaseOut() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAMediaTimingFunctionEaseInEaseOut", .linkage = .weak }) orelse missing("kCAMediaTimingFunctionEaseInEaseOut");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAMediaTimingFunctionDefault`.
+pub fn mediaTimingFunctionDefault() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAMediaTimingFunctionDefault", .linkage = .weak }) orelse missing("kCAMediaTimingFunctionDefault");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGradientLayerAxial`.
+pub fn gradientLayerAxial() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGradientLayerAxial", .linkage = .weak }) orelse missing("kCAGradientLayerAxial");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGradientLayerRadial`.
+pub fn gradientLayerRadial() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGradientLayerRadial", .linkage = .weak }) orelse missing("kCAGradientLayerRadial");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAGradientLayerConic`.
+pub fn gradientLayerConic() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAGradientLayerConic", .linkage = .weak }) orelse missing("kCAGradientLayerConic");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCARendererColorSpace`.
+pub fn rendererColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCARendererColorSpace", .linkage = .weak }) orelse missing("kCARendererColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCARendererMetalCommandQueue`.
+pub fn rendererMetalCommandQueue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCARendererMetalCommandQueue", .linkage = .weak }) orelse missing("kCARendererMetalCommandQueue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAScrollNone`.
+pub fn scrollNone() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAScrollNone", .linkage = .weak }) orelse missing("kCAScrollNone");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAScrollVertically`.
+pub fn scrollVertically() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAScrollVertically", .linkage = .weak }) orelse missing("kCAScrollVertically");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAScrollHorizontally`.
+pub fn scrollHorizontally() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAScrollHorizontally", .linkage = .weak }) orelse missing("kCAScrollHorizontally");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAScrollBoth`.
+pub fn scrollBoth() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAScrollBoth", .linkage = .weak }) orelse missing("kCAScrollBoth");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFillRuleNonZero`.
+pub fn fillRuleNonZero() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillRuleNonZero", .linkage = .weak }) orelse missing("kCAFillRuleNonZero");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAFillRuleEvenOdd`.
+pub fn fillRuleEvenOdd() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAFillRuleEvenOdd", .linkage = .weak }) orelse missing("kCAFillRuleEvenOdd");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineJoinMiter`.
+pub fn lineJoinMiter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineJoinMiter", .linkage = .weak }) orelse missing("kCALineJoinMiter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineJoinRound`.
+pub fn lineJoinRound() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineJoinRound", .linkage = .weak }) orelse missing("kCALineJoinRound");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineJoinBevel`.
+pub fn lineJoinBevel() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineJoinBevel", .linkage = .weak }) orelse missing("kCALineJoinBevel");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineCapButt`.
+pub fn lineCapButt() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineCapButt", .linkage = .weak }) orelse missing("kCALineCapButt");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineCapRound`.
+pub fn lineCapRound() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineCapRound", .linkage = .weak }) orelse missing("kCALineCapRound");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCALineCapSquare`.
+pub fn lineCapSquare() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCALineCapSquare", .linkage = .weak }) orelse missing("kCALineCapSquare");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATruncationNone`.
+pub fn truncationNone() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATruncationNone", .linkage = .weak }) orelse missing("kCATruncationNone");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATruncationStart`.
+pub fn truncationStart() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATruncationStart", .linkage = .weak }) orelse missing("kCATruncationStart");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATruncationEnd`.
+pub fn truncationEnd() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATruncationEnd", .linkage = .weak }) orelse missing("kCATruncationEnd");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATruncationMiddle`.
+pub fn truncationMiddle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATruncationMiddle", .linkage = .weak }) orelse missing("kCATruncationMiddle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAlignmentNatural`.
+pub fn alignmentNatural() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAlignmentNatural", .linkage = .weak }) orelse missing("kCAAlignmentNatural");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAlignmentLeft`.
+pub fn alignmentLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAlignmentLeft", .linkage = .weak }) orelse missing("kCAAlignmentLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAlignmentRight`.
+pub fn alignmentRight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAlignmentRight", .linkage = .weak }) orelse missing("kCAAlignmentRight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAlignmentCenter`.
+pub fn alignmentCenter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAlignmentCenter", .linkage = .weak }) orelse missing("kCAAlignmentCenter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAAlignmentJustified`.
+pub fn alignmentJustified() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAAlignmentJustified", .linkage = .weak }) orelse missing("kCAAlignmentJustified");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransactionAnimationDuration`.
+pub fn transactionAnimationDuration() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransactionAnimationDuration", .linkage = .weak }) orelse missing("kCATransactionAnimationDuration");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransactionDisableActions`.
+pub fn transactionDisableActions() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransactionDisableActions", .linkage = .weak }) orelse missing("kCATransactionDisableActions");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransactionAnimationTimingFunction`.
+pub fn transactionAnimationTimingFunction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransactionAnimationTimingFunction", .linkage = .weak }) orelse missing("kCATransactionAnimationTimingFunction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCATransactionCompletionBlock`.
+pub fn transactionCompletionBlock() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCATransactionCompletionBlock", .linkage = .weak }) orelse missing("kCATransactionCompletionBlock");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionRotateX`.
+pub fn valueFunctionRotateX() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionRotateX", .linkage = .weak }) orelse missing("kCAValueFunctionRotateX");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionRotateY`.
+pub fn valueFunctionRotateY() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionRotateY", .linkage = .weak }) orelse missing("kCAValueFunctionRotateY");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionRotateZ`.
+pub fn valueFunctionRotateZ() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionRotateZ", .linkage = .weak }) orelse missing("kCAValueFunctionRotateZ");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionScale`.
+pub fn valueFunctionScale() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionScale", .linkage = .weak }) orelse missing("kCAValueFunctionScale");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionScaleX`.
+pub fn valueFunctionScaleX() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionScaleX", .linkage = .weak }) orelse missing("kCAValueFunctionScaleX");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionScaleY`.
+pub fn valueFunctionScaleY() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionScaleY", .linkage = .weak }) orelse missing("kCAValueFunctionScaleY");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionScaleZ`.
+pub fn valueFunctionScaleZ() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionScaleZ", .linkage = .weak }) orelse missing("kCAValueFunctionScaleZ");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionTranslate`.
+pub fn valueFunctionTranslate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionTranslate", .linkage = .weak }) orelse missing("kCAValueFunctionTranslate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionTranslateX`.
+pub fn valueFunctionTranslateX() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionTranslateX", .linkage = .weak }) orelse missing("kCAValueFunctionTranslateX");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionTranslateY`.
+pub fn valueFunctionTranslateY() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionTranslateY", .linkage = .weak }) orelse missing("kCAValueFunctionTranslateY");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `kCAValueFunctionTranslateZ`.
+pub fn valueFunctionTranslateZ() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "kCAValueFunctionTranslateZ", .linkage = .weak }) orelse missing("kCAValueFunctionTranslateZ");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+// Not generated:
+//   MTLCopyAllDevicesWithObserver()
+//   MTLIOCreateCompressionContext: MTLIOCompressionContext  _Nullable
+//   MTLIOFlushAndDestroyCompressionContext: MTLIOCompressionStatus

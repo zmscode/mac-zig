@@ -110,7 +110,7 @@ pub fn Array(comptime T: type) type {
 
         /// A sorted copy, ordered by `order`. Autoreleased.
         pub fn sorted(self: Self, comptime order: fn (T, T) std.math.Order) Self {
-            const Compare = objc.Block(struct {}, &.{ T, T }, objc.Integer);
+            const Compare = objc.Block(struct {}, fn (T, T) objc.Integer);
             var comparator = Compare.init(.{}, struct {
                 fn body(_: *const Compare.Captures, a: T, b: T) objc.Integer {
                     return switch (order(a, b)) {

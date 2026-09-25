@@ -40,8 +40,11 @@
 //! `NSString *` is `foundation.String`, `NSArray<NSWindow *> *` is
 //! `foundation.Array(Window)`, `NSRect` is `cg.Rect`, `BOOL` is `bool`, a
 //! `_Nullable` object is an optional. A class not generated here is
-//! `objc.Object`, and a block parameter is `anytype` -- pass a pointer to
-//! an `objc.Block`.
+//! `objc.Object`, and a block parameter is an `objc.BlockRef` of the SDK's
+//! signature -- pass `block.ref()` of an `objc.Block` with that signature.
+//!
+//! Constants and C functions are under `all`, in lower camel case:
+//! `appkit.all.windowWillCloseNotification()`, `appkit.all.beep()`.
 //!
 //! Inherited methods live on the superclass's wrapper: `into` converts,
 //! and refuses at compile time to convert to something that is not an
@@ -94,6 +97,11 @@ pub const EdgeInsets = generated.EdgeInsets;
 pub const ApplicationDelegate = generated.ApplicationDelegate;
 pub const WindowDelegate = generated.WindowDelegate;
 pub const MenuDelegate = generated.MenuDelegate;
+
+/// Everything generated: every class, protocol, enum and struct by its name
+/// without `NS`, and every constant and C function in lower camel case --
+/// `appkit.all.windowWillCloseNotification()`, `appkit.all.beep()`.
+pub const all = generated;
 
 /// Every generated enum and option set, by its name without `NS`.
 pub const enums = generated;

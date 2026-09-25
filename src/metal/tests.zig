@@ -190,3 +190,60 @@ test "an IOSurface shared between cg, Metal and a layer, without copies" {
     layer.setContents(objc.Object.fromCf(surface));
     try std.testing.expect(layer.contents().?.value == @as(*anyopaque, @ptrCast(surface.handle)));
 }
+
+// -- blocks the SDK calls back ---------------------------------------------
+
+const dispatch = @import("../dispatch/dispatch.zig");
+
+test "a completion handler: a typed block, copied by Metal and called from its thread" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+
+    const device = metal.createSystemDefaultDevice() orelse return error.SkipZigTest;
+    defer device.release();
+    const queue = device.newCommandQueue().?;
+    defer queue.release();
+
+    const Done = objc.Block(struct {
+        done: *dispatch.Semaphore,
+        status: *std.atomic.Value(u64),
+    }, fn (metal.CommandBuffer) void);
+
+    var semaphore: dispatch.Semaphore = .init(0);
+    defer semaphore.deinit();
+    var status: std.atomic.Value(u64) = .init(0);
+
+    var handler = Done.init(.{ .done = &semaphore, .status = &status }, struct {
+        fn body(captures: *const Done.Captures, commands: metal.CommandBuffer) void {
+            captures.status.store(@backingInt(commands.status()), .release);
+            captures.done.signal();
+        }
+    }.body);
+
+    const commands = queue.commandBuffer().?;
+    // `addCompletedHandler` takes a BlockRef(fn (CommandBuffer) void); a
+    // block of any other signature would not compile.
+    commands.addCompletedHandler(handler.ref());
+    commands.commit();
+
+    try std.testing.expect(semaphore.wait(5));
+    try std.testing.expectEqual(@backingInt(generated.CommandBufferStatus.completed), status.load(.acquire));
+}
+
+test "every generated constant and function compiles" {
+    @setEvalBranchQuota(1_000_000);
+    inline for (@typeInfo(generated).@"struct".decl_names) |name| {
+        const member = @field(generated, name);
+        const info = @typeInfo(@TypeOf(member));
+        if (info == .@"fn" and !info.@"fn".is_generic) std.mem.doNotOptimizeAway(&member);
+    }
+}
+
+test "QuartzCore's constants and functions, called" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+    try std.testing.expect(metal.all.currentMediaTime() > 0);
+    try std.testing.expect(metal.all.gravityTopLeft().eql(.literal("topLeft")));
+    const scale = metal.all.transform3DMakeScale(2, 3, 4);
+    try std.testing.expectEqual(@as(f64, 3), scale.m22);
+}

@@ -26,6 +26,13 @@ fn lookUp(comptime name: [:0]const u8) objc.Class {
 
 const framework = "AppKit";
 
+/// Every constant and C function is linked weakly: one that a newer SDK
+/// declares and the running macOS lacks leaves the program able to start,
+/// and panics only if it is used.
+fn missing(comptime name: []const u8) noreturn {
+    @panic(name ++ " is not in this version of macOS");
+}
+
 /// `NSEdgeInsets`.
 pub const EdgeInsets = extern struct {
     top: cg.Float,
@@ -1555,7 +1562,7 @@ pub const Application = extern struct {
     }
 
     /// `-[NSApplication enumerateWindowsWithOptions:usingBlock:]`
-    pub fn enumerateWindowsWithOptionsUsingBlock(self: Self, options: WindowListOptions, block: anytype) void {
+    pub fn enumerateWindowsWithOptionsUsingBlock(self: Self, options: WindowListOptions, block: objc.BlockRef(fn (Window, ?*bool) void)) void {
         return self.object.msgSend(void, "enumerateWindowsWithOptions:usingBlock:", .{ options, block });
     }
 
@@ -2010,7 +2017,7 @@ pub const Application = extern struct {
     }
 
     /// `-[NSApplication restoreWindowWithIdentifier:state:completionHandler:]`
-    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: ?foundation.String, state: objc.Object, completion_handler: anytype) bool {
+    pub fn restoreWindowWithIdentifierStateCompletionHandler(self: Self, identifier: ?foundation.String, state: objc.Object, completion_handler: objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool {
         return self.object.msgSend(bool, "restoreWindowWithIdentifier:state:completionHandler:", .{ identifier, state, completion_handler });
     }
 
@@ -2430,6 +2437,7 @@ pub const Application = extern struct {
         pub const @"terminate:" = fn (?objc.Object) void;
         pub const @"requestUserAttention:" = fn (RequestUserAttentionType) objc.Integer;
         pub const @"cancelUserAttentionRequest:" = fn (objc.Integer) void;
+        pub const @"enumerateWindowsWithOptions:usingBlock:" = fn (WindowListOptions, objc.BlockRef(fn (Window, ?*bool) void)) void;
         pub const preventWindowOrdering = fn () void;
         pub const @"setWindowsNeedUpdate:" = fn (bool) void;
         pub const updateWindows = fn () void;
@@ -2520,6 +2528,7 @@ pub const Application = extern struct {
         pub const @"registerUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
         pub const @"unregisterUserInterfaceItemSearchHandler:" = fn (objc.Object) void;
         pub const @"searchString:inUserInterfaceItemString:searchRange:foundRange:" = fn (foundation.String, foundation.String, objc.Range, ?*objc.Range) bool;
+        pub const @"restoreWindowWithIdentifier:state:completionHandler:" = fn (?foundation.String, objc.Object, objc.BlockRef(fn (?Window, ?foundation.ErrorObject) void)) bool;
         pub const extendStateRestoration = fn () void;
         pub const completeStateRestoration = fn () void;
     };
@@ -3125,12 +3134,12 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow beginSheet:completionHandler:]`
-    pub fn beginSheetCompletionHandler(self: Self, sheet_window: Window, handler: anytype) void {
+    pub fn beginSheetCompletionHandler(self: Self, sheet_window: Window, handler: ?objc.BlockRef(fn (objc.Integer) void)) void {
         return self.object.msgSend(void, "beginSheet:completionHandler:", .{ sheet_window, handler });
     }
 
     /// `-[NSWindow beginCriticalSheet:completionHandler:]`
-    pub fn beginCriticalSheetCompletionHandler(self: Self, sheet_window: Window, handler: anytype) void {
+    pub fn beginCriticalSheetCompletionHandler(self: Self, sheet_window: Window, handler: ?objc.BlockRef(fn (objc.Integer) void)) void {
         return self.object.msgSend(void, "beginCriticalSheet:completionHandler:", .{ sheet_window, handler });
     }
 
@@ -3270,17 +3279,17 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow transferWindowSharingToWindow:completionHandler:]`
-    pub fn transferWindowSharingToWindowCompletionHandler(self: Self, window: Window, completion_handler: anytype) void {
+    pub fn transferWindowSharingToWindowCompletionHandler(self: Self, window: Window, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "transferWindowSharingToWindow:completionHandler:", .{ window, completion_handler });
     }
 
     /// `-[NSWindow requestSharingOfWindow:completionHandler:]`
-    pub fn requestSharingOfWindowCompletionHandler(self: Self, window: Window, completion_handler: anytype) void {
+    pub fn requestSharingOfWindowCompletionHandler(self: Self, window: Window, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "requestSharingOfWindow:completionHandler:", .{ window, completion_handler });
     }
 
     /// `-[NSWindow requestSharingOfWindowUsingPreview:title:completionHandler:]`
-    pub fn requestSharingOfWindowUsingPreviewTitleCompletionHandler(self: Self, image: Image, title_: foundation.String, completion_handler: anytype) void {
+    pub fn requestSharingOfWindowUsingPreviewTitleCompletionHandler(self: Self, image: Image, title_: foundation.String, completion_handler: objc.BlockRef(fn (?foundation.ErrorObject) void)) void {
         return self.object.msgSend(void, "requestSharingOfWindowUsingPreview:title:completionHandler:", .{ image, title_, completion_handler });
     }
 
@@ -4090,7 +4099,7 @@ pub const Window = extern struct {
     }
 
     /// `-[NSWindow trackEventsMatchingMask:timeout:mode:handler:]`
-    pub fn trackEventsMatchingMaskTimeoutModeHandler(self: Self, mask: EventMask, timeout: f64, mode: ?foundation.String, tracking_handler: anytype) void {
+    pub fn trackEventsMatchingMaskTimeoutModeHandler(self: Self, mask: EventMask, timeout: f64, mode: ?foundation.String, tracking_handler: objc.BlockRef(fn (?Event, ?*bool) void)) void {
         return self.object.msgSend(void, "trackEventsMatchingMask:timeout:mode:handler:", .{ mask, timeout, mode, tracking_handler });
     }
 
@@ -4933,6 +4942,8 @@ pub const Window = extern struct {
         pub const @"setFrameUsingName:" = fn (?foundation.String) bool;
         pub const @"setFrameAutosaveName:" = fn (?foundation.String) bool;
         pub const @"+removeFrameUsingName:" = fn (?foundation.String) void;
+        pub const @"beginSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
+        pub const @"beginCriticalSheet:completionHandler:" = fn (Window, ?objc.BlockRef(fn (objc.Integer) void)) void;
         pub const @"endSheet:" = fn (Window) void;
         pub const @"endSheet:returnCode:" = fn (Window, objc.Integer) void;
         pub const @"+standardWindowButton:forStyleMask:" = fn (WindowButton, WindowStyleMask) ?objc.Object;
@@ -4960,6 +4971,9 @@ pub const Window = extern struct {
         pub const @"toggleTabBar:" = fn (?objc.Object) void;
         pub const @"toggleTabOverview:" = fn (?objc.Object) void;
         pub const @"addTabbedWindow:ordered:" = fn (Window, WindowOrderingMode) void;
+        pub const @"transferWindowSharingToWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"requestSharingOfWindow:completionHandler:" = fn (Window, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
+        pub const @"requestSharingOfWindowUsingPreview:title:completionHandler:" = fn (Image, foundation.String, objc.BlockRef(fn (?foundation.ErrorObject) void)) void;
         pub const @"+defaultDepthLimit" = fn () WindowDepth;
         pub const title = fn () foundation.String;
         pub const @"setTitle:" = fn (foundation.String) void;
@@ -5121,6 +5135,7 @@ pub const Window = extern struct {
         pub const tabGroup = fn () objc.Object;
         pub const hasActiveWindowSharingSession = fn () bool;
         pub const windowTitlebarLayoutDirection = fn () UserInterfaceLayoutDirection;
+        pub const @"trackEventsMatchingMask:timeout:mode:handler:" = fn (EventMask, f64, ?foundation.String, objc.BlockRef(fn (?Event, ?*bool) void)) void;
         pub const @"nextEventMatchingMask:" = fn (EventMask) ?Event;
         pub const @"nextEventMatchingMask:untilDate:inMode:dequeue:" = fn (EventMask, ?objc.Object, ?foundation.String, bool) ?Event;
         pub const @"discardEventsMatchingMask:beforeEvent:" = fn (EventMask, ?Event) void;
@@ -6372,7 +6387,7 @@ pub const View = extern struct {
     }
 
     /// `-[NSView showDefinitionForAttributedString:range:options:baselineOriginProvider:]`
-    pub fn showDefinitionForAttributedStringRangeOptionsBaselineOriginProvider(self: Self, attr_string: ?objc.Object, target_range: objc.Range, options: ?foundation.Dictionary(objc.Object, objc.Object), origin_provider: anytype) void {
+    pub fn showDefinitionForAttributedStringRangeOptionsBaselineOriginProvider(self: Self, attr_string: ?objc.Object, target_range: objc.Range, options: ?foundation.Dictionary(objc.Object, objc.Object), origin_provider: ?objc.BlockRef(fn (objc.Range) cg.Point)) void {
         return self.object.msgSend(void, "showDefinitionForAttributedString:range:options:baselineOriginProvider:", .{ attr_string, target_range, options, origin_provider });
     }
 
@@ -7573,6 +7588,7 @@ pub const View = extern struct {
         pub const @"exitFullScreenModeWithOptions:" = fn (?foundation.Dictionary(objc.Object, objc.Object)) void;
         pub const isInFullScreenMode = fn () bool;
         pub const @"showDefinitionForAttributedString:atPoint:" = fn (?objc.Object, cg.Point) void;
+        pub const @"showDefinitionForAttributedString:range:options:baselineOriginProvider:" = fn (?objc.Object, objc.Range, ?foundation.Dictionary(objc.Object, objc.Object), ?objc.BlockRef(fn (objc.Range) cg.Point)) void;
         pub const isDrawingFindIndicator = fn () bool;
         pub const @"addGestureRecognizer:" = fn (objc.Object) void;
         pub const @"removeGestureRecognizer:" = fn (objc.Object) void;
@@ -7949,8 +7965,8 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithGenericGamma22White:alpha:]`
-    pub fn colorWithGenericGamma22WhiteAlpha(white: cg.Float, alpha: cg.Float) Color {
-        return class().msgSend(Color, "colorWithGenericGamma22White:alpha:", .{ white, alpha });
+    pub fn colorWithGenericGamma22WhiteAlpha(white_: cg.Float, alpha: cg.Float) Color {
+        return class().msgSend(Color, "colorWithGenericGamma22White:alpha:", .{ white_, alpha });
     }
 
     /// `+[NSColor colorWithDisplayP3Red:green:blue:alpha:]`
@@ -7959,8 +7975,8 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithWhite:alpha:]`
-    pub fn colorWithWhiteAlpha(white: cg.Float, alpha: cg.Float) Color {
-        return class().msgSend(Color, "colorWithWhite:alpha:", .{ white, alpha });
+    pub fn colorWithWhiteAlpha(white_: cg.Float, alpha: cg.Float) Color {
+        return class().msgSend(Color, "colorWithWhite:alpha:", .{ white_, alpha });
     }
 
     /// `+[NSColor colorWithRed:green:blue:alpha:]`
@@ -7994,13 +8010,13 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithName:dynamicProvider:]`
-    pub fn colorWithNameDynamicProvider(color_name: ?foundation.String, dynamic_provider: anytype) Color {
+    pub fn colorWithNameDynamicProvider(color_name: ?foundation.String, dynamic_provider: objc.BlockRef(fn (objc.Object) Color)) Color {
         return class().msgSend(Color, "colorWithName:dynamicProvider:", .{ color_name, dynamic_provider });
     }
 
     /// `+[NSColor colorWithDeviceWhite:alpha:]`
-    pub fn colorWithDeviceWhiteAlpha(white: cg.Float, alpha: cg.Float) Color {
-        return class().msgSend(Color, "colorWithDeviceWhite:alpha:", .{ white, alpha });
+    pub fn colorWithDeviceWhiteAlpha(white_: cg.Float, alpha: cg.Float) Color {
+        return class().msgSend(Color, "colorWithDeviceWhite:alpha:", .{ white_, alpha });
     }
 
     /// `+[NSColor colorWithDeviceRed:green:blue:alpha:]`
@@ -8014,13 +8030,13 @@ pub const Color = extern struct {
     }
 
     /// `+[NSColor colorWithDeviceCyan:magenta:yellow:black:alpha:]`
-    pub fn colorWithDeviceCyanMagentaYellowBlackAlpha(cyan: cg.Float, magenta: cg.Float, yellow: cg.Float, black: cg.Float, alpha: cg.Float) Color {
-        return class().msgSend(Color, "colorWithDeviceCyan:magenta:yellow:black:alpha:", .{ cyan, magenta, yellow, black, alpha });
+    pub fn colorWithDeviceCyanMagentaYellowBlackAlpha(cyan: cg.Float, magenta: cg.Float, yellow: cg.Float, black_: cg.Float, alpha: cg.Float) Color {
+        return class().msgSend(Color, "colorWithDeviceCyan:magenta:yellow:black:alpha:", .{ cyan, magenta, yellow, black_, alpha });
     }
 
     /// `+[NSColor colorWithCalibratedWhite:alpha:]`
-    pub fn colorWithCalibratedWhiteAlpha(white: cg.Float, alpha: cg.Float) Color {
-        return class().msgSend(Color, "colorWithCalibratedWhite:alpha:", .{ white, alpha });
+    pub fn colorWithCalibratedWhiteAlpha(white_: cg.Float, alpha: cg.Float) Color {
+        return class().msgSend(Color, "colorWithCalibratedWhite:alpha:", .{ white_, alpha });
     }
 
     /// `+[NSColor colorWithCalibratedRed:green:blue:alpha:]`
@@ -8119,13 +8135,13 @@ pub const Color = extern struct {
     }
 
     /// `-[NSColor getWhite:alpha:]`
-    pub fn getWhiteAlpha(self: Self, white: ?*cg.Float, alpha: ?*cg.Float) void {
-        return self.object.msgSend(void, "getWhite:alpha:", .{ white, alpha });
+    pub fn getWhiteAlpha(self: Self, white_: ?*cg.Float, alpha: ?*cg.Float) void {
+        return self.object.msgSend(void, "getWhite:alpha:", .{ white_, alpha });
     }
 
     /// `-[NSColor getCyan:magenta:yellow:black:alpha:]`
-    pub fn getCyanMagentaYellowBlackAlpha(self: Self, cyan: ?*cg.Float, magenta: ?*cg.Float, yellow: ?*cg.Float, black: ?*cg.Float, alpha: ?*cg.Float) void {
-        return self.object.msgSend(void, "getCyan:magenta:yellow:black:alpha:", .{ cyan, magenta, yellow, black, alpha });
+    pub fn getCyanMagentaYellowBlackAlpha(self: Self, cyan: ?*cg.Float, magenta: ?*cg.Float, yellow: ?*cg.Float, black_: ?*cg.Float, alpha: ?*cg.Float) void {
+        return self.object.msgSend(void, "getCyan:magenta:yellow:black:alpha:", .{ cyan, magenta, yellow, black_, alpha });
     }
 
     /// `-[NSColor getComponents:]`
@@ -8733,6 +8749,7 @@ pub const Color = extern struct {
         pub const @"+colorWithCatalogName:colorName:" = fn (?foundation.String, ?foundation.String) ?Color;
         pub const @"+colorNamed:bundle:" = fn (?foundation.String, ?objc.Object) ?Color;
         pub const @"+colorNamed:" = fn (?foundation.String) ?Color;
+        pub const @"+colorWithName:dynamicProvider:" = fn (?foundation.String, objc.BlockRef(fn (objc.Object) Color)) Color;
         pub const @"+colorWithDeviceWhite:alpha:" = fn (cg.Float, cg.Float) Color;
         pub const @"+colorWithDeviceRed:green:blue:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
         pub const @"+colorWithDeviceHue:saturation:brightness:alpha:" = fn (cg.Float, cg.Float, cg.Float, cg.Float) Color;
@@ -8961,7 +8978,7 @@ pub const Event = extern struct {
     }
 
     /// `-[NSEvent trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:]`
-    pub fn trackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandler(self: Self, options: EventSwipeTrackingOptions, min_dampen_threshold: cg.Float, max_dampen_threshold: cg.Float, tracking_handler: anytype) void {
+    pub fn trackSwipeEventWithOptionsDampenAmountThresholdMinMaxUsingHandler(self: Self, options: EventSwipeTrackingOptions, min_dampen_threshold: cg.Float, max_dampen_threshold: cg.Float, tracking_handler: objc.BlockRef(fn (cg.Float, EventPhase, bool, ?*bool) void)) void {
         return self.object.msgSend(void, "trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:", .{ options, min_dampen_threshold, max_dampen_threshold, tracking_handler });
     }
 
@@ -8996,12 +9013,12 @@ pub const Event = extern struct {
     }
 
     /// `+[NSEvent addGlobalMonitorForEventsMatchingMask:handler:]`
-    pub fn addGlobalMonitorForEventsMatchingMaskHandler(mask: EventMask, block: anytype) ?objc.Object {
+    pub fn addGlobalMonitorForEventsMatchingMaskHandler(mask: EventMask, block: objc.BlockRef(fn (Event) void)) ?objc.Object {
         return class().msgSend(?objc.Object, "addGlobalMonitorForEventsMatchingMask:handler:", .{ mask, block });
     }
 
     /// `+[NSEvent addLocalMonitorForEventsMatchingMask:handler:]`
-    pub fn addLocalMonitorForEventsMatchingMaskHandler(mask: EventMask, block: anytype) ?objc.Object {
+    pub fn addLocalMonitorForEventsMatchingMaskHandler(mask: EventMask, block: objc.BlockRef(fn (Event) ?Event)) ?objc.Object {
         return class().msgSend(?objc.Object, "addLocalMonitorForEventsMatchingMask:handler:", .{ mask, block });
     }
 
@@ -9349,12 +9366,15 @@ pub const Event = extern struct {
         pub const allTouches = fn () objc.Object;
         pub const @"touchesForView:" = fn (View) objc.Object;
         pub const @"coalescedTouchesForTouch:" = fn (objc.Object) foundation.Array(objc.Object);
+        pub const @"trackSwipeEventWithOptions:dampenAmountThresholdMin:max:usingHandler:" = fn (EventSwipeTrackingOptions, cg.Float, cg.Float, objc.BlockRef(fn (cg.Float, EventPhase, bool, ?*bool) void)) void;
         pub const @"+startPeriodicEventsAfterDelay:withPeriod:" = fn (f64, f64) void;
         pub const @"+stopPeriodicEvents" = fn () void;
         pub const @"+mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure:" = fn (EventType, cg.Point, EventModifierFlags, f64, objc.Integer, ?GraphicsContext, objc.Integer, objc.Integer, f32) ?Event;
         pub const @"+keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:" = fn (EventType, cg.Point, EventModifierFlags, f64, objc.Integer, ?GraphicsContext, foundation.String, foundation.String, bool, c_ushort) ?Event;
         pub const @"+enterExitEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:trackingNumber:userData:" = fn (EventType, cg.Point, EventModifierFlags, f64, objc.Integer, ?GraphicsContext, objc.Integer, objc.Integer, ?*anyopaque) ?Event;
         pub const @"+otherEventWithType:location:modifierFlags:timestamp:windowNumber:context:subtype:data1:data2:" = fn (EventType, cg.Point, EventModifierFlags, f64, objc.Integer, ?GraphicsContext, c_short, objc.Integer, objc.Integer) ?Event;
+        pub const @"+addGlobalMonitorForEventsMatchingMask:handler:" = fn (EventMask, objc.BlockRef(fn (Event) void)) ?objc.Object;
+        pub const @"+addLocalMonitorForEventsMatchingMask:handler:" = fn (EventMask, objc.BlockRef(fn (Event) ?Event)) ?objc.Object;
         pub const @"+removeMonitor:" = fn (objc.Object) void;
         pub const @"type" = fn () EventType;
         pub const modifierFlags = fn () EventModifierFlags;
@@ -9751,12 +9771,12 @@ pub const Menu = extern struct {
     }
 
     /// `+[NSMenu paletteMenuWithColors:titles:selectionHandler:]`
-    pub fn paletteMenuWithColorsTitlesSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), on_selection_change: anytype) Menu {
+    pub fn paletteMenuWithColorsTitlesSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), on_selection_change: ?objc.BlockRef(fn (Menu) void)) Menu {
         return class().msgSend(Menu, "paletteMenuWithColors:titles:selectionHandler:", .{ colors, item_titles, on_selection_change });
     }
 
     /// `+[NSMenu paletteMenuWithColors:titles:templateImage:selectionHandler:]`
-    pub fn paletteMenuWithColorsTitlesTemplateImageSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), image: Image, on_selection_change: anytype) Menu {
+    pub fn paletteMenuWithColorsTitlesTemplateImageSelectionHandler(colors: foundation.Array(Color), item_titles: foundation.Array(foundation.String), image: Image, on_selection_change: ?objc.BlockRef(fn (Menu) void)) Menu {
         return class().msgSend(Menu, "paletteMenuWithColors:titles:templateImage:selectionHandler:", .{ colors, item_titles, image, on_selection_change });
     }
 
@@ -9938,6 +9958,8 @@ pub const Menu = extern struct {
         pub const @"setShowsStateColumn:" = fn (bool) void;
         pub const userInterfaceLayoutDirection = fn () UserInterfaceLayoutDirection;
         pub const @"setUserInterfaceLayoutDirection:" = fn (UserInterfaceLayoutDirection) void;
+        pub const @"+paletteMenuWithColors:titles:selectionHandler:" = fn (foundation.Array(Color), foundation.Array(foundation.String), ?objc.BlockRef(fn (Menu) void)) Menu;
+        pub const @"+paletteMenuWithColors:titles:templateImage:selectionHandler:" = fn (foundation.Array(Color), foundation.Array(foundation.String), Image, ?objc.BlockRef(fn (Menu) void)) Menu;
         pub const presentationStyle = fn () MenuPresentationStyle;
         pub const @"setPresentationStyle:" = fn (MenuPresentationStyle) void;
         pub const selectionMode = fn () MenuSelectionMode;
@@ -10563,7 +10585,7 @@ pub const Image = extern struct {
     }
 
     /// `+[NSImage imageWithSize:flipped:drawingHandler:]`
-    pub fn imageWithSizeFlippedDrawingHandler(size_: cg.Size, drawing_handler_should_be_called_with_flipped_context: bool, drawing_handler: anytype) Image {
+    pub fn imageWithSizeFlippedDrawingHandler(size_: cg.Size, drawing_handler_should_be_called_with_flipped_context: bool, drawing_handler: objc.BlockRef(fn (cg.Rect) bool)) Image {
         return class().msgSend(Image, "imageWithSize:flipped:drawingHandler:", .{ size_, drawing_handler_should_be_called_with_flipped_context, drawing_handler });
     }
 
@@ -10853,6 +10875,7 @@ pub const Image = extern struct {
         pub const @"initByReferencingURL:" = fn (foundation.Url) Image;
         pub const @"initWithPasteboard:" = fn (objc.Object) ?Image;
         pub const @"initWithDataIgnoringOrientation:" = fn (foundation.Data) ?Image;
+        pub const @"+imageWithSize:flipped:drawingHandler:" = fn (cg.Size, bool, objc.BlockRef(fn (cg.Rect) bool)) Image;
         pub const @"setName:" = fn (?foundation.String) bool;
         pub const name = fn () ?foundation.String;
         pub const @"drawAtPoint:fromRect:operation:fraction:" = fn (cg.Point, cg.Rect, CompositingOperation, cg.Float) void;
@@ -12378,8 +12401,8 @@ pub const ApplicationDelegate = extern struct {
     }
 
     /// `-[NSApplicationDelegate applicationSupportsSecureRestorableState:]`
-    pub fn applicationSupportsSecureRestorableState(self: Self, app: Application) bool {
-        return self.object.msgSend(bool, "applicationSupportsSecureRestorableState:", .{app});
+    pub fn applicationSupportsSecureRestorableState(self: Self, app_: Application) bool {
+        return self.object.msgSend(bool, "applicationSupportsSecureRestorableState:", .{app_});
     }
 
     /// `-[NSApplicationDelegate application:handlerForIntent:]`
@@ -12388,13 +12411,13 @@ pub const ApplicationDelegate = extern struct {
     }
 
     /// `-[NSApplicationDelegate application:willEncodeRestorableState:]`
-    pub fn applicationWillEncodeRestorableState(self: Self, app: Application, coder: objc.Object) void {
-        return self.object.msgSend(void, "application:willEncodeRestorableState:", .{ app, coder });
+    pub fn applicationWillEncodeRestorableState(self: Self, app_: Application, coder: objc.Object) void {
+        return self.object.msgSend(void, "application:willEncodeRestorableState:", .{ app_, coder });
     }
 
     /// `-[NSApplicationDelegate application:didDecodeRestorableState:]`
-    pub fn applicationDidDecodeRestorableState(self: Self, app: Application, coder: objc.Object) void {
-        return self.object.msgSend(void, "application:didDecodeRestorableState:", .{ app, coder });
+    pub fn applicationDidDecodeRestorableState(self: Self, app_: Application, coder: objc.Object) void {
+        return self.object.msgSend(void, "application:didDecodeRestorableState:", .{ app_, coder });
     }
 
     /// `-[NSApplicationDelegate application:willContinueUserActivityWithType:]`
@@ -12403,7 +12426,7 @@ pub const ApplicationDelegate = extern struct {
     }
 
     /// `-[NSApplicationDelegate application:continueUserActivity:restorationHandler:]`
-    pub fn applicationContinueUserActivityRestorationHandler(self: Self, application: Application, user_activity: objc.Object, restoration_handler: anytype) bool {
+    pub fn applicationContinueUserActivityRestorationHandler(self: Self, application: Application, user_activity: objc.Object, restoration_handler: objc.BlockRef(fn (foundation.Array(objc.Object)) void)) bool {
         return self.object.msgSend(bool, "application:continueUserActivity:restorationHandler:", .{ application, user_activity, restoration_handler });
     }
 
@@ -12541,6 +12564,7 @@ pub const ApplicationDelegate = extern struct {
         pub const @"application:willEncodeRestorableState:" = fn (Application, objc.Object) void;
         pub const @"application:didDecodeRestorableState:" = fn (Application, objc.Object) void;
         pub const @"application:willContinueUserActivityWithType:" = fn (Application, foundation.String) bool;
+        pub const @"application:continueUserActivity:restorationHandler:" = fn (Application, objc.Object, objc.BlockRef(fn (foundation.Array(objc.Object)) void)) bool;
         pub const @"application:didFailToContinueUserActivityWithType:error:" = fn (Application, foundation.String, foundation.ErrorObject) void;
         pub const @"application:didUpdateUserActivity:" = fn (Application, objc.Object) void;
         pub const @"application:userDidAcceptCloudKitShareWithMetadata:" = fn (Application, objc.Object) void;
@@ -13005,3 +13029,9187 @@ pub const MenuDelegate = extern struct {
         pub const @"confinementRectForMenu:onScreen:" = fn (Menu, ?Screen) cg.Rect;
     };
 };
+
+// -- constants and functions -----------------------------------------------
+
+/// `NSCalibratedWhiteColorSpace`.
+pub fn calibratedWhiteColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCalibratedWhiteColorSpace", .linkage = .weak }) orelse missing("NSCalibratedWhiteColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCalibratedRGBColorSpace`.
+pub fn calibratedRGBColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCalibratedRGBColorSpace", .linkage = .weak }) orelse missing("NSCalibratedRGBColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceWhiteColorSpace`.
+pub fn deviceWhiteColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceWhiteColorSpace", .linkage = .weak }) orelse missing("NSDeviceWhiteColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceRGBColorSpace`.
+pub fn deviceRGBColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceRGBColorSpace", .linkage = .weak }) orelse missing("NSDeviceRGBColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceCMYKColorSpace`.
+pub fn deviceCMYKColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceCMYKColorSpace", .linkage = .weak }) orelse missing("NSDeviceCMYKColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNamedColorSpace`.
+pub fn namedColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNamedColorSpace", .linkage = .weak }) orelse missing("NSNamedColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPatternColorSpace`.
+pub fn patternColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPatternColorSpace", .linkage = .weak }) orelse missing("NSPatternColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCustomColorSpace`.
+pub fn customColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCustomColorSpace", .linkage = .weak }) orelse missing("NSCustomColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCalibratedBlackColorSpace`.
+pub fn calibratedBlackColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCalibratedBlackColorSpace", .linkage = .weak }) orelse missing("NSCalibratedBlackColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceBlackColorSpace`.
+pub fn deviceBlackColorSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceBlackColorSpace", .linkage = .weak }) orelse missing("NSDeviceBlackColorSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBestDepth`.
+pub fn bestDepth(color_space: ?foundation.String, bps: objc.Integer, bpp: objc.Integer, planar: bool, exact_match: ?*bool) WindowDepth {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String), objc.abi.Abi(objc.Integer), objc.abi.Abi(objc.Integer), objc.abi.Abi(bool), objc.abi.Abi(?*bool)) callconv(.c) objc.abi.Abi(WindowDepth), .{ .name = "NSBestDepth", .linkage = .weak }) orelse missing("NSBestDepth");
+    return objc.abi.fromAbi(WindowDepth, function(objc.abi.toAbi(?foundation.String, color_space), objc.abi.toAbi(objc.Integer, bps), objc.abi.toAbi(objc.Integer, bpp), objc.abi.toAbi(bool, planar), objc.abi.toAbi(?*bool, exact_match)));
+}
+
+/// `NSPlanarFromDepth`.
+pub fn planarFromDepth(depth: WindowDepth) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(WindowDepth)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSPlanarFromDepth", .linkage = .weak }) orelse missing("NSPlanarFromDepth");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(WindowDepth, depth)));
+}
+
+/// `NSBitsPerSampleFromDepth`.
+pub fn bitsPerSampleFromDepth(depth: WindowDepth) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(WindowDepth)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSBitsPerSampleFromDepth", .linkage = .weak }) orelse missing("NSBitsPerSampleFromDepth");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(WindowDepth, depth)));
+}
+
+/// `NSBitsPerPixelFromDepth`.
+pub fn bitsPerPixelFromDepth(depth: WindowDepth) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(WindowDepth)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSBitsPerPixelFromDepth", .linkage = .weak }) orelse missing("NSBitsPerPixelFromDepth");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(WindowDepth, depth)));
+}
+
+/// `NSNumberOfColorComponents`.
+pub fn numberOfColorComponents(color_space_name: ?foundation.String) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSNumberOfColorComponents", .linkage = .weak }) orelse missing("NSNumberOfColorComponents");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(?foundation.String, color_space_name)));
+}
+
+/// `NSAvailableWindowDepths`.
+pub fn availableWindowDepths() objc.Object {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(objc.Object), .{ .name = "NSAvailableWindowDepths", .linkage = .weak }) orelse missing("NSAvailableWindowDepths");
+    return objc.abi.fromAbi(objc.Object, function());
+}
+
+/// `NSWhite`.
+pub fn white() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSWhite", .linkage = .weak }) orelse missing("NSWhite");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSLightGray`.
+pub fn lightGray() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSLightGray", .linkage = .weak }) orelse missing("NSLightGray");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSDarkGray`.
+pub fn darkGray() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSDarkGray", .linkage = .weak }) orelse missing("NSDarkGray");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSBlack`.
+pub fn black() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSBlack", .linkage = .weak }) orelse missing("NSBlack");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSDeviceResolution`.
+pub fn deviceResolution() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceResolution", .linkage = .weak }) orelse missing("NSDeviceResolution");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceColorSpaceName`.
+pub fn deviceColorSpaceName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceColorSpaceName", .linkage = .weak }) orelse missing("NSDeviceColorSpaceName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceBitsPerSample`.
+pub fn deviceBitsPerSample() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceBitsPerSample", .linkage = .weak }) orelse missing("NSDeviceBitsPerSample");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceIsScreen`.
+pub fn deviceIsScreen() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceIsScreen", .linkage = .weak }) orelse missing("NSDeviceIsScreen");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceIsPrinter`.
+pub fn deviceIsPrinter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceIsPrinter", .linkage = .weak }) orelse missing("NSDeviceIsPrinter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeviceSize`.
+pub fn deviceSize() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeviceSize", .linkage = .weak }) orelse missing("NSDeviceSize");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRectFill`.
+pub fn rectFill(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectFill", .linkage = .weak }) orelse missing("NSRectFill");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSRectFillList`.
+pub fn rectFillList(rects: ?[*]const cg.Rect, count: objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?[*]const cg.Rect), objc.abi.Abi(objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectFillList", .linkage = .weak }) orelse missing("NSRectFillList");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?[*]const cg.Rect, rects), objc.abi.toAbi(objc.Integer, count)));
+}
+
+/// `NSRectFillListWithGrays`.
+pub fn rectFillListWithGrays(rects: ?[*]const cg.Rect, grays: ?[*]const cg.Float, num: objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?[*]const cg.Rect), objc.abi.Abi(?[*]const cg.Float), objc.abi.Abi(objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectFillListWithGrays", .linkage = .weak }) orelse missing("NSRectFillListWithGrays");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?[*]const cg.Rect, rects), objc.abi.toAbi(?[*]const cg.Float, grays), objc.abi.toAbi(objc.Integer, num)));
+}
+
+/// `NSRectFillUsingOperation`.
+pub fn rectFillUsingOperation(rect: cg.Rect, op: CompositingOperation) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(CompositingOperation)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectFillUsingOperation", .linkage = .weak }) orelse missing("NSRectFillUsingOperation");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(CompositingOperation, op)));
+}
+
+/// `NSRectFillListUsingOperation`.
+pub fn rectFillListUsingOperation(rects: ?[*]const cg.Rect, count: objc.Integer, op: CompositingOperation) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?[*]const cg.Rect), objc.abi.Abi(objc.Integer), objc.abi.Abi(CompositingOperation)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectFillListUsingOperation", .linkage = .weak }) orelse missing("NSRectFillListUsingOperation");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?[*]const cg.Rect, rects), objc.abi.toAbi(objc.Integer, count), objc.abi.toAbi(CompositingOperation, op)));
+}
+
+/// `NSFrameRect`.
+pub fn frameRect(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSFrameRect", .linkage = .weak }) orelse missing("NSFrameRect");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSFrameRectWithWidth`.
+pub fn frameRectWithWidth(rect: cg.Rect, frame_width: cg.Float) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Float)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSFrameRectWithWidth", .linkage = .weak }) orelse missing("NSFrameRectWithWidth");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Float, frame_width)));
+}
+
+/// `NSFrameRectWithWidthUsingOperation`.
+pub fn frameRectWithWidthUsingOperation(rect: cg.Rect, frame_width: cg.Float, op: CompositingOperation) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Float), objc.abi.Abi(CompositingOperation)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSFrameRectWithWidthUsingOperation", .linkage = .weak }) orelse missing("NSFrameRectWithWidthUsingOperation");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Float, frame_width), objc.abi.toAbi(CompositingOperation, op)));
+}
+
+/// `NSRectClip`.
+pub fn rectClip(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectClip", .linkage = .weak }) orelse missing("NSRectClip");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSRectClipList`.
+pub fn rectClipList(rects: ?[*]const cg.Rect, count: objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?[*]const cg.Rect), objc.abi.Abi(objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRectClipList", .linkage = .weak }) orelse missing("NSRectClipList");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?[*]const cg.Rect, rects), objc.abi.toAbi(objc.Integer, count)));
+}
+
+/// `NSDrawTiledRects`.
+pub fn drawTiledRects(bounds_rect: cg.Rect, clip_rect: cg.Rect, sides: objc.Object, grays: ?[*]const cg.Float, count: objc.Integer) cg.Rect {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect), objc.abi.Abi(objc.Object), objc.abi.Abi(?[*]const cg.Float), objc.abi.Abi(objc.Integer)) callconv(.c) objc.abi.Abi(cg.Rect), .{ .name = "NSDrawTiledRects", .linkage = .weak }) orelse missing("NSDrawTiledRects");
+    return objc.abi.fromAbi(cg.Rect, function(objc.abi.toAbi(cg.Rect, bounds_rect), objc.abi.toAbi(cg.Rect, clip_rect), objc.abi.toAbi(objc.Object, sides), objc.abi.toAbi(?[*]const cg.Float, grays), objc.abi.toAbi(objc.Integer, count)));
+}
+
+/// `NSDrawGrayBezel`.
+pub fn drawGrayBezel(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawGrayBezel", .linkage = .weak }) orelse missing("NSDrawGrayBezel");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSDrawGroove`.
+pub fn drawGroove(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawGroove", .linkage = .weak }) orelse missing("NSDrawGroove");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSDrawWhiteBezel`.
+pub fn drawWhiteBezel(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawWhiteBezel", .linkage = .weak }) orelse missing("NSDrawWhiteBezel");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSDrawButton`.
+pub fn drawButton(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawButton", .linkage = .weak }) orelse missing("NSDrawButton");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSEraseRect`.
+pub fn eraseRect(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSEraseRect", .linkage = .weak }) orelse missing("NSEraseRect");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSReadPixel`.
+pub fn readPixel(passed_point: cg.Point) ?Color {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Point)) callconv(.c) objc.abi.Abi(?Color), .{ .name = "NSReadPixel", .linkage = .weak }) orelse missing("NSReadPixel");
+    return objc.abi.fromAbi(?Color, function(objc.abi.toAbi(cg.Point, passed_point)));
+}
+
+/// `NSHighlightRect`.
+pub fn highlightRect(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSHighlightRect", .linkage = .weak }) orelse missing("NSHighlightRect");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSBeep`.
+pub fn beep() void {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(void), .{ .name = "NSBeep", .linkage = .weak }) orelse missing("NSBeep");
+    return objc.abi.fromAbi(void, function());
+}
+
+/// `NSGetWindowServerMemory`.
+pub fn getWindowServerMemory(context: objc.Integer, virtual_memory: ?*objc.Integer, window_backing_memory: ?*objc.Integer, window_dump_string: ?*objc.abi.Id) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Integer), objc.abi.Abi(?*objc.Integer), objc.abi.Abi(?*objc.Integer), objc.abi.Abi(?*objc.abi.Id)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSGetWindowServerMemory", .linkage = .weak }) orelse missing("NSGetWindowServerMemory");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(objc.Integer, context), objc.abi.toAbi(?*objc.Integer, virtual_memory), objc.abi.toAbi(?*objc.Integer, window_backing_memory), objc.abi.toAbi(?*objc.abi.Id, window_dump_string)));
+}
+
+/// `NSDrawColorTiledRects`.
+pub fn drawColorTiledRects(bounds_rect: cg.Rect, clip_rect: cg.Rect, sides: objc.Object, colors: ?*objc.abi.Id, count: objc.Integer) cg.Rect {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect), objc.abi.Abi(objc.Object), objc.abi.Abi(?*objc.abi.Id), objc.abi.Abi(objc.Integer)) callconv(.c) objc.abi.Abi(cg.Rect), .{ .name = "NSDrawColorTiledRects", .linkage = .weak }) orelse missing("NSDrawColorTiledRects");
+    return objc.abi.fromAbi(cg.Rect, function(objc.abi.toAbi(cg.Rect, bounds_rect), objc.abi.toAbi(cg.Rect, clip_rect), objc.abi.toAbi(objc.Object, sides), objc.abi.toAbi(?*objc.abi.Id, colors), objc.abi.toAbi(objc.Integer, count)));
+}
+
+/// `NSDrawDarkBezel`.
+pub fn drawDarkBezel(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawDarkBezel", .linkage = .weak }) orelse missing("NSDrawDarkBezel");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSDrawLightBezel`.
+pub fn drawLightBezel(rect: cg.Rect, clip_rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawLightBezel", .linkage = .weak }) orelse missing("NSDrawLightBezel");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect), objc.abi.toAbi(cg.Rect, clip_rect)));
+}
+
+/// `NSDottedFrameRect`.
+pub fn dottedFrameRect(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDottedFrameRect", .linkage = .weak }) orelse missing("NSDottedFrameRect");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSDrawWindowBackground`.
+pub fn drawWindowBackground(rect: cg.Rect) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawWindowBackground", .linkage = .weak }) orelse missing("NSDrawWindowBackground");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, rect)));
+}
+
+/// `NSDisableScreenUpdates`.
+pub fn disableScreenUpdates() void {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(void), .{ .name = "NSDisableScreenUpdates", .linkage = .weak }) orelse missing("NSDisableScreenUpdates");
+    return objc.abi.fromAbi(void, function());
+}
+
+/// `NSEnableScreenUpdates`.
+pub fn enableScreenUpdates() void {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(void), .{ .name = "NSEnableScreenUpdates", .linkage = .weak }) orelse missing("NSEnableScreenUpdates");
+    return objc.abi.fromAbi(void, function());
+}
+
+/// `NSCountWindows`.
+pub fn countWindows(count: ?*objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?*objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSCountWindows", .linkage = .weak }) orelse missing("NSCountWindows");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?*objc.Integer, count)));
+}
+
+/// `NSWindowList`.
+pub fn windowList(size: objc.Integer, list: ?*objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Integer), objc.abi.Abi(?*objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSWindowList", .linkage = .weak }) orelse missing("NSWindowList");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Integer, size), objc.abi.toAbi(?*objc.Integer, list)));
+}
+
+/// `NSCountWindowsForContext`.
+pub fn countWindowsForContext(context: objc.Integer, count: ?*objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Integer), objc.abi.Abi(?*objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSCountWindowsForContext", .linkage = .weak }) orelse missing("NSCountWindowsForContext");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Integer, context), objc.abi.toAbi(?*objc.Integer, count)));
+}
+
+/// `NSWindowListForContext`.
+pub fn windowListForContext(context: objc.Integer, size: objc.Integer, list: ?*objc.Integer) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Integer), objc.abi.Abi(objc.Integer), objc.abi.Abi(?*objc.Integer)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSWindowListForContext", .linkage = .weak }) orelse missing("NSWindowListForContext");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Integer, context), objc.abi.toAbi(objc.Integer, size), objc.abi.toAbi(?*objc.Integer, list)));
+}
+
+/// `NSCopyBits`. What it returns is yours to release.
+pub fn copyBits(src_g_state: objc.Integer, src_rect: cg.Rect, dest_point: cg.Point) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Integer), objc.abi.Abi(cg.Rect), objc.abi.Abi(cg.Point)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSCopyBits", .linkage = .weak }) orelse missing("NSCopyBits");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Integer, src_g_state), objc.abi.toAbi(cg.Rect, src_rect), objc.abi.toAbi(cg.Point, dest_point)));
+}
+
+/// `NSGraphicsContextDestinationAttributeName`.
+pub fn graphicsContextDestinationAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGraphicsContextDestinationAttributeName", .linkage = .weak }) orelse missing("NSGraphicsContextDestinationAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGraphicsContextRepresentationFormatAttributeName`.
+pub fn graphicsContextRepresentationFormatAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGraphicsContextRepresentationFormatAttributeName", .linkage = .weak }) orelse missing("NSGraphicsContextRepresentationFormatAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGraphicsContextPSFormat`.
+pub fn graphicsContextPSFormat() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGraphicsContextPSFormat", .linkage = .weak }) orelse missing("NSGraphicsContextPSFormat");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGraphicsContextPDFFormat`.
+pub fn graphicsContextPDFFormat() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGraphicsContextPDFFormat", .linkage = .weak }) orelse missing("NSGraphicsContextPDFFormat");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextLineTooLongException`.
+pub fn textLineTooLongException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextLineTooLongException", .linkage = .weak }) orelse missing("NSTextLineTooLongException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextNoSelectionException`.
+pub fn textNoSelectionException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextNoSelectionException", .linkage = .weak }) orelse missing("NSTextNoSelectionException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWordTablesWriteException`.
+pub fn wordTablesWriteException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWordTablesWriteException", .linkage = .weak }) orelse missing("NSWordTablesWriteException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWordTablesReadException`.
+pub fn wordTablesReadException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWordTablesReadException", .linkage = .weak }) orelse missing("NSWordTablesReadException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextReadException`.
+pub fn textReadException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextReadException", .linkage = .weak }) orelse missing("NSTextReadException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextWriteException`.
+pub fn textWriteException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextWriteException", .linkage = .weak }) orelse missing("NSTextWriteException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardCommunicationException`.
+pub fn pasteboardCommunicationException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardCommunicationException", .linkage = .weak }) orelse missing("NSPasteboardCommunicationException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintingCommunicationException`.
+pub fn printingCommunicationException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintingCommunicationException", .linkage = .weak }) orelse missing("NSPrintingCommunicationException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAbortModalException`.
+pub fn abortModalException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAbortModalException", .linkage = .weak }) orelse missing("NSAbortModalException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAbortPrintingException`.
+pub fn abortPrintingException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAbortPrintingException", .linkage = .weak }) orelse missing("NSAbortPrintingException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSIllegalSelectorException`.
+pub fn illegalSelectorException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSIllegalSelectorException", .linkage = .weak }) orelse missing("NSIllegalSelectorException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppKitVirtualMemoryException`.
+pub fn appKitVirtualMemoryException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppKitVirtualMemoryException", .linkage = .weak }) orelse missing("NSAppKitVirtualMemoryException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadRTFDirectiveException`.
+pub fn badRTFDirectiveException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadRTFDirectiveException", .linkage = .weak }) orelse missing("NSBadRTFDirectiveException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadRTFFontTableException`.
+pub fn badRTFFontTableException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadRTFFontTableException", .linkage = .weak }) orelse missing("NSBadRTFFontTableException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadRTFStyleSheetException`.
+pub fn badRTFStyleSheetException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadRTFStyleSheetException", .linkage = .weak }) orelse missing("NSBadRTFStyleSheetException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTypedStreamVersionException`.
+pub fn typedStreamVersionException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTypedStreamVersionException", .linkage = .weak }) orelse missing("NSTypedStreamVersionException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTIFFException`.
+pub fn tiffException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTIFFException", .linkage = .weak }) orelse missing("NSTIFFException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPackageException`.
+pub fn printPackageException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPackageException", .linkage = .weak }) orelse missing("NSPrintPackageException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadRTFColorTableException`.
+pub fn badRTFColorTableException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadRTFColorTableException", .linkage = .weak }) orelse missing("NSBadRTFColorTableException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDraggingException`.
+pub fn draggingException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDraggingException", .linkage = .weak }) orelse missing("NSDraggingException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSColorListIOException`.
+pub fn colorListIOException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSColorListIOException", .linkage = .weak }) orelse missing("NSColorListIOException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSColorListNotEditableException`.
+pub fn colorListNotEditableException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSColorListNotEditableException", .linkage = .weak }) orelse missing("NSColorListNotEditableException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadBitmapParametersException`.
+pub fn badBitmapParametersException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadBitmapParametersException", .linkage = .weak }) orelse missing("NSBadBitmapParametersException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowServerCommunicationException`.
+pub fn windowServerCommunicationException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowServerCommunicationException", .linkage = .weak }) orelse missing("NSWindowServerCommunicationException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontUnavailableException`.
+pub fn fontUnavailableException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontUnavailableException", .linkage = .weak }) orelse missing("NSFontUnavailableException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPPDIncludeNotFoundException`.
+pub fn ppdIncludeNotFoundException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPPDIncludeNotFoundException", .linkage = .weak }) orelse missing("NSPPDIncludeNotFoundException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPPDParseException`.
+pub fn ppdParseException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPPDParseException", .linkage = .weak }) orelse missing("NSPPDParseException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPPDIncludeStackOverflowException`.
+pub fn ppdIncludeStackOverflowException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPPDIncludeStackOverflowException", .linkage = .weak }) orelse missing("NSPPDIncludeStackOverflowException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPPDIncludeStackUnderflowException`.
+pub fn ppdIncludeStackUnderflowException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPPDIncludeStackUnderflowException", .linkage = .weak }) orelse missing("NSPPDIncludeStackUnderflowException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRTFPropertyStackOverflowException`.
+pub fn rtfPropertyStackOverflowException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRTFPropertyStackOverflowException", .linkage = .weak }) orelse missing("NSRTFPropertyStackOverflowException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppKitIgnoredException`.
+pub fn appKitIgnoredException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppKitIgnoredException", .linkage = .weak }) orelse missing("NSAppKitIgnoredException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBadComparisonException`.
+pub fn badComparisonException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBadComparisonException", .linkage = .weak }) orelse missing("NSBadComparisonException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageCacheException`.
+pub fn imageCacheException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageCacheException", .linkage = .weak }) orelse missing("NSImageCacheException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNibLoadingException`.
+pub fn nibLoadingException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNibLoadingException", .linkage = .weak }) orelse missing("NSNibLoadingException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBrowserIllegalDelegateException`.
+pub fn browserIllegalDelegateException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBrowserIllegalDelegateException", .linkage = .weak }) orelse missing("NSBrowserIllegalDelegateException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityException`.
+pub fn accessibilityException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityException", .linkage = .weak }) orelse missing("NSAccessibilityException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityErrorCodeExceptionInfo`.
+pub fn accessibilityErrorCodeExceptionInfo() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityErrorCodeExceptionInfo", .linkage = .weak }) orelse missing("NSAccessibilityErrorCodeExceptionInfo");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRoleAttribute`.
+pub fn accessibilityRoleAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRoleAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRoleAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRoleDescriptionAttribute`.
+pub fn accessibilityRoleDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRoleDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRoleDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySubroleAttribute`.
+pub fn accessibilitySubroleAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySubroleAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySubroleAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHelpAttribute`.
+pub fn accessibilityHelpAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHelpAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHelpAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityValueAttribute`.
+pub fn accessibilityValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMinValueAttribute`.
+pub fn accessibilityMinValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMinValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMinValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMaxValueAttribute`.
+pub fn accessibilityMaxValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMaxValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMaxValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityEnabledAttribute`.
+pub fn accessibilityEnabledAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityEnabledAttribute", .linkage = .weak }) orelse missing("NSAccessibilityEnabledAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFocusedAttribute`.
+pub fn accessibilityFocusedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFocusedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFocusedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityParentAttribute`.
+pub fn accessibilityParentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityParentAttribute", .linkage = .weak }) orelse missing("NSAccessibilityParentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityChildrenAttribute`.
+pub fn accessibilityChildrenAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityChildrenAttribute", .linkage = .weak }) orelse missing("NSAccessibilityChildrenAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowAttribute`.
+pub fn accessibilityWindowAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowAttribute", .linkage = .weak }) orelse missing("NSAccessibilityWindowAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTopLevelUIElementAttribute`.
+pub fn accessibilityTopLevelUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTopLevelUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTopLevelUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedChildrenAttribute`.
+pub fn accessibilitySelectedChildrenAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedChildrenAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedChildrenAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleChildrenAttribute`.
+pub fn accessibilityVisibleChildrenAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleChildrenAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisibleChildrenAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPositionAttribute`.
+pub fn accessibilityPositionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPositionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityPositionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySizeAttribute`.
+pub fn accessibilitySizeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySizeAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySizeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityContentsAttribute`.
+pub fn accessibilityContentsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityContentsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityContentsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTitleAttribute`.
+pub fn accessibilityTitleAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTitleAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTitleAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDescriptionAttribute`.
+pub fn accessibilityDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityShownMenuAttribute`.
+pub fn accessibilityShownMenuAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityShownMenuAttribute", .linkage = .weak }) orelse missing("NSAccessibilityShownMenuAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityValueDescriptionAttribute`.
+pub fn accessibilityValueDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityValueDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityValueDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySharedFocusElementsAttribute`.
+pub fn accessibilitySharedFocusElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySharedFocusElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySharedFocusElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPreviousContentsAttribute`.
+pub fn accessibilityPreviousContentsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPreviousContentsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityPreviousContentsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityNextContentsAttribute`.
+pub fn accessibilityNextContentsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityNextContentsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityNextContentsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeaderAttribute`.
+pub fn accessibilityHeaderAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeaderAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHeaderAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityEditedAttribute`.
+pub fn accessibilityEditedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityEditedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityEditedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTabsAttribute`.
+pub fn accessibilityTabsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTabsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTabsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHorizontalScrollBarAttribute`.
+pub fn accessibilityHorizontalScrollBarAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHorizontalScrollBarAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHorizontalScrollBarAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVerticalScrollBarAttribute`.
+pub fn accessibilityVerticalScrollBarAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVerticalScrollBarAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVerticalScrollBarAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOverflowButtonAttribute`.
+pub fn accessibilityOverflowButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOverflowButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityOverflowButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIncrementButtonAttribute`.
+pub fn accessibilityIncrementButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIncrementButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityIncrementButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDecrementButtonAttribute`.
+pub fn accessibilityDecrementButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDecrementButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDecrementButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFilenameAttribute`.
+pub fn accessibilityFilenameAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFilenameAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFilenameAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityExpandedAttribute`.
+pub fn accessibilityExpandedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityExpandedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityExpandedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedAttribute`.
+pub fn accessibilitySelectedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySplittersAttribute`.
+pub fn accessibilitySplittersAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySplittersAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySplittersAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDocumentAttribute`.
+pub fn accessibilityDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDocumentAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityActivationPointAttribute`.
+pub fn accessibilityActivationPointAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityActivationPointAttribute", .linkage = .weak }) orelse missing("NSAccessibilityActivationPointAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityURLAttribute`.
+pub fn accessibilityURLAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityURLAttribute", .linkage = .weak }) orelse missing("NSAccessibilityURLAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIndexAttribute`.
+pub fn accessibilityIndexAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIndexAttribute", .linkage = .weak }) orelse missing("NSAccessibilityIndexAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowCountAttribute`.
+pub fn accessibilityRowCountAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowCountAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRowCountAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnCountAttribute`.
+pub fn accessibilityColumnCountAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnCountAttribute", .linkage = .weak }) orelse missing("NSAccessibilityColumnCountAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOrderedByRowAttribute`.
+pub fn accessibilityOrderedByRowAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOrderedByRowAttribute", .linkage = .weak }) orelse missing("NSAccessibilityOrderedByRowAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWarningValueAttribute`.
+pub fn accessibilityWarningValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWarningValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityWarningValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCriticalValueAttribute`.
+pub fn accessibilityCriticalValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCriticalValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityCriticalValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPlaceholderValueAttribute`.
+pub fn accessibilityPlaceholderValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPlaceholderValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityPlaceholderValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityContainsProtectedContentAttribute`.
+pub fn accessibilityContainsProtectedContentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityContainsProtectedContentAttribute", .linkage = .weak }) orelse missing("NSAccessibilityContainsProtectedContentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAlternateUIVisibleAttribute`.
+pub fn accessibilityAlternateUIVisibleAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAlternateUIVisibleAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAlternateUIVisibleAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRequiredAttribute`.
+pub fn accessibilityRequiredAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRequiredAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRequiredAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAutoInteractableAttribute`.
+pub fn accessibilityAutoInteractableAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAutoInteractableAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAutoInteractableAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDateTimeComponentsAttribute`.
+pub fn accessibilityDateTimeComponentsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDateTimeComponentsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDateTimeComponentsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityEmbeddedImageDescriptionAttribute`.
+pub fn accessibilityEmbeddedImageDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityEmbeddedImageDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityEmbeddedImageDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPathAttribute`.
+pub fn accessibilityPathAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPathAttribute", .linkage = .weak }) orelse missing("NSAccessibilityPathAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextInputMarkedRangeAttribute`.
+pub fn accessibilityTextInputMarkedRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextInputMarkedRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTextInputMarkedRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBlockQuoteLevelAttribute`.
+pub fn accessibilityBlockQuoteLevelAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBlockQuoteLevelAttribute", .linkage = .weak }) orelse missing("NSAccessibilityBlockQuoteLevelAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevelAttribute`.
+pub fn accessibilityHeadingLevelAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevelAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevelAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLanguageAttribute`.
+pub fn accessibilityLanguageAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLanguageAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLanguageAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisitedAttribute`.
+pub fn accessibilityVisitedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisitedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisitedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTitleUIElementAttribute`.
+pub fn accessibilityTitleUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTitleUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTitleUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityServesAsTitleForUIElementsAttribute`.
+pub fn accessibilityServesAsTitleForUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityServesAsTitleForUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityServesAsTitleForUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLinkedUIElementsAttribute`.
+pub fn accessibilityLinkedUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLinkedUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLinkedUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedTextAttribute`.
+pub fn accessibilitySelectedTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedTextRangeAttribute`.
+pub fn accessibilitySelectedTextRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedTextRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedTextRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityNumberOfCharactersAttribute`.
+pub fn accessibilityNumberOfCharactersAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityNumberOfCharactersAttribute", .linkage = .weak }) orelse missing("NSAccessibilityNumberOfCharactersAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleCharacterRangeAttribute`.
+pub fn accessibilityVisibleCharacterRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleCharacterRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisibleCharacterRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySharedTextUIElementsAttribute`.
+pub fn accessibilitySharedTextUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySharedTextUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySharedTextUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySharedCharacterRangeAttribute`.
+pub fn accessibilitySharedCharacterRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySharedCharacterRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySharedCharacterRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityInsertionPointLineNumberAttribute`.
+pub fn accessibilityInsertionPointLineNumberAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityInsertionPointLineNumberAttribute", .linkage = .weak }) orelse missing("NSAccessibilityInsertionPointLineNumberAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedTextRangesAttribute`.
+pub fn accessibilitySelectedTextRangesAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedTextRangesAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedTextRangesAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLineForIndexParameterizedAttribute`.
+pub fn accessibilityLineForIndexParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLineForIndexParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLineForIndexParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRangeForLineParameterizedAttribute`.
+pub fn accessibilityRangeForLineParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRangeForLineParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRangeForLineParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStringForRangeParameterizedAttribute`.
+pub fn accessibilityStringForRangeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStringForRangeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityStringForRangeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRangeForPositionParameterizedAttribute`.
+pub fn accessibilityRangeForPositionParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRangeForPositionParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRangeForPositionParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRangeForIndexParameterizedAttribute`.
+pub fn accessibilityRangeForIndexParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRangeForIndexParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRangeForIndexParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBoundsForRangeParameterizedAttribute`.
+pub fn accessibilityBoundsForRangeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBoundsForRangeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityBoundsForRangeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRTFForRangeParameterizedAttribute`.
+pub fn accessibilityRTFForRangeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRTFForRangeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRTFForRangeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStyleRangeForIndexParameterizedAttribute`.
+pub fn accessibilityStyleRangeForIndexParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStyleRangeForIndexParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityStyleRangeForIndexParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAttributedStringForRangeParameterizedAttribute`.
+pub fn accessibilityAttributedStringForRangeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAttributedStringForRangeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAttributedStringForRangeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontTextAttribute`.
+pub fn accessibilityFontTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFontTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityForegroundColorTextAttribute`.
+pub fn accessibilityForegroundColorTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityForegroundColorTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityForegroundColorTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBackgroundColorTextAttribute`.
+pub fn accessibilityBackgroundColorTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBackgroundColorTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityBackgroundColorTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnderlineColorTextAttribute`.
+pub fn accessibilityUnderlineColorTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnderlineColorTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityUnderlineColorTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStrikethroughColorTextAttribute`.
+pub fn accessibilityStrikethroughColorTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStrikethroughColorTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityStrikethroughColorTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnderlineTextAttribute`.
+pub fn accessibilityUnderlineTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnderlineTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityUnderlineTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySuperscriptTextAttribute`.
+pub fn accessibilitySuperscriptTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySuperscriptTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySuperscriptTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStrikethroughTextAttribute`.
+pub fn accessibilityStrikethroughTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStrikethroughTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityStrikethroughTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityShadowTextAttribute`.
+pub fn accessibilityShadowTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityShadowTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityShadowTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAttachmentTextAttribute`.
+pub fn accessibilityAttachmentTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAttachmentTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAttachmentTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLinkTextAttribute`.
+pub fn accessibilityLinkTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLinkTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLinkTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAutocorrectedTextAttribute`.
+pub fn accessibilityAutocorrectedTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAutocorrectedTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAutocorrectedTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextAlignmentAttribute`.
+pub fn accessibilityTextAlignmentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextAlignmentAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTextAlignmentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontBoldAttribute`.
+pub fn accessibilityFontBoldAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontBoldAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFontBoldAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontItalicAttribute`.
+pub fn accessibilityFontItalicAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontItalicAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFontItalicAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityChildrenInNavigationOrderAttribute`.
+pub fn accessibilityChildrenInNavigationOrderAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityChildrenInNavigationOrderAttribute", .linkage = .weak }) orelse missing("NSAccessibilityChildrenInNavigationOrderAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIndexForChildUIElementAttribute`.
+pub fn accessibilityIndexForChildUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIndexForChildUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityIndexForChildUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIndexForChildUIElementInNavigationOrderAttribute`.
+pub fn accessibilityIndexForChildUIElementInNavigationOrderAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIndexForChildUIElementInNavigationOrderAttribute", .linkage = .weak }) orelse missing("NSAccessibilityIndexForChildUIElementInNavigationOrderAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListItemPrefixTextAttribute`.
+pub fn accessibilityListItemPrefixTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListItemPrefixTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityListItemPrefixTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListItemIndexTextAttribute`.
+pub fn accessibilityListItemIndexTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListItemIndexTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityListItemIndexTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListItemLevelTextAttribute`.
+pub fn accessibilityListItemLevelTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListItemLevelTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityListItemLevelTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMisspelledTextAttribute`.
+pub fn accessibilityMisspelledTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMisspelledTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMisspelledTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkedMisspelledTextAttribute`.
+pub fn accessibilityMarkedMisspelledTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkedMisspelledTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkedMisspelledTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLanguageTextAttribute`.
+pub fn accessibilityLanguageTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLanguageTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLanguageTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCustomTextAttribute`.
+pub fn accessibilityCustomTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCustomTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityCustomTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnotationTextAttribute`.
+pub fn accessibilityAnnotationTextAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnotationTextAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAnnotationTextAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextCompletionAttribute`.
+pub fn accessibilityTextCompletionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextCompletionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityTextCompletionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnotationLabel`.
+pub fn accessibilityAnnotationLabel() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnotationLabel", .linkage = .weak }) orelse missing("NSAccessibilityAnnotationLabel");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnotationElement`.
+pub fn accessibilityAnnotationElement() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnotationElement", .linkage = .weak }) orelse missing("NSAccessibilityAnnotationElement");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnotationLocation`.
+pub fn accessibilityAnnotationLocation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnotationLocation", .linkage = .weak }) orelse missing("NSAccessibilityAnnotationLocation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontNameKey`.
+pub fn accessibilityFontNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontNameKey", .linkage = .weak }) orelse missing("NSAccessibilityFontNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontFamilyKey`.
+pub fn accessibilityFontFamilyKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontFamilyKey", .linkage = .weak }) orelse missing("NSAccessibilityFontFamilyKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleNameKey`.
+pub fn accessibilityVisibleNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleNameKey", .linkage = .weak }) orelse missing("NSAccessibilityVisibleNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontSizeKey`.
+pub fn accessibilityFontSizeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontSizeKey", .linkage = .weak }) orelse missing("NSAccessibilityFontSizeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMainAttribute`.
+pub fn accessibilityMainAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMainAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMainAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMinimizedAttribute`.
+pub fn accessibilityMinimizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMinimizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMinimizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCloseButtonAttribute`.
+pub fn accessibilityCloseButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCloseButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityCloseButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityZoomButtonAttribute`.
+pub fn accessibilityZoomButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityZoomButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityZoomButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMinimizeButtonAttribute`.
+pub fn accessibilityMinimizeButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMinimizeButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMinimizeButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityToolbarButtonAttribute`.
+pub fn accessibilityToolbarButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityToolbarButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityToolbarButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityProxyAttribute`.
+pub fn accessibilityProxyAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityProxyAttribute", .linkage = .weak }) orelse missing("NSAccessibilityProxyAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityGrowAreaAttribute`.
+pub fn accessibilityGrowAreaAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityGrowAreaAttribute", .linkage = .weak }) orelse missing("NSAccessibilityGrowAreaAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityModalAttribute`.
+pub fn accessibilityModalAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityModalAttribute", .linkage = .weak }) orelse missing("NSAccessibilityModalAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDefaultButtonAttribute`.
+pub fn accessibilityDefaultButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDefaultButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDefaultButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCancelButtonAttribute`.
+pub fn accessibilityCancelButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCancelButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityCancelButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFullScreenButtonAttribute`.
+pub fn accessibilityFullScreenButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFullScreenButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFullScreenButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuBarAttribute`.
+pub fn accessibilityMenuBarAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuBarAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMenuBarAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowsAttribute`.
+pub fn accessibilityWindowsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityWindowsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFrontmostAttribute`.
+pub fn accessibilityFrontmostAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFrontmostAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFrontmostAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHiddenAttribute`.
+pub fn accessibilityHiddenAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHiddenAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHiddenAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMainWindowAttribute`.
+pub fn accessibilityMainWindowAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMainWindowAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMainWindowAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFocusedWindowAttribute`.
+pub fn accessibilityFocusedWindowAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFocusedWindowAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFocusedWindowAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFocusedUIElementAttribute`.
+pub fn accessibilityFocusedUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFocusedUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityFocusedUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityExtrasMenuBarAttribute`.
+pub fn accessibilityExtrasMenuBarAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityExtrasMenuBarAttribute", .linkage = .weak }) orelse missing("NSAccessibilityExtrasMenuBarAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOrientationAttribute`.
+pub fn accessibilityOrientationAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOrientationAttribute", .linkage = .weak }) orelse missing("NSAccessibilityOrientationAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVerticalOrientationValue`.
+pub fn accessibilityVerticalOrientationValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVerticalOrientationValue", .linkage = .weak }) orelse missing("NSAccessibilityVerticalOrientationValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHorizontalOrientationValue`.
+pub fn accessibilityHorizontalOrientationValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHorizontalOrientationValue", .linkage = .weak }) orelse missing("NSAccessibilityHorizontalOrientationValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownOrientationValue`.
+pub fn accessibilityUnknownOrientationValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownOrientationValue", .linkage = .weak }) orelse missing("NSAccessibilityUnknownOrientationValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnTitlesAttribute`.
+pub fn accessibilityColumnTitlesAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnTitlesAttribute", .linkage = .weak }) orelse missing("NSAccessibilityColumnTitlesAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchButtonAttribute`.
+pub fn accessibilitySearchButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySearchButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchMenuAttribute`.
+pub fn accessibilitySearchMenuAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchMenuAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySearchMenuAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityClearButtonAttribute`.
+pub fn accessibilityClearButtonAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityClearButtonAttribute", .linkage = .weak }) orelse missing("NSAccessibilityClearButtonAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowsAttribute`.
+pub fn accessibilityRowsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRowsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleRowsAttribute`.
+pub fn accessibilityVisibleRowsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleRowsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisibleRowsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedRowsAttribute`.
+pub fn accessibilitySelectedRowsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedRowsAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedRowsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnsAttribute`.
+pub fn accessibilityColumnsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityColumnsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleColumnsAttribute`.
+pub fn accessibilityVisibleColumnsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleColumnsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisibleColumnsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedColumnsAttribute`.
+pub fn accessibilitySelectedColumnsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedColumnsAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedColumnsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySortDirectionAttribute`.
+pub fn accessibilitySortDirectionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySortDirectionAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySortDirectionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedCellsAttribute`.
+pub fn accessibilitySelectedCellsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedCellsAttribute", .linkage = .weak }) orelse missing("NSAccessibilitySelectedCellsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisibleCellsAttribute`.
+pub fn accessibilityVisibleCellsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisibleCellsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVisibleCellsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowHeaderUIElementsAttribute`.
+pub fn accessibilityRowHeaderUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowHeaderUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRowHeaderUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnHeaderUIElementsAttribute`.
+pub fn accessibilityColumnHeaderUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnHeaderUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityColumnHeaderUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCellForColumnAndRowParameterizedAttribute`.
+pub fn accessibilityCellForColumnAndRowParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCellForColumnAndRowParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityCellForColumnAndRowParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowIndexRangeAttribute`.
+pub fn accessibilityRowIndexRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowIndexRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilityRowIndexRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnIndexRangeAttribute`.
+pub fn accessibilityColumnIndexRangeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnIndexRangeAttribute", .linkage = .weak }) orelse missing("NSAccessibilityColumnIndexRangeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHorizontalUnitsAttribute`.
+pub fn accessibilityHorizontalUnitsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHorizontalUnitsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHorizontalUnitsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVerticalUnitsAttribute`.
+pub fn accessibilityVerticalUnitsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVerticalUnitsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVerticalUnitsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHorizontalUnitDescriptionAttribute`.
+pub fn accessibilityHorizontalUnitDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHorizontalUnitDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHorizontalUnitDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVerticalUnitDescriptionAttribute`.
+pub fn accessibilityVerticalUnitDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVerticalUnitDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityVerticalUnitDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLayoutPointForScreenPointParameterizedAttribute`.
+pub fn accessibilityLayoutPointForScreenPointParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLayoutPointForScreenPointParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLayoutPointForScreenPointParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLayoutSizeForScreenSizeParameterizedAttribute`.
+pub fn accessibilityLayoutSizeForScreenSizeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLayoutSizeForScreenSizeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLayoutSizeForScreenSizeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityScreenPointForLayoutPointParameterizedAttribute`.
+pub fn accessibilityScreenPointForLayoutPointParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityScreenPointForLayoutPointParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityScreenPointForLayoutPointParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityScreenSizeForLayoutSizeParameterizedAttribute`.
+pub fn accessibilityScreenSizeForLayoutSizeParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityScreenSizeForLayoutSizeParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityScreenSizeForLayoutSizeParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHandlesAttribute`.
+pub fn accessibilityHandlesAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHandlesAttribute", .linkage = .weak }) orelse missing("NSAccessibilityHandlesAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAscendingSortDirectionValue`.
+pub fn accessibilityAscendingSortDirectionValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAscendingSortDirectionValue", .linkage = .weak }) orelse missing("NSAccessibilityAscendingSortDirectionValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDescendingSortDirectionValue`.
+pub fn accessibilityDescendingSortDirectionValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDescendingSortDirectionValue", .linkage = .weak }) orelse missing("NSAccessibilityDescendingSortDirectionValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownSortDirectionValue`.
+pub fn accessibilityUnknownSortDirectionValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownSortDirectionValue", .linkage = .weak }) orelse missing("NSAccessibilityUnknownSortDirectionValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDisclosingAttribute`.
+pub fn accessibilityDisclosingAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDisclosingAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDisclosingAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDisclosedRowsAttribute`.
+pub fn accessibilityDisclosedRowsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDisclosedRowsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDisclosedRowsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDisclosedByRowAttribute`.
+pub fn accessibilityDisclosedByRowAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDisclosedByRowAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDisclosedByRowAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDisclosureLevelAttribute`.
+pub fn accessibilityDisclosureLevelAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDisclosureLevelAttribute", .linkage = .weak }) orelse missing("NSAccessibilityDisclosureLevelAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAllowedValuesAttribute`.
+pub fn accessibilityAllowedValuesAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAllowedValuesAttribute", .linkage = .weak }) orelse missing("NSAccessibilityAllowedValuesAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLabelUIElementsAttribute`.
+pub fn accessibilityLabelUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLabelUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLabelUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLabelValueAttribute`.
+pub fn accessibilityLabelValueAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLabelValueAttribute", .linkage = .weak }) orelse missing("NSAccessibilityLabelValueAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMatteHoleAttribute`.
+pub fn accessibilityMatteHoleAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMatteHoleAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMatteHoleAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMatteContentUIElementAttribute`.
+pub fn accessibilityMatteContentUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMatteContentUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMatteContentUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkerUIElementsAttribute`.
+pub fn accessibilityMarkerUIElementsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkerUIElementsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkerUIElementsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkerValuesAttribute`.
+pub fn accessibilityMarkerValuesAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkerValuesAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkerValuesAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkerGroupUIElementAttribute`.
+pub fn accessibilityMarkerGroupUIElementAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkerGroupUIElementAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkerGroupUIElementAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnitsAttribute`.
+pub fn accessibilityUnitsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnitsAttribute", .linkage = .weak }) orelse missing("NSAccessibilityUnitsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnitDescriptionAttribute`.
+pub fn accessibilityUnitDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnitDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityUnitDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkerTypeAttribute`.
+pub fn accessibilityMarkerTypeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkerTypeAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkerTypeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMarkerTypeDescriptionAttribute`.
+pub fn accessibilityMarkerTypeDescriptionAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMarkerTypeDescriptionAttribute", .linkage = .weak }) orelse missing("NSAccessibilityMarkerTypeDescriptionAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIdentifierAttribute`.
+pub fn accessibilityIdentifierAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIdentifierAttribute", .linkage = .weak }) orelse missing("NSAccessibilityIdentifierAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLeftTabStopMarkerTypeValue`.
+pub fn accessibilityLeftTabStopMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLeftTabStopMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityLeftTabStopMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRightTabStopMarkerTypeValue`.
+pub fn accessibilityRightTabStopMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRightTabStopMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityRightTabStopMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCenterTabStopMarkerTypeValue`.
+pub fn accessibilityCenterTabStopMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCenterTabStopMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityCenterTabStopMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDecimalTabStopMarkerTypeValue`.
+pub fn accessibilityDecimalTabStopMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDecimalTabStopMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityDecimalTabStopMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadIndentMarkerTypeValue`.
+pub fn accessibilityHeadIndentMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadIndentMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityHeadIndentMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTailIndentMarkerTypeValue`.
+pub fn accessibilityTailIndentMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTailIndentMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityTailIndentMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFirstLineIndentMarkerTypeValue`.
+pub fn accessibilityFirstLineIndentMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFirstLineIndentMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityFirstLineIndentMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownMarkerTypeValue`.
+pub fn accessibilityUnknownMarkerTypeValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownMarkerTypeValue", .linkage = .weak }) orelse missing("NSAccessibilityUnknownMarkerTypeValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityInchesUnitValue`.
+pub fn accessibilityInchesUnitValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityInchesUnitValue", .linkage = .weak }) orelse missing("NSAccessibilityInchesUnitValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCentimetersUnitValue`.
+pub fn accessibilityCentimetersUnitValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCentimetersUnitValue", .linkage = .weak }) orelse missing("NSAccessibilityCentimetersUnitValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPointsUnitValue`.
+pub fn accessibilityPointsUnitValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPointsUnitValue", .linkage = .weak }) orelse missing("NSAccessibilityPointsUnitValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPicasUnitValue`.
+pub fn accessibilityPicasUnitValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPicasUnitValue", .linkage = .weak }) orelse missing("NSAccessibilityPicasUnitValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownUnitValue`.
+pub fn accessibilityUnknownUnitValue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownUnitValue", .linkage = .weak }) orelse missing("NSAccessibilityUnknownUnitValue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPressAction`.
+pub fn accessibilityPressAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPressAction", .linkage = .weak }) orelse missing("NSAccessibilityPressAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIncrementAction`.
+pub fn accessibilityIncrementAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIncrementAction", .linkage = .weak }) orelse missing("NSAccessibilityIncrementAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDecrementAction`.
+pub fn accessibilityDecrementAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDecrementAction", .linkage = .weak }) orelse missing("NSAccessibilityDecrementAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityConfirmAction`.
+pub fn accessibilityConfirmAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityConfirmAction", .linkage = .weak }) orelse missing("NSAccessibilityConfirmAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPickAction`.
+pub fn accessibilityPickAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPickAction", .linkage = .weak }) orelse missing("NSAccessibilityPickAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCancelAction`.
+pub fn accessibilityCancelAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCancelAction", .linkage = .weak }) orelse missing("NSAccessibilityCancelAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRaiseAction`.
+pub fn accessibilityRaiseAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRaiseAction", .linkage = .weak }) orelse missing("NSAccessibilityRaiseAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityShowMenuAction`.
+pub fn accessibilityShowMenuAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityShowMenuAction", .linkage = .weak }) orelse missing("NSAccessibilityShowMenuAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDeleteAction`.
+pub fn accessibilityDeleteAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDeleteAction", .linkage = .weak }) orelse missing("NSAccessibilityDeleteAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityScrollToVisibleAction`.
+pub fn accessibilityScrollToVisibleAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityScrollToVisibleAction", .linkage = .weak }) orelse missing("NSAccessibilityScrollToVisibleAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityShowAlternateUIAction`.
+pub fn accessibilityShowAlternateUIAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityShowAlternateUIAction", .linkage = .weak }) orelse missing("NSAccessibilityShowAlternateUIAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityShowDefaultUIAction`.
+pub fn accessibilityShowDefaultUIAction() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityShowDefaultUIAction", .linkage = .weak }) orelse missing("NSAccessibilityShowDefaultUIAction");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMainWindowChangedNotification`.
+pub fn accessibilityMainWindowChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMainWindowChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityMainWindowChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFocusedWindowChangedNotification`.
+pub fn accessibilityFocusedWindowChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFocusedWindowChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityFocusedWindowChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFocusedUIElementChangedNotification`.
+pub fn accessibilityFocusedUIElementChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFocusedUIElementChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityFocusedUIElementChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityApplicationActivatedNotification`.
+pub fn accessibilityApplicationActivatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityApplicationActivatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityApplicationActivatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityApplicationDeactivatedNotification`.
+pub fn accessibilityApplicationDeactivatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityApplicationDeactivatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityApplicationDeactivatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityApplicationHiddenNotification`.
+pub fn accessibilityApplicationHiddenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityApplicationHiddenNotification", .linkage = .weak }) orelse missing("NSAccessibilityApplicationHiddenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityApplicationShownNotification`.
+pub fn accessibilityApplicationShownNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityApplicationShownNotification", .linkage = .weak }) orelse missing("NSAccessibilityApplicationShownNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowCreatedNotification`.
+pub fn accessibilityWindowCreatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowCreatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityWindowCreatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowMovedNotification`.
+pub fn accessibilityWindowMovedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowMovedNotification", .linkage = .weak }) orelse missing("NSAccessibilityWindowMovedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowResizedNotification`.
+pub fn accessibilityWindowResizedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowResizedNotification", .linkage = .weak }) orelse missing("NSAccessibilityWindowResizedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowMiniaturizedNotification`.
+pub fn accessibilityWindowMiniaturizedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowMiniaturizedNotification", .linkage = .weak }) orelse missing("NSAccessibilityWindowMiniaturizedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowDeminiaturizedNotification`.
+pub fn accessibilityWindowDeminiaturizedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowDeminiaturizedNotification", .linkage = .weak }) orelse missing("NSAccessibilityWindowDeminiaturizedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDrawerCreatedNotification`.
+pub fn accessibilityDrawerCreatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDrawerCreatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDrawerCreatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySheetCreatedNotification`.
+pub fn accessibilitySheetCreatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySheetCreatedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySheetCreatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUIElementDestroyedNotification`.
+pub fn accessibilityUIElementDestroyedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUIElementDestroyedNotification", .linkage = .weak }) orelse missing("NSAccessibilityUIElementDestroyedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityValueChangedNotification`.
+pub fn accessibilityValueChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityValueChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityValueChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTitleChangedNotification`.
+pub fn accessibilityTitleChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTitleChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityTitleChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityResizedNotification`.
+pub fn accessibilityResizedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityResizedNotification", .linkage = .weak }) orelse missing("NSAccessibilityResizedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMovedNotification`.
+pub fn accessibilityMovedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMovedNotification", .linkage = .weak }) orelse missing("NSAccessibilityMovedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCreatedNotification`.
+pub fn accessibilityCreatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCreatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityCreatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLayoutChangedNotification`.
+pub fn accessibilityLayoutChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLayoutChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityLayoutChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHelpTagCreatedNotification`.
+pub fn accessibilityHelpTagCreatedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHelpTagCreatedNotification", .linkage = .weak }) orelse missing("NSAccessibilityHelpTagCreatedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedTextChangedNotification`.
+pub fn accessibilitySelectedTextChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedTextChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedTextChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowCountChangedNotification`.
+pub fn accessibilityRowCountChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowCountChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityRowCountChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedChildrenChangedNotification`.
+pub fn accessibilitySelectedChildrenChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedChildrenChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedChildrenChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedRowsChangedNotification`.
+pub fn accessibilitySelectedRowsChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedRowsChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedRowsChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedColumnsChangedNotification`.
+pub fn accessibilitySelectedColumnsChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedColumnsChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedColumnsChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowExpandedNotification`.
+pub fn accessibilityRowExpandedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowExpandedNotification", .linkage = .weak }) orelse missing("NSAccessibilityRowExpandedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowCollapsedNotification`.
+pub fn accessibilityRowCollapsedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowCollapsedNotification", .linkage = .weak }) orelse missing("NSAccessibilityRowCollapsedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAutocorrectionOccurredNotification`.
+pub fn accessibilityAutocorrectionOccurredNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAutocorrectionOccurredNotification", .linkage = .weak }) orelse missing("NSAccessibilityAutocorrectionOccurredNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextInputMarkingSessionBeganNotification`.
+pub fn accessibilityTextInputMarkingSessionBeganNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextInputMarkingSessionBeganNotification", .linkage = .weak }) orelse missing("NSAccessibilityTextInputMarkingSessionBeganNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextInputMarkingSessionEndedNotification`.
+pub fn accessibilityTextInputMarkingSessionEndedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextInputMarkingSessionEndedNotification", .linkage = .weak }) orelse missing("NSAccessibilityTextInputMarkingSessionEndedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingSourceDragBeganNotification`.
+pub fn accessibilityDraggingSourceDragBeganNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingSourceDragBeganNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingSourceDragBeganNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingSourceDragEndedNotification`.
+pub fn accessibilityDraggingSourceDragEndedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingSourceDragEndedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingSourceDragEndedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingDestinationDropAllowedNotification`.
+pub fn accessibilityDraggingDestinationDropAllowedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingDestinationDropAllowedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingDestinationDropAllowedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingDestinationDropNotAllowedNotification`.
+pub fn accessibilityDraggingDestinationDropNotAllowedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingDestinationDropNotAllowedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingDestinationDropNotAllowedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingDestinationDragAcceptedNotification`.
+pub fn accessibilityDraggingDestinationDragAcceptedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingDestinationDragAcceptedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingDestinationDragAcceptedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDraggingDestinationDragNotAcceptedNotification`.
+pub fn accessibilityDraggingDestinationDragNotAcceptedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDraggingDestinationDragNotAcceptedNotification", .linkage = .weak }) orelse missing("NSAccessibilityDraggingDestinationDragNotAcceptedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedCellsChangedNotification`.
+pub fn accessibilitySelectedCellsChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedCellsChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedCellsChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnitsChangedNotification`.
+pub fn accessibilityUnitsChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnitsChangedNotification", .linkage = .weak }) orelse missing("NSAccessibilityUnitsChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySelectedChildrenMovedNotification`.
+pub fn accessibilitySelectedChildrenMovedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySelectedChildrenMovedNotification", .linkage = .weak }) orelse missing("NSAccessibilitySelectedChildrenMovedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnouncementRequestedNotification`.
+pub fn accessibilityAnnouncementRequestedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnouncementRequestedNotification", .linkage = .weak }) orelse missing("NSAccessibilityAnnouncementRequestedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownRole`.
+pub fn accessibilityUnknownRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownRole", .linkage = .weak }) orelse missing("NSAccessibilityUnknownRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityButtonRole`.
+pub fn accessibilityButtonRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityButtonRole", .linkage = .weak }) orelse missing("NSAccessibilityButtonRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRadioButtonRole`.
+pub fn accessibilityRadioButtonRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRadioButtonRole", .linkage = .weak }) orelse missing("NSAccessibilityRadioButtonRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCheckBoxRole`.
+pub fn accessibilityCheckBoxRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCheckBoxRole", .linkage = .weak }) orelse missing("NSAccessibilityCheckBoxRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySliderRole`.
+pub fn accessibilitySliderRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySliderRole", .linkage = .weak }) orelse missing("NSAccessibilitySliderRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTabGroupRole`.
+pub fn accessibilityTabGroupRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTabGroupRole", .linkage = .weak }) orelse missing("NSAccessibilityTabGroupRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextFieldRole`.
+pub fn accessibilityTextFieldRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextFieldRole", .linkage = .weak }) orelse missing("NSAccessibilityTextFieldRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStaticTextRole`.
+pub fn accessibilityStaticTextRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStaticTextRole", .linkage = .weak }) orelse missing("NSAccessibilityStaticTextRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextAreaRole`.
+pub fn accessibilityTextAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityTextAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityScrollAreaRole`.
+pub fn accessibilityScrollAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityScrollAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityScrollAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPopUpButtonRole`.
+pub fn accessibilityPopUpButtonRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPopUpButtonRole", .linkage = .weak }) orelse missing("NSAccessibilityPopUpButtonRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuButtonRole`.
+pub fn accessibilityMenuButtonRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuButtonRole", .linkage = .weak }) orelse missing("NSAccessibilityMenuButtonRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTableRole`.
+pub fn accessibilityTableRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTableRole", .linkage = .weak }) orelse missing("NSAccessibilityTableRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityApplicationRole`.
+pub fn accessibilityApplicationRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityApplicationRole", .linkage = .weak }) orelse missing("NSAccessibilityApplicationRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityGroupRole`.
+pub fn accessibilityGroupRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityGroupRole", .linkage = .weak }) orelse missing("NSAccessibilityGroupRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRadioGroupRole`.
+pub fn accessibilityRadioGroupRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRadioGroupRole", .linkage = .weak }) orelse missing("NSAccessibilityRadioGroupRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListRole`.
+pub fn accessibilityListRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListRole", .linkage = .weak }) orelse missing("NSAccessibilityListRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityScrollBarRole`.
+pub fn accessibilityScrollBarRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityScrollBarRole", .linkage = .weak }) orelse missing("NSAccessibilityScrollBarRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityValueIndicatorRole`.
+pub fn accessibilityValueIndicatorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityValueIndicatorRole", .linkage = .weak }) orelse missing("NSAccessibilityValueIndicatorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityImageRole`.
+pub fn accessibilityImageRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityImageRole", .linkage = .weak }) orelse missing("NSAccessibilityImageRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuBarRole`.
+pub fn accessibilityMenuBarRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuBarRole", .linkage = .weak }) orelse missing("NSAccessibilityMenuBarRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuBarItemRole`.
+pub fn accessibilityMenuBarItemRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuBarItemRole", .linkage = .weak }) orelse missing("NSAccessibilityMenuBarItemRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuRole`.
+pub fn accessibilityMenuRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuRole", .linkage = .weak }) orelse missing("NSAccessibilityMenuRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMenuItemRole`.
+pub fn accessibilityMenuItemRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMenuItemRole", .linkage = .weak }) orelse missing("NSAccessibilityMenuItemRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColumnRole`.
+pub fn accessibilityColumnRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColumnRole", .linkage = .weak }) orelse missing("NSAccessibilityColumnRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRowRole`.
+pub fn accessibilityRowRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRowRole", .linkage = .weak }) orelse missing("NSAccessibilityRowRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityToolbarRole`.
+pub fn accessibilityToolbarRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityToolbarRole", .linkage = .weak }) orelse missing("NSAccessibilityToolbarRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBusyIndicatorRole`.
+pub fn accessibilityBusyIndicatorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBusyIndicatorRole", .linkage = .weak }) orelse missing("NSAccessibilityBusyIndicatorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityProgressIndicatorRole`.
+pub fn accessibilityProgressIndicatorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityProgressIndicatorRole", .linkage = .weak }) orelse missing("NSAccessibilityProgressIndicatorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWindowRole`.
+pub fn accessibilityWindowRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWindowRole", .linkage = .weak }) orelse missing("NSAccessibilityWindowRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDrawerRole`.
+pub fn accessibilityDrawerRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDrawerRole", .linkage = .weak }) orelse missing("NSAccessibilityDrawerRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySystemWideRole`.
+pub fn accessibilitySystemWideRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySystemWideRole", .linkage = .weak }) orelse missing("NSAccessibilitySystemWideRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOutlineRole`.
+pub fn accessibilityOutlineRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOutlineRole", .linkage = .weak }) orelse missing("NSAccessibilityOutlineRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIncrementorRole`.
+pub fn accessibilityIncrementorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIncrementorRole", .linkage = .weak }) orelse missing("NSAccessibilityIncrementorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBrowserRole`.
+pub fn accessibilityBrowserRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBrowserRole", .linkage = .weak }) orelse missing("NSAccessibilityBrowserRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityComboBoxRole`.
+pub fn accessibilityComboBoxRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityComboBoxRole", .linkage = .weak }) orelse missing("NSAccessibilityComboBoxRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySplitGroupRole`.
+pub fn accessibilitySplitGroupRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySplitGroupRole", .linkage = .weak }) orelse missing("NSAccessibilitySplitGroupRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySplitterRole`.
+pub fn accessibilitySplitterRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySplitterRole", .linkage = .weak }) orelse missing("NSAccessibilitySplitterRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityColorWellRole`.
+pub fn accessibilityColorWellRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityColorWellRole", .linkage = .weak }) orelse missing("NSAccessibilityColorWellRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityGrowAreaRole`.
+pub fn accessibilityGrowAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityGrowAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityGrowAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySheetRole`.
+pub fn accessibilitySheetRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySheetRole", .linkage = .weak }) orelse missing("NSAccessibilitySheetRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHelpTagRole`.
+pub fn accessibilityHelpTagRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHelpTagRole", .linkage = .weak }) orelse missing("NSAccessibilityHelpTagRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMatteRole`.
+pub fn accessibilityMatteRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMatteRole", .linkage = .weak }) orelse missing("NSAccessibilityMatteRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRulerRole`.
+pub fn accessibilityRulerRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRulerRole", .linkage = .weak }) orelse missing("NSAccessibilityRulerRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRulerMarkerRole`.
+pub fn accessibilityRulerMarkerRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRulerMarkerRole", .linkage = .weak }) orelse missing("NSAccessibilityRulerMarkerRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLinkRole`.
+pub fn accessibilityLinkRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLinkRole", .linkage = .weak }) orelse missing("NSAccessibilityLinkRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDisclosureTriangleRole`.
+pub fn accessibilityDisclosureTriangleRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDisclosureTriangleRole", .linkage = .weak }) orelse missing("NSAccessibilityDisclosureTriangleRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityGridRole`.
+pub fn accessibilityGridRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityGridRole", .linkage = .weak }) orelse missing("NSAccessibilityGridRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRelevanceIndicatorRole`.
+pub fn accessibilityRelevanceIndicatorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRelevanceIndicatorRole", .linkage = .weak }) orelse missing("NSAccessibilityRelevanceIndicatorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDateTimeAreaRole`.
+pub fn accessibilityDateTimeAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDateTimeAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityDateTimeAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLevelIndicatorRole`.
+pub fn accessibilityLevelIndicatorRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLevelIndicatorRole", .linkage = .weak }) orelse missing("NSAccessibilityLevelIndicatorRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCellRole`.
+pub fn accessibilityCellRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCellRole", .linkage = .weak }) orelse missing("NSAccessibilityCellRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPopoverRole`.
+pub fn accessibilityPopoverRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPopoverRole", .linkage = .weak }) orelse missing("NSAccessibilityPopoverRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPageRole`.
+pub fn accessibilityPageRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPageRole", .linkage = .weak }) orelse missing("NSAccessibilityPageRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingRole`.
+pub fn accessibilityHeadingRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingRole", .linkage = .weak }) orelse missing("NSAccessibilityHeadingRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListMarkerRole`.
+pub fn accessibilityListMarkerRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListMarkerRole", .linkage = .weak }) orelse missing("NSAccessibilityListMarkerRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityWebAreaRole`.
+pub fn accessibilityWebAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityWebAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityWebAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLayoutAreaRole`.
+pub fn accessibilityLayoutAreaRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLayoutAreaRole", .linkage = .weak }) orelse missing("NSAccessibilityLayoutAreaRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLayoutItemRole`.
+pub fn accessibilityLayoutItemRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLayoutItemRole", .linkage = .weak }) orelse missing("NSAccessibilityLayoutItemRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHandleRole`.
+pub fn accessibilityHandleRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHandleRole", .linkage = .weak }) orelse missing("NSAccessibilityHandleRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnknownSubrole`.
+pub fn accessibilityUnknownSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnknownSubrole", .linkage = .weak }) orelse missing("NSAccessibilityUnknownSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCloseButtonSubrole`.
+pub fn accessibilityCloseButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCloseButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityCloseButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityZoomButtonSubrole`.
+pub fn accessibilityZoomButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityZoomButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityZoomButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMinimizeButtonSubrole`.
+pub fn accessibilityMinimizeButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMinimizeButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityMinimizeButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityToolbarButtonSubrole`.
+pub fn accessibilityToolbarButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityToolbarButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityToolbarButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTableRowSubrole`.
+pub fn accessibilityTableRowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTableRowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityTableRowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOutlineRowSubrole`.
+pub fn accessibilityOutlineRowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOutlineRowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityOutlineRowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySecureTextFieldSubrole`.
+pub fn accessibilitySecureTextFieldSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySecureTextFieldSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySecureTextFieldSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStandardWindowSubrole`.
+pub fn accessibilityStandardWindowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStandardWindowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityStandardWindowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDialogSubrole`.
+pub fn accessibilityDialogSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDialogSubrole", .linkage = .weak }) orelse missing("NSAccessibilityDialogSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySystemDialogSubrole`.
+pub fn accessibilitySystemDialogSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySystemDialogSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySystemDialogSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFloatingWindowSubrole`.
+pub fn accessibilityFloatingWindowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFloatingWindowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityFloatingWindowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySystemFloatingWindowSubrole`.
+pub fn accessibilitySystemFloatingWindowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySystemFloatingWindowSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySystemFloatingWindowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIncrementArrowSubrole`.
+pub fn accessibilityIncrementArrowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIncrementArrowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityIncrementArrowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDecrementArrowSubrole`.
+pub fn accessibilityDecrementArrowSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDecrementArrowSubrole", .linkage = .weak }) orelse missing("NSAccessibilityDecrementArrowSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityIncrementPageSubrole`.
+pub fn accessibilityIncrementPageSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityIncrementPageSubrole", .linkage = .weak }) orelse missing("NSAccessibilityIncrementPageSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDecrementPageSubrole`.
+pub fn accessibilityDecrementPageSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDecrementPageSubrole", .linkage = .weak }) orelse missing("NSAccessibilityDecrementPageSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchFieldSubrole`.
+pub fn accessibilitySearchFieldSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchFieldSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySearchFieldSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextAttachmentSubrole`.
+pub fn accessibilityTextAttachmentSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextAttachmentSubrole", .linkage = .weak }) orelse missing("NSAccessibilityTextAttachmentSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextLinkSubrole`.
+pub fn accessibilityTextLinkSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextLinkSubrole", .linkage = .weak }) orelse missing("NSAccessibilityTextLinkSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTimelineSubrole`.
+pub fn accessibilityTimelineSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTimelineSubrole", .linkage = .weak }) orelse missing("NSAccessibilityTimelineSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySortButtonSubrole`.
+pub fn accessibilitySortButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySortButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySortButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRatingIndicatorSubrole`.
+pub fn accessibilityRatingIndicatorSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRatingIndicatorSubrole", .linkage = .weak }) orelse missing("NSAccessibilityRatingIndicatorSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityContentListSubrole`.
+pub fn accessibilityContentListSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityContentListSubrole", .linkage = .weak }) orelse missing("NSAccessibilityContentListSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDefinitionListSubrole`.
+pub fn accessibilityDefinitionListSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDefinitionListSubrole", .linkage = .weak }) orelse missing("NSAccessibilityDefinitionListSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFullScreenButtonSubrole`.
+pub fn accessibilityFullScreenButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFullScreenButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityFullScreenButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityToggleSubrole`.
+pub fn accessibilityToggleSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityToggleSubrole", .linkage = .weak }) orelse missing("NSAccessibilityToggleSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySwitchSubrole`.
+pub fn accessibilitySwitchSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySwitchSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySwitchSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDescriptionListSubrole`.
+pub fn accessibilityDescriptionListSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDescriptionListSubrole", .linkage = .weak }) orelse missing("NSAccessibilityDescriptionListSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTabButtonSubrole`.
+pub fn accessibilityTabButtonSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTabButtonSubrole", .linkage = .weak }) orelse missing("NSAccessibilityTabButtonSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCollectionListSubrole`.
+pub fn accessibilityCollectionListSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCollectionListSubrole", .linkage = .weak }) orelse missing("NSAccessibilityCollectionListSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySectionListSubrole`.
+pub fn accessibilitySectionListSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySectionListSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySectionListSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySuggestionSubrole`.
+pub fn accessibilitySuggestionSubrole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySuggestionSubrole", .linkage = .weak }) orelse missing("NSAccessibilitySuggestionSubrole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUIElementsKey`.
+pub fn accessibilityUIElementsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUIElementsKey", .linkage = .weak }) orelse missing("NSAccessibilityUIElementsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPriorityKey`.
+pub fn accessibilityPriorityKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPriorityKey", .linkage = .weak }) orelse missing("NSAccessibilityPriorityKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnnouncementKey`.
+pub fn accessibilityAnnouncementKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnnouncementKey", .linkage = .weak }) orelse missing("NSAccessibilityAnnouncementKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPostNotificationWithUserInfo`.
+pub fn accessibilityPostNotificationWithUserInfo(element: objc.Object, notification: ?foundation.String, user_info: ?foundation.Dictionary(objc.Object, objc.Object)) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(?foundation.String), objc.abi.Abi(?foundation.Dictionary(objc.Object, objc.Object))) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotificationWithUserInfo", .linkage = .weak }) orelse missing("NSAccessibilityPostNotificationWithUserInfo");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(?foundation.String, notification), objc.abi.toAbi(?foundation.Dictionary(objc.Object, objc.Object), user_info)));
+}
+
+/// `NSAccessibilityUIElementsForSearchPredicateParameterizedAttribute`.
+pub fn accessibilityUIElementsForSearchPredicateParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUIElementsForSearchPredicateParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityUIElementsForSearchPredicateParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityResultsForSearchPredicateParameterizedAttribute`.
+pub fn accessibilityResultsForSearchPredicateParameterizedAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityResultsForSearchPredicateParameterizedAttribute", .linkage = .weak }) orelse missing("NSAccessibilityResultsForSearchPredicateParameterizedAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchIdentifiersKey`.
+pub fn accessibilitySearchIdentifiersKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchIdentifiersKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchIdentifiersKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchCurrentElementKey`.
+pub fn accessibilitySearchCurrentElementKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchCurrentElementKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchCurrentElementKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchCurrentRangeKey`.
+pub fn accessibilitySearchCurrentRangeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchCurrentRangeKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchCurrentRangeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchDirectionKey`.
+pub fn accessibilitySearchDirectionKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchDirectionKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchDirectionKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchResultsLimitKey`.
+pub fn accessibilitySearchResultsLimitKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchResultsLimitKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchResultsLimitKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchTextKey`.
+pub fn accessibilitySearchTextKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchTextKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchTextKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchDirectionNext`.
+pub fn accessibilitySearchDirectionNext() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchDirectionNext", .linkage = .weak }) orelse missing("NSAccessibilitySearchDirectionNext");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchDirectionPrevious`.
+pub fn accessibilitySearchDirectionPrevious() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchDirectionPrevious", .linkage = .weak }) orelse missing("NSAccessibilitySearchDirectionPrevious");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchResultElementKey`.
+pub fn accessibilitySearchResultElementKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchResultElementKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchResultElementKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchResultRangeKey`.
+pub fn accessibilitySearchResultRangeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchResultRangeKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchResultRangeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchResultDescriptionOverrideKey`.
+pub fn accessibilitySearchResultDescriptionOverrideKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchResultDescriptionOverrideKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchResultDescriptionOverrideKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySearchResultLoaderKey`.
+pub fn accessibilitySearchResultLoaderKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySearchResultLoaderKey", .linkage = .weak }) orelse missing("NSAccessibilitySearchResultLoaderKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityAnyTypeSearchKey`.
+pub fn accessibilityAnyTypeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityAnyTypeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityAnyTypeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityArticleSearchKey`.
+pub fn accessibilityArticleSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityArticleSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityArticleSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBlockquoteSameLevelSearchKey`.
+pub fn accessibilityBlockquoteSameLevelSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBlockquoteSameLevelSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityBlockquoteSameLevelSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBlockquoteSearchKey`.
+pub fn accessibilityBlockquoteSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBlockquoteSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityBlockquoteSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityBoldFontSearchKey`.
+pub fn accessibilityBoldFontSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityBoldFontSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityBoldFontSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityButtonSearchKey`.
+pub fn accessibilityButtonSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityButtonSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityButtonSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityCheckBoxSearchKey`.
+pub fn accessibilityCheckBoxSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityCheckBoxSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityCheckBoxSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityControlSearchKey`.
+pub fn accessibilityControlSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityControlSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityControlSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityDifferentTypeSearchKey`.
+pub fn accessibilityDifferentTypeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityDifferentTypeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityDifferentTypeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontChangeSearchKey`.
+pub fn accessibilityFontChangeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontChangeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityFontChangeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFontColorChangeSearchKey`.
+pub fn accessibilityFontColorChangeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFontColorChangeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityFontColorChangeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFrameSearchKey`.
+pub fn accessibilityFrameSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityFrameSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityFrameSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityGraphicSearchKey`.
+pub fn accessibilityGraphicSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityGraphicSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityGraphicSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel1SearchKey`.
+pub fn accessibilityHeadingLevel1SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel1SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel1SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel2SearchKey`.
+pub fn accessibilityHeadingLevel2SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel2SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel2SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel3SearchKey`.
+pub fn accessibilityHeadingLevel3SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel3SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel3SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel4SearchKey`.
+pub fn accessibilityHeadingLevel4SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel4SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel4SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel5SearchKey`.
+pub fn accessibilityHeadingLevel5SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel5SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel5SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingLevel6SearchKey`.
+pub fn accessibilityHeadingLevel6SearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingLevel6SearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingLevel6SearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingSameLevelSearchKey`.
+pub fn accessibilityHeadingSameLevelSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingSameLevelSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingSameLevelSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityHeadingSearchKey`.
+pub fn accessibilityHeadingSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityHeadingSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityHeadingSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityItalicFontSearchKey`.
+pub fn accessibilityItalicFontSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityItalicFontSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityItalicFontSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityKeyboardFocusableSearchKey`.
+pub fn accessibilityKeyboardFocusableSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityKeyboardFocusableSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityKeyboardFocusableSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLandmarkSearchKey`.
+pub fn accessibilityLandmarkSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLandmarkSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityLandmarkSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLinkSearchKey`.
+pub fn accessibilityLinkSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLinkSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityLinkSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityListSearchKey`.
+pub fn accessibilityListSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityListSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityListSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityLiveRegionSearchKey`.
+pub fn accessibilityLiveRegionSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityLiveRegionSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityLiveRegionSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityMisspelledWordSearchKey`.
+pub fn accessibilityMisspelledWordSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityMisspelledWordSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityMisspelledWordSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityOutlineSearchKey`.
+pub fn accessibilityOutlineSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityOutlineSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityOutlineSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityPlainTextSearchKey`.
+pub fn accessibilityPlainTextSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityPlainTextSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityPlainTextSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityRadioGroupSearchKey`.
+pub fn accessibilityRadioGroupSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityRadioGroupSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityRadioGroupSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySameTypeSearchKey`.
+pub fn accessibilitySameTypeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySameTypeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilitySameTypeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStaticTextSearchKey`.
+pub fn accessibilityStaticTextSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStaticTextSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityStaticTextSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityStyleChangeSearchKey`.
+pub fn accessibilityStyleChangeSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityStyleChangeSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityStyleChangeSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTableSameLevelSearchKey`.
+pub fn accessibilityTableSameLevelSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTableSameLevelSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityTableSameLevelSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTableSearchKey`.
+pub fn accessibilityTableSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTableSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityTableSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextFieldSearchKey`.
+pub fn accessibilityTextFieldSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextFieldSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityTextFieldSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextStateChangeTypeKey`.
+pub fn accessibilityTextStateChangeTypeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextStateChangeTypeKey", .linkage = .weak }) orelse missing("NSAccessibilityTextStateChangeTypeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityTextStateSyncKey`.
+pub fn accessibilityTextStateSyncKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityTextStateSyncKey", .linkage = .weak }) orelse missing("NSAccessibilityTextStateSyncKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnderlineSearchKey`.
+pub fn accessibilityUnderlineSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnderlineSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityUnderlineSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityUnvisitedLinkSearchKey`.
+pub fn accessibilityUnvisitedLinkSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityUnvisitedLinkSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityUnvisitedLinkSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityVisitedLinkSearchKey`.
+pub fn accessibilityVisitedLinkSearchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilityVisitedLinkSearchKey", .linkage = .weak }) orelse missing("NSAccessibilityVisitedLinkSearchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilitySortButtonRole`.
+pub fn accessibilitySortButtonRole() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAccessibilitySortButtonRole", .linkage = .weak }) orelse missing("NSAccessibilitySortButtonRole");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDesktopImageScalingKey`.
+pub fn workspaceDesktopImageScalingKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDesktopImageScalingKey", .linkage = .weak }) orelse missing("NSWorkspaceDesktopImageScalingKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDesktopImageAllowClippingKey`.
+pub fn workspaceDesktopImageAllowClippingKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDesktopImageAllowClippingKey", .linkage = .weak }) orelse missing("NSWorkspaceDesktopImageAllowClippingKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDesktopImageFillColorKey`.
+pub fn workspaceDesktopImageFillColorKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDesktopImageFillColorKey", .linkage = .weak }) orelse missing("NSWorkspaceDesktopImageFillColorKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceApplicationKey`.
+pub fn workspaceApplicationKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceApplicationKey", .linkage = .weak }) orelse missing("NSWorkspaceApplicationKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceWillLaunchApplicationNotification`.
+pub fn workspaceWillLaunchApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceWillLaunchApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceWillLaunchApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidLaunchApplicationNotification`.
+pub fn workspaceDidLaunchApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidLaunchApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidLaunchApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidTerminateApplicationNotification`.
+pub fn workspaceDidTerminateApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidTerminateApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidTerminateApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidHideApplicationNotification`.
+pub fn workspaceDidHideApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidHideApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidHideApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidUnhideApplicationNotification`.
+pub fn workspaceDidUnhideApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidUnhideApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidUnhideApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidActivateApplicationNotification`.
+pub fn workspaceDidActivateApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidActivateApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidActivateApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidDeactivateApplicationNotification`.
+pub fn workspaceDidDeactivateApplicationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidDeactivateApplicationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidDeactivateApplicationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceVolumeLocalizedNameKey`.
+pub fn workspaceVolumeLocalizedNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceVolumeLocalizedNameKey", .linkage = .weak }) orelse missing("NSWorkspaceVolumeLocalizedNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceVolumeURLKey`.
+pub fn workspaceVolumeURLKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceVolumeURLKey", .linkage = .weak }) orelse missing("NSWorkspaceVolumeURLKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceVolumeOldLocalizedNameKey`.
+pub fn workspaceVolumeOldLocalizedNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceVolumeOldLocalizedNameKey", .linkage = .weak }) orelse missing("NSWorkspaceVolumeOldLocalizedNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceVolumeOldURLKey`.
+pub fn workspaceVolumeOldURLKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceVolumeOldURLKey", .linkage = .weak }) orelse missing("NSWorkspaceVolumeOldURLKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidMountNotification`.
+pub fn workspaceDidMountNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidMountNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidMountNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidUnmountNotification`.
+pub fn workspaceDidUnmountNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidUnmountNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidUnmountNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceWillUnmountNotification`.
+pub fn workspaceWillUnmountNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceWillUnmountNotification", .linkage = .weak }) orelse missing("NSWorkspaceWillUnmountNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidRenameVolumeNotification`.
+pub fn workspaceDidRenameVolumeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidRenameVolumeNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidRenameVolumeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceWillPowerOffNotification`.
+pub fn workspaceWillPowerOffNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceWillPowerOffNotification", .linkage = .weak }) orelse missing("NSWorkspaceWillPowerOffNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceWillSleepNotification`.
+pub fn workspaceWillSleepNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceWillSleepNotification", .linkage = .weak }) orelse missing("NSWorkspaceWillSleepNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidWakeNotification`.
+pub fn workspaceDidWakeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidWakeNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidWakeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceScreensDidSleepNotification`.
+pub fn workspaceScreensDidSleepNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceScreensDidSleepNotification", .linkage = .weak }) orelse missing("NSWorkspaceScreensDidSleepNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceScreensDidWakeNotification`.
+pub fn workspaceScreensDidWakeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceScreensDidWakeNotification", .linkage = .weak }) orelse missing("NSWorkspaceScreensDidWakeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceSessionDidBecomeActiveNotification`.
+pub fn workspaceSessionDidBecomeActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceSessionDidBecomeActiveNotification", .linkage = .weak }) orelse missing("NSWorkspaceSessionDidBecomeActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceSessionDidResignActiveNotification`.
+pub fn workspaceSessionDidResignActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceSessionDidResignActiveNotification", .linkage = .weak }) orelse missing("NSWorkspaceSessionDidResignActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidChangeFileLabelsNotification`.
+pub fn workspaceDidChangeFileLabelsNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidChangeFileLabelsNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidChangeFileLabelsNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceActiveSpaceDidChangeNotification`.
+pub fn workspaceActiveSpaceDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceActiveSpaceDidChangeNotification", .linkage = .weak }) orelse missing("NSWorkspaceActiveSpaceDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceLaunchConfigurationAppleEvent`.
+pub fn workspaceLaunchConfigurationAppleEvent() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceLaunchConfigurationAppleEvent", .linkage = .weak }) orelse missing("NSWorkspaceLaunchConfigurationAppleEvent");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceLaunchConfigurationArguments`.
+pub fn workspaceLaunchConfigurationArguments() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceLaunchConfigurationArguments", .linkage = .weak }) orelse missing("NSWorkspaceLaunchConfigurationArguments");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceLaunchConfigurationEnvironment`.
+pub fn workspaceLaunchConfigurationEnvironment() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceLaunchConfigurationEnvironment", .linkage = .weak }) orelse missing("NSWorkspaceLaunchConfigurationEnvironment");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceLaunchConfigurationArchitecture`.
+pub fn workspaceLaunchConfigurationArchitecture() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceLaunchConfigurationArchitecture", .linkage = .weak }) orelse missing("NSWorkspaceLaunchConfigurationArchitecture");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceMoveOperation`.
+pub fn workspaceMoveOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceMoveOperation", .linkage = .weak }) orelse missing("NSWorkspaceMoveOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceCopyOperation`.
+pub fn workspaceCopyOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceCopyOperation", .linkage = .weak }) orelse missing("NSWorkspaceCopyOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceLinkOperation`.
+pub fn workspaceLinkOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceLinkOperation", .linkage = .weak }) orelse missing("NSWorkspaceLinkOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceCompressOperation`.
+pub fn workspaceCompressOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceCompressOperation", .linkage = .weak }) orelse missing("NSWorkspaceCompressOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDecompressOperation`.
+pub fn workspaceDecompressOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDecompressOperation", .linkage = .weak }) orelse missing("NSWorkspaceDecompressOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceEncryptOperation`.
+pub fn workspaceEncryptOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceEncryptOperation", .linkage = .weak }) orelse missing("NSWorkspaceEncryptOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDecryptOperation`.
+pub fn workspaceDecryptOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDecryptOperation", .linkage = .weak }) orelse missing("NSWorkspaceDecryptOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDestroyOperation`.
+pub fn workspaceDestroyOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDestroyOperation", .linkage = .weak }) orelse missing("NSWorkspaceDestroyOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceRecycleOperation`.
+pub fn workspaceRecycleOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceRecycleOperation", .linkage = .weak }) orelse missing("NSWorkspaceRecycleOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDuplicateOperation`.
+pub fn workspaceDuplicateOperation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDuplicateOperation", .linkage = .weak }) orelse missing("NSWorkspaceDuplicateOperation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceDidPerformFileOperationNotification`.
+pub fn workspaceDidPerformFileOperationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceDidPerformFileOperationNotification", .linkage = .weak }) orelse missing("NSWorkspaceDidPerformFileOperationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPlainFileType`.
+pub fn plainFileType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPlainFileType", .linkage = .weak }) orelse missing("NSPlainFileType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDirectoryFileType`.
+pub fn directoryFileType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDirectoryFileType", .linkage = .weak }) orelse missing("NSDirectoryFileType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationFileType`.
+pub fn applicationFileType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationFileType", .linkage = .weak }) orelse missing("NSApplicationFileType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFilesystemFileType`.
+pub fn filesystemFileType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFilesystemFileType", .linkage = .weak }) orelse missing("NSFilesystemFileType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSShellCommandFileType`.
+pub fn shellCommandFileType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSShellCommandFileType", .linkage = .weak }) orelse missing("NSShellCommandFileType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification`.
+pub fn workspaceAccessibilityDisplayOptionsDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification", .linkage = .weak }) orelse missing("NSWorkspaceAccessibilityDisplayOptionsDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAccessibilityFrameInView`.
+pub fn accessibilityFrameInView(parent_view: View, frame: cg.Rect) cg.Rect {
+    const function = @extern(?*const fn (objc.abi.Abi(View), objc.abi.Abi(cg.Rect)) callconv(.c) objc.abi.Abi(cg.Rect), .{ .name = "NSAccessibilityFrameInView", .linkage = .weak }) orelse missing("NSAccessibilityFrameInView");
+    return objc.abi.fromAbi(cg.Rect, function(objc.abi.toAbi(View, parent_view), objc.abi.toAbi(cg.Rect, frame)));
+}
+
+/// `NSAccessibilityPointInView`.
+pub fn accessibilityPointInView(parent_view: View, point: cg.Point) cg.Point {
+    const function = @extern(?*const fn (objc.abi.Abi(View), objc.abi.Abi(cg.Point)) callconv(.c) objc.abi.Abi(cg.Point), .{ .name = "NSAccessibilityPointInView", .linkage = .weak }) orelse missing("NSAccessibilityPointInView");
+    return objc.abi.fromAbi(cg.Point, function(objc.abi.toAbi(View, parent_view), objc.abi.toAbi(cg.Point, point)));
+}
+
+/// `NSAccessibilitySetMayContainProtectedContent`.
+pub fn accessibilitySetMayContainProtectedContent(flag: bool) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(bool)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSAccessibilitySetMayContainProtectedContent", .linkage = .weak }) orelse missing("NSAccessibilitySetMayContainProtectedContent");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(bool, flag)));
+}
+
+/// `NSAccessibilityRoleDescription`.
+pub fn accessibilityRoleDescription(role: ?foundation.String, subrole: ?foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityRoleDescription", .linkage = .weak }) orelse missing("NSAccessibilityRoleDescription");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, role), objc.abi.toAbi(?foundation.String, subrole)));
+}
+
+/// `NSAccessibilityRoleDescriptionForUIElement`.
+pub fn accessibilityRoleDescriptionForUIElement(element: objc.Object) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityRoleDescriptionForUIElement", .linkage = .weak }) orelse missing("NSAccessibilityRoleDescriptionForUIElement");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(objc.Object, element)));
+}
+
+/// `NSAccessibilityActionDescription`.
+pub fn accessibilityActionDescription(action: ?foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSAccessibilityActionDescription", .linkage = .weak }) orelse missing("NSAccessibilityActionDescription");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, action)));
+}
+
+/// `NSAccessibilityRaiseBadArgumentException`.
+pub fn accessibilityRaiseBadArgumentException(element: ?objc.Object, attribute: ?foundation.String, value: ?objc.Object) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object), objc.abi.Abi(?foundation.String), objc.abi.Abi(?objc.Object)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityRaiseBadArgumentException", .linkage = .weak }) orelse missing("NSAccessibilityRaiseBadArgumentException");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, element), objc.abi.toAbi(?foundation.String, attribute), objc.abi.toAbi(?objc.Object, value)));
+}
+
+/// `NSAccessibilityUnignoredAncestor`.
+pub fn accessibilityUnignoredAncestor(element: objc.Object) ?objc.Object {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(?objc.Object), .{ .name = "NSAccessibilityUnignoredAncestor", .linkage = .weak }) orelse missing("NSAccessibilityUnignoredAncestor");
+    return objc.abi.fromAbi(?objc.Object, function(objc.abi.toAbi(objc.Object, element)));
+}
+
+/// `NSAccessibilityUnignoredDescendant`.
+pub fn accessibilityUnignoredDescendant(element: objc.Object) ?objc.Object {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(?objc.Object), .{ .name = "NSAccessibilityUnignoredDescendant", .linkage = .weak }) orelse missing("NSAccessibilityUnignoredDescendant");
+    return objc.abi.fromAbi(?objc.Object, function(objc.abi.toAbi(objc.Object, element)));
+}
+
+/// `NSAccessibilityUnignoredChildren`.
+pub fn accessibilityUnignoredChildren(original_children: foundation.Array(objc.Object)) foundation.Array(objc.Object) {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.Array(objc.Object))) callconv(.c) objc.abi.Abi(foundation.Array(objc.Object)), .{ .name = "NSAccessibilityUnignoredChildren", .linkage = .weak }) orelse missing("NSAccessibilityUnignoredChildren");
+    return objc.abi.fromAbi(foundation.Array(objc.Object), function(objc.abi.toAbi(foundation.Array(objc.Object), original_children)));
+}
+
+/// `NSAccessibilityUnignoredChildrenForOnlyChild`.
+pub fn accessibilityUnignoredChildrenForOnlyChild(original_child: objc.Object) foundation.Array(objc.Object) {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object)) callconv(.c) objc.abi.Abi(foundation.Array(objc.Object)), .{ .name = "NSAccessibilityUnignoredChildrenForOnlyChild", .linkage = .weak }) orelse missing("NSAccessibilityUnignoredChildrenForOnlyChild");
+    return objc.abi.fromAbi(foundation.Array(objc.Object), function(objc.abi.toAbi(objc.Object, original_child)));
+}
+
+/// `NSAccessibilityPostNotification`.
+pub fn accessibilityPostNotification(element: objc.Object, notification: ?foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(objc.Object), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSAccessibilityPostNotification", .linkage = .weak }) orelse missing("NSAccessibilityPostNotification");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(objc.Object, element), objc.abi.toAbi(?foundation.String, notification)));
+}
+
+/// `NSPasteboardTypeString`.
+pub fn pasteboardTypeString() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeString", .linkage = .weak }) orelse missing("NSPasteboardTypeString");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypePDF`.
+pub fn pasteboardTypePDF() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypePDF", .linkage = .weak }) orelse missing("NSPasteboardTypePDF");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeTIFF`.
+pub fn pasteboardTypeTIFF() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeTIFF", .linkage = .weak }) orelse missing("NSPasteboardTypeTIFF");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypePNG`.
+pub fn pasteboardTypePNG() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypePNG", .linkage = .weak }) orelse missing("NSPasteboardTypePNG");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeRTF`.
+pub fn pasteboardTypeRTF() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeRTF", .linkage = .weak }) orelse missing("NSPasteboardTypeRTF");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeRTFD`.
+pub fn pasteboardTypeRTFD() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeRTFD", .linkage = .weak }) orelse missing("NSPasteboardTypeRTFD");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeHTML`.
+pub fn pasteboardTypeHTML() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeHTML", .linkage = .weak }) orelse missing("NSPasteboardTypeHTML");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeTabularText`.
+pub fn pasteboardTypeTabularText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeTabularText", .linkage = .weak }) orelse missing("NSPasteboardTypeTabularText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeFont`.
+pub fn pasteboardTypeFont() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeFont", .linkage = .weak }) orelse missing("NSPasteboardTypeFont");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeRuler`.
+pub fn pasteboardTypeRuler() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeRuler", .linkage = .weak }) orelse missing("NSPasteboardTypeRuler");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeColor`.
+pub fn pasteboardTypeColor() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeColor", .linkage = .weak }) orelse missing("NSPasteboardTypeColor");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeSound`.
+pub fn pasteboardTypeSound() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeSound", .linkage = .weak }) orelse missing("NSPasteboardTypeSound");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeMultipleTextSelection`.
+pub fn pasteboardTypeMultipleTextSelection() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeMultipleTextSelection", .linkage = .weak }) orelse missing("NSPasteboardTypeMultipleTextSelection");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeTextFinderOptions`.
+pub fn pasteboardTypeTextFinderOptions() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeTextFinderOptions", .linkage = .weak }) orelse missing("NSPasteboardTypeTextFinderOptions");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeURL`.
+pub fn pasteboardTypeURL() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeURL", .linkage = .weak }) orelse missing("NSPasteboardTypeURL");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeFileURL`.
+pub fn pasteboardTypeFileURL() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeFileURL", .linkage = .weak }) orelse missing("NSPasteboardTypeFileURL");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardNameGeneral`.
+pub fn pasteboardNameGeneral() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardNameGeneral", .linkage = .weak }) orelse missing("NSPasteboardNameGeneral");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardNameFont`.
+pub fn pasteboardNameFont() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardNameFont", .linkage = .weak }) orelse missing("NSPasteboardNameFont");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardNameRuler`.
+pub fn pasteboardNameRuler() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardNameRuler", .linkage = .weak }) orelse missing("NSPasteboardNameRuler");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardNameFind`.
+pub fn pasteboardNameFind() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardNameFind", .linkage = .weak }) orelse missing("NSPasteboardNameFind");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardNameDrag`.
+pub fn pasteboardNameDrag() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardNameDrag", .linkage = .weak }) orelse missing("NSPasteboardNameDrag");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternProbableWebURL`.
+pub fn pasteboardDetectionPatternProbableWebURL() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternProbableWebURL", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternProbableWebURL");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternProbableWebSearch`.
+pub fn pasteboardDetectionPatternProbableWebSearch() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternProbableWebSearch", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternProbableWebSearch");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternNumber`.
+pub fn pasteboardDetectionPatternNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternNumber", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternLink`.
+pub fn pasteboardDetectionPatternLink() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternLink", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternLink");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternPhoneNumber`.
+pub fn pasteboardDetectionPatternPhoneNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternPhoneNumber", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternPhoneNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternEmailAddress`.
+pub fn pasteboardDetectionPatternEmailAddress() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternEmailAddress", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternEmailAddress");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternPostalAddress`.
+pub fn pasteboardDetectionPatternPostalAddress() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternPostalAddress", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternPostalAddress");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternCalendarEvent`.
+pub fn pasteboardDetectionPatternCalendarEvent() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternCalendarEvent", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternCalendarEvent");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternShipmentTrackingNumber`.
+pub fn pasteboardDetectionPatternShipmentTrackingNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternShipmentTrackingNumber", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternShipmentTrackingNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternFlightNumber`.
+pub fn pasteboardDetectionPatternFlightNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternFlightNumber", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternFlightNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardDetectionPatternMoneyAmount`.
+pub fn pasteboardDetectionPatternMoneyAmount() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardDetectionPatternMoneyAmount", .linkage = .weak }) orelse missing("NSPasteboardDetectionPatternMoneyAmount");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardMetadataTypeContentType`.
+pub fn pasteboardMetadataTypeContentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardMetadataTypeContentType", .linkage = .weak }) orelse missing("NSPasteboardMetadataTypeContentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardURLReadingFileURLsOnlyKey`.
+pub fn pasteboardURLReadingFileURLsOnlyKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardURLReadingFileURLsOnlyKey", .linkage = .weak }) orelse missing("NSPasteboardURLReadingFileURLsOnlyKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardURLReadingContentsConformToTypesKey`.
+pub fn pasteboardURLReadingContentsConformToTypesKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardURLReadingContentsConformToTypesKey", .linkage = .weak }) orelse missing("NSPasteboardURLReadingContentsConformToTypesKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFileContentsPboardType`.
+pub fn fileContentsPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFileContentsPboardType", .linkage = .weak }) orelse missing("NSFileContentsPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGetFileType`.
+pub fn getFileType(pboard_type: ?foundation.String) ?foundation.String {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(?foundation.String), .{ .name = "NSGetFileType", .linkage = .weak }) orelse missing("NSGetFileType");
+    return objc.abi.fromAbi(?foundation.String, function(objc.abi.toAbi(?foundation.String, pboard_type)));
+}
+
+/// `NSGetFileTypes`.
+pub fn getFileTypes(pboard_types: foundation.Array(objc.Object)) ?foundation.Array(foundation.String) {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.Array(objc.Object))) callconv(.c) objc.abi.Abi(?foundation.Array(foundation.String)), .{ .name = "NSGetFileTypes", .linkage = .weak }) orelse missing("NSGetFileTypes");
+    return objc.abi.fromAbi(?foundation.Array(foundation.String), function(objc.abi.toAbi(foundation.Array(objc.Object), pboard_types)));
+}
+
+/// `NSStringPboardType`.
+pub fn stringPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSStringPboardType", .linkage = .weak }) orelse missing("NSStringPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFilenamesPboardType`.
+pub fn filenamesPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFilenamesPboardType", .linkage = .weak }) orelse missing("NSFilenamesPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTIFFPboardType`.
+pub fn tiffPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTIFFPboardType", .linkage = .weak }) orelse missing("NSTIFFPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRTFPboardType`.
+pub fn rtfPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRTFPboardType", .linkage = .weak }) orelse missing("NSRTFPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTabularTextPboardType`.
+pub fn tabularTextPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTabularTextPboardType", .linkage = .weak }) orelse missing("NSTabularTextPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontPboardType`.
+pub fn fontPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontPboardType", .linkage = .weak }) orelse missing("NSFontPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerPboardType`.
+pub fn rulerPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerPboardType", .linkage = .weak }) orelse missing("NSRulerPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSColorPboardType`.
+pub fn colorPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSColorPboardType", .linkage = .weak }) orelse missing("NSColorPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRTFDPboardType`.
+pub fn rtfdPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRTFDPboardType", .linkage = .weak }) orelse missing("NSRTFDPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHTMLPboardType`.
+pub fn htmlPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHTMLPboardType", .linkage = .weak }) orelse missing("NSHTMLPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSURLPboardType`.
+pub fn urlPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSURLPboardType", .linkage = .weak }) orelse missing("NSURLPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPDFPboardType`.
+pub fn pdfPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPDFPboardType", .linkage = .weak }) orelse missing("NSPDFPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMultipleTextSelectionPboardType`.
+pub fn multipleTextSelectionPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMultipleTextSelectionPboardType", .linkage = .weak }) orelse missing("NSMultipleTextSelectionPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPostScriptPboardType`.
+pub fn postScriptPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPostScriptPboardType", .linkage = .weak }) orelse missing("NSPostScriptPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVCardPboardType`.
+pub fn vCardPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVCardPboardType", .linkage = .weak }) orelse missing("NSVCardPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInkTextPboardType`.
+pub fn inkTextPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInkTextPboardType", .linkage = .weak }) orelse missing("NSInkTextPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFilesPromisePboardType`.
+pub fn filesPromisePboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFilesPromisePboardType", .linkage = .weak }) orelse missing("NSFilesPromisePboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPasteboardTypeFindPanelSearchOptions`.
+pub fn pasteboardTypeFindPanelSearchOptions() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPasteboardTypeFindPanelSearchOptions", .linkage = .weak }) orelse missing("NSPasteboardTypeFindPanelSearchOptions");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGeneralPboard`.
+pub fn generalPboard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGeneralPboard", .linkage = .weak }) orelse missing("NSGeneralPboard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontPboard`.
+pub fn fontPboard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontPboard", .linkage = .weak }) orelse missing("NSFontPboard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerPboard`.
+pub fn rulerPboard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerPboard", .linkage = .weak }) orelse missing("NSRulerPboard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFindPboard`.
+pub fn findPboard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFindPboard", .linkage = .weak }) orelse missing("NSFindPboard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDragPboard`.
+pub fn dragPboard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDragPboard", .linkage = .weak }) orelse missing("NSDragPboard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPICTPboardType`.
+pub fn pictPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPICTPboardType", .linkage = .weak }) orelse missing("NSPICTPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNibOwner`.
+pub fn nibOwner() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNibOwner", .linkage = .weak }) orelse missing("NSNibOwner");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNibTopLevelObjects`.
+pub fn nibTopLevelObjects() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNibTopLevelObjects", .linkage = .weak }) orelse missing("NSNibTopLevelObjects");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimationProgressMarkNotification`.
+pub fn animationProgressMarkNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimationProgressMarkNotification", .linkage = .weak }) orelse missing("NSAnimationProgressMarkNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimationProgressMark`.
+pub fn animationProgressMark() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimationProgressMark", .linkage = .weak }) orelse missing("NSAnimationProgressMark");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationTargetKey`.
+pub fn viewAnimationTargetKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationTargetKey", .linkage = .weak }) orelse missing("NSViewAnimationTargetKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationStartFrameKey`.
+pub fn viewAnimationStartFrameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationStartFrameKey", .linkage = .weak }) orelse missing("NSViewAnimationStartFrameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationEndFrameKey`.
+pub fn viewAnimationEndFrameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationEndFrameKey", .linkage = .weak }) orelse missing("NSViewAnimationEndFrameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationEffectKey`.
+pub fn viewAnimationEffectKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationEffectKey", .linkage = .weak }) orelse missing("NSViewAnimationEffectKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationFadeInEffect`.
+pub fn viewAnimationFadeInEffect() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationFadeInEffect", .linkage = .weak }) orelse missing("NSViewAnimationFadeInEffect");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewAnimationFadeOutEffect`.
+pub fn viewAnimationFadeOutEffect() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewAnimationFadeOutEffect", .linkage = .weak }) orelse missing("NSViewAnimationFadeOutEffect");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimationTriggerOrderIn`.
+pub fn animationTriggerOrderIn() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimationTriggerOrderIn", .linkage = .weak }) orelse missing("NSAnimationTriggerOrderIn");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimationTriggerOrderOut`.
+pub fn animationTriggerOrderOut() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimationTriggerOrderOut", .linkage = .weak }) orelse missing("NSAnimationTriggerOrderOut");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameAqua`.
+pub fn appearanceNameAqua() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameAqua", .linkage = .weak }) orelse missing("NSAppearanceNameAqua");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameDarkAqua`.
+pub fn appearanceNameDarkAqua() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameDarkAqua", .linkage = .weak }) orelse missing("NSAppearanceNameDarkAqua");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameLightContent`.
+pub fn appearanceNameLightContent() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameLightContent", .linkage = .weak }) orelse missing("NSAppearanceNameLightContent");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameVibrantDark`.
+pub fn appearanceNameVibrantDark() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameVibrantDark", .linkage = .weak }) orelse missing("NSAppearanceNameVibrantDark");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameVibrantLight`.
+pub fn appearanceNameVibrantLight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameVibrantLight", .linkage = .weak }) orelse missing("NSAppearanceNameVibrantLight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameAccessibilityHighContrastAqua`.
+pub fn appearanceNameAccessibilityHighContrastAqua() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameAccessibilityHighContrastAqua", .linkage = .weak }) orelse missing("NSAppearanceNameAccessibilityHighContrastAqua");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameAccessibilityHighContrastDarkAqua`.
+pub fn appearanceNameAccessibilityHighContrastDarkAqua() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameAccessibilityHighContrastDarkAqua", .linkage = .weak }) orelse missing("NSAppearanceNameAccessibilityHighContrastDarkAqua");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameAccessibilityHighContrastVibrantLight`.
+pub fn appearanceNameAccessibilityHighContrastVibrantLight() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameAccessibilityHighContrastVibrantLight", .linkage = .weak }) orelse missing("NSAppearanceNameAccessibilityHighContrastVibrantLight");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceNameAccessibilityHighContrastVibrantDark`.
+pub fn appearanceNameAccessibilityHighContrastVibrantDark() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceNameAccessibilityHighContrastVibrantDark", .linkage = .weak }) orelse missing("NSAppearanceNameAccessibilityHighContrastVibrantDark");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFullScreenModeAllScreens`.
+pub fn fullScreenModeAllScreens() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFullScreenModeAllScreens", .linkage = .weak }) orelse missing("NSFullScreenModeAllScreens");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFullScreenModeSetting`.
+pub fn fullScreenModeSetting() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFullScreenModeSetting", .linkage = .weak }) orelse missing("NSFullScreenModeSetting");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFullScreenModeWindowLevel`.
+pub fn fullScreenModeWindowLevel() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFullScreenModeWindowLevel", .linkage = .weak }) orelse missing("NSFullScreenModeWindowLevel");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFullScreenModeApplicationPresentationOptions`.
+pub fn fullScreenModeApplicationPresentationOptions() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFullScreenModeApplicationPresentationOptions", .linkage = .weak }) orelse missing("NSFullScreenModeApplicationPresentationOptions");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefinitionPresentationTypeKey`.
+pub fn definitionPresentationTypeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefinitionPresentationTypeKey", .linkage = .weak }) orelse missing("NSDefinitionPresentationTypeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefinitionPresentationTypeOverlay`.
+pub fn definitionPresentationTypeOverlay() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefinitionPresentationTypeOverlay", .linkage = .weak }) orelse missing("NSDefinitionPresentationTypeOverlay");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefinitionPresentationTypeDictionaryApplication`.
+pub fn definitionPresentationTypeDictionaryApplication() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefinitionPresentationTypeDictionaryApplication", .linkage = .weak }) orelse missing("NSDefinitionPresentationTypeDictionaryApplication");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewFrameDidChangeNotification`.
+pub fn viewFrameDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewFrameDidChangeNotification", .linkage = .weak }) orelse missing("NSViewFrameDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewFocusDidChangeNotification`.
+pub fn viewFocusDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewFocusDidChangeNotification", .linkage = .weak }) orelse missing("NSViewFocusDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewBoundsDidChangeNotification`.
+pub fn viewBoundsDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewBoundsDidChangeNotification", .linkage = .weak }) orelse missing("NSViewBoundsDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewGlobalFrameDidChangeNotification`.
+pub fn viewGlobalFrameDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewGlobalFrameDidChangeNotification", .linkage = .weak }) orelse missing("NSViewGlobalFrameDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewDidUpdateTrackingAreasNotification`.
+pub fn viewDidUpdateTrackingAreasNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewDidUpdateTrackingAreasNotification", .linkage = .weak }) orelse missing("NSViewDidUpdateTrackingAreasNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextDidBeginEditingNotification`.
+pub fn textDidBeginEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextDidBeginEditingNotification", .linkage = .weak }) orelse missing("NSTextDidBeginEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextDidEndEditingNotification`.
+pub fn textDidEndEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextDidEndEditingNotification", .linkage = .weak }) orelse missing("NSTextDidEndEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextDidChangeNotification`.
+pub fn textDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextDidChangeNotification", .linkage = .weak }) orelse missing("NSTextDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextMovementUserInfoKey`.
+pub fn textMovementUserInfoKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextMovementUserInfoKey", .linkage = .weak }) orelse missing("NSTextMovementUserInfoKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTabColumnTerminatorsAttributeName`.
+pub fn tabColumnTerminatorsAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTabColumnTerminatorsAttributeName", .linkage = .weak }) orelse missing("NSTabColumnTerminatorsAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDrawThreePartImage`.
+pub fn drawThreePartImage(frame: cg.Rect, start_cap: ?Image, center_fill: ?Image, end_cap: ?Image, vertical: bool, op: CompositingOperation, alpha_fraction: cg.Float, flipped: bool) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(bool), objc.abi.Abi(CompositingOperation), objc.abi.Abi(cg.Float), objc.abi.Abi(bool)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawThreePartImage", .linkage = .weak }) orelse missing("NSDrawThreePartImage");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, frame), objc.abi.toAbi(?Image, start_cap), objc.abi.toAbi(?Image, center_fill), objc.abi.toAbi(?Image, end_cap), objc.abi.toAbi(bool, vertical), objc.abi.toAbi(CompositingOperation, op), objc.abi.toAbi(cg.Float, alpha_fraction), objc.abi.toAbi(bool, flipped)));
+}
+
+/// `NSDrawNinePartImage`.
+pub fn drawNinePartImage(frame: cg.Rect, top_left_corner: ?Image, top_edge_fill: ?Image, top_right_corner: ?Image, left_edge_fill: ?Image, center_fill: ?Image, right_edge_fill: ?Image, bottom_left_corner: ?Image, bottom_edge_fill: ?Image, bottom_right_corner: ?Image, op: CompositingOperation, alpha_fraction: cg.Float, flipped: bool) void {
+    const function = @extern(?*const fn (objc.abi.Abi(cg.Rect), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(?Image), objc.abi.Abi(CompositingOperation), objc.abi.Abi(cg.Float), objc.abi.Abi(bool)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSDrawNinePartImage", .linkage = .weak }) orelse missing("NSDrawNinePartImage");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(cg.Rect, frame), objc.abi.toAbi(?Image, top_left_corner), objc.abi.toAbi(?Image, top_edge_fill), objc.abi.toAbi(?Image, top_right_corner), objc.abi.toAbi(?Image, left_edge_fill), objc.abi.toAbi(?Image, center_fill), objc.abi.toAbi(?Image, right_edge_fill), objc.abi.toAbi(?Image, bottom_left_corner), objc.abi.toAbi(?Image, bottom_edge_fill), objc.abi.toAbi(?Image, bottom_right_corner), objc.abi.toAbi(CompositingOperation, op), objc.abi.toAbi(cg.Float, alpha_fraction), objc.abi.toAbi(bool, flipped)));
+}
+
+/// `NSControlTintDidChangeNotification`.
+pub fn controlTintDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSControlTintDidChangeNotification", .linkage = .weak }) orelse missing("NSControlTintDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuItemImportFromDeviceIdentifier`.
+pub fn menuItemImportFromDeviceIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuItemImportFromDeviceIdentifier", .linkage = .weak }) orelse missing("NSMenuItemImportFromDeviceIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuWillSendActionNotification`.
+pub fn menuWillSendActionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuWillSendActionNotification", .linkage = .weak }) orelse missing("NSMenuWillSendActionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidSendActionNotification`.
+pub fn menuDidSendActionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidSendActionNotification", .linkage = .weak }) orelse missing("NSMenuDidSendActionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidAddItemNotification`.
+pub fn menuDidAddItemNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidAddItemNotification", .linkage = .weak }) orelse missing("NSMenuDidAddItemNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidRemoveItemNotification`.
+pub fn menuDidRemoveItemNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidRemoveItemNotification", .linkage = .weak }) orelse missing("NSMenuDidRemoveItemNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidChangeItemNotification`.
+pub fn menuDidChangeItemNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidChangeItemNotification", .linkage = .weak }) orelse missing("NSMenuDidChangeItemNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidBeginTrackingNotification`.
+pub fn menuDidBeginTrackingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidBeginTrackingNotification", .linkage = .weak }) orelse missing("NSMenuDidBeginTrackingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMenuDidEndTrackingNotification`.
+pub fn menuDidEndTrackingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMenuDidEndTrackingNotification", .linkage = .weak }) orelse missing("NSMenuDidEndTrackingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPaperName`.
+pub fn printPaperName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPaperName", .linkage = .weak }) orelse missing("NSPrintPaperName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPaperSize`.
+pub fn printPaperSize() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPaperSize", .linkage = .weak }) orelse missing("NSPrintPaperSize");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintOrientation`.
+pub fn printOrientation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintOrientation", .linkage = .weak }) orelse missing("NSPrintOrientation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintScalingFactor`.
+pub fn printScalingFactor() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintScalingFactor", .linkage = .weak }) orelse missing("NSPrintScalingFactor");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintLeftMargin`.
+pub fn printLeftMargin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintLeftMargin", .linkage = .weak }) orelse missing("NSPrintLeftMargin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintRightMargin`.
+pub fn printRightMargin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintRightMargin", .linkage = .weak }) orelse missing("NSPrintRightMargin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintTopMargin`.
+pub fn printTopMargin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintTopMargin", .linkage = .weak }) orelse missing("NSPrintTopMargin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintBottomMargin`.
+pub fn printBottomMargin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintBottomMargin", .linkage = .weak }) orelse missing("NSPrintBottomMargin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintHorizontallyCentered`.
+pub fn printHorizontallyCentered() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintHorizontallyCentered", .linkage = .weak }) orelse missing("NSPrintHorizontallyCentered");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintVerticallyCentered`.
+pub fn printVerticallyCentered() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintVerticallyCentered", .linkage = .weak }) orelse missing("NSPrintVerticallyCentered");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintHorizontalPagination`.
+pub fn printHorizontalPagination() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintHorizontalPagination", .linkage = .weak }) orelse missing("NSPrintHorizontalPagination");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintVerticalPagination`.
+pub fn printVerticalPagination() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintVerticalPagination", .linkage = .weak }) orelse missing("NSPrintVerticalPagination");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPrinter`.
+pub fn printPrinter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPrinter", .linkage = .weak }) orelse missing("NSPrintPrinter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintCopies`.
+pub fn printCopies() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintCopies", .linkage = .weak }) orelse missing("NSPrintCopies");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintAllPages`.
+pub fn printAllPages() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintAllPages", .linkage = .weak }) orelse missing("NSPrintAllPages");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintFirstPage`.
+pub fn printFirstPage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintFirstPage", .linkage = .weak }) orelse missing("NSPrintFirstPage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintLastPage`.
+pub fn printLastPage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintLastPage", .linkage = .weak }) orelse missing("NSPrintLastPage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintMustCollate`.
+pub fn printMustCollate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintMustCollate", .linkage = .weak }) orelse missing("NSPrintMustCollate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintReversePageOrder`.
+pub fn printReversePageOrder() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintReversePageOrder", .linkage = .weak }) orelse missing("NSPrintReversePageOrder");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintJobDisposition`.
+pub fn printJobDisposition() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintJobDisposition", .linkage = .weak }) orelse missing("NSPrintJobDisposition");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPagesAcross`.
+pub fn printPagesAcross() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPagesAcross", .linkage = .weak }) orelse missing("NSPrintPagesAcross");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPagesDown`.
+pub fn printPagesDown() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPagesDown", .linkage = .weak }) orelse missing("NSPrintPagesDown");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintTime`.
+pub fn printTime() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintTime", .linkage = .weak }) orelse missing("NSPrintTime");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintDetailedErrorReporting`.
+pub fn printDetailedErrorReporting() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintDetailedErrorReporting", .linkage = .weak }) orelse missing("NSPrintDetailedErrorReporting");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintFaxNumber`.
+pub fn printFaxNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintFaxNumber", .linkage = .weak }) orelse missing("NSPrintFaxNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPrinterName`.
+pub fn printPrinterName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPrinterName", .linkage = .weak }) orelse missing("NSPrintPrinterName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintSelectionOnly`.
+pub fn printSelectionOnly() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintSelectionOnly", .linkage = .weak }) orelse missing("NSPrintSelectionOnly");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintJobSavingURL`.
+pub fn printJobSavingURL() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintJobSavingURL", .linkage = .weak }) orelse missing("NSPrintJobSavingURL");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintJobSavingFileNameExtensionHidden`.
+pub fn printJobSavingFileNameExtensionHidden() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintJobSavingFileNameExtensionHidden", .linkage = .weak }) orelse missing("NSPrintJobSavingFileNameExtensionHidden");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintHeaderAndFooter`.
+pub fn printHeaderAndFooter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintHeaderAndFooter", .linkage = .weak }) orelse missing("NSPrintHeaderAndFooter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintSpoolJob`.
+pub fn printSpoolJob() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintSpoolJob", .linkage = .weak }) orelse missing("NSPrintSpoolJob");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPreviewJob`.
+pub fn printPreviewJob() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPreviewJob", .linkage = .weak }) orelse missing("NSPrintPreviewJob");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintSaveJob`.
+pub fn printSaveJob() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintSaveJob", .linkage = .weak }) orelse missing("NSPrintSaveJob");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintCancelJob`.
+pub fn printCancelJob() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintCancelJob", .linkage = .weak }) orelse missing("NSPrintCancelJob");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintFormName`.
+pub fn printFormName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintFormName", .linkage = .weak }) orelse missing("NSPrintFormName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintJobFeatures`.
+pub fn printJobFeatures() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintJobFeatures", .linkage = .weak }) orelse missing("NSPrintJobFeatures");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintManualFeed`.
+pub fn printManualFeed() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintManualFeed", .linkage = .weak }) orelse missing("NSPrintManualFeed");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPagesPerSheet`.
+pub fn printPagesPerSheet() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPagesPerSheet", .linkage = .weak }) orelse missing("NSPrintPagesPerSheet");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPaperFeed`.
+pub fn printPaperFeed() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPaperFeed", .linkage = .weak }) orelse missing("NSPrintPaperFeed");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintSavePath`.
+pub fn printSavePath() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintSavePath", .linkage = .weak }) orelse missing("NSPrintSavePath");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMultipleValuesMarker`.
+pub fn multipleValuesMarker() objc.Object {
+    const symbol = @extern(?*const objc.abi.Abi(objc.Object), .{ .name = "NSMultipleValuesMarker", .linkage = .weak }) orelse missing("NSMultipleValuesMarker");
+    return objc.abi.fromAbi(objc.Object, symbol.*);
+}
+
+/// `NSNoSelectionMarker`.
+pub fn noSelectionMarker() objc.Object {
+    const symbol = @extern(?*const objc.abi.Abi(objc.Object), .{ .name = "NSNoSelectionMarker", .linkage = .weak }) orelse missing("NSNoSelectionMarker");
+    return objc.abi.fromAbi(objc.Object, symbol.*);
+}
+
+/// `NSNotApplicableMarker`.
+pub fn notApplicableMarker() objc.Object {
+    const symbol = @extern(?*const objc.abi.Abi(objc.Object), .{ .name = "NSNotApplicableMarker", .linkage = .weak }) orelse missing("NSNotApplicableMarker");
+    return objc.abi.fromAbi(objc.Object, symbol.*);
+}
+
+/// `NSIsControllerMarker`.
+pub fn isControllerMarker(object: ?objc.Object) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSIsControllerMarker", .linkage = .weak }) orelse missing("NSIsControllerMarker");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(?objc.Object, object)));
+}
+
+/// `NSObservedObjectKey`.
+pub fn observedObjectKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSObservedObjectKey", .linkage = .weak }) orelse missing("NSObservedObjectKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSObservedKeyPathKey`.
+pub fn observedKeyPathKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSObservedKeyPathKey", .linkage = .weak }) orelse missing("NSObservedKeyPathKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOptionsKey`.
+pub fn optionsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOptionsKey", .linkage = .weak }) orelse missing("NSOptionsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAlignmentBinding`.
+pub fn alignmentBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAlignmentBinding", .linkage = .weak }) orelse missing("NSAlignmentBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAlternateImageBinding`.
+pub fn alternateImageBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAlternateImageBinding", .linkage = .weak }) orelse missing("NSAlternateImageBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAlternateTitleBinding`.
+pub fn alternateTitleBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAlternateTitleBinding", .linkage = .weak }) orelse missing("NSAlternateTitleBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimateBinding`.
+pub fn animateBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimateBinding", .linkage = .weak }) orelse missing("NSAnimateBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAnimationDelayBinding`.
+pub fn animationDelayBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAnimationDelayBinding", .linkage = .weak }) orelse missing("NSAnimationDelayBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSArgumentBinding`.
+pub fn argumentBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSArgumentBinding", .linkage = .weak }) orelse missing("NSArgumentBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAttributedStringBinding`.
+pub fn attributedStringBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAttributedStringBinding", .linkage = .weak }) orelse missing("NSAttributedStringBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentArrayBinding`.
+pub fn contentArrayBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentArrayBinding", .linkage = .weak }) orelse missing("NSContentArrayBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentArrayForMultipleSelectionBinding`.
+pub fn contentArrayForMultipleSelectionBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentArrayForMultipleSelectionBinding", .linkage = .weak }) orelse missing("NSContentArrayForMultipleSelectionBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentBinding`.
+pub fn contentBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentBinding", .linkage = .weak }) orelse missing("NSContentBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentDictionaryBinding`.
+pub fn contentDictionaryBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentDictionaryBinding", .linkage = .weak }) orelse missing("NSContentDictionaryBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentHeightBinding`.
+pub fn contentHeightBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentHeightBinding", .linkage = .weak }) orelse missing("NSContentHeightBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentObjectBinding`.
+pub fn contentObjectBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentObjectBinding", .linkage = .weak }) orelse missing("NSContentObjectBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentObjectsBinding`.
+pub fn contentObjectsBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentObjectsBinding", .linkage = .weak }) orelse missing("NSContentObjectsBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentSetBinding`.
+pub fn contentSetBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentSetBinding", .linkage = .weak }) orelse missing("NSContentSetBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentValuesBinding`.
+pub fn contentValuesBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentValuesBinding", .linkage = .weak }) orelse missing("NSContentValuesBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentWidthBinding`.
+pub fn contentWidthBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentWidthBinding", .linkage = .weak }) orelse missing("NSContentWidthBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCriticalValueBinding`.
+pub fn criticalValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCriticalValueBinding", .linkage = .weak }) orelse missing("NSCriticalValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDataBinding`.
+pub fn dataBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDataBinding", .linkage = .weak }) orelse missing("NSDataBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDisplayPatternTitleBinding`.
+pub fn displayPatternTitleBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDisplayPatternTitleBinding", .linkage = .weak }) orelse missing("NSDisplayPatternTitleBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDisplayPatternValueBinding`.
+pub fn displayPatternValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDisplayPatternValueBinding", .linkage = .weak }) orelse missing("NSDisplayPatternValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDocumentEditedBinding`.
+pub fn documentEditedBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDocumentEditedBinding", .linkage = .weak }) orelse missing("NSDocumentEditedBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDoubleClickArgumentBinding`.
+pub fn doubleClickArgumentBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDoubleClickArgumentBinding", .linkage = .weak }) orelse missing("NSDoubleClickArgumentBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDoubleClickTargetBinding`.
+pub fn doubleClickTargetBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDoubleClickTargetBinding", .linkage = .weak }) orelse missing("NSDoubleClickTargetBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSEditableBinding`.
+pub fn editableBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSEditableBinding", .linkage = .weak }) orelse missing("NSEditableBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSEnabledBinding`.
+pub fn enabledBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSEnabledBinding", .linkage = .weak }) orelse missing("NSEnabledBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSExcludedKeysBinding`.
+pub fn excludedKeysBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSExcludedKeysBinding", .linkage = .weak }) orelse missing("NSExcludedKeysBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFilterPredicateBinding`.
+pub fn filterPredicateBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFilterPredicateBinding", .linkage = .weak }) orelse missing("NSFilterPredicateBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontBinding`.
+pub fn fontBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontBinding", .linkage = .weak }) orelse missing("NSFontBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontBoldBinding`.
+pub fn fontBoldBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontBoldBinding", .linkage = .weak }) orelse missing("NSFontBoldBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFamilyNameBinding`.
+pub fn fontFamilyNameBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFamilyNameBinding", .linkage = .weak }) orelse missing("NSFontFamilyNameBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontItalicBinding`.
+pub fn fontItalicBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontItalicBinding", .linkage = .weak }) orelse missing("NSFontItalicBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontNameBinding`.
+pub fn fontNameBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontNameBinding", .linkage = .weak }) orelse missing("NSFontNameBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontSizeBinding`.
+pub fn fontSizeBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontSizeBinding", .linkage = .weak }) orelse missing("NSFontSizeBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHeaderTitleBinding`.
+pub fn headerTitleBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHeaderTitleBinding", .linkage = .weak }) orelse missing("NSHeaderTitleBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHiddenBinding`.
+pub fn hiddenBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHiddenBinding", .linkage = .weak }) orelse missing("NSHiddenBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageBinding`.
+pub fn imageBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageBinding", .linkage = .weak }) orelse missing("NSImageBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSIncludedKeysBinding`.
+pub fn includedKeysBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSIncludedKeysBinding", .linkage = .weak }) orelse missing("NSIncludedKeysBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInitialKeyBinding`.
+pub fn initialKeyBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInitialKeyBinding", .linkage = .weak }) orelse missing("NSInitialKeyBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInitialValueBinding`.
+pub fn initialValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInitialValueBinding", .linkage = .weak }) orelse missing("NSInitialValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSIsIndeterminateBinding`.
+pub fn isIndeterminateBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSIsIndeterminateBinding", .linkage = .weak }) orelse missing("NSIsIndeterminateBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSLabelBinding`.
+pub fn labelBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSLabelBinding", .linkage = .weak }) orelse missing("NSLabelBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSLocalizedKeyDictionaryBinding`.
+pub fn localizedKeyDictionaryBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSLocalizedKeyDictionaryBinding", .linkage = .weak }) orelse missing("NSLocalizedKeyDictionaryBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSManagedObjectContextBinding`.
+pub fn managedObjectContextBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSManagedObjectContextBinding", .linkage = .weak }) orelse missing("NSManagedObjectContextBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMaximumRecentsBinding`.
+pub fn maximumRecentsBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMaximumRecentsBinding", .linkage = .weak }) orelse missing("NSMaximumRecentsBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMaxValueBinding`.
+pub fn maxValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMaxValueBinding", .linkage = .weak }) orelse missing("NSMaxValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMaxWidthBinding`.
+pub fn maxWidthBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMaxWidthBinding", .linkage = .weak }) orelse missing("NSMaxWidthBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMinValueBinding`.
+pub fn minValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMinValueBinding", .linkage = .weak }) orelse missing("NSMinValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMinWidthBinding`.
+pub fn minWidthBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMinWidthBinding", .linkage = .weak }) orelse missing("NSMinWidthBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMixedStateImageBinding`.
+pub fn mixedStateImageBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMixedStateImageBinding", .linkage = .weak }) orelse missing("NSMixedStateImageBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOffStateImageBinding`.
+pub fn offStateImageBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOffStateImageBinding", .linkage = .weak }) orelse missing("NSOffStateImageBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOnStateImageBinding`.
+pub fn onStateImageBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOnStateImageBinding", .linkage = .weak }) orelse missing("NSOnStateImageBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPositioningRectBinding`.
+pub fn positioningRectBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPositioningRectBinding", .linkage = .weak }) orelse missing("NSPositioningRectBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPredicateBinding`.
+pub fn predicateBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPredicateBinding", .linkage = .weak }) orelse missing("NSPredicateBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRecentSearchesBinding`.
+pub fn recentSearchesBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRecentSearchesBinding", .linkage = .weak }) orelse missing("NSRecentSearchesBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRepresentedFilenameBinding`.
+pub fn representedFilenameBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRepresentedFilenameBinding", .linkage = .weak }) orelse missing("NSRepresentedFilenameBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRowHeightBinding`.
+pub fn rowHeightBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRowHeightBinding", .linkage = .weak }) orelse missing("NSRowHeightBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedIdentifierBinding`.
+pub fn selectedIdentifierBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedIdentifierBinding", .linkage = .weak }) orelse missing("NSSelectedIdentifierBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedIndexBinding`.
+pub fn selectedIndexBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedIndexBinding", .linkage = .weak }) orelse missing("NSSelectedIndexBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedLabelBinding`.
+pub fn selectedLabelBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedLabelBinding", .linkage = .weak }) orelse missing("NSSelectedLabelBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedObjectBinding`.
+pub fn selectedObjectBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedObjectBinding", .linkage = .weak }) orelse missing("NSSelectedObjectBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedObjectsBinding`.
+pub fn selectedObjectsBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedObjectsBinding", .linkage = .weak }) orelse missing("NSSelectedObjectsBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedTagBinding`.
+pub fn selectedTagBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedTagBinding", .linkage = .weak }) orelse missing("NSSelectedTagBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedValueBinding`.
+pub fn selectedValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedValueBinding", .linkage = .weak }) orelse missing("NSSelectedValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectedValuesBinding`.
+pub fn selectedValuesBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectedValuesBinding", .linkage = .weak }) orelse missing("NSSelectedValuesBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectionIndexesBinding`.
+pub fn selectionIndexesBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectionIndexesBinding", .linkage = .weak }) orelse missing("NSSelectionIndexesBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectionIndexPathsBinding`.
+pub fn selectionIndexPathsBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectionIndexPathsBinding", .linkage = .weak }) orelse missing("NSSelectionIndexPathsBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSortDescriptorsBinding`.
+pub fn sortDescriptorsBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSortDescriptorsBinding", .linkage = .weak }) orelse missing("NSSortDescriptorsBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTargetBinding`.
+pub fn targetBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTargetBinding", .linkage = .weak }) orelse missing("NSTargetBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextColorBinding`.
+pub fn textColorBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextColorBinding", .linkage = .weak }) orelse missing("NSTextColorBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTitleBinding`.
+pub fn titleBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTitleBinding", .linkage = .weak }) orelse missing("NSTitleBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolTipBinding`.
+pub fn toolTipBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolTipBinding", .linkage = .weak }) orelse missing("NSToolTipBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTransparentBinding`.
+pub fn transparentBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTransparentBinding", .linkage = .weak }) orelse missing("NSTransparentBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValueBinding`.
+pub fn valueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValueBinding", .linkage = .weak }) orelse missing("NSValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValuePathBinding`.
+pub fn valuePathBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValuePathBinding", .linkage = .weak }) orelse missing("NSValuePathBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValueURLBinding`.
+pub fn valueURLBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValueURLBinding", .linkage = .weak }) orelse missing("NSValueURLBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVisibleBinding`.
+pub fn visibleBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVisibleBinding", .linkage = .weak }) orelse missing("NSVisibleBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWarningValueBinding`.
+pub fn warningValueBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWarningValueBinding", .linkage = .weak }) orelse missing("NSWarningValueBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWidthBinding`.
+pub fn widthBinding() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWidthBinding", .linkage = .weak }) orelse missing("NSWidthBinding");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAllowsEditingMultipleValuesSelectionBindingOption`.
+pub fn allowsEditingMultipleValuesSelectionBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAllowsEditingMultipleValuesSelectionBindingOption", .linkage = .weak }) orelse missing("NSAllowsEditingMultipleValuesSelectionBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAllowsNullArgumentBindingOption`.
+pub fn allowsNullArgumentBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAllowsNullArgumentBindingOption", .linkage = .weak }) orelse missing("NSAllowsNullArgumentBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAlwaysPresentsApplicationModalAlertsBindingOption`.
+pub fn alwaysPresentsApplicationModalAlertsBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAlwaysPresentsApplicationModalAlertsBindingOption", .linkage = .weak }) orelse missing("NSAlwaysPresentsApplicationModalAlertsBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSConditionallySetsEditableBindingOption`.
+pub fn conditionallySetsEditableBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSConditionallySetsEditableBindingOption", .linkage = .weak }) orelse missing("NSConditionallySetsEditableBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSConditionallySetsEnabledBindingOption`.
+pub fn conditionallySetsEnabledBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSConditionallySetsEnabledBindingOption", .linkage = .weak }) orelse missing("NSConditionallySetsEnabledBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSConditionallySetsHiddenBindingOption`.
+pub fn conditionallySetsHiddenBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSConditionallySetsHiddenBindingOption", .linkage = .weak }) orelse missing("NSConditionallySetsHiddenBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContinuouslyUpdatesValueBindingOption`.
+pub fn continuouslyUpdatesValueBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContinuouslyUpdatesValueBindingOption", .linkage = .weak }) orelse missing("NSContinuouslyUpdatesValueBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCreatesSortDescriptorBindingOption`.
+pub fn createsSortDescriptorBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCreatesSortDescriptorBindingOption", .linkage = .weak }) orelse missing("NSCreatesSortDescriptorBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDeletesObjectsOnRemoveBindingsOption`.
+pub fn deletesObjectsOnRemoveBindingsOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDeletesObjectsOnRemoveBindingsOption", .linkage = .weak }) orelse missing("NSDeletesObjectsOnRemoveBindingsOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDisplayNameBindingOption`.
+pub fn displayNameBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDisplayNameBindingOption", .linkage = .weak }) orelse missing("NSDisplayNameBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDisplayPatternBindingOption`.
+pub fn displayPatternBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDisplayPatternBindingOption", .linkage = .weak }) orelse missing("NSDisplayPatternBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContentPlacementTagBindingOption`.
+pub fn contentPlacementTagBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContentPlacementTagBindingOption", .linkage = .weak }) orelse missing("NSContentPlacementTagBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHandlesContentAsCompoundValueBindingOption`.
+pub fn handlesContentAsCompoundValueBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHandlesContentAsCompoundValueBindingOption", .linkage = .weak }) orelse missing("NSHandlesContentAsCompoundValueBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInsertsNullPlaceholderBindingOption`.
+pub fn insertsNullPlaceholderBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInsertsNullPlaceholderBindingOption", .linkage = .weak }) orelse missing("NSInsertsNullPlaceholderBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInvokesSeparatelyWithArrayObjectsBindingOption`.
+pub fn invokesSeparatelyWithArrayObjectsBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInvokesSeparatelyWithArrayObjectsBindingOption", .linkage = .weak }) orelse missing("NSInvokesSeparatelyWithArrayObjectsBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMultipleValuesPlaceholderBindingOption`.
+pub fn multipleValuesPlaceholderBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMultipleValuesPlaceholderBindingOption", .linkage = .weak }) orelse missing("NSMultipleValuesPlaceholderBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNoSelectionPlaceholderBindingOption`.
+pub fn noSelectionPlaceholderBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNoSelectionPlaceholderBindingOption", .linkage = .weak }) orelse missing("NSNoSelectionPlaceholderBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNotApplicablePlaceholderBindingOption`.
+pub fn notApplicablePlaceholderBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNotApplicablePlaceholderBindingOption", .linkage = .weak }) orelse missing("NSNotApplicablePlaceholderBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSNullPlaceholderBindingOption`.
+pub fn nullPlaceholderBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSNullPlaceholderBindingOption", .linkage = .weak }) orelse missing("NSNullPlaceholderBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRaisesForNotApplicableKeysBindingOption`.
+pub fn raisesForNotApplicableKeysBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRaisesForNotApplicableKeysBindingOption", .linkage = .weak }) orelse missing("NSRaisesForNotApplicableKeysBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPredicateFormatBindingOption`.
+pub fn predicateFormatBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPredicateFormatBindingOption", .linkage = .weak }) orelse missing("NSPredicateFormatBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectorNameBindingOption`.
+pub fn selectorNameBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectorNameBindingOption", .linkage = .weak }) orelse missing("NSSelectorNameBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSelectsAllWhenSettingContentBindingOption`.
+pub fn selectsAllWhenSettingContentBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSelectsAllWhenSettingContentBindingOption", .linkage = .weak }) orelse missing("NSSelectsAllWhenSettingContentBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValidatesImmediatelyBindingOption`.
+pub fn validatesImmediatelyBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValidatesImmediatelyBindingOption", .linkage = .weak }) orelse missing("NSValidatesImmediatelyBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValueTransformerNameBindingOption`.
+pub fn valueTransformerNameBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValueTransformerNameBindingOption", .linkage = .weak }) orelse missing("NSValueTransformerNameBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSValueTransformerBindingOption`.
+pub fn valueTransformerBindingOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSValueTransformerBindingOption", .linkage = .weak }) orelse missing("NSValueTransformerBindingOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSUserActivityDocumentURLKey`.
+pub fn userActivityDocumentURLKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSUserActivityDocumentURLKey", .linkage = .weak }) orelse missing("NSUserActivityDocumentURLKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppKitVersionNumber`.
+pub fn appKitVersionNumber() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSAppKitVersionNumber", .linkage = .weak }) orelse missing("NSAppKitVersionNumber");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSModalPanelRunLoopMode`.
+pub fn modalPanelRunLoopMode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSModalPanelRunLoopMode", .linkage = .weak }) orelse missing("NSModalPanelRunLoopMode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSEventTrackingRunLoopMode`.
+pub fn eventTrackingRunLoopMode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSEventTrackingRunLoopMode", .linkage = .weak }) orelse missing("NSEventTrackingRunLoopMode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApp`.
+pub fn app() Application {
+    const symbol = @extern(?*const objc.abi.Abi(Application), .{ .name = "NSApp", .linkage = .weak }) orelse missing("NSApp");
+    return objc.abi.fromAbi(Application, symbol.*);
+}
+
+/// `NSAboutPanelOptionCredits`.
+pub fn aboutPanelOptionCredits() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAboutPanelOptionCredits", .linkage = .weak }) orelse missing("NSAboutPanelOptionCredits");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAboutPanelOptionApplicationName`.
+pub fn aboutPanelOptionApplicationName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAboutPanelOptionApplicationName", .linkage = .weak }) orelse missing("NSAboutPanelOptionApplicationName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAboutPanelOptionApplicationIcon`.
+pub fn aboutPanelOptionApplicationIcon() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAboutPanelOptionApplicationIcon", .linkage = .weak }) orelse missing("NSAboutPanelOptionApplicationIcon");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAboutPanelOptionVersion`.
+pub fn aboutPanelOptionVersion() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAboutPanelOptionVersion", .linkage = .weak }) orelse missing("NSAboutPanelOptionVersion");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAboutPanelOptionApplicationVersion`.
+pub fn aboutPanelOptionApplicationVersion() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAboutPanelOptionApplicationVersion", .linkage = .weak }) orelse missing("NSAboutPanelOptionApplicationVersion");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationMain`.
+pub fn applicationMain(argc: c_int, argv: ?[*]?[*]u8) c_int {
+    const function = @extern(?*const fn (objc.abi.Abi(c_int), objc.abi.Abi(?[*]?[*]u8)) callconv(.c) objc.abi.Abi(c_int), .{ .name = "NSApplicationMain", .linkage = .weak }) orelse missing("NSApplicationMain");
+    return objc.abi.fromAbi(c_int, function(objc.abi.toAbi(c_int, argc), objc.abi.toAbi(?[*]?[*]u8, argv)));
+}
+
+/// `NSApplicationLoad`.
+pub fn applicationLoad() bool {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(bool), .{ .name = "NSApplicationLoad", .linkage = .weak }) orelse missing("NSApplicationLoad");
+    return objc.abi.fromAbi(bool, function());
+}
+
+/// `NSShowsServicesMenuItem`.
+pub fn showsServicesMenuItem(item_name: foundation.String) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSShowsServicesMenuItem", .linkage = .weak }) orelse missing("NSShowsServicesMenuItem");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(foundation.String, item_name)));
+}
+
+/// `NSSetShowsServicesMenuItem`.
+pub fn setShowsServicesMenuItem(item_name: foundation.String, enabled: bool) objc.Integer {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String), objc.abi.Abi(bool)) callconv(.c) objc.abi.Abi(objc.Integer), .{ .name = "NSSetShowsServicesMenuItem", .linkage = .weak }) orelse missing("NSSetShowsServicesMenuItem");
+    return objc.abi.fromAbi(objc.Integer, function(objc.abi.toAbi(foundation.String, item_name), objc.abi.toAbi(bool, enabled)));
+}
+
+/// `NSUpdateDynamicServices`.
+pub fn updateDynamicServices() void {
+    const function = @extern(?*const fn () callconv(.c) objc.abi.Abi(void), .{ .name = "NSUpdateDynamicServices", .linkage = .weak }) orelse missing("NSUpdateDynamicServices");
+    return objc.abi.fromAbi(void, function());
+}
+
+/// `NSPerformService`.
+pub fn performService(item_name: foundation.String, pboard: ?objc.Object) bool {
+    const function = @extern(?*const fn (objc.abi.Abi(foundation.String), objc.abi.Abi(?objc.Object)) callconv(.c) objc.abi.Abi(bool), .{ .name = "NSPerformService", .linkage = .weak }) orelse missing("NSPerformService");
+    return objc.abi.fromAbi(bool, function(objc.abi.toAbi(foundation.String, item_name), objc.abi.toAbi(?objc.Object, pboard)));
+}
+
+/// `NSRegisterServicesProvider`.
+pub fn registerServicesProvider(provider: ?objc.Object, name: ?foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object), objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSRegisterServicesProvider", .linkage = .weak }) orelse missing("NSRegisterServicesProvider");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, provider), objc.abi.toAbi(?foundation.String, name)));
+}
+
+/// `NSUnregisterServicesProvider`.
+pub fn unregisterServicesProvider(name: ?foundation.String) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSUnregisterServicesProvider", .linkage = .weak }) orelse missing("NSUnregisterServicesProvider");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?foundation.String, name)));
+}
+
+/// `NSApplicationDidBecomeActiveNotification`.
+pub fn applicationDidBecomeActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidBecomeActiveNotification", .linkage = .weak }) orelse missing("NSApplicationDidBecomeActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidHideNotification`.
+pub fn applicationDidHideNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidHideNotification", .linkage = .weak }) orelse missing("NSApplicationDidHideNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidFinishLaunchingNotification`.
+pub fn applicationDidFinishLaunchingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidFinishLaunchingNotification", .linkage = .weak }) orelse missing("NSApplicationDidFinishLaunchingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidResignActiveNotification`.
+pub fn applicationDidResignActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidResignActiveNotification", .linkage = .weak }) orelse missing("NSApplicationDidResignActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidUnhideNotification`.
+pub fn applicationDidUnhideNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidUnhideNotification", .linkage = .weak }) orelse missing("NSApplicationDidUnhideNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidUpdateNotification`.
+pub fn applicationDidUpdateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidUpdateNotification", .linkage = .weak }) orelse missing("NSApplicationDidUpdateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillBecomeActiveNotification`.
+pub fn applicationWillBecomeActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillBecomeActiveNotification", .linkage = .weak }) orelse missing("NSApplicationWillBecomeActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillHideNotification`.
+pub fn applicationWillHideNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillHideNotification", .linkage = .weak }) orelse missing("NSApplicationWillHideNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillFinishLaunchingNotification`.
+pub fn applicationWillFinishLaunchingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillFinishLaunchingNotification", .linkage = .weak }) orelse missing("NSApplicationWillFinishLaunchingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillResignActiveNotification`.
+pub fn applicationWillResignActiveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillResignActiveNotification", .linkage = .weak }) orelse missing("NSApplicationWillResignActiveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillUnhideNotification`.
+pub fn applicationWillUnhideNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillUnhideNotification", .linkage = .weak }) orelse missing("NSApplicationWillUnhideNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillUpdateNotification`.
+pub fn applicationWillUpdateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillUpdateNotification", .linkage = .weak }) orelse missing("NSApplicationWillUpdateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationWillTerminateNotification`.
+pub fn applicationWillTerminateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationWillTerminateNotification", .linkage = .weak }) orelse missing("NSApplicationWillTerminateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidChangeScreenParametersNotification`.
+pub fn applicationDidChangeScreenParametersNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidChangeScreenParametersNotification", .linkage = .weak }) orelse missing("NSApplicationDidChangeScreenParametersNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationProtectedDataWillBecomeUnavailableNotification`.
+pub fn applicationProtectedDataWillBecomeUnavailableNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationProtectedDataWillBecomeUnavailableNotification", .linkage = .weak }) orelse missing("NSApplicationProtectedDataWillBecomeUnavailableNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationProtectedDataDidBecomeAvailableNotification`.
+pub fn applicationProtectedDataDidBecomeAvailableNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationProtectedDataDidBecomeAvailableNotification", .linkage = .weak }) orelse missing("NSApplicationProtectedDataDidBecomeAvailableNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification`.
+pub fn applicationShouldBeginSuppressingHighDynamicRangeContentNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification", .linkage = .weak }) orelse missing("NSApplicationShouldBeginSuppressingHighDynamicRangeContentNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification`.
+pub fn applicationShouldEndSuppressingHighDynamicRangeContentNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification", .linkage = .weak }) orelse missing("NSApplicationShouldEndSuppressingHighDynamicRangeContentNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationLaunchIsDefaultLaunchKey`.
+pub fn applicationLaunchIsDefaultLaunchKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationLaunchIsDefaultLaunchKey", .linkage = .weak }) orelse missing("NSApplicationLaunchIsDefaultLaunchKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationLaunchUserNotificationKey`.
+pub fn applicationLaunchUserNotificationKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationLaunchUserNotificationKey", .linkage = .weak }) orelse missing("NSApplicationLaunchUserNotificationKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationLaunchRemoteNotificationKey`.
+pub fn applicationLaunchRemoteNotificationKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationLaunchRemoteNotificationKey", .linkage = .weak }) orelse missing("NSApplicationLaunchRemoteNotificationKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidChangeOcclusionStateNotification`.
+pub fn applicationDidChangeOcclusionStateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidChangeOcclusionStateNotification", .linkage = .weak }) orelse missing("NSApplicationDidChangeOcclusionStateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSColorListDidChangeNotification`.
+pub fn colorListDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSColorListDidChangeNotification", .linkage = .weak }) orelse missing("NSColorListDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSystemColorsDidChangeNotification`.
+pub fn systemColorsDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSystemColorsDidChangeNotification", .linkage = .weak }) orelse missing("NSSystemColorsDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContextHelpModeDidActivateNotification`.
+pub fn contextHelpModeDidActivateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContextHelpModeDidActivateNotification", .linkage = .weak }) orelse missing("NSContextHelpModeDidActivateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSContextHelpModeDidDeactivateNotification`.
+pub fn contextHelpModeDidDeactivateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSContextHelpModeDidDeactivateNotification", .linkage = .weak }) orelse missing("NSContextHelpModeDidDeactivateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSControlTextDidBeginEditingNotification`.
+pub fn controlTextDidBeginEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSControlTextDidBeginEditingNotification", .linkage = .weak }) orelse missing("NSControlTextDidBeginEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSControlTextDidEndEditingNotification`.
+pub fn controlTextDidEndEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSControlTextDidEndEditingNotification", .linkage = .weak }) orelse missing("NSControlTextDidEndEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSControlTextDidChangeNotification`.
+pub fn controlTextDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSControlTextDidChangeNotification", .linkage = .weak }) orelse missing("NSControlTextDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierFixedSpaceSmall`.
+pub fn touchBarItemIdentifierFixedSpaceSmall() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierFixedSpaceSmall", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierFixedSpaceSmall");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierFixedSpaceLarge`.
+pub fn touchBarItemIdentifierFixedSpaceLarge() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierFixedSpaceLarge", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierFixedSpaceLarge");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierFlexibleSpace`.
+pub fn touchBarItemIdentifierFlexibleSpace() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierFlexibleSpace", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierFlexibleSpace");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierOtherItemsProxy`.
+pub fn touchBarItemIdentifierOtherItemsProxy() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierOtherItemsProxy", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierOtherItemsProxy");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierCandidateList`.
+pub fn touchBarItemIdentifierCandidateList() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierCandidateList", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierCandidateList");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverCloseReasonKey`.
+pub fn popoverCloseReasonKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverCloseReasonKey", .linkage = .weak }) orelse missing("NSPopoverCloseReasonKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverCloseReasonStandard`.
+pub fn popoverCloseReasonStandard() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverCloseReasonStandard", .linkage = .weak }) orelse missing("NSPopoverCloseReasonStandard");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverCloseReasonDetachToWindow`.
+pub fn popoverCloseReasonDetachToWindow() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverCloseReasonDetachToWindow", .linkage = .weak }) orelse missing("NSPopoverCloseReasonDetachToWindow");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverWillShowNotification`.
+pub fn popoverWillShowNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverWillShowNotification", .linkage = .weak }) orelse missing("NSPopoverWillShowNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverDidShowNotification`.
+pub fn popoverDidShowNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverDidShowNotification", .linkage = .weak }) orelse missing("NSPopoverDidShowNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverWillCloseNotification`.
+pub fn popoverWillCloseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverWillCloseNotification", .linkage = .weak }) orelse missing("NSPopoverWillCloseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopoverDidCloseNotification`.
+pub fn popoverDidCloseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopoverDidCloseNotification", .linkage = .weak }) orelse missing("NSPopoverDidCloseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCollectionElementKindInterItemGapIndicator`.
+pub fn collectionElementKindInterItemGapIndicator() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCollectionElementKindInterItemGapIndicator", .linkage = .weak }) orelse missing("NSCollectionElementKindInterItemGapIndicator");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCollectionElementKindSectionHeader`.
+pub fn collectionElementKindSectionHeader() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCollectionElementKindSectionHeader", .linkage = .weak }) orelse missing("NSCollectionElementKindSectionHeader");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCollectionElementKindSectionFooter`.
+pub fn collectionElementKindSectionFooter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCollectionElementKindSectionFooter", .linkage = .weak }) orelse missing("NSCollectionElementKindSectionFooter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFamilyAttribute`.
+pub fn fontFamilyAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFamilyAttribute", .linkage = .weak }) orelse missing("NSFontFamilyAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontNameAttribute`.
+pub fn fontNameAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontNameAttribute", .linkage = .weak }) orelse missing("NSFontNameAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFaceAttribute`.
+pub fn fontFaceAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFaceAttribute", .linkage = .weak }) orelse missing("NSFontFaceAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontSizeAttribute`.
+pub fn fontSizeAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontSizeAttribute", .linkage = .weak }) orelse missing("NSFontSizeAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVisibleNameAttribute`.
+pub fn fontVisibleNameAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVisibleNameAttribute", .linkage = .weak }) orelse missing("NSFontVisibleNameAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontMatrixAttribute`.
+pub fn fontMatrixAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontMatrixAttribute", .linkage = .weak }) orelse missing("NSFontMatrixAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAttribute`.
+pub fn fontVariationAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAttribute", .linkage = .weak }) orelse missing("NSFontVariationAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCharacterSetAttribute`.
+pub fn fontCharacterSetAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCharacterSetAttribute", .linkage = .weak }) orelse missing("NSFontCharacterSetAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCascadeListAttribute`.
+pub fn fontCascadeListAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCascadeListAttribute", .linkage = .weak }) orelse missing("NSFontCascadeListAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTraitsAttribute`.
+pub fn fontTraitsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTraitsAttribute", .linkage = .weak }) orelse missing("NSFontTraitsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFixedAdvanceAttribute`.
+pub fn fontFixedAdvanceAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFixedAdvanceAttribute", .linkage = .weak }) orelse missing("NSFontFixedAdvanceAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFeatureSettingsAttribute`.
+pub fn fontFeatureSettingsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFeatureSettingsAttribute", .linkage = .weak }) orelse missing("NSFontFeatureSettingsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontSymbolicTrait`.
+pub fn fontSymbolicTrait() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontSymbolicTrait", .linkage = .weak }) orelse missing("NSFontSymbolicTrait");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontWeightTrait`.
+pub fn fontWeightTrait() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontWeightTrait", .linkage = .weak }) orelse missing("NSFontWeightTrait");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontWidthTrait`.
+pub fn fontWidthTrait() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontWidthTrait", .linkage = .weak }) orelse missing("NSFontWidthTrait");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontSlantTrait`.
+pub fn fontSlantTrait() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontSlantTrait", .linkage = .weak }) orelse missing("NSFontSlantTrait");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAxisIdentifierKey`.
+pub fn fontVariationAxisIdentifierKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAxisIdentifierKey", .linkage = .weak }) orelse missing("NSFontVariationAxisIdentifierKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAxisMinimumValueKey`.
+pub fn fontVariationAxisMinimumValueKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAxisMinimumValueKey", .linkage = .weak }) orelse missing("NSFontVariationAxisMinimumValueKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAxisMaximumValueKey`.
+pub fn fontVariationAxisMaximumValueKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAxisMaximumValueKey", .linkage = .weak }) orelse missing("NSFontVariationAxisMaximumValueKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAxisDefaultValueKey`.
+pub fn fontVariationAxisDefaultValueKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAxisDefaultValueKey", .linkage = .weak }) orelse missing("NSFontVariationAxisDefaultValueKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontVariationAxisNameKey`.
+pub fn fontVariationAxisNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontVariationAxisNameKey", .linkage = .weak }) orelse missing("NSFontVariationAxisNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFeatureTypeIdentifierKey`.
+pub fn fontFeatureTypeIdentifierKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFeatureTypeIdentifierKey", .linkage = .weak }) orelse missing("NSFontFeatureTypeIdentifierKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontFeatureSelectorIdentifierKey`.
+pub fn fontFeatureSelectorIdentifierKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontFeatureSelectorIdentifierKey", .linkage = .weak }) orelse missing("NSFontFeatureSelectorIdentifierKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontWeightUltraLight`.
+pub fn fontWeightUltraLight() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightUltraLight", .linkage = .weak }) orelse missing("NSFontWeightUltraLight");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightThin`.
+pub fn fontWeightThin() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightThin", .linkage = .weak }) orelse missing("NSFontWeightThin");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightLight`.
+pub fn fontWeightLight() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightLight", .linkage = .weak }) orelse missing("NSFontWeightLight");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightRegular`.
+pub fn fontWeightRegular() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightRegular", .linkage = .weak }) orelse missing("NSFontWeightRegular");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightMedium`.
+pub fn fontWeightMedium() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightMedium", .linkage = .weak }) orelse missing("NSFontWeightMedium");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightSemibold`.
+pub fn fontWeightSemibold() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightSemibold", .linkage = .weak }) orelse missing("NSFontWeightSemibold");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightBold`.
+pub fn fontWeightBold() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightBold", .linkage = .weak }) orelse missing("NSFontWeightBold");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightHeavy`.
+pub fn fontWeightHeavy() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightHeavy", .linkage = .weak }) orelse missing("NSFontWeightHeavy");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWeightBlack`.
+pub fn fontWeightBlack() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWeightBlack", .linkage = .weak }) orelse missing("NSFontWeightBlack");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWidthCompressed`.
+pub fn fontWidthCompressed() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWidthCompressed", .linkage = .weak }) orelse missing("NSFontWidthCompressed");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWidthCondensed`.
+pub fn fontWidthCondensed() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWidthCondensed", .linkage = .weak }) orelse missing("NSFontWidthCondensed");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWidthStandard`.
+pub fn fontWidthStandard() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWidthStandard", .linkage = .weak }) orelse missing("NSFontWidthStandard");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontWidthExpanded`.
+pub fn fontWidthExpanded() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSFontWidthExpanded", .linkage = .weak }) orelse missing("NSFontWidthExpanded");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSFontDescriptorSystemDesignDefault`.
+pub fn fontDescriptorSystemDesignDefault() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontDescriptorSystemDesignDefault", .linkage = .weak }) orelse missing("NSFontDescriptorSystemDesignDefault");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontDescriptorSystemDesignSerif`.
+pub fn fontDescriptorSystemDesignSerif() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontDescriptorSystemDesignSerif", .linkage = .weak }) orelse missing("NSFontDescriptorSystemDesignSerif");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontDescriptorSystemDesignMonospaced`.
+pub fn fontDescriptorSystemDesignMonospaced() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontDescriptorSystemDesignMonospaced", .linkage = .weak }) orelse missing("NSFontDescriptorSystemDesignMonospaced");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontDescriptorSystemDesignRounded`.
+pub fn fontDescriptorSystemDesignRounded() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontDescriptorSystemDesignRounded", .linkage = .weak }) orelse missing("NSFontDescriptorSystemDesignRounded");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleLargeTitle`.
+pub fn fontTextStyleLargeTitle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleLargeTitle", .linkage = .weak }) orelse missing("NSFontTextStyleLargeTitle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleTitle1`.
+pub fn fontTextStyleTitle1() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleTitle1", .linkage = .weak }) orelse missing("NSFontTextStyleTitle1");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleTitle2`.
+pub fn fontTextStyleTitle2() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleTitle2", .linkage = .weak }) orelse missing("NSFontTextStyleTitle2");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleTitle3`.
+pub fn fontTextStyleTitle3() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleTitle3", .linkage = .weak }) orelse missing("NSFontTextStyleTitle3");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleHeadline`.
+pub fn fontTextStyleHeadline() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleHeadline", .linkage = .weak }) orelse missing("NSFontTextStyleHeadline");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleSubheadline`.
+pub fn fontTextStyleSubheadline() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleSubheadline", .linkage = .weak }) orelse missing("NSFontTextStyleSubheadline");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleBody`.
+pub fn fontTextStyleBody() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleBody", .linkage = .weak }) orelse missing("NSFontTextStyleBody");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleCallout`.
+pub fn fontTextStyleCallout() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleCallout", .linkage = .weak }) orelse missing("NSFontTextStyleCallout");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleFootnote`.
+pub fn fontTextStyleFootnote() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleFootnote", .linkage = .weak }) orelse missing("NSFontTextStyleFootnote");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleCaption1`.
+pub fn fontTextStyleCaption1() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleCaption1", .linkage = .weak }) orelse missing("NSFontTextStyleCaption1");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontTextStyleCaption2`.
+pub fn fontTextStyleCaption2() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontTextStyleCaption2", .linkage = .weak }) orelse missing("NSFontTextStyleCaption2");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontColorAttribute`.
+pub fn fontColorAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontColorAttribute", .linkage = .weak }) orelse missing("NSFontColorAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontIdentityMatrix`.
+pub fn fontIdentityMatrix() [*]const cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi([*]const cg.Float), .{ .name = "NSFontIdentityMatrix", .linkage = .weak }) orelse missing("NSFontIdentityMatrix");
+    return objc.abi.fromAbi([*]const cg.Float, symbol.*);
+}
+
+/// `NSAntialiasThresholdChangedNotification`.
+pub fn antialiasThresholdChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAntialiasThresholdChangedNotification", .linkage = .weak }) orelse missing("NSAntialiasThresholdChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontSetChangedNotification`.
+pub fn fontSetChangedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontSetChangedNotification", .linkage = .weak }) orelse missing("NSFontSetChangedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionIncludeDisabledFontsOption`.
+pub fn fontCollectionIncludeDisabledFontsOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionIncludeDisabledFontsOption", .linkage = .weak }) orelse missing("NSFontCollectionIncludeDisabledFontsOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionRemoveDuplicatesOption`.
+pub fn fontCollectionRemoveDuplicatesOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionRemoveDuplicatesOption", .linkage = .weak }) orelse missing("NSFontCollectionRemoveDuplicatesOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionDisallowAutoActivationOption`.
+pub fn fontCollectionDisallowAutoActivationOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionDisallowAutoActivationOption", .linkage = .weak }) orelse missing("NSFontCollectionDisallowAutoActivationOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionDidChangeNotification`.
+pub fn fontCollectionDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionDidChangeNotification", .linkage = .weak }) orelse missing("NSFontCollectionDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionActionKey`.
+pub fn fontCollectionActionKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionActionKey", .linkage = .weak }) orelse missing("NSFontCollectionActionKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionNameKey`.
+pub fn fontCollectionNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionNameKey", .linkage = .weak }) orelse missing("NSFontCollectionNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionOldNameKey`.
+pub fn fontCollectionOldNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionOldNameKey", .linkage = .weak }) orelse missing("NSFontCollectionOldNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionVisibilityKey`.
+pub fn fontCollectionVisibilityKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionVisibilityKey", .linkage = .weak }) orelse missing("NSFontCollectionVisibilityKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionWasShown`.
+pub fn fontCollectionWasShown() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionWasShown", .linkage = .weak }) orelse missing("NSFontCollectionWasShown");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionWasHidden`.
+pub fn fontCollectionWasHidden() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionWasHidden", .linkage = .weak }) orelse missing("NSFontCollectionWasHidden");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionWasRenamed`.
+pub fn fontCollectionWasRenamed() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionWasRenamed", .linkage = .weak }) orelse missing("NSFontCollectionWasRenamed");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionAllFonts`.
+pub fn fontCollectionAllFonts() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionAllFonts", .linkage = .weak }) orelse missing("NSFontCollectionAllFonts");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionUser`.
+pub fn fontCollectionUser() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionUser", .linkage = .weak }) orelse missing("NSFontCollectionUser");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionFavorites`.
+pub fn fontCollectionFavorites() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionFavorites", .linkage = .weak }) orelse missing("NSFontCollectionFavorites");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontCollectionRecentlyUsed`.
+pub fn fontCollectionRecentlyUsed() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontCollectionRecentlyUsed", .linkage = .weak }) orelse missing("NSFontCollectionRecentlyUsed");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidBecomeKeyNotification`.
+pub fn windowDidBecomeKeyNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidBecomeKeyNotification", .linkage = .weak }) orelse missing("NSWindowDidBecomeKeyNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidBecomeMainNotification`.
+pub fn windowDidBecomeMainNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidBecomeMainNotification", .linkage = .weak }) orelse missing("NSWindowDidBecomeMainNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidChangeScreenNotification`.
+pub fn windowDidChangeScreenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidChangeScreenNotification", .linkage = .weak }) orelse missing("NSWindowDidChangeScreenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidDeminiaturizeNotification`.
+pub fn windowDidDeminiaturizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidDeminiaturizeNotification", .linkage = .weak }) orelse missing("NSWindowDidDeminiaturizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidExposeNotification`.
+pub fn windowDidExposeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidExposeNotification", .linkage = .weak }) orelse missing("NSWindowDidExposeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidMiniaturizeNotification`.
+pub fn windowDidMiniaturizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidMiniaturizeNotification", .linkage = .weak }) orelse missing("NSWindowDidMiniaturizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidMoveNotification`.
+pub fn windowDidMoveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidMoveNotification", .linkage = .weak }) orelse missing("NSWindowDidMoveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidResignKeyNotification`.
+pub fn windowDidResignKeyNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidResignKeyNotification", .linkage = .weak }) orelse missing("NSWindowDidResignKeyNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidResignMainNotification`.
+pub fn windowDidResignMainNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidResignMainNotification", .linkage = .weak }) orelse missing("NSWindowDidResignMainNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidResizeNotification`.
+pub fn windowDidResizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidResizeNotification", .linkage = .weak }) orelse missing("NSWindowDidResizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidUpdateNotification`.
+pub fn windowDidUpdateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidUpdateNotification", .linkage = .weak }) orelse missing("NSWindowDidUpdateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillCloseNotification`.
+pub fn windowWillCloseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillCloseNotification", .linkage = .weak }) orelse missing("NSWindowWillCloseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillMiniaturizeNotification`.
+pub fn windowWillMiniaturizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillMiniaturizeNotification", .linkage = .weak }) orelse missing("NSWindowWillMiniaturizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillMoveNotification`.
+pub fn windowWillMoveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillMoveNotification", .linkage = .weak }) orelse missing("NSWindowWillMoveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillBeginSheetNotification`.
+pub fn windowWillBeginSheetNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillBeginSheetNotification", .linkage = .weak }) orelse missing("NSWindowWillBeginSheetNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidEndSheetNotification`.
+pub fn windowDidEndSheetNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidEndSheetNotification", .linkage = .weak }) orelse missing("NSWindowDidEndSheetNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidChangeBackingPropertiesNotification`.
+pub fn windowDidChangeBackingPropertiesNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidChangeBackingPropertiesNotification", .linkage = .weak }) orelse missing("NSWindowDidChangeBackingPropertiesNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBackingPropertyOldScaleFactorKey`.
+pub fn backingPropertyOldScaleFactorKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBackingPropertyOldScaleFactorKey", .linkage = .weak }) orelse missing("NSBackingPropertyOldScaleFactorKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBackingPropertyOldColorSpaceKey`.
+pub fn backingPropertyOldColorSpaceKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBackingPropertyOldColorSpaceKey", .linkage = .weak }) orelse missing("NSBackingPropertyOldColorSpaceKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidChangeScreenProfileNotification`.
+pub fn windowDidChangeScreenProfileNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidChangeScreenProfileNotification", .linkage = .weak }) orelse missing("NSWindowDidChangeScreenProfileNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillStartLiveResizeNotification`.
+pub fn windowWillStartLiveResizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillStartLiveResizeNotification", .linkage = .weak }) orelse missing("NSWindowWillStartLiveResizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidEndLiveResizeNotification`.
+pub fn windowDidEndLiveResizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidEndLiveResizeNotification", .linkage = .weak }) orelse missing("NSWindowDidEndLiveResizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillEnterFullScreenNotification`.
+pub fn windowWillEnterFullScreenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillEnterFullScreenNotification", .linkage = .weak }) orelse missing("NSWindowWillEnterFullScreenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidEnterFullScreenNotification`.
+pub fn windowDidEnterFullScreenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidEnterFullScreenNotification", .linkage = .weak }) orelse missing("NSWindowDidEnterFullScreenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillExitFullScreenNotification`.
+pub fn windowWillExitFullScreenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillExitFullScreenNotification", .linkage = .weak }) orelse missing("NSWindowWillExitFullScreenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidExitFullScreenNotification`.
+pub fn windowDidExitFullScreenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidExitFullScreenNotification", .linkage = .weak }) orelse missing("NSWindowDidExitFullScreenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillEnterVersionBrowserNotification`.
+pub fn windowWillEnterVersionBrowserNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillEnterVersionBrowserNotification", .linkage = .weak }) orelse missing("NSWindowWillEnterVersionBrowserNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidEnterVersionBrowserNotification`.
+pub fn windowDidEnterVersionBrowserNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidEnterVersionBrowserNotification", .linkage = .weak }) orelse missing("NSWindowDidEnterVersionBrowserNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowWillExitVersionBrowserNotification`.
+pub fn windowWillExitVersionBrowserNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowWillExitVersionBrowserNotification", .linkage = .weak }) orelse missing("NSWindowWillExitVersionBrowserNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidExitVersionBrowserNotification`.
+pub fn windowDidExitVersionBrowserNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidExitVersionBrowserNotification", .linkage = .weak }) orelse missing("NSWindowDidExitVersionBrowserNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWindowDidChangeOcclusionStateNotification`.
+pub fn windowDidChangeOcclusionStateNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWindowDidChangeOcclusionStateNotification", .linkage = .weak }) orelse missing("NSWindowDidChangeOcclusionStateNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSReleaseAlertPanel`.
+pub fn releaseAlertPanel(panel: ?objc.Object) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSReleaseAlertPanel", .linkage = .weak }) orelse missing("NSReleaseAlertPanel");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, panel)));
+}
+
+/// `NSImageRepRegistryDidChangeNotification`.
+pub fn imageRepRegistryDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageRepRegistryDidChangeNotification", .linkage = .weak }) orelse missing("NSImageRepRegistryDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageCompressionMethod`.
+pub fn imageCompressionMethod() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageCompressionMethod", .linkage = .weak }) orelse missing("NSImageCompressionMethod");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageCompressionFactor`.
+pub fn imageCompressionFactor() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageCompressionFactor", .linkage = .weak }) orelse missing("NSImageCompressionFactor");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageDitherTransparency`.
+pub fn imageDitherTransparency() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageDitherTransparency", .linkage = .weak }) orelse missing("NSImageDitherTransparency");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageRGBColorTable`.
+pub fn imageRGBColorTable() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageRGBColorTable", .linkage = .weak }) orelse missing("NSImageRGBColorTable");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageInterlaced`.
+pub fn imageInterlaced() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageInterlaced", .linkage = .weak }) orelse missing("NSImageInterlaced");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageColorSyncProfileData`.
+pub fn imageColorSyncProfileData() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageColorSyncProfileData", .linkage = .weak }) orelse missing("NSImageColorSyncProfileData");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageFrameCount`.
+pub fn imageFrameCount() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageFrameCount", .linkage = .weak }) orelse missing("NSImageFrameCount");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageCurrentFrame`.
+pub fn imageCurrentFrame() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageCurrentFrame", .linkage = .weak }) orelse missing("NSImageCurrentFrame");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageCurrentFrameDuration`.
+pub fn imageCurrentFrameDuration() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageCurrentFrameDuration", .linkage = .weak }) orelse missing("NSImageCurrentFrameDuration");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageLoopCount`.
+pub fn imageLoopCount() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageLoopCount", .linkage = .weak }) orelse missing("NSImageLoopCount");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageGamma`.
+pub fn imageGamma() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageGamma", .linkage = .weak }) orelse missing("NSImageGamma");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageProgressive`.
+pub fn imageProgressive() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageProgressive", .linkage = .weak }) orelse missing("NSImageProgressive");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageEXIFData`.
+pub fn imageEXIFData() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageEXIFData", .linkage = .weak }) orelse missing("NSImageEXIFData");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageIPTCData`.
+pub fn imageIPTCData() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageIPTCData", .linkage = .weak }) orelse missing("NSImageIPTCData");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageFallbackBackgroundColor`.
+pub fn imageFallbackBackgroundColor() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageFallbackBackgroundColor", .linkage = .weak }) orelse missing("NSImageFallbackBackgroundColor");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBrowserColumnConfigurationDidChangeNotification`.
+pub fn browserColumnConfigurationDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBrowserColumnConfigurationDidChangeNotification", .linkage = .weak }) orelse missing("NSBrowserColumnConfigurationDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSColorPanelColorDidChangeNotification`.
+pub fn colorPanelColorDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSColorPanelColorDidChangeNotification", .linkage = .weak }) orelse missing("NSColorPanelColorDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDraggingImageComponentIconKey`.
+pub fn draggingImageComponentIconKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDraggingImageComponentIconKey", .linkage = .weak }) orelse missing("NSDraggingImageComponentIconKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDraggingImageComponentLabelKey`.
+pub fn draggingImageComponentLabelKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDraggingImageComponentLabelKey", .linkage = .weak }) orelse missing("NSDraggingImageComponentLabelKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewNoInstrinsicMetric`.
+pub fn viewNoInstrinsicMetric() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSViewNoInstrinsicMetric", .linkage = .weak }) orelse missing("NSViewNoInstrinsicMetric");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSViewNoIntrinsicMetric`.
+pub fn viewNoIntrinsicMetric() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSViewNoIntrinsicMetric", .linkage = .weak }) orelse missing("NSViewNoIntrinsicMetric");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSImageHintCTM`.
+pub fn imageHintCTM() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageHintCTM", .linkage = .weak }) orelse missing("NSImageHintCTM");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageHintInterpolation`.
+pub fn imageHintInterpolation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageHintInterpolation", .linkage = .weak }) orelse missing("NSImageHintInterpolation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageHintUserInterfaceLayoutDirection`.
+pub fn imageHintUserInterfaceLayoutDirection() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageHintUserInterfaceLayoutDirection", .linkage = .weak }) orelse missing("NSImageHintUserInterfaceLayoutDirection");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameAddTemplate`.
+pub fn imageNameAddTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameAddTemplate", .linkage = .weak }) orelse missing("NSImageNameAddTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameBluetoothTemplate`.
+pub fn imageNameBluetoothTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameBluetoothTemplate", .linkage = .weak }) orelse missing("NSImageNameBluetoothTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameBonjour`.
+pub fn imageNameBonjour() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameBonjour", .linkage = .weak }) orelse missing("NSImageNameBonjour");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameBookmarksTemplate`.
+pub fn imageNameBookmarksTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameBookmarksTemplate", .linkage = .weak }) orelse missing("NSImageNameBookmarksTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameCaution`.
+pub fn imageNameCaution() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameCaution", .linkage = .weak }) orelse missing("NSImageNameCaution");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameComputer`.
+pub fn imageNameComputer() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameComputer", .linkage = .weak }) orelse missing("NSImageNameComputer");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameEnterFullScreenTemplate`.
+pub fn imageNameEnterFullScreenTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameEnterFullScreenTemplate", .linkage = .weak }) orelse missing("NSImageNameEnterFullScreenTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameExitFullScreenTemplate`.
+pub fn imageNameExitFullScreenTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameExitFullScreenTemplate", .linkage = .weak }) orelse missing("NSImageNameExitFullScreenTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFolder`.
+pub fn imageNameFolder() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFolder", .linkage = .weak }) orelse missing("NSImageNameFolder");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFolderBurnable`.
+pub fn imageNameFolderBurnable() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFolderBurnable", .linkage = .weak }) orelse missing("NSImageNameFolderBurnable");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFolderSmart`.
+pub fn imageNameFolderSmart() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFolderSmart", .linkage = .weak }) orelse missing("NSImageNameFolderSmart");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFollowLinkFreestandingTemplate`.
+pub fn imageNameFollowLinkFreestandingTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFollowLinkFreestandingTemplate", .linkage = .weak }) orelse missing("NSImageNameFollowLinkFreestandingTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameHomeTemplate`.
+pub fn imageNameHomeTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameHomeTemplate", .linkage = .weak }) orelse missing("NSImageNameHomeTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameIChatTheaterTemplate`.
+pub fn imageNameIChatTheaterTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameIChatTheaterTemplate", .linkage = .weak }) orelse missing("NSImageNameIChatTheaterTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameLockLockedTemplate`.
+pub fn imageNameLockLockedTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameLockLockedTemplate", .linkage = .weak }) orelse missing("NSImageNameLockLockedTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameLockUnlockedTemplate`.
+pub fn imageNameLockUnlockedTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameLockUnlockedTemplate", .linkage = .weak }) orelse missing("NSImageNameLockUnlockedTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameNetwork`.
+pub fn imageNameNetwork() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameNetwork", .linkage = .weak }) orelse missing("NSImageNameNetwork");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNamePathTemplate`.
+pub fn imageNamePathTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNamePathTemplate", .linkage = .weak }) orelse missing("NSImageNamePathTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameQuickLookTemplate`.
+pub fn imageNameQuickLookTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameQuickLookTemplate", .linkage = .weak }) orelse missing("NSImageNameQuickLookTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameRefreshFreestandingTemplate`.
+pub fn imageNameRefreshFreestandingTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameRefreshFreestandingTemplate", .linkage = .weak }) orelse missing("NSImageNameRefreshFreestandingTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameRefreshTemplate`.
+pub fn imageNameRefreshTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameRefreshTemplate", .linkage = .weak }) orelse missing("NSImageNameRefreshTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameRemoveTemplate`.
+pub fn imageNameRemoveTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameRemoveTemplate", .linkage = .weak }) orelse missing("NSImageNameRemoveTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameRevealFreestandingTemplate`.
+pub fn imageNameRevealFreestandingTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameRevealFreestandingTemplate", .linkage = .weak }) orelse missing("NSImageNameRevealFreestandingTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameShareTemplate`.
+pub fn imageNameShareTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameShareTemplate", .linkage = .weak }) orelse missing("NSImageNameShareTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameSlideshowTemplate`.
+pub fn imageNameSlideshowTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameSlideshowTemplate", .linkage = .weak }) orelse missing("NSImageNameSlideshowTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStatusAvailable`.
+pub fn imageNameStatusAvailable() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStatusAvailable", .linkage = .weak }) orelse missing("NSImageNameStatusAvailable");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStatusNone`.
+pub fn imageNameStatusNone() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStatusNone", .linkage = .weak }) orelse missing("NSImageNameStatusNone");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStatusPartiallyAvailable`.
+pub fn imageNameStatusPartiallyAvailable() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStatusPartiallyAvailable", .linkage = .weak }) orelse missing("NSImageNameStatusPartiallyAvailable");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStatusUnavailable`.
+pub fn imageNameStatusUnavailable() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStatusUnavailable", .linkage = .weak }) orelse missing("NSImageNameStatusUnavailable");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStopProgressFreestandingTemplate`.
+pub fn imageNameStopProgressFreestandingTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStopProgressFreestandingTemplate", .linkage = .weak }) orelse missing("NSImageNameStopProgressFreestandingTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameStopProgressTemplate`.
+pub fn imageNameStopProgressTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameStopProgressTemplate", .linkage = .weak }) orelse missing("NSImageNameStopProgressTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTrashEmpty`.
+pub fn imageNameTrashEmpty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTrashEmpty", .linkage = .weak }) orelse missing("NSImageNameTrashEmpty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTrashFull`.
+pub fn imageNameTrashFull() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTrashFull", .linkage = .weak }) orelse missing("NSImageNameTrashFull");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameActionTemplate`.
+pub fn imageNameActionTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameActionTemplate", .linkage = .weak }) orelse missing("NSImageNameActionTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameSmartBadgeTemplate`.
+pub fn imageNameSmartBadgeTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameSmartBadgeTemplate", .linkage = .weak }) orelse missing("NSImageNameSmartBadgeTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameIconViewTemplate`.
+pub fn imageNameIconViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameIconViewTemplate", .linkage = .weak }) orelse missing("NSImageNameIconViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameListViewTemplate`.
+pub fn imageNameListViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameListViewTemplate", .linkage = .weak }) orelse missing("NSImageNameListViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameColumnViewTemplate`.
+pub fn imageNameColumnViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameColumnViewTemplate", .linkage = .weak }) orelse missing("NSImageNameColumnViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFlowViewTemplate`.
+pub fn imageNameFlowViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFlowViewTemplate", .linkage = .weak }) orelse missing("NSImageNameFlowViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameInvalidDataFreestandingTemplate`.
+pub fn imageNameInvalidDataFreestandingTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameInvalidDataFreestandingTemplate", .linkage = .weak }) orelse missing("NSImageNameInvalidDataFreestandingTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameGoForwardTemplate`.
+pub fn imageNameGoForwardTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameGoForwardTemplate", .linkage = .weak }) orelse missing("NSImageNameGoForwardTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameGoBackTemplate`.
+pub fn imageNameGoBackTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameGoBackTemplate", .linkage = .weak }) orelse missing("NSImageNameGoBackTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameGoRightTemplate`.
+pub fn imageNameGoRightTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameGoRightTemplate", .linkage = .weak }) orelse missing("NSImageNameGoRightTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameGoLeftTemplate`.
+pub fn imageNameGoLeftTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameGoLeftTemplate", .linkage = .weak }) orelse missing("NSImageNameGoLeftTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameRightFacingTriangleTemplate`.
+pub fn imageNameRightFacingTriangleTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameRightFacingTriangleTemplate", .linkage = .weak }) orelse missing("NSImageNameRightFacingTriangleTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameLeftFacingTriangleTemplate`.
+pub fn imageNameLeftFacingTriangleTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameLeftFacingTriangleTemplate", .linkage = .weak }) orelse missing("NSImageNameLeftFacingTriangleTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameDotMac`.
+pub fn imageNameDotMac() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameDotMac", .linkage = .weak }) orelse missing("NSImageNameDotMac");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameMobileMe`.
+pub fn imageNameMobileMe() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameMobileMe", .linkage = .weak }) orelse missing("NSImageNameMobileMe");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameMultipleDocuments`.
+pub fn imageNameMultipleDocuments() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameMultipleDocuments", .linkage = .weak }) orelse missing("NSImageNameMultipleDocuments");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameUserAccounts`.
+pub fn imageNameUserAccounts() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameUserAccounts", .linkage = .weak }) orelse missing("NSImageNameUserAccounts");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNamePreferencesGeneral`.
+pub fn imageNamePreferencesGeneral() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNamePreferencesGeneral", .linkage = .weak }) orelse missing("NSImageNamePreferencesGeneral");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameAdvanced`.
+pub fn imageNameAdvanced() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameAdvanced", .linkage = .weak }) orelse missing("NSImageNameAdvanced");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameInfo`.
+pub fn imageNameInfo() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameInfo", .linkage = .weak }) orelse missing("NSImageNameInfo");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameFontPanel`.
+pub fn imageNameFontPanel() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameFontPanel", .linkage = .weak }) orelse missing("NSImageNameFontPanel");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameColorPanel`.
+pub fn imageNameColorPanel() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameColorPanel", .linkage = .weak }) orelse missing("NSImageNameColorPanel");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameUser`.
+pub fn imageNameUser() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameUser", .linkage = .weak }) orelse missing("NSImageNameUser");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameUserGroup`.
+pub fn imageNameUserGroup() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameUserGroup", .linkage = .weak }) orelse missing("NSImageNameUserGroup");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameEveryone`.
+pub fn imageNameEveryone() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameEveryone", .linkage = .weak }) orelse missing("NSImageNameEveryone");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameUserGuest`.
+pub fn imageNameUserGuest() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameUserGuest", .linkage = .weak }) orelse missing("NSImageNameUserGuest");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameMenuOnStateTemplate`.
+pub fn imageNameMenuOnStateTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameMenuOnStateTemplate", .linkage = .weak }) orelse missing("NSImageNameMenuOnStateTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameMenuMixedStateTemplate`.
+pub fn imageNameMenuMixedStateTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameMenuMixedStateTemplate", .linkage = .weak }) orelse missing("NSImageNameMenuMixedStateTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameApplicationIcon`.
+pub fn imageNameApplicationIcon() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameApplicationIcon", .linkage = .weak }) orelse missing("NSImageNameApplicationIcon");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAddDetailTemplate`.
+pub fn imageNameTouchBarAddDetailTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAddDetailTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAddDetailTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAddTemplate`.
+pub fn imageNameTouchBarAddTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAddTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAddTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAlarmTemplate`.
+pub fn imageNameTouchBarAlarmTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAlarmTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAlarmTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioInputMuteTemplate`.
+pub fn imageNameTouchBarAudioInputMuteTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioInputMuteTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioInputMuteTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioInputTemplate`.
+pub fn imageNameTouchBarAudioInputTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioInputTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioInputTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioOutputMuteTemplate`.
+pub fn imageNameTouchBarAudioOutputMuteTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioOutputMuteTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioOutputMuteTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioOutputVolumeHighTemplate`.
+pub fn imageNameTouchBarAudioOutputVolumeHighTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioOutputVolumeHighTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioOutputVolumeHighTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioOutputVolumeLowTemplate`.
+pub fn imageNameTouchBarAudioOutputVolumeLowTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioOutputVolumeLowTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioOutputVolumeLowTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioOutputVolumeMediumTemplate`.
+pub fn imageNameTouchBarAudioOutputVolumeMediumTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioOutputVolumeMediumTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioOutputVolumeMediumTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarAudioOutputVolumeOffTemplate`.
+pub fn imageNameTouchBarAudioOutputVolumeOffTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarAudioOutputVolumeOffTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarAudioOutputVolumeOffTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarBookmarksTemplate`.
+pub fn imageNameTouchBarBookmarksTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarBookmarksTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarBookmarksTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarColorPickerFill`.
+pub fn imageNameTouchBarColorPickerFill() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarColorPickerFill", .linkage = .weak }) orelse missing("NSImageNameTouchBarColorPickerFill");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarColorPickerFont`.
+pub fn imageNameTouchBarColorPickerFont() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarColorPickerFont", .linkage = .weak }) orelse missing("NSImageNameTouchBarColorPickerFont");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarColorPickerStroke`.
+pub fn imageNameTouchBarColorPickerStroke() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarColorPickerStroke", .linkage = .weak }) orelse missing("NSImageNameTouchBarColorPickerStroke");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarCommunicationAudioTemplate`.
+pub fn imageNameTouchBarCommunicationAudioTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarCommunicationAudioTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarCommunicationAudioTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarCommunicationVideoTemplate`.
+pub fn imageNameTouchBarCommunicationVideoTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarCommunicationVideoTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarCommunicationVideoTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarComposeTemplate`.
+pub fn imageNameTouchBarComposeTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarComposeTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarComposeTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarDeleteTemplate`.
+pub fn imageNameTouchBarDeleteTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarDeleteTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarDeleteTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarDownloadTemplate`.
+pub fn imageNameTouchBarDownloadTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarDownloadTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarDownloadTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarEnterFullScreenTemplate`.
+pub fn imageNameTouchBarEnterFullScreenTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarEnterFullScreenTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarEnterFullScreenTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarExitFullScreenTemplate`.
+pub fn imageNameTouchBarExitFullScreenTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarExitFullScreenTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarExitFullScreenTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarFastForwardTemplate`.
+pub fn imageNameTouchBarFastForwardTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarFastForwardTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarFastForwardTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarFolderCopyToTemplate`.
+pub fn imageNameTouchBarFolderCopyToTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarFolderCopyToTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarFolderCopyToTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarFolderMoveToTemplate`.
+pub fn imageNameTouchBarFolderMoveToTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarFolderMoveToTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarFolderMoveToTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarFolderTemplate`.
+pub fn imageNameTouchBarFolderTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarFolderTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarFolderTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarGetInfoTemplate`.
+pub fn imageNameTouchBarGetInfoTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarGetInfoTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarGetInfoTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarGoBackTemplate`.
+pub fn imageNameTouchBarGoBackTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarGoBackTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarGoBackTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarGoDownTemplate`.
+pub fn imageNameTouchBarGoDownTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarGoDownTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarGoDownTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarGoForwardTemplate`.
+pub fn imageNameTouchBarGoForwardTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarGoForwardTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarGoForwardTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarGoUpTemplate`.
+pub fn imageNameTouchBarGoUpTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarGoUpTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarGoUpTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarHistoryTemplate`.
+pub fn imageNameTouchBarHistoryTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarHistoryTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarHistoryTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarIconViewTemplate`.
+pub fn imageNameTouchBarIconViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarIconViewTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarIconViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarListViewTemplate`.
+pub fn imageNameTouchBarListViewTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarListViewTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarListViewTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarMailTemplate`.
+pub fn imageNameTouchBarMailTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarMailTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarMailTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarNewFolderTemplate`.
+pub fn imageNameTouchBarNewFolderTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarNewFolderTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarNewFolderTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarNewMessageTemplate`.
+pub fn imageNameTouchBarNewMessageTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarNewMessageTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarNewMessageTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarOpenInBrowserTemplate`.
+pub fn imageNameTouchBarOpenInBrowserTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarOpenInBrowserTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarOpenInBrowserTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarPauseTemplate`.
+pub fn imageNameTouchBarPauseTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarPauseTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarPauseTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarPlayPauseTemplate`.
+pub fn imageNameTouchBarPlayPauseTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarPlayPauseTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarPlayPauseTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarPlayTemplate`.
+pub fn imageNameTouchBarPlayTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarPlayTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarPlayTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarQuickLookTemplate`.
+pub fn imageNameTouchBarQuickLookTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarQuickLookTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarQuickLookTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRecordStartTemplate`.
+pub fn imageNameTouchBarRecordStartTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRecordStartTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRecordStartTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRecordStopTemplate`.
+pub fn imageNameTouchBarRecordStopTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRecordStopTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRecordStopTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRefreshTemplate`.
+pub fn imageNameTouchBarRefreshTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRefreshTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRefreshTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRemoveTemplate`.
+pub fn imageNameTouchBarRemoveTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRemoveTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRemoveTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRewindTemplate`.
+pub fn imageNameTouchBarRewindTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRewindTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRewindTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRotateLeftTemplate`.
+pub fn imageNameTouchBarRotateLeftTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRotateLeftTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRotateLeftTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarRotateRightTemplate`.
+pub fn imageNameTouchBarRotateRightTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarRotateRightTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarRotateRightTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSearchTemplate`.
+pub fn imageNameTouchBarSearchTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSearchTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSearchTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarShareTemplate`.
+pub fn imageNameTouchBarShareTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarShareTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarShareTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSidebarTemplate`.
+pub fn imageNameTouchBarSidebarTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSidebarTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSidebarTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipAhead15SecondsTemplate`.
+pub fn imageNameTouchBarSkipAhead15SecondsTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipAhead15SecondsTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipAhead15SecondsTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipAhead30SecondsTemplate`.
+pub fn imageNameTouchBarSkipAhead30SecondsTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipAhead30SecondsTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipAhead30SecondsTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipAheadTemplate`.
+pub fn imageNameTouchBarSkipAheadTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipAheadTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipAheadTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipBack15SecondsTemplate`.
+pub fn imageNameTouchBarSkipBack15SecondsTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipBack15SecondsTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipBack15SecondsTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipBack30SecondsTemplate`.
+pub fn imageNameTouchBarSkipBack30SecondsTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipBack30SecondsTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipBack30SecondsTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipBackTemplate`.
+pub fn imageNameTouchBarSkipBackTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipBackTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipBackTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipToEndTemplate`.
+pub fn imageNameTouchBarSkipToEndTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipToEndTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipToEndTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSkipToStartTemplate`.
+pub fn imageNameTouchBarSkipToStartTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSkipToStartTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSkipToStartTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarSlideshowTemplate`.
+pub fn imageNameTouchBarSlideshowTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarSlideshowTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarSlideshowTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTagIconTemplate`.
+pub fn imageNameTouchBarTagIconTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTagIconTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTagIconTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextBoldTemplate`.
+pub fn imageNameTouchBarTextBoldTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextBoldTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextBoldTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextBoxTemplate`.
+pub fn imageNameTouchBarTextBoxTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextBoxTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextBoxTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextCenterAlignTemplate`.
+pub fn imageNameTouchBarTextCenterAlignTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextCenterAlignTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextCenterAlignTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextItalicTemplate`.
+pub fn imageNameTouchBarTextItalicTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextItalicTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextItalicTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextJustifiedAlignTemplate`.
+pub fn imageNameTouchBarTextJustifiedAlignTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextJustifiedAlignTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextJustifiedAlignTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextLeftAlignTemplate`.
+pub fn imageNameTouchBarTextLeftAlignTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextLeftAlignTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextLeftAlignTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextListTemplate`.
+pub fn imageNameTouchBarTextListTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextListTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextListTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextRightAlignTemplate`.
+pub fn imageNameTouchBarTextRightAlignTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextRightAlignTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextRightAlignTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextStrikethroughTemplate`.
+pub fn imageNameTouchBarTextStrikethroughTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextStrikethroughTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextStrikethroughTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarTextUnderlineTemplate`.
+pub fn imageNameTouchBarTextUnderlineTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarTextUnderlineTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarTextUnderlineTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarUserAddTemplate`.
+pub fn imageNameTouchBarUserAddTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarUserAddTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarUserAddTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarUserGroupTemplate`.
+pub fn imageNameTouchBarUserGroupTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarUserGroupTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarUserGroupTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarUserTemplate`.
+pub fn imageNameTouchBarUserTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarUserTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarUserTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarVolumeDownTemplate`.
+pub fn imageNameTouchBarVolumeDownTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarVolumeDownTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarVolumeDownTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarVolumeUpTemplate`.
+pub fn imageNameTouchBarVolumeUpTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarVolumeUpTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarVolumeUpTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSImageNameTouchBarPlayheadTemplate`.
+pub fn imageNameTouchBarPlayheadTemplate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSImageNameTouchBarPlayheadTemplate", .linkage = .weak }) orelse missing("NSImageNameTouchBarPlayheadTemplate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameComposeEmail`.
+pub fn sharingServiceNameComposeEmail() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameComposeEmail", .linkage = .weak }) orelse missing("NSSharingServiceNameComposeEmail");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameComposeMessage`.
+pub fn sharingServiceNameComposeMessage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameComposeMessage", .linkage = .weak }) orelse missing("NSSharingServiceNameComposeMessage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameSendViaAirDrop`.
+pub fn sharingServiceNameSendViaAirDrop() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameSendViaAirDrop", .linkage = .weak }) orelse missing("NSSharingServiceNameSendViaAirDrop");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameAddToSafariReadingList`.
+pub fn sharingServiceNameAddToSafariReadingList() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameAddToSafariReadingList", .linkage = .weak }) orelse missing("NSSharingServiceNameAddToSafariReadingList");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameAddToIPhoto`.
+pub fn sharingServiceNameAddToIPhoto() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameAddToIPhoto", .linkage = .weak }) orelse missing("NSSharingServiceNameAddToIPhoto");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameAddToAperture`.
+pub fn sharingServiceNameAddToAperture() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameAddToAperture", .linkage = .weak }) orelse missing("NSSharingServiceNameAddToAperture");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameUseAsDesktopPicture`.
+pub fn sharingServiceNameUseAsDesktopPicture() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameUseAsDesktopPicture", .linkage = .weak }) orelse missing("NSSharingServiceNameUseAsDesktopPicture");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostOnFacebook`.
+pub fn sharingServiceNamePostOnFacebook() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostOnFacebook", .linkage = .weak }) orelse missing("NSSharingServiceNamePostOnFacebook");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostOnTwitter`.
+pub fn sharingServiceNamePostOnTwitter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostOnTwitter", .linkage = .weak }) orelse missing("NSSharingServiceNamePostOnTwitter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostOnSinaWeibo`.
+pub fn sharingServiceNamePostOnSinaWeibo() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostOnSinaWeibo", .linkage = .weak }) orelse missing("NSSharingServiceNamePostOnSinaWeibo");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostOnTencentWeibo`.
+pub fn sharingServiceNamePostOnTencentWeibo() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostOnTencentWeibo", .linkage = .weak }) orelse missing("NSSharingServiceNamePostOnTencentWeibo");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostOnLinkedIn`.
+pub fn sharingServiceNamePostOnLinkedIn() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostOnLinkedIn", .linkage = .weak }) orelse missing("NSSharingServiceNamePostOnLinkedIn");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameUseAsTwitterProfileImage`.
+pub fn sharingServiceNameUseAsTwitterProfileImage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameUseAsTwitterProfileImage", .linkage = .weak }) orelse missing("NSSharingServiceNameUseAsTwitterProfileImage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameUseAsFacebookProfileImage`.
+pub fn sharingServiceNameUseAsFacebookProfileImage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameUseAsFacebookProfileImage", .linkage = .weak }) orelse missing("NSSharingServiceNameUseAsFacebookProfileImage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameUseAsLinkedInProfileImage`.
+pub fn sharingServiceNameUseAsLinkedInProfileImage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameUseAsLinkedInProfileImage", .linkage = .weak }) orelse missing("NSSharingServiceNameUseAsLinkedInProfileImage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostImageOnFlickr`.
+pub fn sharingServiceNamePostImageOnFlickr() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostImageOnFlickr", .linkage = .weak }) orelse missing("NSSharingServiceNamePostImageOnFlickr");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostVideoOnVimeo`.
+pub fn sharingServiceNamePostVideoOnVimeo() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostVideoOnVimeo", .linkage = .weak }) orelse missing("NSSharingServiceNamePostVideoOnVimeo");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostVideoOnYouku`.
+pub fn sharingServiceNamePostVideoOnYouku() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostVideoOnYouku", .linkage = .weak }) orelse missing("NSSharingServiceNamePostVideoOnYouku");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNamePostVideoOnTudou`.
+pub fn sharingServiceNamePostVideoOnTudou() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNamePostVideoOnTudou", .linkage = .weak }) orelse missing("NSSharingServiceNamePostVideoOnTudou");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSharingServiceNameCloudSharing`.
+pub fn sharingServiceNameCloudSharing() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSharingServiceNameCloudSharing", .linkage = .weak }) orelse missing("NSSharingServiceNameCloudSharing");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSliderAccessoryWidthDefault`.
+pub fn sliderAccessoryWidthDefault() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSSliderAccessoryWidthDefault", .linkage = .weak }) orelse missing("NSSliderAccessoryWidthDefault");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSSliderAccessoryWidthWide`.
+pub fn sliderAccessoryWidthWide() f64 {
+    const symbol = @extern(?*const objc.abi.Abi(f64), .{ .name = "NSSliderAccessoryWidthWide", .linkage = .weak }) orelse missing("NSSliderAccessoryWidthWide");
+    return objc.abi.fromAbi(f64, symbol.*);
+}
+
+/// `NSVoiceName`.
+pub fn voiceName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceName", .linkage = .weak }) orelse missing("NSVoiceName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceIdentifier`.
+pub fn voiceIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceIdentifier", .linkage = .weak }) orelse missing("NSVoiceIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceAge`.
+pub fn voiceAge() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceAge", .linkage = .weak }) orelse missing("NSVoiceAge");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceGender`.
+pub fn voiceGender() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceGender", .linkage = .weak }) orelse missing("NSVoiceGender");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceDemoText`.
+pub fn voiceDemoText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceDemoText", .linkage = .weak }) orelse missing("NSVoiceDemoText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceLocaleIdentifier`.
+pub fn voiceLocaleIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceLocaleIdentifier", .linkage = .weak }) orelse missing("NSVoiceLocaleIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceSupportedCharacters`.
+pub fn voiceSupportedCharacters() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceSupportedCharacters", .linkage = .weak }) orelse missing("NSVoiceSupportedCharacters");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceIndividuallySpokenCharacters`.
+pub fn voiceIndividuallySpokenCharacters() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceIndividuallySpokenCharacters", .linkage = .weak }) orelse missing("NSVoiceIndividuallySpokenCharacters");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryLocaleIdentifier`.
+pub fn speechDictionaryLocaleIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryLocaleIdentifier", .linkage = .weak }) orelse missing("NSSpeechDictionaryLocaleIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryModificationDate`.
+pub fn speechDictionaryModificationDate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryModificationDate", .linkage = .weak }) orelse missing("NSSpeechDictionaryModificationDate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryPronunciations`.
+pub fn speechDictionaryPronunciations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryPronunciations", .linkage = .weak }) orelse missing("NSSpeechDictionaryPronunciations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryAbbreviations`.
+pub fn speechDictionaryAbbreviations() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryAbbreviations", .linkage = .weak }) orelse missing("NSSpeechDictionaryAbbreviations");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryEntrySpelling`.
+pub fn speechDictionaryEntrySpelling() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryEntrySpelling", .linkage = .weak }) orelse missing("NSSpeechDictionaryEntrySpelling");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechDictionaryEntryPhonemes`.
+pub fn speechDictionaryEntryPhonemes() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechDictionaryEntryPhonemes", .linkage = .weak }) orelse missing("NSSpeechDictionaryEntryPhonemes");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceGenderNeuter`.
+pub fn voiceGenderNeuter() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceGenderNeuter", .linkage = .weak }) orelse missing("NSVoiceGenderNeuter");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceGenderMale`.
+pub fn voiceGenderMale() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceGenderMale", .linkage = .weak }) orelse missing("NSVoiceGenderMale");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceGenderFemale`.
+pub fn voiceGenderFemale() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceGenderFemale", .linkage = .weak }) orelse missing("NSVoiceGenderFemale");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceGenderNeutral`.
+pub fn voiceGenderNeutral() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceGenderNeutral", .linkage = .weak }) orelse missing("NSVoiceGenderNeutral");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechStatusProperty`.
+pub fn speechStatusProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechStatusProperty", .linkage = .weak }) orelse missing("NSSpeechStatusProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorsProperty`.
+pub fn speechErrorsProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorsProperty", .linkage = .weak }) orelse missing("NSSpeechErrorsProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechInputModeProperty`.
+pub fn speechInputModeProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechInputModeProperty", .linkage = .weak }) orelse missing("NSSpeechInputModeProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechCharacterModeProperty`.
+pub fn speechCharacterModeProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechCharacterModeProperty", .linkage = .weak }) orelse missing("NSSpeechCharacterModeProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechNumberModeProperty`.
+pub fn speechNumberModeProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechNumberModeProperty", .linkage = .weak }) orelse missing("NSSpeechNumberModeProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechRateProperty`.
+pub fn speechRateProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechRateProperty", .linkage = .weak }) orelse missing("NSSpeechRateProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPitchBaseProperty`.
+pub fn speechPitchBaseProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPitchBaseProperty", .linkage = .weak }) orelse missing("NSSpeechPitchBaseProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPitchModProperty`.
+pub fn speechPitchModProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPitchModProperty", .linkage = .weak }) orelse missing("NSSpeechPitchModProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechVolumeProperty`.
+pub fn speechVolumeProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechVolumeProperty", .linkage = .weak }) orelse missing("NSSpeechVolumeProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechSynthesizerInfoProperty`.
+pub fn speechSynthesizerInfoProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechSynthesizerInfoProperty", .linkage = .weak }) orelse missing("NSSpeechSynthesizerInfoProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechRecentSyncProperty`.
+pub fn speechRecentSyncProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechRecentSyncProperty", .linkage = .weak }) orelse missing("NSSpeechRecentSyncProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeSymbolsProperty`.
+pub fn speechPhonemeSymbolsProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeSymbolsProperty", .linkage = .weak }) orelse missing("NSSpeechPhonemeSymbolsProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechCurrentVoiceProperty`.
+pub fn speechCurrentVoiceProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechCurrentVoiceProperty", .linkage = .weak }) orelse missing("NSSpeechCurrentVoiceProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechCommandDelimiterProperty`.
+pub fn speechCommandDelimiterProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechCommandDelimiterProperty", .linkage = .weak }) orelse missing("NSSpeechCommandDelimiterProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechResetProperty`.
+pub fn speechResetProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechResetProperty", .linkage = .weak }) orelse missing("NSSpeechResetProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechOutputToFileURLProperty`.
+pub fn speechOutputToFileURLProperty() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechOutputToFileURLProperty", .linkage = .weak }) orelse missing("NSSpeechOutputToFileURLProperty");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVoiceLanguage`.
+pub fn voiceLanguage() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVoiceLanguage", .linkage = .weak }) orelse missing("NSVoiceLanguage");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechModeText`.
+pub fn speechModeText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechModeText", .linkage = .weak }) orelse missing("NSSpeechModeText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechModePhoneme`.
+pub fn speechModePhoneme() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechModePhoneme", .linkage = .weak }) orelse missing("NSSpeechModePhoneme");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechModeNormal`.
+pub fn speechModeNormal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechModeNormal", .linkage = .weak }) orelse missing("NSSpeechModeNormal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechModeLiteral`.
+pub fn speechModeLiteral() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechModeLiteral", .linkage = .weak }) orelse missing("NSSpeechModeLiteral");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechStatusOutputBusy`.
+pub fn speechStatusOutputBusy() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechStatusOutputBusy", .linkage = .weak }) orelse missing("NSSpeechStatusOutputBusy");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechStatusOutputPaused`.
+pub fn speechStatusOutputPaused() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechStatusOutputPaused", .linkage = .weak }) orelse missing("NSSpeechStatusOutputPaused");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechStatusNumberOfCharactersLeft`.
+pub fn speechStatusNumberOfCharactersLeft() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechStatusNumberOfCharactersLeft", .linkage = .weak }) orelse missing("NSSpeechStatusNumberOfCharactersLeft");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechStatusPhonemeCode`.
+pub fn speechStatusPhonemeCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechStatusPhonemeCode", .linkage = .weak }) orelse missing("NSSpeechStatusPhonemeCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorCount`.
+pub fn speechErrorCount() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorCount", .linkage = .weak }) orelse missing("NSSpeechErrorCount");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorOldestCode`.
+pub fn speechErrorOldestCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorOldestCode", .linkage = .weak }) orelse missing("NSSpeechErrorOldestCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorOldestCharacterOffset`.
+pub fn speechErrorOldestCharacterOffset() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorOldestCharacterOffset", .linkage = .weak }) orelse missing("NSSpeechErrorOldestCharacterOffset");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorNewestCode`.
+pub fn speechErrorNewestCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorNewestCode", .linkage = .weak }) orelse missing("NSSpeechErrorNewestCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechErrorNewestCharacterOffset`.
+pub fn speechErrorNewestCharacterOffset() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechErrorNewestCharacterOffset", .linkage = .weak }) orelse missing("NSSpeechErrorNewestCharacterOffset");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechSynthesizerInfoIdentifier`.
+pub fn speechSynthesizerInfoIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechSynthesizerInfoIdentifier", .linkage = .weak }) orelse missing("NSSpeechSynthesizerInfoIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechSynthesizerInfoVersion`.
+pub fn speechSynthesizerInfoVersion() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechSynthesizerInfoVersion", .linkage = .weak }) orelse missing("NSSpeechSynthesizerInfoVersion");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeInfoOpcode`.
+pub fn speechPhonemeInfoOpcode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeInfoOpcode", .linkage = .weak }) orelse missing("NSSpeechPhonemeInfoOpcode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeInfoSymbol`.
+pub fn speechPhonemeInfoSymbol() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeInfoSymbol", .linkage = .weak }) orelse missing("NSSpeechPhonemeInfoSymbol");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeInfoExample`.
+pub fn speechPhonemeInfoExample() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeInfoExample", .linkage = .weak }) orelse missing("NSSpeechPhonemeInfoExample");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeInfoHiliteStart`.
+pub fn speechPhonemeInfoHiliteStart() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeInfoHiliteStart", .linkage = .weak }) orelse missing("NSSpeechPhonemeInfoHiliteStart");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechPhonemeInfoHiliteEnd`.
+pub fn speechPhonemeInfoHiliteEnd() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechPhonemeInfoHiliteEnd", .linkage = .weak }) orelse missing("NSSpeechPhonemeInfoHiliteEnd");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechCommandPrefix`.
+pub fn speechCommandPrefix() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechCommandPrefix", .linkage = .weak }) orelse missing("NSSpeechCommandPrefix");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpeechCommandSuffix`.
+pub fn speechCommandSuffix() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpeechCommandSuffix", .linkage = .weak }) orelse missing("NSSpeechCommandSuffix");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingOrthographyKey`.
+pub fn textCheckingOrthographyKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingOrthographyKey", .linkage = .weak }) orelse missing("NSTextCheckingOrthographyKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingQuotesKey`.
+pub fn textCheckingQuotesKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingQuotesKey", .linkage = .weak }) orelse missing("NSTextCheckingQuotesKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingReplacementsKey`.
+pub fn textCheckingReplacementsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingReplacementsKey", .linkage = .weak }) orelse missing("NSTextCheckingReplacementsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingReferenceDateKey`.
+pub fn textCheckingReferenceDateKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingReferenceDateKey", .linkage = .weak }) orelse missing("NSTextCheckingReferenceDateKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingReferenceTimeZoneKey`.
+pub fn textCheckingReferenceTimeZoneKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingReferenceTimeZoneKey", .linkage = .weak }) orelse missing("NSTextCheckingReferenceTimeZoneKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingDocumentURLKey`.
+pub fn textCheckingDocumentURLKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingDocumentURLKey", .linkage = .weak }) orelse missing("NSTextCheckingDocumentURLKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingDocumentTitleKey`.
+pub fn textCheckingDocumentTitleKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingDocumentTitleKey", .linkage = .weak }) orelse missing("NSTextCheckingDocumentTitleKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingDocumentAuthorKey`.
+pub fn textCheckingDocumentAuthorKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingDocumentAuthorKey", .linkage = .weak }) orelse missing("NSTextCheckingDocumentAuthorKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingRegularExpressionsKey`.
+pub fn textCheckingRegularExpressionsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingRegularExpressionsKey", .linkage = .weak }) orelse missing("NSTextCheckingRegularExpressionsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingSelectedRangeKey`.
+pub fn textCheckingSelectedRangeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingSelectedRangeKey", .linkage = .weak }) orelse missing("NSTextCheckingSelectedRangeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingGenerateInlinePredictionsKey`.
+pub fn textCheckingGenerateInlinePredictionsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingGenerateInlinePredictionsKey", .linkage = .weak }) orelse missing("NSTextCheckingGenerateInlinePredictionsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingAutomaticCapitalizationEnabledKey`.
+pub fn textCheckingAutomaticCapitalizationEnabledKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingAutomaticCapitalizationEnabledKey", .linkage = .weak }) orelse missing("NSTextCheckingAutomaticCapitalizationEnabledKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextCheckingWaitForAllGrammarCheckingResultsKey`.
+pub fn textCheckingWaitForAllGrammarCheckingResultsKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextCheckingWaitForAllGrammarCheckingResultsKey", .linkage = .weak }) orelse missing("NSTextCheckingWaitForAllGrammarCheckingResultsKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticSpellingCorrectionNotification`.
+pub fn spellCheckerDidChangeAutomaticSpellingCorrectionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticSpellingCorrectionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticSpellingCorrectionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticTextReplacementNotification`.
+pub fn spellCheckerDidChangeAutomaticTextReplacementNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticTextReplacementNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticTextReplacementNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticQuoteSubstitutionNotification`.
+pub fn spellCheckerDidChangeAutomaticQuoteSubstitutionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticQuoteSubstitutionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticQuoteSubstitutionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticDashSubstitutionNotification`.
+pub fn spellCheckerDidChangeAutomaticDashSubstitutionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticDashSubstitutionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticDashSubstitutionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticCapitalizationNotification`.
+pub fn spellCheckerDidChangeAutomaticCapitalizationNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticCapitalizationNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticCapitalizationNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticPeriodSubstitutionNotification`.
+pub fn spellCheckerDidChangeAutomaticPeriodSubstitutionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticPeriodSubstitutionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticPeriodSubstitutionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticTextCompletionNotification`.
+pub fn spellCheckerDidChangeAutomaticTextCompletionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticTextCompletionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticTextCompletionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellCheckerDidChangeAutomaticInlinePredictionNotification`.
+pub fn spellCheckerDidChangeAutomaticInlinePredictionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellCheckerDidChangeAutomaticInlinePredictionNotification", .linkage = .weak }) orelse missing("NSSpellCheckerDidChangeAutomaticInlinePredictionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSplitViewWillResizeSubviewsNotification`.
+pub fn splitViewWillResizeSubviewsNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSplitViewWillResizeSubviewsNotification", .linkage = .weak }) orelse missing("NSSplitViewWillResizeSubviewsNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSplitViewDidResizeSubviewsNotification`.
+pub fn splitViewDidResizeSubviewsNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSplitViewDidResizeSubviewsNotification", .linkage = .weak }) orelse missing("NSSplitViewDidResizeSubviewsNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSplitViewItemUnspecifiedDimension`.
+pub fn splitViewItemUnspecifiedDimension() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSSplitViewItemUnspecifiedDimension", .linkage = .weak }) orelse missing("NSSplitViewItemUnspecifiedDimension");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSSplitViewControllerAutomaticDimension`.
+pub fn splitViewControllerAutomaticDimension() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSSplitViewControllerAutomaticDimension", .linkage = .weak }) orelse missing("NSSplitViewControllerAutomaticDimension");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSPopUpButtonCellWillPopUpNotification`.
+pub fn popUpButtonCellWillPopUpNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopUpButtonCellWillPopUpNotification", .linkage = .weak }) orelse missing("NSPopUpButtonCellWillPopUpNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPopUpButtonWillPopUpNotification`.
+pub fn popUpButtonWillPopUpNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPopUpButtonWillPopUpNotification", .linkage = .weak }) orelse missing("NSPopUpButtonWillPopUpNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintOperationExistsException`.
+pub fn printOperationExistsException() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintOperationExistsException", .linkage = .weak }) orelse missing("NSPrintOperationExistsException");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPhotoJobStyleHint`.
+pub fn printPhotoJobStyleHint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPhotoJobStyleHint", .linkage = .weak }) orelse missing("NSPrintPhotoJobStyleHint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintAllPresetsJobStyleHint`.
+pub fn printAllPresetsJobStyleHint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintAllPresetsJobStyleHint", .linkage = .weak }) orelse missing("NSPrintAllPresetsJobStyleHint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintNoPresetsJobStyleHint`.
+pub fn printNoPresetsJobStyleHint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintNoPresetsJobStyleHint", .linkage = .weak }) orelse missing("NSPrintNoPresetsJobStyleHint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPanelAccessorySummaryItemNameKey`.
+pub fn printPanelAccessorySummaryItemNameKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPanelAccessorySummaryItemNameKey", .linkage = .weak }) orelse missing("NSPrintPanelAccessorySummaryItemNameKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrintPanelAccessorySummaryItemDescriptionKey`.
+pub fn printPanelAccessorySummaryItemDescriptionKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrintPanelAccessorySummaryItemDescriptionKey", .linkage = .weak }) orelse missing("NSPrintPanelAccessorySummaryItemDescriptionKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScreenColorSpaceDidChangeNotification`.
+pub fn screenColorSpaceDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScreenColorSpaceDidChangeNotification", .linkage = .weak }) orelse missing("NSScreenColorSpaceDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPreferredScrollerStyleDidChangeNotification`.
+pub fn preferredScrollerStyleDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPreferredScrollerStyleDidChangeNotification", .linkage = .weak }) orelse missing("NSPreferredScrollerStyleDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextFinderCaseInsensitiveKey`.
+pub fn textFinderCaseInsensitiveKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextFinderCaseInsensitiveKey", .linkage = .weak }) orelse missing("NSTextFinderCaseInsensitiveKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextFinderMatchingTypeKey`.
+pub fn textFinderMatchingTypeKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextFinderMatchingTypeKey", .linkage = .weak }) orelse missing("NSTextFinderMatchingTypeKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScrollViewWillStartLiveMagnifyNotification`.
+pub fn scrollViewWillStartLiveMagnifyNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScrollViewWillStartLiveMagnifyNotification", .linkage = .weak }) orelse missing("NSScrollViewWillStartLiveMagnifyNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScrollViewDidEndLiveMagnifyNotification`.
+pub fn scrollViewDidEndLiveMagnifyNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScrollViewDidEndLiveMagnifyNotification", .linkage = .weak }) orelse missing("NSScrollViewDidEndLiveMagnifyNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScrollViewWillStartLiveScrollNotification`.
+pub fn scrollViewWillStartLiveScrollNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScrollViewWillStartLiveScrollNotification", .linkage = .weak }) orelse missing("NSScrollViewWillStartLiveScrollNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScrollViewDidLiveScrollNotification`.
+pub fn scrollViewDidLiveScrollNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScrollViewDidLiveScrollNotification", .linkage = .weak }) orelse missing("NSScrollViewDidLiveScrollNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSScrollViewDidEndLiveScrollNotification`.
+pub fn scrollViewDidEndLiveScrollNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSScrollViewDidEndLiveScrollNotification", .linkage = .weak }) orelse missing("NSScrollViewDidEndLiveScrollNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGridViewSizeForContent`.
+pub fn gridViewSizeForContent() cg.Float {
+    const symbol = @extern(?*const objc.abi.Abi(cg.Float), .{ .name = "NSGridViewSizeForContent", .linkage = .weak }) orelse missing("NSGridViewSizeForContent");
+    return objc.abi.fromAbi(cg.Float, symbol.*);
+}
+
+/// `NSTextContentTypeUsername`.
+pub fn textContentTypeUsername() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeUsername", .linkage = .weak }) orelse missing("NSTextContentTypeUsername");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypePassword`.
+pub fn textContentTypePassword() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypePassword", .linkage = .weak }) orelse missing("NSTextContentTypePassword");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeOneTimeCode`.
+pub fn textContentTypeOneTimeCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeOneTimeCode", .linkage = .weak }) orelse missing("NSTextContentTypeOneTimeCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeNewPassword`.
+pub fn textContentTypeNewPassword() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeNewPassword", .linkage = .weak }) orelse missing("NSTextContentTypeNewPassword");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeName`.
+pub fn textContentTypeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeName", .linkage = .weak }) orelse missing("NSTextContentTypeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeNamePrefix`.
+pub fn textContentTypeNamePrefix() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeNamePrefix", .linkage = .weak }) orelse missing("NSTextContentTypeNamePrefix");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeGivenName`.
+pub fn textContentTypeGivenName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeGivenName", .linkage = .weak }) orelse missing("NSTextContentTypeGivenName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeMiddleName`.
+pub fn textContentTypeMiddleName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeMiddleName", .linkage = .weak }) orelse missing("NSTextContentTypeMiddleName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeFamilyName`.
+pub fn textContentTypeFamilyName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeFamilyName", .linkage = .weak }) orelse missing("NSTextContentTypeFamilyName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeNameSuffix`.
+pub fn textContentTypeNameSuffix() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeNameSuffix", .linkage = .weak }) orelse missing("NSTextContentTypeNameSuffix");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeNickname`.
+pub fn textContentTypeNickname() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeNickname", .linkage = .weak }) orelse missing("NSTextContentTypeNickname");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeJobTitle`.
+pub fn textContentTypeJobTitle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeJobTitle", .linkage = .weak }) orelse missing("NSTextContentTypeJobTitle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeOrganizationName`.
+pub fn textContentTypeOrganizationName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeOrganizationName", .linkage = .weak }) orelse missing("NSTextContentTypeOrganizationName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeLocation`.
+pub fn textContentTypeLocation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeLocation", .linkage = .weak }) orelse missing("NSTextContentTypeLocation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeFullStreetAddress`.
+pub fn textContentTypeFullStreetAddress() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeFullStreetAddress", .linkage = .weak }) orelse missing("NSTextContentTypeFullStreetAddress");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeStreetAddressLine1`.
+pub fn textContentTypeStreetAddressLine1() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeStreetAddressLine1", .linkage = .weak }) orelse missing("NSTextContentTypeStreetAddressLine1");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeStreetAddressLine2`.
+pub fn textContentTypeStreetAddressLine2() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeStreetAddressLine2", .linkage = .weak }) orelse missing("NSTextContentTypeStreetAddressLine2");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeAddressCity`.
+pub fn textContentTypeAddressCity() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeAddressCity", .linkage = .weak }) orelse missing("NSTextContentTypeAddressCity");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeAddressState`.
+pub fn textContentTypeAddressState() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeAddressState", .linkage = .weak }) orelse missing("NSTextContentTypeAddressState");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeAddressCityAndState`.
+pub fn textContentTypeAddressCityAndState() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeAddressCityAndState", .linkage = .weak }) orelse missing("NSTextContentTypeAddressCityAndState");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeSublocality`.
+pub fn textContentTypeSublocality() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeSublocality", .linkage = .weak }) orelse missing("NSTextContentTypeSublocality");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCountryName`.
+pub fn textContentTypeCountryName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCountryName", .linkage = .weak }) orelse missing("NSTextContentTypeCountryName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypePostalCode`.
+pub fn textContentTypePostalCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypePostalCode", .linkage = .weak }) orelse missing("NSTextContentTypePostalCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeTelephoneNumber`.
+pub fn textContentTypeTelephoneNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeTelephoneNumber", .linkage = .weak }) orelse missing("NSTextContentTypeTelephoneNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeEmailAddress`.
+pub fn textContentTypeEmailAddress() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeEmailAddress", .linkage = .weak }) orelse missing("NSTextContentTypeEmailAddress");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeURL`.
+pub fn textContentTypeURL() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeURL", .linkage = .weak }) orelse missing("NSTextContentTypeURL");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardNumber`.
+pub fn textContentTypeCreditCardNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardNumber", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardName`.
+pub fn textContentTypeCreditCardName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardName", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardGivenName`.
+pub fn textContentTypeCreditCardGivenName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardGivenName", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardGivenName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardMiddleName`.
+pub fn textContentTypeCreditCardMiddleName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardMiddleName", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardMiddleName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardFamilyName`.
+pub fn textContentTypeCreditCardFamilyName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardFamilyName", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardFamilyName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardSecurityCode`.
+pub fn textContentTypeCreditCardSecurityCode() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardSecurityCode", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardSecurityCode");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardExpiration`.
+pub fn textContentTypeCreditCardExpiration() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardExpiration", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardExpiration");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardExpirationMonth`.
+pub fn textContentTypeCreditCardExpirationMonth() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardExpirationMonth", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardExpirationMonth");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardExpirationYear`.
+pub fn textContentTypeCreditCardExpirationYear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardExpirationYear", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardExpirationYear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeCreditCardType`.
+pub fn textContentTypeCreditCardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeCreditCardType", .linkage = .weak }) orelse missing("NSTextContentTypeCreditCardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeShipmentTrackingNumber`.
+pub fn textContentTypeShipmentTrackingNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeShipmentTrackingNumber", .linkage = .weak }) orelse missing("NSTextContentTypeShipmentTrackingNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeFlightNumber`.
+pub fn textContentTypeFlightNumber() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeFlightNumber", .linkage = .weak }) orelse missing("NSTextContentTypeFlightNumber");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeDateTime`.
+pub fn textContentTypeDateTime() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeDateTime", .linkage = .weak }) orelse missing("NSTextContentTypeDateTime");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeBirthdate`.
+pub fn textContentTypeBirthdate() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeBirthdate", .linkage = .weak }) orelse missing("NSTextContentTypeBirthdate");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeBirthdateDay`.
+pub fn textContentTypeBirthdateDay() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeBirthdateDay", .linkage = .weak }) orelse missing("NSTextContentTypeBirthdateDay");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeBirthdateMonth`.
+pub fn textContentTypeBirthdateMonth() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeBirthdateMonth", .linkage = .weak }) orelse missing("NSTextContentTypeBirthdateMonth");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentTypeBirthdateYear`.
+pub fn textContentTypeBirthdateYear() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentTypeBirthdateYear", .linkage = .weak }) orelse missing("NSTextContentTypeBirthdateYear");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFontAttributeName`.
+pub fn fontAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFontAttributeName", .linkage = .weak }) orelse missing("NSFontAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSParagraphStyleAttributeName`.
+pub fn paragraphStyleAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSParagraphStyleAttributeName", .linkage = .weak }) orelse missing("NSParagraphStyleAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSForegroundColorAttributeName`.
+pub fn foregroundColorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSForegroundColorAttributeName", .linkage = .weak }) orelse missing("NSForegroundColorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBackgroundColorAttributeName`.
+pub fn backgroundColorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBackgroundColorAttributeName", .linkage = .weak }) orelse missing("NSBackgroundColorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSLigatureAttributeName`.
+pub fn ligatureAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSLigatureAttributeName", .linkage = .weak }) orelse missing("NSLigatureAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSKernAttributeName`.
+pub fn kernAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSKernAttributeName", .linkage = .weak }) orelse missing("NSKernAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTrackingAttributeName`.
+pub fn trackingAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTrackingAttributeName", .linkage = .weak }) orelse missing("NSTrackingAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSStrikethroughStyleAttributeName`.
+pub fn strikethroughStyleAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSStrikethroughStyleAttributeName", .linkage = .weak }) orelse missing("NSStrikethroughStyleAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSUnderlineStyleAttributeName`.
+pub fn underlineStyleAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSUnderlineStyleAttributeName", .linkage = .weak }) orelse missing("NSUnderlineStyleAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSStrokeColorAttributeName`.
+pub fn strokeColorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSStrokeColorAttributeName", .linkage = .weak }) orelse missing("NSStrokeColorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSStrokeWidthAttributeName`.
+pub fn strokeWidthAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSStrokeWidthAttributeName", .linkage = .weak }) orelse missing("NSStrokeWidthAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSShadowAttributeName`.
+pub fn shadowAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSShadowAttributeName", .linkage = .weak }) orelse missing("NSShadowAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextEffectAttributeName`.
+pub fn textEffectAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextEffectAttributeName", .linkage = .weak }) orelse missing("NSTextEffectAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAttachmentAttributeName`.
+pub fn attachmentAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAttachmentAttributeName", .linkage = .weak }) orelse missing("NSAttachmentAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSLinkAttributeName`.
+pub fn linkAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSLinkAttributeName", .linkage = .weak }) orelse missing("NSLinkAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBaselineOffsetAttributeName`.
+pub fn baselineOffsetAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBaselineOffsetAttributeName", .linkage = .weak }) orelse missing("NSBaselineOffsetAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSUnderlineColorAttributeName`.
+pub fn underlineColorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSUnderlineColorAttributeName", .linkage = .weak }) orelse missing("NSUnderlineColorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSStrikethroughColorAttributeName`.
+pub fn strikethroughColorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSStrikethroughColorAttributeName", .linkage = .weak }) orelse missing("NSStrikethroughColorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWritingDirectionAttributeName`.
+pub fn writingDirectionAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWritingDirectionAttributeName", .linkage = .weak }) orelse missing("NSWritingDirectionAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightStyleAttributeName`.
+pub fn textHighlightStyleAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightStyleAttributeName", .linkage = .weak }) orelse missing("NSTextHighlightStyleAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemeAttributeName`.
+pub fn textHighlightColorSchemeAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemeAttributeName", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemeAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAdaptiveImageGlyphAttributeName`.
+pub fn adaptiveImageGlyphAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAdaptiveImageGlyphAttributeName", .linkage = .weak }) orelse missing("NSAdaptiveImageGlyphAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWritingToolsExclusionAttributeName`.
+pub fn writingToolsExclusionAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWritingToolsExclusionAttributeName", .linkage = .weak }) orelse missing("NSWritingToolsExclusionAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextEffectLetterpressStyle`.
+pub fn textEffectLetterpressStyle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextEffectLetterpressStyle", .linkage = .weak }) orelse missing("NSTextEffectLetterpressStyle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightStyleDefault`.
+pub fn textHighlightStyleDefault() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightStyleDefault", .linkage = .weak }) orelse missing("NSTextHighlightStyleDefault");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemeDefault`.
+pub fn textHighlightColorSchemeDefault() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemeDefault", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemeDefault");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemePurple`.
+pub fn textHighlightColorSchemePurple() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemePurple", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemePurple");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemePink`.
+pub fn textHighlightColorSchemePink() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemePink", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemePink");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemeOrange`.
+pub fn textHighlightColorSchemeOrange() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemeOrange", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemeOrange");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemeMint`.
+pub fn textHighlightColorSchemeMint() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemeMint", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemeMint");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextHighlightColorSchemeBlue`.
+pub fn textHighlightColorSchemeBlue() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextHighlightColorSchemeBlue", .linkage = .weak }) orelse missing("NSTextHighlightColorSchemeBlue");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPlainTextDocumentType`.
+pub fn plainTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPlainTextDocumentType", .linkage = .weak }) orelse missing("NSPlainTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRTFTextDocumentType`.
+pub fn rtfTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRTFTextDocumentType", .linkage = .weak }) orelse missing("NSRTFTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRTFDTextDocumentType`.
+pub fn rtfdTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRTFDTextDocumentType", .linkage = .weak }) orelse missing("NSRTFDTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHTMLTextDocumentType`.
+pub fn htmlTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHTMLTextDocumentType", .linkage = .weak }) orelse missing("NSHTMLTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextLayoutSectionOrientation`.
+pub fn textLayoutSectionOrientation() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextLayoutSectionOrientation", .linkage = .weak }) orelse missing("NSTextLayoutSectionOrientation");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextLayoutSectionRange`.
+pub fn textLayoutSectionRange() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextLayoutSectionRange", .linkage = .weak }) orelse missing("NSTextLayoutSectionRange");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDocumentTypeDocumentAttribute`.
+pub fn documentTypeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDocumentTypeDocumentAttribute", .linkage = .weak }) orelse missing("NSDocumentTypeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCharacterEncodingDocumentAttribute`.
+pub fn characterEncodingDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCharacterEncodingDocumentAttribute", .linkage = .weak }) orelse missing("NSCharacterEncodingDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefaultAttributesDocumentAttribute`.
+pub fn defaultAttributesDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefaultAttributesDocumentAttribute", .linkage = .weak }) orelse missing("NSDefaultAttributesDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPaperSizeDocumentAttribute`.
+pub fn paperSizeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPaperSizeDocumentAttribute", .linkage = .weak }) orelse missing("NSPaperSizeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewSizeDocumentAttribute`.
+pub fn viewSizeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewSizeDocumentAttribute", .linkage = .weak }) orelse missing("NSViewSizeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewZoomDocumentAttribute`.
+pub fn viewZoomDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewZoomDocumentAttribute", .linkage = .weak }) orelse missing("NSViewZoomDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSViewModeDocumentAttribute`.
+pub fn viewModeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSViewModeDocumentAttribute", .linkage = .weak }) orelse missing("NSViewModeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefaultFontExcludedDocumentAttribute`.
+pub fn defaultFontExcludedDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefaultFontExcludedDocumentAttribute", .linkage = .weak }) orelse missing("NSDefaultFontExcludedDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSReadOnlyDocumentAttribute`.
+pub fn readOnlyDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSReadOnlyDocumentAttribute", .linkage = .weak }) orelse missing("NSReadOnlyDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBackgroundColorDocumentAttribute`.
+pub fn backgroundColorDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBackgroundColorDocumentAttribute", .linkage = .weak }) orelse missing("NSBackgroundColorDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSHyphenationFactorDocumentAttribute`.
+pub fn hyphenationFactorDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSHyphenationFactorDocumentAttribute", .linkage = .weak }) orelse missing("NSHyphenationFactorDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefaultTabIntervalDocumentAttribute`.
+pub fn defaultTabIntervalDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefaultTabIntervalDocumentAttribute", .linkage = .weak }) orelse missing("NSDefaultTabIntervalDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextLayoutSectionsAttribute`.
+pub fn textLayoutSectionsAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextLayoutSectionsAttribute", .linkage = .weak }) orelse missing("NSTextLayoutSectionsAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextScalingDocumentAttribute`.
+pub fn textScalingDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextScalingDocumentAttribute", .linkage = .weak }) orelse missing("NSTextScalingDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSourceTextScalingDocumentAttribute`.
+pub fn sourceTextScalingDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSourceTextScalingDocumentAttribute", .linkage = .weak }) orelse missing("NSSourceTextScalingDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCocoaVersionDocumentAttribute`.
+pub fn cocoaVersionDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCocoaVersionDocumentAttribute", .linkage = .weak }) orelse missing("NSCocoaVersionDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDocumentTypeDocumentOption`.
+pub fn documentTypeDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDocumentTypeDocumentOption", .linkage = .weak }) orelse missing("NSDocumentTypeDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDefaultAttributesDocumentOption`.
+pub fn defaultAttributesDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDefaultAttributesDocumentOption", .linkage = .weak }) orelse missing("NSDefaultAttributesDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCharacterEncodingDocumentOption`.
+pub fn characterEncodingDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCharacterEncodingDocumentOption", .linkage = .weak }) orelse missing("NSCharacterEncodingDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTargetTextScalingDocumentOption`.
+pub fn targetTextScalingDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTargetTextScalingDocumentOption", .linkage = .weak }) orelse missing("NSTargetTextScalingDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSourceTextScalingDocumentOption`.
+pub fn sourceTextScalingDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSourceTextScalingDocumentOption", .linkage = .weak }) orelse missing("NSSourceTextScalingDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextKit1ListMarkerFormatDocumentOption`.
+pub fn textKit1ListMarkerFormatDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextKit1ListMarkerFormatDocumentOption", .linkage = .weak }) orelse missing("NSTextKit1ListMarkerFormatDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPaperMarginDocumentAttribute`.
+pub fn paperMarginDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPaperMarginDocumentAttribute", .linkage = .weak }) orelse missing("NSPaperMarginDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSObliquenessAttributeName`.
+pub fn obliquenessAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSObliquenessAttributeName", .linkage = .weak }) orelse missing("NSObliquenessAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSExpansionAttributeName`.
+pub fn expansionAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSExpansionAttributeName", .linkage = .weak }) orelse missing("NSExpansionAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSVerticalGlyphFormAttributeName`.
+pub fn verticalGlyphFormAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSVerticalGlyphFormAttributeName", .linkage = .weak }) orelse missing("NSVerticalGlyphFormAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCursorAttributeName`.
+pub fn cursorAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCursorAttributeName", .linkage = .weak }) orelse missing("NSCursorAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolTipAttributeName`.
+pub fn toolTipAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolTipAttributeName", .linkage = .weak }) orelse missing("NSToolTipAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMarkedClauseSegmentAttributeName`.
+pub fn markedClauseSegmentAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMarkedClauseSegmentAttributeName", .linkage = .weak }) orelse missing("NSMarkedClauseSegmentAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextAlternativesAttributeName`.
+pub fn textAlternativesAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextAlternativesAttributeName", .linkage = .weak }) orelse missing("NSTextAlternativesAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSpellingStateAttributeName`.
+pub fn spellingStateAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSpellingStateAttributeName", .linkage = .weak }) orelse missing("NSSpellingStateAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSuperscriptAttributeName`.
+pub fn superscriptAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSuperscriptAttributeName", .linkage = .weak }) orelse missing("NSSuperscriptAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSGlyphInfoAttributeName`.
+pub fn glyphInfoAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSGlyphInfoAttributeName", .linkage = .weak }) orelse missing("NSGlyphInfoAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSMacSimpleTextDocumentType`.
+pub fn macSimpleTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSMacSimpleTextDocumentType", .linkage = .weak }) orelse missing("NSMacSimpleTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDocFormatTextDocumentType`.
+pub fn docFormatTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDocFormatTextDocumentType", .linkage = .weak }) orelse missing("NSDocFormatTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWordMLTextDocumentType`.
+pub fn wordMLTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWordMLTextDocumentType", .linkage = .weak }) orelse missing("NSWordMLTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWebArchiveTextDocumentType`.
+pub fn webArchiveTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWebArchiveTextDocumentType", .linkage = .weak }) orelse missing("NSWebArchiveTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOfficeOpenXMLTextDocumentType`.
+pub fn officeOpenXMLTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOfficeOpenXMLTextDocumentType", .linkage = .weak }) orelse missing("NSOfficeOpenXMLTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOpenDocumentTextDocumentType`.
+pub fn openDocumentTextDocumentType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOpenDocumentTextDocumentType", .linkage = .weak }) orelse missing("NSOpenDocumentTextDocumentType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSConvertedDocumentAttribute`.
+pub fn convertedDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSConvertedDocumentAttribute", .linkage = .weak }) orelse missing("NSConvertedDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFileTypeDocumentAttribute`.
+pub fn fileTypeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFileTypeDocumentAttribute", .linkage = .weak }) orelse missing("NSFileTypeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTitleDocumentAttribute`.
+pub fn titleDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTitleDocumentAttribute", .linkage = .weak }) orelse missing("NSTitleDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCompanyDocumentAttribute`.
+pub fn companyDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCompanyDocumentAttribute", .linkage = .weak }) orelse missing("NSCompanyDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCopyrightDocumentAttribute`.
+pub fn copyrightDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCopyrightDocumentAttribute", .linkage = .weak }) orelse missing("NSCopyrightDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSubjectDocumentAttribute`.
+pub fn subjectDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSubjectDocumentAttribute", .linkage = .weak }) orelse missing("NSSubjectDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAuthorDocumentAttribute`.
+pub fn authorDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAuthorDocumentAttribute", .linkage = .weak }) orelse missing("NSAuthorDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSKeywordsDocumentAttribute`.
+pub fn keywordsDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSKeywordsDocumentAttribute", .linkage = .weak }) orelse missing("NSKeywordsDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCommentDocumentAttribute`.
+pub fn commentDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCommentDocumentAttribute", .linkage = .weak }) orelse missing("NSCommentDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSEditorDocumentAttribute`.
+pub fn editorDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSEditorDocumentAttribute", .linkage = .weak }) orelse missing("NSEditorDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCreationTimeDocumentAttribute`.
+pub fn creationTimeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCreationTimeDocumentAttribute", .linkage = .weak }) orelse missing("NSCreationTimeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSModificationTimeDocumentAttribute`.
+pub fn modificationTimeDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSModificationTimeDocumentAttribute", .linkage = .weak }) orelse missing("NSModificationTimeDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSManagerDocumentAttribute`.
+pub fn managerDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSManagerDocumentAttribute", .linkage = .weak }) orelse missing("NSManagerDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCategoryDocumentAttribute`.
+pub fn categoryDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCategoryDocumentAttribute", .linkage = .weak }) orelse missing("NSCategoryDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAppearanceDocumentAttribute`.
+pub fn appearanceDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAppearanceDocumentAttribute", .linkage = .weak }) orelse missing("NSAppearanceDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSExcludedElementsDocumentAttribute`.
+pub fn excludedElementsDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSExcludedElementsDocumentAttribute", .linkage = .weak }) orelse missing("NSExcludedElementsDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextEncodingNameDocumentAttribute`.
+pub fn textEncodingNameDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextEncodingNameDocumentAttribute", .linkage = .weak }) orelse missing("NSTextEncodingNameDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSPrefixSpacesDocumentAttribute`.
+pub fn prefixSpacesDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSPrefixSpacesDocumentAttribute", .linkage = .weak }) orelse missing("NSPrefixSpacesDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSLeftMarginDocumentAttribute`.
+pub fn leftMarginDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSLeftMarginDocumentAttribute", .linkage = .weak }) orelse missing("NSLeftMarginDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRightMarginDocumentAttribute`.
+pub fn rightMarginDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRightMarginDocumentAttribute", .linkage = .weak }) orelse missing("NSRightMarginDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTopMarginDocumentAttribute`.
+pub fn topMarginDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTopMarginDocumentAttribute", .linkage = .weak }) orelse missing("NSTopMarginDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBottomMarginDocumentAttribute`.
+pub fn bottomMarginDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBottomMarginDocumentAttribute", .linkage = .weak }) orelse missing("NSBottomMarginDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextEncodingNameDocumentOption`.
+pub fn textEncodingNameDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextEncodingNameDocumentOption", .linkage = .weak }) orelse missing("NSTextEncodingNameDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSBaseURLDocumentOption`.
+pub fn baseURLDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSBaseURLDocumentOption", .linkage = .weak }) orelse missing("NSBaseURLDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTimeoutDocumentOption`.
+pub fn timeoutDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTimeoutDocumentOption", .linkage = .weak }) orelse missing("NSTimeoutDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWebPreferencesDocumentOption`.
+pub fn webPreferencesDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWebPreferencesDocumentOption", .linkage = .weak }) orelse missing("NSWebPreferencesDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSWebResourceLoadDelegateDocumentOption`.
+pub fn webResourceLoadDelegateDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSWebResourceLoadDelegateDocumentOption", .linkage = .weak }) orelse missing("NSWebResourceLoadDelegateDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextSizeMultiplierDocumentOption`.
+pub fn textSizeMultiplierDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextSizeMultiplierDocumentOption", .linkage = .weak }) orelse missing("NSTextSizeMultiplierDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFileTypeDocumentOption`.
+pub fn fileTypeDocumentOption() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFileTypeDocumentOption", .linkage = .weak }) orelse missing("NSFileTypeDocumentOption");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSCharacterShapeAttributeName`.
+pub fn characterShapeAttributeName() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSCharacterShapeAttributeName", .linkage = .weak }) orelse missing("NSCharacterShapeAttributeName");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSUsesScreenFontsDocumentAttribute`.
+pub fn usesScreenFontsDocumentAttribute() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSUsesScreenFontsDocumentAttribute", .linkage = .weak }) orelse missing("NSUsesScreenFontsDocumentAttribute");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSUnderlineStrikethroughMask`.
+pub fn underlineStrikethroughMask() objc.UInteger {
+    const symbol = @extern(?*const objc.abi.Abi(objc.UInteger), .{ .name = "NSUnderlineStrikethroughMask", .linkage = .weak }) orelse missing("NSUnderlineStrikethroughMask");
+    return objc.abi.fromAbi(objc.UInteger, symbol.*);
+}
+
+/// `NSUnderlineByWordMask`.
+pub fn underlineByWordMask() objc.UInteger {
+    const symbol = @extern(?*const objc.abi.Abi(objc.UInteger), .{ .name = "NSUnderlineByWordMask", .linkage = .weak }) orelse missing("NSUnderlineByWordMask");
+    return objc.abi.fromAbi(objc.UInteger, symbol.*);
+}
+
+/// `NSTextStorageWillProcessEditingNotification`.
+pub fn textStorageWillProcessEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextStorageWillProcessEditingNotification", .linkage = .weak }) orelse missing("NSTextStorageWillProcessEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextStorageDidProcessEditingNotification`.
+pub fn textStorageDidProcessEditingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextStorageDidProcessEditingNotification", .linkage = .weak }) orelse missing("NSTextStorageDidProcessEditingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarItemKey`.
+pub fn toolbarItemKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarItemKey", .linkage = .weak }) orelse missing("NSToolbarItemKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarNewIndexKey`.
+pub fn toolbarNewIndexKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarNewIndexKey", .linkage = .weak }) orelse missing("NSToolbarNewIndexKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarWillAddItemNotification`.
+pub fn toolbarWillAddItemNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarWillAddItemNotification", .linkage = .weak }) orelse missing("NSToolbarWillAddItemNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarDidRemoveItemNotification`.
+pub fn toolbarDidRemoveItemNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarDidRemoveItemNotification", .linkage = .weak }) orelse missing("NSToolbarDidRemoveItemNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarSpaceItemIdentifier`.
+pub fn toolbarSpaceItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarSpaceItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarSpaceItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarFlexibleSpaceItemIdentifier`.
+pub fn toolbarFlexibleSpaceItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarFlexibleSpaceItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarFlexibleSpaceItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarShowColorsItemIdentifier`.
+pub fn toolbarShowColorsItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarShowColorsItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarShowColorsItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarShowFontsItemIdentifier`.
+pub fn toolbarShowFontsItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarShowFontsItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarShowFontsItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarPrintItemIdentifier`.
+pub fn toolbarPrintItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarPrintItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarPrintItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarToggleSidebarItemIdentifier`.
+pub fn toolbarToggleSidebarItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarToggleSidebarItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarToggleSidebarItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarToggleInspectorItemIdentifier`.
+pub fn toolbarToggleInspectorItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarToggleInspectorItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarToggleInspectorItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarCloudSharingItemIdentifier`.
+pub fn toolbarCloudSharingItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarCloudSharingItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarCloudSharingItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarWritingToolsItemIdentifier`.
+pub fn toolbarWritingToolsItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarWritingToolsItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarWritingToolsItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarSidebarTrackingSeparatorItemIdentifier`.
+pub fn toolbarSidebarTrackingSeparatorItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarSidebarTrackingSeparatorItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarSidebarTrackingSeparatorItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarInspectorTrackingSeparatorItemIdentifier`.
+pub fn toolbarInspectorTrackingSeparatorItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarInspectorTrackingSeparatorItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarInspectorTrackingSeparatorItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarSeparatorItemIdentifier`.
+pub fn toolbarSeparatorItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarSeparatorItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarSeparatorItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSToolbarCustomizeToolbarItemIdentifier`.
+pub fn toolbarCustomizeToolbarItemIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSToolbarCustomizeToolbarItemIdentifier", .linkage = .weak }) orelse missing("NSToolbarCustomizeToolbarItemIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSComboBoxWillPopUpNotification`.
+pub fn comboBoxWillPopUpNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSComboBoxWillPopUpNotification", .linkage = .weak }) orelse missing("NSComboBoxWillPopUpNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSComboBoxWillDismissNotification`.
+pub fn comboBoxWillDismissNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSComboBoxWillDismissNotification", .linkage = .weak }) orelse missing("NSComboBoxWillDismissNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSComboBoxSelectionDidChangeNotification`.
+pub fn comboBoxSelectionDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSComboBoxSelectionDidChangeNotification", .linkage = .weak }) orelse missing("NSComboBoxSelectionDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSComboBoxSelectionIsChangingNotification`.
+pub fn comboBoxSelectionIsChangingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSComboBoxSelectionIsChangingNotification", .linkage = .weak }) orelse missing("NSComboBoxSelectionIsChangingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSAllRomanInputSourcesLocaleIdentifier`.
+pub fn allRomanInputSourcesLocaleIdentifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSAllRomanInputSourcesLocaleIdentifier", .linkage = .weak }) orelse missing("NSAllRomanInputSourcesLocaleIdentifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierCharacterPicker`.
+pub fn touchBarItemIdentifierCharacterPicker() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierCharacterPicker", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierCharacterPicker");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierTextColorPicker`.
+pub fn touchBarItemIdentifierTextColorPicker() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierTextColorPicker", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierTextColorPicker");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierTextStyle`.
+pub fn touchBarItemIdentifierTextStyle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierTextStyle", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierTextStyle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierTextAlignment`.
+pub fn touchBarItemIdentifierTextAlignment() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierTextAlignment", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierTextAlignment");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierTextList`.
+pub fn touchBarItemIdentifierTextList() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierTextList", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierTextList");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTouchBarItemIdentifierTextFormat`.
+pub fn touchBarItemIdentifierTextFormat() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTouchBarItemIdentifierTextFormat", .linkage = .weak }) orelse missing("NSTouchBarItemIdentifierTextFormat");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextViewWillChangeNotifyingTextViewNotification`.
+pub fn textViewWillChangeNotifyingTextViewNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextViewWillChangeNotifyingTextViewNotification", .linkage = .weak }) orelse missing("NSTextViewWillChangeNotifyingTextViewNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextViewDidChangeSelectionNotification`.
+pub fn textViewDidChangeSelectionNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextViewDidChangeSelectionNotification", .linkage = .weak }) orelse missing("NSTextViewDidChangeSelectionNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextViewDidChangeTypingAttributesNotification`.
+pub fn textViewDidChangeTypingAttributesNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextViewDidChangeTypingAttributesNotification", .linkage = .weak }) orelse missing("NSTextViewDidChangeTypingAttributesNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextViewWillSwitchToNSLayoutManagerNotification`.
+pub fn textViewWillSwitchToNSLayoutManagerNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextViewWillSwitchToNSLayoutManagerNotification", .linkage = .weak }) orelse missing("NSTextViewWillSwitchToNSLayoutManagerNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextViewDidSwitchToNSLayoutManagerNotification`.
+pub fn textViewDidSwitchToNSLayoutManagerNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextViewDidSwitchToNSLayoutManagerNotification", .linkage = .weak }) orelse missing("NSTextViewDidSwitchToNSLayoutManagerNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFindPanelSearchOptionsPboardType`.
+pub fn findPanelSearchOptionsPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFindPanelSearchOptionsPboardType", .linkage = .weak }) orelse missing("NSFindPanelSearchOptionsPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFindPanelCaseInsensitiveSearch`.
+pub fn findPanelCaseInsensitiveSearch() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFindPanelCaseInsensitiveSearch", .linkage = .weak }) orelse missing("NSFindPanelCaseInsensitiveSearch");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSFindPanelSubstringMatch`.
+pub fn findPanelSubstringMatch() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSFindPanelSubstringMatch", .linkage = .weak }) orelse missing("NSFindPanelSubstringMatch");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTableViewSelectionDidChangeNotification`.
+pub fn tableViewSelectionDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTableViewSelectionDidChangeNotification", .linkage = .weak }) orelse missing("NSTableViewSelectionDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTableViewColumnDidMoveNotification`.
+pub fn tableViewColumnDidMoveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTableViewColumnDidMoveNotification", .linkage = .weak }) orelse missing("NSTableViewColumnDidMoveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTableViewColumnDidResizeNotification`.
+pub fn tableViewColumnDidResizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTableViewColumnDidResizeNotification", .linkage = .weak }) orelse missing("NSTableViewColumnDidResizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTableViewSelectionIsChangingNotification`.
+pub fn tableViewSelectionIsChangingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTableViewSelectionIsChangingNotification", .linkage = .weak }) orelse missing("NSTableViewSelectionIsChangingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTableViewRowViewKey`.
+pub fn tableViewRowViewKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTableViewRowViewKey", .linkage = .weak }) orelse missing("NSTableViewRowViewKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewDisclosureButtonKey`.
+pub fn outlineViewDisclosureButtonKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewDisclosureButtonKey", .linkage = .weak }) orelse missing("NSOutlineViewDisclosureButtonKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewShowHideButtonKey`.
+pub fn outlineViewShowHideButtonKey() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewShowHideButtonKey", .linkage = .weak }) orelse missing("NSOutlineViewShowHideButtonKey");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewSelectionDidChangeNotification`.
+pub fn outlineViewSelectionDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewSelectionDidChangeNotification", .linkage = .weak }) orelse missing("NSOutlineViewSelectionDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewColumnDidMoveNotification`.
+pub fn outlineViewColumnDidMoveNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewColumnDidMoveNotification", .linkage = .weak }) orelse missing("NSOutlineViewColumnDidMoveNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewColumnDidResizeNotification`.
+pub fn outlineViewColumnDidResizeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewColumnDidResizeNotification", .linkage = .weak }) orelse missing("NSOutlineViewColumnDidResizeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewSelectionIsChangingNotification`.
+pub fn outlineViewSelectionIsChangingNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewSelectionIsChangingNotification", .linkage = .weak }) orelse missing("NSOutlineViewSelectionIsChangingNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewItemWillExpandNotification`.
+pub fn outlineViewItemWillExpandNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewItemWillExpandNotification", .linkage = .weak }) orelse missing("NSOutlineViewItemWillExpandNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewItemDidExpandNotification`.
+pub fn outlineViewItemDidExpandNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewItemDidExpandNotification", .linkage = .weak }) orelse missing("NSOutlineViewItemDidExpandNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewItemWillCollapseNotification`.
+pub fn outlineViewItemWillCollapseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewItemWillCollapseNotification", .linkage = .weak }) orelse missing("NSOutlineViewItemWillCollapseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOutlineViewItemDidCollapseNotification`.
+pub fn outlineViewItemDidCollapseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSOutlineViewItemDidCollapseNotification", .linkage = .weak }) orelse missing("NSOutlineViewItemDidCollapseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerViewUnitInches`.
+pub fn rulerViewUnitInches() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerViewUnitInches", .linkage = .weak }) orelse missing("NSRulerViewUnitInches");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerViewUnitCentimeters`.
+pub fn rulerViewUnitCentimeters() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerViewUnitCentimeters", .linkage = .weak }) orelse missing("NSRulerViewUnitCentimeters");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerViewUnitPoints`.
+pub fn rulerViewUnitPoints() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerViewUnitPoints", .linkage = .weak }) orelse missing("NSRulerViewUnitPoints");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRulerViewUnitPicas`.
+pub fn rulerViewUnitPicas() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRulerViewUnitPicas", .linkage = .weak }) orelse missing("NSRulerViewUnitPicas");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSInterfaceStyleForKey`.
+pub fn interfaceStyleForKey(key: ?foundation.String, responder: ?Responder) objc.UInteger {
+    const function = @extern(?*const fn (objc.abi.Abi(?foundation.String), objc.abi.Abi(?Responder)) callconv(.c) objc.abi.Abi(objc.UInteger), .{ .name = "NSInterfaceStyleForKey", .linkage = .weak }) orelse missing("NSInterfaceStyleForKey");
+    return objc.abi.fromAbi(objc.UInteger, function(objc.abi.toAbi(?foundation.String, key), objc.abi.toAbi(?Responder, responder)));
+}
+
+/// `NSInterfaceStyleDefault`.
+pub fn interfaceStyleDefault() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSInterfaceStyleDefault", .linkage = .weak }) orelse missing("NSInterfaceStyleDefault");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSSoundPboardType`.
+pub fn soundPboardType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSSoundPboardType", .linkage = .weak }) orelse missing("NSSoundPboardType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDrawerWillOpenNotification`.
+pub fn drawerWillOpenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDrawerWillOpenNotification", .linkage = .weak }) orelse missing("NSDrawerWillOpenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDrawerDidOpenNotification`.
+pub fn drawerDidOpenNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDrawerDidOpenNotification", .linkage = .weak }) orelse missing("NSDrawerDidOpenNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDrawerWillCloseNotification`.
+pub fn drawerWillCloseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDrawerWillCloseNotification", .linkage = .weak }) orelse missing("NSDrawerWillCloseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSDrawerDidCloseNotification`.
+pub fn drawerDidCloseNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSDrawerDidCloseNotification", .linkage = .weak }) orelse missing("NSDrawerDidCloseNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSOpenGLGetVersion`.
+pub fn openGLGetVersion(major: ?objc.Object, minor: ?objc.Object) void {
+    const function = @extern(?*const fn (objc.abi.Abi(?objc.Object), objc.abi.Abi(?objc.Object)) callconv(.c) objc.abi.Abi(void), .{ .name = "NSOpenGLGetVersion", .linkage = .weak }) orelse missing("NSOpenGLGetVersion");
+    return objc.abi.fromAbi(void, function(objc.abi.toAbi(?objc.Object, major), objc.abi.toAbi(?objc.Object, minor)));
+}
+
+/// `NSTextListMarkerBox`.
+pub fn textListMarkerBox() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerBox", .linkage = .weak }) orelse missing("NSTextListMarkerBox");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerCheck`.
+pub fn textListMarkerCheck() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerCheck", .linkage = .weak }) orelse missing("NSTextListMarkerCheck");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerCircle`.
+pub fn textListMarkerCircle() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerCircle", .linkage = .weak }) orelse missing("NSTextListMarkerCircle");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerDiamond`.
+pub fn textListMarkerDiamond() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerDiamond", .linkage = .weak }) orelse missing("NSTextListMarkerDiamond");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerDisc`.
+pub fn textListMarkerDisc() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerDisc", .linkage = .weak }) orelse missing("NSTextListMarkerDisc");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerHyphen`.
+pub fn textListMarkerHyphen() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerHyphen", .linkage = .weak }) orelse missing("NSTextListMarkerHyphen");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerSquare`.
+pub fn textListMarkerSquare() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerSquare", .linkage = .weak }) orelse missing("NSTextListMarkerSquare");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerLowercaseHexadecimal`.
+pub fn textListMarkerLowercaseHexadecimal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerLowercaseHexadecimal", .linkage = .weak }) orelse missing("NSTextListMarkerLowercaseHexadecimal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerUppercaseHexadecimal`.
+pub fn textListMarkerUppercaseHexadecimal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerUppercaseHexadecimal", .linkage = .weak }) orelse missing("NSTextListMarkerUppercaseHexadecimal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerOctal`.
+pub fn textListMarkerOctal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerOctal", .linkage = .weak }) orelse missing("NSTextListMarkerOctal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerLowercaseAlpha`.
+pub fn textListMarkerLowercaseAlpha() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerLowercaseAlpha", .linkage = .weak }) orelse missing("NSTextListMarkerLowercaseAlpha");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerUppercaseAlpha`.
+pub fn textListMarkerUppercaseAlpha() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerUppercaseAlpha", .linkage = .weak }) orelse missing("NSTextListMarkerUppercaseAlpha");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerLowercaseLatin`.
+pub fn textListMarkerLowercaseLatin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerLowercaseLatin", .linkage = .weak }) orelse missing("NSTextListMarkerLowercaseLatin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerUppercaseLatin`.
+pub fn textListMarkerUppercaseLatin() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerUppercaseLatin", .linkage = .weak }) orelse missing("NSTextListMarkerUppercaseLatin");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerLowercaseRoman`.
+pub fn textListMarkerLowercaseRoman() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerLowercaseRoman", .linkage = .weak }) orelse missing("NSTextListMarkerLowercaseRoman");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerUppercaseRoman`.
+pub fn textListMarkerUppercaseRoman() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerUppercaseRoman", .linkage = .weak }) orelse missing("NSTextListMarkerUppercaseRoman");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextListMarkerDecimal`.
+pub fn textListMarkerDecimal() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextListMarkerDecimal", .linkage = .weak }) orelse missing("NSTextListMarkerDecimal");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateLeftExpression`.
+pub fn ruleEditorPredicateLeftExpression() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateLeftExpression", .linkage = .weak }) orelse missing("NSRuleEditorPredicateLeftExpression");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateRightExpression`.
+pub fn ruleEditorPredicateRightExpression() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateRightExpression", .linkage = .weak }) orelse missing("NSRuleEditorPredicateRightExpression");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateComparisonModifier`.
+pub fn ruleEditorPredicateComparisonModifier() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateComparisonModifier", .linkage = .weak }) orelse missing("NSRuleEditorPredicateComparisonModifier");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateOptions`.
+pub fn ruleEditorPredicateOptions() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateOptions", .linkage = .weak }) orelse missing("NSRuleEditorPredicateOptions");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateOperatorType`.
+pub fn ruleEditorPredicateOperatorType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateOperatorType", .linkage = .weak }) orelse missing("NSRuleEditorPredicateOperatorType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateCustomSelector`.
+pub fn ruleEditorPredicateCustomSelector() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateCustomSelector", .linkage = .weak }) orelse missing("NSRuleEditorPredicateCustomSelector");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorPredicateCompoundType`.
+pub fn ruleEditorPredicateCompoundType() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorPredicateCompoundType", .linkage = .weak }) orelse missing("NSRuleEditorPredicateCompoundType");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSRuleEditorRowsDidChangeNotification`.
+pub fn ruleEditorRowsDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSRuleEditorRowsDidChangeNotification", .linkage = .weak }) orelse missing("NSRuleEditorRowsDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextInputContextKeyboardSelectionDidChangeNotification`.
+pub fn textInputContextKeyboardSelectionDidChangeNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextInputContextKeyboardSelectionDidChangeNotification", .linkage = .weak }) orelse missing("NSTextInputContextKeyboardSelectionDidChangeNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSApplicationDidFinishRestoringWindowsNotification`.
+pub fn applicationDidFinishRestoringWindowsNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSApplicationDidFinishRestoringWindowsNotification", .linkage = .weak }) orelse missing("NSApplicationDidFinishRestoringWindowsNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextAlternativesSelectedAlternativeStringNotification`.
+pub fn textAlternativesSelectedAlternativeStringNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextAlternativesSelectedAlternativeStringNotification", .linkage = .weak }) orelse missing("NSTextAlternativesSelectedAlternativeStringNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTypeIdentifierDateText`.
+pub fn typeIdentifierDateText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTypeIdentifierDateText", .linkage = .weak }) orelse missing("NSTypeIdentifierDateText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTypeIdentifierAddressText`.
+pub fn typeIdentifierAddressText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTypeIdentifierAddressText", .linkage = .weak }) orelse missing("NSTypeIdentifierAddressText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTypeIdentifierPhoneNumberText`.
+pub fn typeIdentifierPhoneNumberText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTypeIdentifierPhoneNumberText", .linkage = .weak }) orelse missing("NSTypeIdentifierPhoneNumberText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTypeIdentifierTransitInformationText`.
+pub fn typeIdentifierTransitInformationText() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTypeIdentifierTransitInformationText", .linkage = .weak }) orelse missing("NSTypeIdentifierTransitInformationText");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+/// `NSTextContentStorageUnsupportedAttributeAddedNotification`.
+pub fn textContentStorageUnsupportedAttributeAddedNotification() foundation.String {
+    const symbol = @extern(?*const objc.abi.Abi(foundation.String), .{ .name = "NSTextContentStorageUnsupportedAttributeAddedNotification", .linkage = .weak }) orelse missing("NSTextContentStorageUnsupportedAttributeAddedNotification");
+    return objc.abi.fromAbi(foundation.String, symbol.*);
+}
+
+// Not generated:
+//   NSColorSpaceFromDepth: NSColorSpaceName  _Nullable
+//   NSRectFillListWithColors()
+//   NSRectFillListWithColorsUsingOperation()
+//   NSDrawBitmap()
+//   NSSetFocusRingStyle()
+//   NSShowAnimationEffect()
+//   NSCreateFilenamePboardType: NSPasteboardType  _Nullable
+//   NSCreateFileContentsPboardType: NSPasteboardType  _Nullable
+//   NSDirectionalEdgeInsetsZero: const NSDirectionalEdgeInsets
+//   NSConvertGlyphsToPackedGlyphs()
+//   NSOpenGLSetOption()
+//   NSOpenGLGetOption()

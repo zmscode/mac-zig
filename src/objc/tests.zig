@@ -163,7 +163,7 @@ test "a block called by Foundation" {
         @as(UInteger, values.len),
     });
 
-    const Visit = objc.Block(struct { total: *i64, visits: *usize }, &.{ Object, UInteger, *bool }, void);
+    const Visit = objc.Block(struct { total: *i64, visits: *usize }, fn (Object, UInteger, *bool) void);
     var total: i64 = 0;
     var visits: usize = 0;
     var block = Visit.init(.{ .total = &total, .visits = &visits }, struct {
@@ -190,7 +190,7 @@ test "a block that returns a value to Foundation" {
     });
 
     // Sorts descending, so the result proves the block's answer was used.
-    const Compare = objc.Block(struct {}, &.{ Object, Object }, Integer);
+    const Compare = objc.Block(struct {}, fn (Object, Object) Integer);
     var block = Compare.init(.{}, struct {
         fn body(_: *const Compare.Captures, a: Object, b: Object) Integer {
             return b.msgSend(Integer, "compare:", .{a});
@@ -205,7 +205,7 @@ test "a block that returns a value to Foundation" {
 }
 
 test "a block kept by Foundation outlives the stack block, and holds its objects" {
-    const Run = objc.Block(struct { label: Object, seen: *UInteger }, &.{}, void);
+    const Run = objc.Block(struct { label: Object, seen: *UInteger }, fn () void);
 
     var seen: UInteger = 0;
     const operation = blk: {
@@ -299,7 +299,7 @@ const Counter = struct {
     }
 
     /// Calls `visit` with 0, 1, ... count-1 -- a block handed in from outside.
-    fn each(self: Counter, cmd: Sel, visit: objc.BlockRef(&.{Integer}, void)) void {
+    fn each(self: Counter, cmd: Sel, visit: objc.BlockRef(fn (Integer) void)) void {
         var i: Integer = 0;
         while (i < count(self, cmd)) : (i += 1) visit.call(.{i});
     }
@@ -363,7 +363,7 @@ test "a Zig block handed to a Zig method, through Objective-C" {
 
     const counter = (try Counter.define()).msgSend(Counter, "counterStartingAt:", .{@as(Integer, 4)});
 
-    const Sum = objc.Block(struct { total: *Integer }, &.{Integer}, void);
+    const Sum = objc.Block(struct { total: *Integer }, fn (Integer) void);
     var total: Integer = 0;
     var block = Sum.init(.{ .total = &total }, struct {
         fn body(captures: *const Sum.Captures, i: Integer) void {
@@ -448,7 +448,7 @@ test "an exception thrown through a method implemented in Zig" {
 
     // Counter's `each:` calls back into a block; this block throws.
     const counter = (try Counter.define()).msgSend(Counter, "counterStartingAt:", .{@as(Integer, 2)});
-    const Throw = objc.Block(struct {}, &.{Integer}, void);
+    const Throw = objc.Block(struct {}, fn (Integer) void);
     var block = Throw.init(.{}, struct {
         fn body(_: *const Throw.Captures, _: Integer) void {
             _ = class("NSArray").msgSend(Object, "array", .{}).msgSend(Object, "objectAtIndex:", .{@as(UInteger, 0)});

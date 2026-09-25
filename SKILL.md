@@ -356,16 +356,18 @@ const window = app.msgSend(Window, "mainWindow", .{});
 Blocks:
 
 ```zig
-const Visit = objc.Block(struct { total: *i64 }, &.{ objc.Object, objc.UInteger, *bool }, void);
+const Visit = objc.Block(struct { total: *i64 }, fn (objc.Object, objc.UInteger, *bool) void);
 var block = Visit.init(.{ .total = &total }, struct {
     fn body(captures: *const Visit.Captures, item: objc.Object, _: objc.UInteger, _: *bool) void { ... }
 }.body);
 array.msgSend(void, "enumerateObjectsUsingBlock:", .{&block});   // pass a pointer
 ```
 
-The body takes `*const Captures` (or `*Captures`) first, then `Args`. A stack block lives as
-long as its variable; APIs that keep a block copy it themselves. A block handed *to* your method
-is an `objc.BlockRef(Args, Return)` parameter; call it with `.call(.{...})`.
+The signature is a Zig function type; the body takes `*const Captures` (or `*Captures`) first,
+then the signature's parameters. Generated methods take `objc.BlockRef(fn (...) R)`: pass
+`block.ref()` — a block of any other signature does not compile. A stack block lives as long as
+its variable; APIs that keep a block copy it themselves. A block handed *to* your method is an
+`objc.BlockRef(fn (...) R)` parameter; call it with `.call(.{...})`.
 
 Defining a class — use `objc.Subclass`:
 
@@ -426,8 +428,12 @@ window.into(appkit.Responder)                    // superclass methods; checked 
   (`NSBackingStoreBuffered` → `.buffered`); option sets are `packed struct`s of bools.
 - Types: `NSString *` → `foundation.String`, `NSArray<NSScreen *> *` → `foundation.Array(Screen)`,
   `NSRect` → `cg.Rect`, `CGImageRef`/`CGContextRef`/… → `cg.Image`/`cg.Context`/…,
-  `NSEdgeInsets` → `EdgeInsets`, unlisted classes → `objc.Object`, block params → `anytype`
-  (pass `&block`). Nullable → optional.
+  `NSEdgeInsets` → `EdgeInsets`, unlisted classes → `objc.Object`, blocks →
+  `objc.BlockRef(fn (...) R)` (pass `block.ref()`). Nullable → optional.
+- Constants and C functions are under `all`, lower camel case, prefix off:
+  `foundation.all.runLoopCommonModes()`, `appkit.all.beep()`, `metal.all.currentMediaTime()`.
+  A constant is a function. All are weakly linked: one missing from the running macOS panics
+  only when used.
 - Inherited methods are generated on each subclass: `window.nextResponder()`. `into(T)` is
   only for passing a value where a superclass type is wanted.
 - **Never edit `src/appkit/generated.zig`.** To wrap more, add the class, enum, struct or

@@ -343,3 +343,19 @@ test "a MetalView draws frames from its display link" {
     try std.testing.expectEqual(counter.last_size.width / 64, counter.last_size.height / 32);
     try std.testing.expectEqual(@as(u64, counter.frames), view.frameCount());
 }
+
+test "every generated constant and function compiles" {
+    @setEvalBranchQuota(1_000_000);
+    inline for (@typeInfo(generated).@"struct".decl_names) |name| {
+        const member = @field(generated, name);
+        const info = @typeInfo(@TypeOf(member));
+        if (info == .@"fn" and !info.@"fn".is_generic) std.mem.doNotOptimizeAway(&member);
+    }
+}
+
+test "AppKit's constants and functions, called" {
+    const pool = objc.AutoreleasePool.init();
+    defer pool.deinit();
+    try std.testing.expect(appkit.all.appKitVersionNumber() > 2000);
+    try std.testing.expect(appkit.all.windowWillCloseNotification().eql(.literal("NSWindowWillCloseNotification")));
+}

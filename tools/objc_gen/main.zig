@@ -176,6 +176,16 @@ const Class = struct {
     }
 };
 
+/// An `extern` constant, or a C function, from one of the manifest's
+/// frameworks.
+const Global = struct {
+    name: []const u8,
+    /// A constant's type, or a function's result.
+    type: TypeRef,
+    /// null for a constant.
+    params: ?[]const Param,
+};
+
 /// A C struct, from a manifest `structs` entry.
 const Record = struct {
     name: []const u8,
@@ -200,6 +210,15 @@ const Model = struct {
     /// The fields of the last nameless struct seen: `typedef struct {...}
     /// MTLClearColor` dumps as a nameless record, then the typedef naming it.
     anonymous_fields: ?[]const Param = null,
+    /// Typedefs of plain scalars -- `NSModalResponse` for `NSInteger` --
+    /// for the places clang does not desugar them, like a block's own
+    /// parameters.
+    typedefs: std.StringHashMapUnmanaged([]const u8) = .empty,
+    globals: std.StringArrayHashMapUnmanaged(Global) = .empty,
+    /// Each global's Zig name, by its C name -- worked out before anything is
+    /// written, since a parameter anywhere in the file may not shadow one.
+    global_names: std.StringArrayHashMapUnmanaged([]const u8) = .empty,
+    file_scope: std.StringHashMapUnmanaged(void) = .empty,
 
     fn wantsClass(name: []const u8) bool {
         for (manifest.classes) |c| if (std.mem.eql(u8, c, name)) return true;
@@ -228,9 +247,25 @@ const Model = struct {
     /// read off the text -- and only the wanted ones are parsed.
     fn load(self: *Model, text: []const u8) !void {
         var rest = text;
+        // Clang writes a location's file only when it differs from the last
+        // one it printed, so the current file is carried from declaration
+        // to declaration -- through the ones not parsed as well.
+        var file: []const u8 = "";
         while (nextObject(rest)) |span| {
             rest = rest[span.end..];
-            if (!wanted(skim(span.text))) {
+            const skimmed = skim(span.text);
+            const decl_file = skimmed.file orelse file;
+            if (lastString(span.text, "\"file\": \"")) |last| file = last;
+
+            if (std.mem.eql(u8, skimmed.kind, "TypedefDecl")) try self.noteTypedef(span.text, skimmed);
+            if (std.mem.eql(u8, skimmed.kind, "FunctionDecl") or std.mem.eql(u8, skimmed.kind, "VarDecl")) {
+                self.anonymous_fields = null;
+                if (skimmed.name != null and fromFramework(decl_file)) {
+                    try self.global(try std.json.parseFromSliceLeaky(Value, self.arena, span.text, .{}));
+                }
+                continue;
+            }
+            if (!wanted(skimmed)) {
                 // A nameless struct is only ever named by the very next
                 // declaration; anything else in between breaks the pair.
                 self.anonymous_fields = null;
@@ -241,7 +276,64 @@ const Model = struct {
         }
     }
 
-    const Skim = struct { kind: []const u8, name: ?[]const u8, interface: ?[]const u8 };
+    /// Remembers a typedef whose target is a scalar the mapping knows.
+    fn noteTypedef(self: *Model, text: []const u8, skimmed: Skim) !void {
+        const name = skimmed.name orelse return;
+        const head = text[0 .. std.mem.indexOf(u8, text, "\"inner\"") orelse text.len];
+        const target = stringAfter(head, "\"desugaredQualType\": \"") orelse stringAfter(head, "\"qualType\": \"") orelse return;
+        if (scalar(target) != null) try self.typedefs.put(self.arena, name, target);
+    }
+
+    const Skim = struct { kind: []const u8, name: ?[]const u8, interface: ?[]const u8, file: ?[]const u8 };
+
+    /// Whether `file` is a header of one of the manifest's frameworks.
+    fn fromFramework(file: []const u8) bool {
+        for (manifest.frameworks) |framework| {
+            var buffer: [128]u8 = undefined;
+            const needle = std.fmt.bufPrint(&buffer, "/{s}.framework/", .{framework}) catch continue;
+            if (std.mem.indexOf(u8, file, needle) != null) return true;
+        }
+        return false;
+    }
+
+    /// Records a constant or function. `static inline` ones -- `NSMakeRect`,
+    /// `MTLClearColorMake` -- have no symbol to link to and are left out,
+    /// as is anything variadic.
+    fn global(self: *Model, value: Value) !void {
+        const object = value.object;
+        const name = object.get("name").?.string;
+        if (self.globals.contains(name) or hasAttr(value, "UnavailableAttr")) return;
+        const storage = if (object.get("storageClass")) |s| s.string else "";
+        if (!std.mem.eql(u8, storage, "extern") and storage.len != 0) return;
+        if (object.get("inline")) |i| if (i.bool) return;
+        const type_ref: TypeRef = .from(object.get("type").?);
+        // Declared for iOS only: there is no symbol on macOS to link to.
+        // The JSON's availability attributes carry no detail, but the macro
+        // survives in the type's spelling.
+        if (unavailableOnMacos(type_ref.qual)) return;
+
+        if (std.mem.eql(u8, object.get("kind").?.string, "VarDecl")) {
+            if (!std.mem.eql(u8, storage, "extern")) return;
+            try self.globals.put(self.arena, name, .{ .name = name, .type = type_ref, .params = null });
+            return;
+        }
+
+        // `R (A, B)`: the result is what comes before the parameter list.
+        const result: TypeRef = .{
+            .qual = resultOf(type_ref.qual) orelse return,
+            .desugared = if (type_ref.desugared) |d| resultOf(d) else null,
+        };
+        if (std.mem.indexOf(u8, type_ref.qual, "...") != null) return;
+        var params: std.ArrayList(Param) = .empty;
+        if (object.get("inner")) |parts| for (parts.array.items) |part| {
+            if (!std.mem.eql(u8, part.object.get("kind").?.string, "ParmVarDecl")) continue;
+            try params.append(self.arena, .{
+                .name = if (part.object.get("name")) |n| n.string else "arg",
+                .type = .from(part.object.get("type").?),
+            });
+        };
+        try self.globals.put(self.arena, name, .{ .name = name, .type = result, .params = params.items });
+    }
 
     /// The declaration's kind and name, and a category's class, from the
     /// part of its JSON before `inner` -- where clang writes them.
@@ -253,6 +345,7 @@ const Model = struct {
             .kind = stringAfter(head, "\"kind\": \"") orelse "",
             .name = stringAfter(name_head, "\"name\": \""),
             .interface = interface,
+            .file = stringAfter(head, "\"file\": \""),
         };
     }
 
@@ -456,8 +549,16 @@ const Model = struct {
             \\
             \\const framework = "{s}";
             \\
+            \\/// Every constant and C function is linked weakly: one that a newer SDK
+            \\/// declares and the running macOS lacks leaves the program able to start,
+            \\/// and panics only if it is used.
+            \\fn missing(comptime name: []const u8) noreturn {{
+            \\    @panic(name ++ " is not in this version of macOS");
+            \\}}
+            \\
         , .{ manifest.framework, lowerFramework(), manifest.framework });
 
+        try self.nameGlobals();
         for (manifest.structs) |name| {
             const record = self.structs.get(name) orelse {
                 try w.print("\n// Not generated: struct {s}, which was not found.\n", .{name});
@@ -485,6 +586,97 @@ const Model = struct {
                 continue;
             };
             try self.emitClass(w, protocol);
+        }
+        try self.emitGlobals(w);
+    }
+
+    fn nameGlobals(self: *Model) !void {
+        for ([_][]const u8{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework", "missing" }) |n| {
+            try self.file_scope.put(self.arena, n, {});
+        }
+        for (self.globals.values()) |g| {
+            var name = try globalName(self.arena, g.name);
+            while (self.file_scope.contains(name)) name = try std.fmt.allocPrint(self.arena, "{s}_", .{name});
+            try self.file_scope.put(self.arena, name, {});
+            try self.global_names.put(self.arena, g.name, name);
+        }
+    }
+
+    /// Each constant as a function returning it, and each C function as a
+    /// Zig one: declared against C types, wrapped with the mapped ones.
+    fn emitGlobals(self: *Model, w: *std.Io.Writer) !void {
+        if (self.globals.count() == 0) return;
+        try w.writeAll("\n// -- constants and functions -----------------------------------------------\n");
+        var dummy: Class = .{ .name = manifest.framework };
+        var skipped: std.ArrayList([]const u8) = .empty;
+
+        for (self.globals.values()) |g| {
+            const zig_type = self.zigType(&dummy, g.type, .result) catch {
+                try skipped.append(self.arena, try std.fmt.allocPrint(self.arena, "{s}: {s}", .{ g.name, g.type.qual }));
+                continue;
+            };
+            var param_types: std.ArrayList([]const u8) = .empty;
+            var supported = true;
+            if (g.params) |params| for (params) |p| {
+                const t = self.zigType(&dummy, p.type, .param) catch {
+                    supported = false;
+                    break;
+                };
+                try param_types.append(self.arena, t);
+            };
+            if (!supported) {
+                try skipped.append(self.arena, try std.fmt.allocPrint(self.arena, "{s}()", .{g.name}));
+                continue;
+            }
+
+            const name = self.global_names.get(g.name).?;
+
+            if (g.params == null) {
+                // A constant is resolved when the program is linked; one
+                // that is not marked nullable is not nil.
+                const constant_type = if (zig_type[0] == '?' and std.mem.indexOf(u8, g.type.qual, "_Nullable") == null)
+                    zig_type[1..]
+                else
+                    zig_type;
+                try w.print(
+                    \\
+                    \\/// `{s}`.
+                    \\pub fn {f}() {s} {{
+                    \\    const symbol = @extern(?*const objc.abi.Abi({s}), .{{ .name = "{s}", .linkage = .weak }}) orelse missing("{s}");
+                    \\    return objc.abi.fromAbi({s}, symbol.*);
+                    \\}}
+                    \\
+                , .{ g.name, ident(name), constant_type, constant_type, g.name, g.name, constant_type });
+                continue;
+            }
+
+            const params = g.params.?;
+            const owned = std.mem.indexOf(u8, g.name, "Create") != null or std.mem.indexOf(u8, g.name, "Copy") != null;
+            try w.print("\n/// `{s}`.{s}\npub fn {f}(", .{ g.name, if (owned) " What it returns is yours to release." else "", ident(name) });
+            var names: std.ArrayList([]const u8) = .empty;
+            for (params, param_types.items, 0..) |p, t, i| {
+                var pname = try self.snake(p.name);
+                while (self.file_scope.contains(pname) or contains(names.items, pname)) pname = try std.fmt.allocPrint(self.arena, "{s}_", .{pname});
+                try names.append(self.arena, pname);
+                if (i > 0) try w.writeAll(", ");
+                try w.print("{f}: {s}", .{ ident(pname), t });
+            }
+            try w.print(") {s} {{\n    const function = @extern(?*const fn (", .{zig_type});
+            for (param_types.items, 0..) |t, i| {
+                if (i > 0) try w.writeAll(", ");
+                try w.print("objc.abi.Abi({s})", .{t});
+            }
+            try w.print(") callconv(.c) objc.abi.Abi({s}), .{{ .name = \"{s}\", .linkage = .weak }}) orelse missing(\"{s}\");\n", .{ zig_type, g.name, g.name });
+            try w.print("    return objc.abi.fromAbi({s}, function(", .{zig_type});
+            for (names.items, param_types.items, 0..) |pname, t, i| {
+                if (i > 0) try w.writeAll(", ");
+                try w.print("objc.abi.toAbi({s}, {f})", .{ t, ident(pname) });
+            }
+            try w.writeAll("));\n}\n");
+        }
+        if (skipped.items.len > 0) {
+            try w.writeAll("\n// Not generated:\n");
+            for (skipped.items) |line| try w.print("//   {s}\n", .{line});
         }
     }
 
@@ -787,7 +979,7 @@ const Model = struct {
         var param_names: std.ArrayList([]const u8) = .empty;
         for (m.params, 0..) |p, i| {
             var pname = try self.snake(p.name);
-            while (taken.contains(pname) or isFileScope(pname) or std.mem.eql(u8, pname, "self") or
+            while (taken.contains(pname) or isFileScope(pname) or self.file_scope.contains(pname) or std.mem.eql(u8, pname, "self") or
                 contains(param_names.items, pname))
             {
                 pname = try std.fmt.allocPrint(self.arena, "{s}_", .{pname});
@@ -818,22 +1010,31 @@ const Model = struct {
     }
 
     fn spell(self: *Model, class: *Class, raw_type: []const u8, position: Position) Allocator.Error!?[]const u8 {
+        // Every type now maps the same way in and out; blocks, which once
+        // could only go in, were the last to differ.
+        _ = position;
         const cleaned = try clean(self.arena, raw_type);
         const text = cleaned.text;
         const optional = !cleaned.nonnull;
 
-        if (std.mem.indexOf(u8, text, "(^") != null) {
-            // A block goes in as a pointer to an `objc.Block`, whose type
-            // the caller chooses; it cannot come back out.
-            return if (position == .param) "anytype" else null;
+        // A block or a C function pointer -- whichever comes first, since
+        // either can take the other. Checked on the spelling as clang gave
+        // it: cleaning moves the spaces in `(^ _Nonnull)`.
+        const block_at = std.mem.indexOf(u8, raw_type, "(^");
+        const pointer_at = std.mem.indexOf(u8, raw_type, "(*");
+        if (block_at != null or pointer_at != null) {
+            const is_block = pointer_at == null or (block_at != null and block_at.? < pointer_at.?);
+            return try self.callable(class, raw_type, if (is_block) .block else .function_pointer);
         }
-        // Checked on the spelling as clang gave it: cleaning moves the
-        // spaces in `(* _Nonnull)`.
-        if (std.mem.indexOf(u8, raw_type, "(*") != null) return try self.functionPointer(class, raw_type);
         if (std.mem.indexOfScalar(u8, text, '(') != null) return null;
 
         var depth: usize = 0;
         var base = text;
+        // `NSString *const`: the pointer itself is const, which a value
+        // read out of it does not care about.
+        if (std.mem.endsWith(u8, base, "const") and base.len > 5 and (base[base.len - 6] == ' ' or base[base.len - 6] == '*')) {
+            base = std.mem.trimEnd(u8, base[0 .. base.len - "const".len], " ");
+        }
         while (std.mem.endsWith(u8, base, "*")) {
             depth += 1;
             base = std.mem.trimEnd(u8, base[0 .. base.len - 1], " ");
@@ -867,6 +1068,7 @@ const Model = struct {
                 if (std.mem.eql(u8, base, "Class") or std.mem.startsWith(u8, base, "Class<"))
                     return try self.maybeOptional("objc.Class", optional);
                 if (scalar(base)) |s| return s;
+                if (self.typedefs.get(base)) |target| return scalar(target);
                 if (structType(base)) |s| return s;
                 const struct_name = if (std.mem.startsWith(u8, base, "struct ")) base["struct ".len..] else base;
                 if (self.structs.contains(struct_name)) return stripPrefix(struct_name);
@@ -912,30 +1114,41 @@ const Model = struct {
     /// through the same mapping as any other type, and since every wrapper
     /// is the size of the pointer it holds, a Zig function taking wrappers
     /// is what the C caller expects.
-    fn functionPointer(self: *Model, class: *Class, text: []const u8) Allocator.Error!?[]const u8 {
-        // `R (* _Nonnull)(A, B)`: the pointer's own parentheses, then the
-        // parameters'.
-        const marker = std.mem.indexOf(u8, text, "(*").?;
-        const pointer_close = std.mem.indexOfScalarPos(u8, text, marker, ')') orelse return null;
+    /// A block, `R (^ _Nonnull)(A, B)`, as `objc.BlockRef(fn (A, B) R)` --
+    /// so only a block of that exact signature can be passed -- or a C
+    /// function pointer, `R (* _Nonnull)(A, B)`, as a Zig one. The pieces
+    /// go through the same mapping as any other type; every wrapper is the
+    /// size of the pointer it holds, so a Zig function taking wrappers is
+    /// what the C caller expects.
+    fn callable(self: *Model, class: *Class, text: []const u8, kind: enum { block, function_pointer }) Allocator.Error!?[]const u8 {
+        const marker = std.mem.indexOf(u8, text, if (kind == .block) "(^" else "(*").?;
+        const marker_close = std.mem.indexOfScalarPos(u8, text, marker, ')') orelse return null;
         const result = try self.spell(class, std.mem.trim(u8, text[0..marker], " "), .result) orelse return null;
-        const open = std.mem.indexOfScalarPos(u8, text, pointer_close, '(') orelse return null;
+        const open = std.mem.indexOfScalarPos(u8, text, marker_close, '(') orelse return null;
         const close = std.mem.lastIndexOfScalar(u8, text, ')') orelse return null;
+
         var params: std.ArrayList(u8) = .empty;
-        var it = std.mem.splitScalar(u8, text[open + 1 .. close], ',');
+        var pieces = TopLevel.init(text[open + 1 .. close]);
         var first = true;
-        while (it.next()) |piece| {
+        while (pieces.next()) |piece| {
             const trimmed = std.mem.trim(u8, piece, " ");
             if (trimmed.len == 0 or std.mem.eql(u8, trimmed, "void")) continue;
             const param = try self.spell(class, trimmed, .param) orelse return null;
-            if (std.mem.eql(u8, param, "anytype")) return null;
             if (!first) try params.appendSlice(self.arena, ", ");
             try params.appendSlice(self.arena, param);
             first = false;
         }
-        const optional = std.mem.indexOf(u8, text[marker..open], "_Nullable") != null;
-        return try std.fmt.allocPrint(self.arena, "{s}*const fn ({s}) callconv(.c) {s}", .{
-            if (optional) "?" else "", params.items, result,
-        });
+        const qualifiers = text[marker..marker_close];
+        return switch (kind) {
+            // Unannotated is taken as nullable: passing null is then allowed
+            // where it might be wrong, rather than refused where it is right.
+            .block => try std.fmt.allocPrint(self.arena, "{s}objc.BlockRef(fn ({s}) {s})", .{
+                if (std.mem.indexOf(u8, qualifiers, "_Nonnull") == null) "?" else "", params.items, result,
+            }),
+            .function_pointer => try std.fmt.allocPrint(self.arena, "{s}*const fn ({s}) callconv(.c) {s}", .{
+                if (std.mem.indexOf(u8, qualifiers, "_Nullable") != null) "?" else "", params.items, result,
+            }),
+        };
     }
 
     fn generatedStruct(self: *Model, base: []const u8) ?[]const u8 {
@@ -997,6 +1210,7 @@ const Model = struct {
             });
         }
         if (foundationType(name)) |f| return f;
+        if (std.mem.eql(u8, name, "Protocol")) return "objc.Protocol";
         if (wantsClass(name)) return stripPrefix(name);
         return "objc.Object";
     }
@@ -1005,6 +1219,11 @@ const Model = struct {
     fn elementType(self: *Model, text: []const u8) Allocator.Error![]const u8 {
         const cleaned = try clean(self.arena, text);
         var t = cleaned.text;
+        // `id<MTLDevice>`: the protocol's wrapper, when it is generated.
+        if (std.mem.startsWith(u8, t, "id<") and std.mem.endsWith(u8, t, ">")) {
+            const inside = std.mem.trim(u8, t[3 .. t.len - 1], " ");
+            return if (std.mem.indexOfScalar(u8, inside, ',') == null and wantsProtocol(inside)) stripPrefix(inside) else "objc.Object";
+        }
         if (!std.mem.endsWith(u8, t, "*")) return "objc.Object";
         t = std.mem.trimEnd(u8, t[0 .. t.len - 1], " ");
         if (std.mem.indexOfScalar(u8, t, '<') != null) return "objc.Object";
@@ -1052,6 +1271,46 @@ fn nextObject(text: []const u8) ?Span {
             '}' => {
                 depth -= 1;
                 if (depth == 0) return .{ .text = text[start .. i + 1], .end = i + 1 };
+            },
+            else => {},
+        }
+    }
+    return null;
+}
+
+/// Whether a spelling carries `API_UNAVAILABLE(..., macos, ...)` or
+/// `__API_UNAVAILABLE`-style macros naming macOS.
+fn unavailableOnMacos(spelling: []const u8) bool {
+    var rest = spelling;
+    while (std.mem.indexOf(u8, rest, "UNAVAILABLE(")) |at| {
+        const open = at + "UNAVAILABLE(".len;
+        const close = std.mem.indexOfScalarPos(u8, rest, open, ')') orelse return false;
+        if (std.mem.indexOf(u8, rest[open..close], "macos") != null) return true;
+        rest = rest[close..];
+    }
+    return false;
+}
+
+/// The string after the *last* `marker` in `text`.
+fn lastString(text: []const u8, marker: []const u8) ?[]const u8 {
+    const at = std.mem.lastIndexOf(u8, text, marker) orelse return null;
+    return stringAfter(text[at..], marker);
+}
+
+/// The result type in a function type's spelling, `R (A, B)`: everything
+/// before the parameter list's opening parenthesis.
+fn resultOf(function_type: []const u8) ?[]const u8 {
+    const trimmed = std.mem.trimEnd(u8, function_type, " ");
+    if (trimmed.len == 0 or trimmed[trimmed.len - 1] != ')') return null;
+    var depth: usize = 0;
+    var i = trimmed.len;
+    while (i > 0) {
+        i -= 1;
+        switch (trimmed[i]) {
+            ')' => depth += 1,
+            '(' => {
+                depth -= 1;
+                if (depth == 0) return std.mem.trim(u8, trimmed[0..i], " ");
             },
             else => {},
         }
@@ -1160,6 +1419,7 @@ fn scalar(name: []const u8) ?[]const u8 {
         .{ "uint64_t", "u64" },                   .{ "size_t", "usize" },
         .{ "unichar", "u16" },                    .{ "NSTimeInterval", "f64" },
         .{ "pid_t", "c_int" },                    .{ "CGDirectDisplayID", "u32" },
+        .{ "CFTimeInterval", "f64" },             .{ "CFAbsoluteTime", "f64" },
     };
     inline for (table) |entry| if (std.mem.eql(u8, name, entry[0])) return entry[1];
     return null;
@@ -1271,6 +1531,23 @@ fn lowerFramework() []const u8 {
     return Lower.value;
 }
 
+/// `MTLCreateSystemDefaultDevice` to `createSystemDefaultDevice`,
+/// `kCAGravityTopLeft` to `gravityTopLeft`, `NSURLErrorDomain` to
+/// `urlErrorDomain`: the prefix off, then lower camel case.
+fn globalName(arena: Allocator, c_name: []const u8) ![]const u8 {
+    var name = c_name;
+    if (name.len > 1 and name[0] == 'k' and std.ascii.isUpper(name[1])) name = name[1..];
+    name = stripPrefix(name);
+    var out = try arena.dupe(u8, name);
+    // Lower the leading capitals: all of them, or all but the last when a
+    // lower-case letter follows -- `URLFor` to `urlFor`, `Create` to `create`.
+    var run: usize = 0;
+    while (run < out.len and std.ascii.isUpper(out[run])) run += 1;
+    const lower = if (run > 1 and run < out.len and std.ascii.isLower(out[run])) run - 1 else run;
+    for (out[0..@max(lower, 1)]) |*c| c.* = std.ascii.toLower(c.*);
+    return out;
+}
+
 /// `initWithContentRect:styleMask:backing:defer:` to
 /// `initWithContentRectStyleMaskBackingDefer`.
 fn methodName(arena: Allocator, selector: []const u8) ![]const u8 {
@@ -1290,6 +1567,32 @@ fn methodName(arena: Allocator, selector: []const u8) ![]const u8 {
     return out.items;
 }
 
+/// The comma-separated pieces of a parameter list, split only at the top
+/// level: `NSDictionary<K, V> *` and a block's own parameters stay whole.
+const TopLevel = struct {
+    text: []const u8,
+    at: usize = 0,
+
+    fn init(text: []const u8) TopLevel {
+        return .{ .text = text };
+    }
+
+    fn next(self: *TopLevel) ?[]const u8 {
+        if (self.at > self.text.len) return null;
+        var depth: usize = 0;
+        var i = self.at;
+        while (i < self.text.len) : (i += 1) switch (self.text[i]) {
+            '<', '(' => depth += 1,
+            '>', ')' => depth -|= 1,
+            ',' => if (depth == 0) break,
+            else => {},
+        };
+        const piece = self.text[self.at..i];
+        self.at = i + 1;
+        return piece;
+    }
+};
+
 fn splitTopLevelComma(text: []const u8) ?[2][]const u8 {
     var depth: usize = 0;
     for (text, 0..) |c, i| switch (c) {
@@ -1305,6 +1608,7 @@ fn splitTopLevelComma(text: []const u8) ?[2][]const u8 {
 /// prefix, then more of an identifier -- `NSWindow`, `NSURL`, `CIFilter`.
 /// Scalars and C structs are matched before this is asked.
 fn isClassName(name: []const u8) bool {
+    if (std.mem.eql(u8, name, "Protocol")) return true;
     if (name.len < 3 or !std.ascii.isUpper(name[0]) or !std.ascii.isUpper(name[1])) return false;
     for (name) |c| if (!std.ascii.isAlphanumeric(c)) return false;
     return true;
@@ -1318,7 +1622,7 @@ fn contains(list: []const []const u8, name: []const u8) bool {
 /// Names declared at the top of the generated file, which a parameter
 /// may not shadow.
 fn isFileScope(name: []const u8) bool {
-    return contains(&.{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework" }, name) or
+    return contains(&.{ "objc", "foundation", "cg", "io_surface", "inherits", "lookUp", "framework", "missing" }, name) or
         cgHandle(name) != null;
 }
 

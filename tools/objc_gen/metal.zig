@@ -10,6 +10,8 @@
 pub const framework = "Metal";
 pub const imports = [_][]const u8{ "Metal/Metal.h", "QuartzCore/QuartzCore.h" };
 pub const prefixes = [_][]const u8{ "MTL", "CA" };
+/// The frameworks whose `extern` constants and C functions are generated.
+pub const frameworks = [_][]const u8{ "Metal", "QuartzCore" };
 
 pub const classes = [_][]const u8{
     // Describing work.

@@ -43,8 +43,10 @@ const Error = errors.Error;
 pub const enabled = true;
 
 /// Every generated class, protocol, enum and struct, by its name without
-/// `MTL` or `CA`: `metal.all.RenderPassColorAttachmentDescriptor`. The
-/// ones most programs use are also right here.
+/// `MTL` or `CA` -- `metal.all.RenderPassColorAttachmentDescriptor` -- and
+/// every constant and C function, in lower camel case:
+/// `metal.all.currentMediaTime()`, `metal.all.gravityTopLeft()`. The ones
+/// most programs use are also right here.
 pub const all = generated;
 
 // Objects.
@@ -97,19 +99,12 @@ pub const Origin = generated.Origin;
 pub const Size = generated.Size;
 pub const Region = generated.Region;
 
-extern fn MTLCreateSystemDefaultDevice() objc.abi.Id;
-extern fn MTLCopyAllDevices() objc.abi.Id;
-
 /// The GPU the system would pick: the built-in one on a laptop. Null on a
 /// machine with no Metal support. Yours to `release`.
-pub fn createSystemDefaultDevice() ?Device {
-    return .from(.{ .value = MTLCreateSystemDefaultDevice() orelse return null });
-}
+pub const createSystemDefaultDevice = generated.createSystemDefaultDevice;
 
 /// Every GPU, eGPUs and all. Yours to `deinit`.
-pub fn copyAllDevices() foundation.Array(Device) {
-    return .from(.{ .value = MTLCopyAllDevices().? });
-}
+pub const copyAllDevices = generated.copyAllDevices;
 
 /// Compiles Metal Shading Language source. A compile error comes back as
 /// `error.Failed`, with the compiler's messages in `details` when given.
